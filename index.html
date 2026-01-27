@@ -887,7 +887,9 @@
                             news: item.news_score || 0,
                             theme_keywords: item.theme_score || 0,
                             investor: 0  // DB에는 investor 필드가 없음
-                        }
+                        },
+                        // selection_reason 필드 매핑
+                        selection_reason: item.selection_reason || '-'
                     }));
                     document.getElementById('updateTime').textContent = `업데이트: ${selectedDate}`;
                 } else {
