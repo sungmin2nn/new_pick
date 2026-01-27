@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Malgun Gothic', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f7fa;
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,67 +24,68 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            color: #667eea;
+            font-size: 2.2rem;
+            color: #2d3748;
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
         .header .subtitle {
-            color: #666;
-            font-size: 1.1rem;
+            color: #718096;
+            font-size: 1rem;
         }
 
         .header .update-time {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #f0f0f0;
-            border-radius: 10px;
+            margin-top: 16px;
+            padding: 8px 16px;
+            background: #f0f4f8;
+            border-radius: 8px;
             display: inline-block;
-            color: #333;
-            font-weight: 600;
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .tabs {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 10px;
+            background: white;
+            border-radius: 12px;
+            padding: 6px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             display: flex;
-            gap: 10px;
+            gap: 6px;
         }
 
         .tab-button {
             flex: 1;
-            padding: 15px 30px;
+            padding: 12px 24px;
             background: transparent;
             border: none;
-            border-radius: 15px;
-            font-size: 1.1rem;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: 600;
-            color: #666;
+            color: #718096;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .tab-button:hover {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
+            background: #f7fafc;
+            color: #4a5568;
         }
 
         .tab-button.active {
-            background: #667eea;
-            color: white;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            background: #d4e4f7;
+            color: #2c5282;
         }
 
         .tab-content {
@@ -96,10 +97,10 @@
         }
 
         .system-info {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .system-section {
@@ -107,17 +108,19 @@
         }
 
         .system-section h2 {
-            color: #667eea;
-            font-size: 1.8rem;
+            color: #2d3748;
+            font-size: 1.5rem;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 700;
         }
 
         .system-section h3 {
-            color: #764ba2;
-            font-size: 1.3rem;
+            color: #4a5568;
+            font-size: 1.2rem;
             margin: 20px 0 15px 0;
+            font-weight: 600;
         }
 
         .pipeline-flow {
@@ -128,20 +131,20 @@
         }
 
         .pipeline-step {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #e6f3ff 0%, #f0e6ff 100%);
+            color: #2d3748;
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 12px;
             position: relative;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #90cdf4;
         }
 
         .pipeline-step::after {
-            content: '▼';
+            content: '↓';
             display: block;
             text-align: center;
-            color: #667eea;
-            font-size: 2rem;
+            color: #90cdf4;
+            font-size: 1.5rem;
             margin-top: 10px;
         }
 
@@ -150,13 +153,15 @@
         }
 
         .pipeline-step h4 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #2c5282;
         }
 
         .pipeline-step p {
-            opacity: 0.9;
             line-height: 1.6;
+            color: #4a5568;
         }
 
         .feature-list {
@@ -165,11 +170,11 @@
         }
 
         .feature-item {
-            background: #f8f9ff;
-            padding: 15px 20px;
+            background: #f7fafc;
+            padding: 16px 20px;
             margin-bottom: 10px;
             border-radius: 10px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #bee3f8;
             display: flex;
             align-items: center;
             gap: 15px;
@@ -215,24 +220,24 @@
         }
 
         .priority-high {
-            background: #ffe6e6;
-            color: #e74c3c;
+            background: #fed7d7;
+            color: #c53030;
         }
 
         .priority-medium {
-            background: #fff3e0;
-            color: #f39c12;
+            background: #feebc8;
+            color: #c05621;
         }
 
         .priority-low {
-            background: #e8f5e9;
-            color: #27ae60;
+            background: #c6f6d5;
+            color: #2f855a;
         }
 
         .coverage-meter {
-            background: #f0f0f0;
-            border-radius: 20px;
-            padding: 20px;
+            background: linear-gradient(135deg, #e6f3ff 0%, #f0e6ff 100%);
+            border-radius: 16px;
+            padding: 24px;
             text-align: center;
             margin: 20px 0;
         }
@@ -240,43 +245,40 @@
         .coverage-value {
             font-size: 3rem;
             font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #2c5282;
         }
 
         .coverage-label {
-            color: #666;
-            font-size: 1.1rem;
+            color: #4a5568;
+            font-size: 1rem;
             margin-top: 10px;
         }
 
         .progress-bar {
-            background: #e0e0e0;
-            border-radius: 20px;
-            height: 30px;
+            background: #e2e8f0;
+            border-radius: 16px;
+            height: 32px;
             overflow: hidden;
             margin: 20px 0;
         }
 
         .progress-fill {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(90deg, #90cdf4 0%, #b794f6 100%);
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #2d3748;
             font-weight: 600;
             transition: width 1s ease-out;
         }
 
         .controls {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
+            background: white;
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
@@ -285,35 +287,39 @@
 
         .controls label {
             font-weight: 600;
-            color: #333;
+            color: #4a5568;
         }
 
         .controls select {
             padding: 10px 15px;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            font-size: 1rem;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
             cursor: pointer;
             background: white;
             min-width: 150px;
+            color: #2d3748;
+        }
+
+        .controls select:focus {
+            outline: none;
+            border-color: #90cdf4;
         }
 
         .controls button {
             padding: 10px 20px;
-            background: #667eea;
-            color: white;
+            background: #90cdf4;
+            color: #1a365d;
             border: none;
-            border-radius: 10px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .controls button:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background: #63b3ed;
         }
 
         .stats {
@@ -324,30 +330,30 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             text-align: center;
         }
 
         .stat-card .label {
-            color: #666;
+            color: #718096;
             font-size: 0.9rem;
             margin-bottom: 10px;
         }
 
         .stat-card .value {
-            color: #667eea;
+            color: #2c5282;
             font-size: 2rem;
             font-weight: bold;
         }
 
         .table-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             overflow-x: auto;
         }
 
@@ -357,19 +363,20 @@
         }
 
         th {
-            background: #667eea;
-            color: white;
-            padding: 15px;
+            background: #e6f3ff;
+            color: #2c5282;
+            padding: 14px;
             text-align: left;
             font-weight: 600;
             position: sticky;
             top: 0;
             cursor: pointer;
             user-select: none;
+            border-bottom: 2px solid #90cdf4;
         }
 
         th:hover {
-            background: #5568d3;
+            background: #d4e9fc;
         }
 
         th.sortable::after {
@@ -388,62 +395,62 @@
         }
 
         td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         tr:hover {
-            background: #f8f9ff;
+            background: #f7fafc;
         }
 
         .rank {
             font-weight: bold;
-            color: #667eea;
-            font-size: 1.2rem;
+            color: #4299e1;
+            font-size: 1.1rem;
         }
 
         .rank.top3 {
-            color: #e74c3c;
+            color: #f56565;
         }
 
         .stock-name {
             font-weight: 600;
-            color: #333;
+            color: #2d3748;
         }
 
         .stock-code {
-            color: #999;
-            font-size: 0.9rem;
+            color: #a0aec0;
+            font-size: 0.85rem;
         }
 
         .score {
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .score.high {
-            color: #e74c3c;
+            color: #f56565;
         }
 
         .score.medium {
-            color: #f39c12;
+            color: #ed8936;
         }
 
         .score.low {
-            color: #3498db;
+            color: #4299e1;
         }
 
         .score-detail {
             display: flex;
             gap: 5px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
 
         .score-badge {
             padding: 3px 8px;
-            border-radius: 5px;
-            background: #f0f0f0;
-            color: #666;
+            border-radius: 6px;
+            background: #edf2f7;
+            color: #4a5568;
         }
 
         .price-change {
@@ -451,25 +458,25 @@
         }
 
         .price-change.positive {
-            color: #e74c3c;
+            color: #f56565;
         }
 
         .price-change.negative {
-            color: #3498db;
+            color: #4299e1;
         }
 
         .loading {
             text-align: center;
             padding: 50px;
-            font-size: 1.2rem;
-            color: #667eea;
+            font-size: 1.1rem;
+            color: #4a5568;
         }
 
         .error {
             text-align: center;
             padding: 50px;
-            color: #e74c3c;
-            font-size: 1.1rem;
+            color: #f56565;
+            font-size: 1rem;
         }
 
         @media (max-width: 768px) {
@@ -569,7 +576,7 @@
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 90%;">90% 달성</div>
                     </div>
-                    <p style="color: #666; text-align: center; margin-top: 20px;">
+                    <p style="color: #4a5568; text-align: center; margin-top: 20px;">
                         실전 시초가 매매 투자자들이 사용하는 주요 요소들을 90% 수준으로 자동화하여 매일 아침 최적의 종목을 선정합니다.
                     </p>
                 </div>
@@ -730,9 +737,9 @@
 
                 <div class="system-section">
                     <h2>🏗️ 기술 아키텍처</h2>
-                    <div style="background: #f8f9ff; padding: 25px; border-radius: 15px; border-left: 5px solid #667eea;">
-                        <h3 style="margin-top: 0;">백엔드 (Python)</h3>
-                        <p style="color: #666; line-height: 1.8;">
+                    <div style="background: #f7fafc; padding: 25px; border-radius: 12px; border-left: 4px solid #90cdf4;">
+                        <h3 style="margin-top: 0; color: #2c5282;">백엔드 (Python)</h3>
+                        <p style="color: #4a5568; line-height: 1.8;">
                             • <strong>stock_screener.py</strong>: 메인 오케스트레이션 로직<br>
                             • <strong>disclosure_collector.py</strong>: DART API 공시 수집 + 금액 추출<br>
                             • <strong>news_collector.py</strong>: 네이버 금융 뉴스 크롤링 + 감성 분석<br>
@@ -742,16 +749,16 @@
                             • <strong>config.py</strong>: 점수 배점, 테마 키워드 설정
                         </p>
 
-                        <h3>프론트엔드 (HTML/JS)</h3>
-                        <p style="color: #666; line-height: 1.8;">
+                        <h3 style="color: #2c5282;">프론트엔드 (HTML/JS)</h3>
+                        <p style="color: #4a5568; line-height: 1.8;">
                             • <strong>index.html</strong>: 반응형 대시보드 (Vanilla JS)<br>
                             • GitHub Pages 무료 호스팅<br>
                             • JSON 파일 기반 실시간 업데이트<br>
                             • 정렬, 필터링, 통계 기능
                         </p>
 
-                        <h3>인프라 (GitHub Actions)</h3>
-                        <p style="color: #666; line-height: 1.8;">
+                        <h3 style="color: #2c5282;">인프라 (GitHub Actions)</h3>
+                        <p style="color: #4a5568; line-height: 1.8;">
                             • <strong>.github/workflows/morning-scan.yml</strong>: 자동 실행 워크플로우<br>
                             • 매일 08:30 KST 크론 스케줄링<br>
                             • Python 의존성 자동 설치<br>
@@ -759,8 +766,8 @@
                             • 무료 GitHub Runner 사용 (월 2000분)
                         </p>
 
-                        <h3>데이터 소스</h3>
-                        <p style="color: #666; line-height: 1.8;">
+                        <h3 style="color: #2c5282;">데이터 소스</h3>
+                        <p style="color: #4a5568; line-height: 1.8;">
                             • <strong>DART OpenAPI</strong>: 공시 정보 (API 키 필요)<br>
                             • <strong>네이버 금융</strong>: 뉴스, 시장 데이터, 외국인/기관 매매<br>
                             • <strong>BeautifulSoup4</strong>: HTML 파싱 및 크롤링<br>
@@ -772,17 +779,17 @@
                 <div class="system-section">
                     <h2>📈 성능 지표</h2>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                        <div style="background: #e8f5e9; padding: 20px; border-radius: 15px; text-align: center;">
-                            <div style="font-size: 2rem; font-weight: bold; color: #27ae60;">< 3분</div>
-                            <div style="color: #666; margin-top: 10px;">전체 파이프라인 실행 시간</div>
+                        <div style="background: #c6f6d5; padding: 20px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #2f855a;">< 3분</div>
+                            <div style="color: #4a5568; margin-top: 10px;">전체 파이프라인 실행 시간</div>
                         </div>
-                        <div style="background: #fff3e0; padding: 20px; border-radius: 15px; text-align: center;">
-                            <div style="font-size: 2rem; font-weight: bold; color: #f39c12;">100%</div>
-                            <div style="color: #666; margin-top: 10px;">자동화 비율</div>
+                        <div style="background: #feebc8; padding: 20px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #c05621;">100%</div>
+                            <div style="color: #4a5568; margin-top: 10px;">자동화 비율</div>
                         </div>
-                        <div style="background: #e3f2fd; padding: 20px; border-radius: 15px; text-align: center;">
-                            <div style="font-size: 2rem; font-weight: bold; color: #3498db;">무료</div>
-                            <div style="color: #666; margin-top: 10px;">운영 비용 (GitHub 무료 플랜)</div>
+                        <div style="background: #bee3f8; padding: 20px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #2c5282;">무료</div>
+                            <div style="color: #4a5568; margin-top: 10px;">운영 비용 (GitHub 무료 플랜)</div>
                         </div>
                     </div>
                 </div>
