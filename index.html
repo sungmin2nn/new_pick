@@ -876,7 +876,14 @@
                         code: item.stock_code || item.code,
                         name: item.stock_name || item.name,
                         rank: index + 1,
-                        date: selectedDate
+                        date: selectedDate,
+                        // score_detail 필드명 매핑
+                        score_detail: {
+                            disclosure: item.price_score || 0,
+                            news: item.news_score || 0,
+                            theme_keywords: item.theme_score || 0,
+                            investor: 0  // DB에는 investor 필드가 없음
+                        }
                     }));
                     document.getElementById('updateTime').textContent = `업데이트: ${selectedDate}`;
                 } else {
