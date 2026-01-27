@@ -89,26 +89,46 @@ class StockScreener:
         """종목별 점수 계산 (총 100점 - 공시+뉴스 중심)"""
         score = 0
         score_detail = {}
+        reasons = []
 
         # 1. 공시 점수 (40점) - 최우선!
         disclosure_score = self.calculate_disclosure_score(stock)
         score += disclosure_score
         score_detail['disclosure'] = disclosure_score
+        if disclosure_score > 0:
+            disclosures = stock.get('disclosures', [])
+            if disclosures:
+                categories = [d.get('disclosure_category', '기타') for d in disclosures[:2]]
+                reasons.append(f"{'·'.join(set(categories))} 공시 발표")
 
         # 2. 뉴스 점수 (30점)
         news_score = self.calculate_news_score(stock)
         score += news_score
         score_detail['news'] = news_score
+        if stock.get('news_mentions', 0) > 0:
+            sentiment = "긍정" if stock.get('positive_news', 0) > stock.get('negative_news', 0) else "중립"
+            reasons.append(f"뉴스 {stock.get('news_mentions')}건 언급 ({sentiment})")
 
         # 3. 테마/키워드 점수 (20점)
         theme_score = self.calculate_theme_score(stock)
         score += theme_score
         score_detail['theme_keywords'] = theme_score
+        if stock.get('matched_themes'):
+            themes = '·'.join(stock.get('matched_themes', [])[:2])
+            reasons.append(f"{themes} 테마")
 
         # 4. 외국인/기관 점수 (10점)
         investor_score = self.calculate_investor_score(stock)
         score += investor_score
         score_detail['investor'] = investor_score
+        if investor_score > 0:
+            if stock.get('foreign_buy', 0) > 0:
+                reasons.append("외국인 순매수")
+            if stock.get('institution_buy', 0) > 0:
+                reasons.append("기관 순매수")
+
+        # 선정 사유 저장
+        stock['selection_reason'] = ' / '.join(reasons) if reasons else '-'
 
         return score, score_detail
 
