@@ -452,10 +452,10 @@
                     <td><span class="score ${scoreClass}">${(stock.total_score || 0).toFixed(0)}점</span></td>
                     <td>
                         <div class="score-detail">
-                            <span class="score-badge">가격 ${(stock.score_detail?.price_momentum || 0)}점</span>
-                            <span class="score-badge">거래량 ${(stock.score_detail?.volume || 0)}점</span>
-                            <span class="score-badge">테마 ${(stock.score_detail?.theme_keywords || 0)}점</span>
+                            <span class="score-badge">공시 ${(stock.score_detail?.disclosure || 0)}점</span>
                             <span class="score-badge">뉴스 ${(stock.score_detail?.news || 0)}점</span>
+                            <span class="score-badge">테마 ${(stock.score_detail?.theme_keywords || 0)}점</span>
+                            <span class="score-badge">투자자 ${(stock.score_detail?.investor || 0)}점</span>
                         </div>
                     </td>
                     <td>${(stock.current_price || 0).toLocaleString()}원</td>

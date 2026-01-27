@@ -1,151 +1,148 @@
 # 🔮 장전 종목 선정 시스템
 
-매일 아침 08:30에 자동으로 실행되어 당일 주목할 종목을 선정하는 시스템입니다.
+시초가 매매를 위한 자동 종목 선정 시스템입니다. 매일 08:30에 자동으로 실행되어 공시, 뉴스, 테마를 기반으로 주목할 종목을 선정합니다.
 
-## 📋 주요 기능
+## 📊 주요 기능
 
-### 1. 자동 스크리닝
-- **실행 시간**: 매일 08:30 (GitHub Actions)
-- **대상**: 코스피/코스닥 전종목
-- **필터링**: 거래대금, 상승률, 시가총액, 거래량 기준
+- **자동 실행**: 매일 08:30 GitHub Actions를 통해 자동 실행
+- **공시 기반 선정**: DART API를 통한 전일 18:00 ~ 당일 08:30 공시 수집
+- **뉴스 분석**: 네이버 금융 뉴스 실시간 수집 및 언급 횟수 분석
+- **테마 매칭**: AI, 반도체, 2차전지 등 주요 테마 자동 분류
+- **대시보드**: GitHub Pages를 통한 실시간 대시보드 제공
 
-### 2. 필터링 조건
-- 거래대금 ≥ 1,000억원
-- 상승률 ≥ +3%
-- 시가총액 ≥ 1,000억원
-- 주가 ≤ 10만원
-- 거래량 급증 (평균 대비 1.5배 이상)
+## 🎯 점수 시스템 (총 100점)
 
-### 3. 점수 시스템 (100점 만점)
-- **가격 모멘텀** (30점): 상승률 기반 점수
-- **거래량** (25점): 평균 거래량 대비 배수
-- **테마/키워드** (25점): AI, 반도체, 2차전지 등 주요 테마
-- **뉴스** (20점): 뉴스 언급 빈도
+| 항목 | 배점 | 설명 |
+|------|------|------|
+| 공시 | 40점 | DART 공시 개수 및 중요도 (실적, 계약, 투자 등) |
+| 뉴스 | 30점 | 뉴스 언급 횟수 (5회 이상 30점) |
+| 테마 | 20점 | 주요 테마 매칭 개수 (AI, 반도체 등) |
+| 투자자 | 10점 | 외국인/기관 매매 정보 (추후 구현) |
 
-### 4. 결과 저장
-- JSON 파일 저장 (`data/morning_candidates.json`)
-- SQLite 데이터베이스 저장
-- 대시보드를 통한 시각화
+## 🔧 설정 방법
 
-## 🚀 설치 및 실행
+### 1. DART API 키 설정 (필수)
+
+DART API 키가 없으면 공시 점수가 0점 처리됩니다.
+
+1. [DART 오픈API](https://opendart.fss.or.kr/) 접속
+2. 회원가입 후 API 키 발급
+3. GitHub Repository Settings > Secrets and variables > Actions
+4. New repository secret 클릭
+5. Name: `DART_API_KEY`, Value: 발급받은 API 키 입력
+
+### 2. GitHub Pages 활성화
+
+1. Repository Settings > Pages
+2. Source: Deploy from a branch
+3. Branch: master, Folder: / (root)
+4. Save
+
+### 3. GitHub Actions 권한 설정
+
+1. Repository Settings > Actions > General
+2. Workflow permissions: Read and write permissions 선택
+3. Save
+
+## 🚀 실행 방법
+
+### 자동 실행 (GitHub Actions)
+
+매일 08:30 KST에 자동으로 실행됩니다.
+
+### 수동 실행 (GitHub Actions)
+
+1. Actions 탭 이동
+2. Morning Stock Scan 워크플로우 선택
+3. Run workflow 클릭
 
 ### 로컬 실행
 
 ```bash
+# 환경변수 설정
+export DART_API_KEY='your_api_key_here'
+
 # 의존성 설치
 pip install -r requirements.txt
 
-# 스크리너 실행
-python stock_screener.py
-
-# 대시보드 열기
-open index.html
+# 실행
+python3 stock_screener.py
 ```
 
-### GitHub Actions 설정
+## 📁 파일 구조
 
-1. 리포지토리를 GitHub에 푸시
-2. Settings → Actions → General에서 Workflow permissions를 "Read and write permissions"로 설정
-3. 매일 08:30에 자동 실행됨
-
-## 📊 데이터 구조
-
-### JSON 출력 형식
-
-```json
-{
-  "generated_at": "2024-01-27T08:30:00",
-  "date": "2024-01-27",
-  "count": 20,
-  "candidates": [
-    {
-      "code": "005930",
-      "name": "삼성전자",
-      "current_price": 75000,
-      "price_change_percent": 5.2,
-      "trading_value": 150000000000,
-      "volume": 20000000,
-      "market_cap": 500000000000000,
-      "total_score": 85,
-      "score_detail": {
-        "price_momentum": 25,
-        "volume": 20,
-        "theme_keywords": 20,
-        "news": 20
-      }
-    }
-  ]
-}
+```
+.
+├── stock_screener.py          # 메인 스크리너 로직
+├── market_data.py             # 시장 데이터 수집
+├── news_collector.py          # 뉴스 수집
+├── disclosure_collector.py    # DART 공시 수집
+├── database.py                # 데이터베이스 관리
+├── config.py                  # 설정 파일
+├── index.html                 # 대시보드
+├── requirements.txt           # 의존성
+└── .github/workflows/
+    └── morning-scan.yml       # 자동 실행 워크플로우
 ```
 
-### 데이터베이스 스키마
+## 📈 필터링 기준
 
-```sql
-CREATE TABLE morning_candidates (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TEXT NOT NULL,
-    stock_code TEXT NOT NULL,
-    stock_name TEXT NOT NULL,
-    current_price REAL,
-    price_change_percent REAL,
-    trading_value REAL,
-    volume REAL,
-    market_cap REAL,
-    total_score REAL,
-    price_score REAL,
-    volume_score REAL,
-    theme_score REAL,
-    news_score REAL,
-    matched_themes TEXT,
-    news_mentions INTEGER,
-    created_at TEXT NOT NULL,
-    UNIQUE(date, stock_code)
-);
+| 항목 | 기준 |
+|------|------|
+| 거래대금 | 300억원 이상 |
+| 시가총액 | 500억원 이상 |
+| 주가 상한 | 10만원 이하 |
+| 등락률 | 제한 없음 (전일 하락 종목도 포함) |
+
+## 🔍 테마 키워드
+
+- AI: 인공지능, ChatGPT, 생성형AI, LLM 등
+- 반도체: HBM, 파운드리, 메모리, GPU 등
+- 2차전지: 배터리, EV, 양극재, 음극재 등
+- 바이오: 신약, 임상, FDA, 치료제 등
+- 방산: 국방, 방위산업, 무기, 미사일 등
+- 기타: 엔터, 게임, 수소 등
+
+## 📊 대시보드
+
+GitHub Pages를 통해 자동으로 배포됩니다.
+
+URL: `https://[username].github.io/[repository-name]/`
+
+기능:
+- 실시간 종목 정보
+- 점수별 필터링
+- 컬럼별 정렬
+- 통계 요약
+
+## ⚠️ 주의사항
+
+1. **투자 책임**: 이 시스템은 참고용이며, 투자 책임은 본인에게 있습니다
+2. **데이터 정확성**: 크롤링 오류나 API 장애로 데이터가 부정확할 수 있습니다
+3. **시장 변동성**: 시초가 매매는 높은 변동성이 있으니 주의하세요
+4. **API 제한**: DART API는 일일 요청 제한이 있을 수 있습니다
+
+## 🐛 문제 해결
+
+### DART API 오류
+
+```
+⚠️  DART API 키가 설정되지 않았습니다
 ```
 
-## 🎯 사용 방법
+→ GitHub Secrets에 `DART_API_KEY` 설정 확인
 
-### 대시보드
+### 뉴스 수집 0개
 
-1. `index.html` 파일을 브라우저로 열기
-2. 날짜 선택으로 과거 데이터 조회
-3. 최소 점수 필터로 종목 필터링
-4. 컬럼 클릭으로 정렬
-
-### Python API
-
-```python
-from database import Database
-
-# 데이터베이스 초기화
-db = Database()
-
-# 오늘 선정 종목 조회
-today_candidates = db.get_candidates_by_date('2024-01-27')
-
-# 최근 7일 데이터 조회
-recent = db.get_recent_candidates(days=7)
-
-# JSON으로 내보내기
-db.export_to_json(date='2024-01-27', output_path='output.json')
+```
+✓ 총 0개 뉴스 수집 완료
 ```
 
-## 🔧 설정 변경
+→ 네이버 금융 사이트 구조 변경 또는 네트워크 오류. 시간이 지나면 해결될 수 있습니다.
 
-`config.py` 파일에서 다음 항목들을 수정할 수 있습니다:
+### 대시보드 로딩 중
 
-- 필터링 기준값
-- 점수 배점
-- 테마 키워드
-- 선정 종목 수
-
-## 📈 향후 개선 계획
-
-- [ ] 실시간 API 연동 (한국투자증권, 키움증권 등)
-- [ ] 백테스팅 기능 추가
-- [ ] 알림 기능 (텔레그램, 이메일)
-- [ ] 상세 차트 및 분석 추가
-- [ ] 모바일 앱 개발
+→ GitHub Pages가 활성화되어 있는지 확인하고, `morning_candidates.json` 파일이 생성되었는지 확인
 
 ## 📝 라이선스
 
@@ -153,4 +150,4 @@ MIT License
 
 ## 🤝 기여
 
-이슈 및 풀 리퀘스트는 언제든 환영합니다!
+이슈 및 풀 리퀘스트 환영합니다!

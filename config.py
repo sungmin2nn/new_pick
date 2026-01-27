@@ -7,11 +7,12 @@ MIN_MARKET_CAP = 50_000_000_000  # 시가총액 500억 이상
 MAX_PRICE = 100_000  # 주가 10만원 이하
 VOLUME_SPIKE_MULTIPLIER = 1.0  # 거래량 제한 없음
 
-# 점수 배점 (총 100점 - 뉴스 중심)
+# 점수 배점 (총 100점 - 공시+뉴스 중심)
 SCORE_WEIGHTS = {
-    'news': 50,            # 뉴스 (핵심!)
-    'theme_keywords': 30,  # 테마/키워드
-    'investor': 20         # 외국인/기관 (예정)
+    'disclosure': 40,      # 공시 (최우선! 시초가 매매 핵심)
+    'news': 30,            # 뉴스
+    'theme_keywords': 20,  # 테마/키워드
+    'investor': 10         # 외국인/기관 (예정)
 }
 
 # 테마 키워드

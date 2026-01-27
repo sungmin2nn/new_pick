@@ -28,6 +28,8 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run stock screener
+      env:
+        DART_API_KEY: ${{ secrets.DART_API_KEY }}
       run: |
         python stock_screener.py
 

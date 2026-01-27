@@ -9,14 +9,21 @@ from datetime import datetime, timedelta
 import config
 from market_data import MarketDataCollector
 from news_collector import NewsCollector
+from disclosure_collector import DisclosureCollector
 from database import Database
 
 class StockScreener:
     def __init__(self):
         self.candidates = []
         self.news_data = []
+        self.disclosure_data = []
         self.market_collector = MarketDataCollector()
         self.news_collector = NewsCollector()
+
+        # DART API 키 (환경변수에서 읽기)
+        dart_api_key = os.environ.get('DART_API_KEY', '')
+        self.disclosure_collector = DisclosureCollector(dart_api_key) if dart_api_key else None
+
         self.db = Database()
 
     def fetch_market_data(self):
@@ -61,30 +68,44 @@ class StockScreener:
         self.news_data = self.news_collector.get_stock_news()
         return self.news_data
 
+    def fetch_disclosures(self):
+        """공시 데이터 수집"""
+        if self.disclosure_collector:
+            self.disclosure_data = self.disclosure_collector.get_recent_disclosures()
+        else:
+            print("\n⚠️  DART API 키가 설정되지 않았습니다. 공시 점수는 0점으로 처리됩니다.")
+            self.disclosure_data = []
+        return self.disclosure_data
+
     def calculate_score(self, stock):
-        """종목별 점수 계산 (총 100점 - 뉴스 중심)"""
+        """종목별 점수 계산 (총 100점 - 공시+뉴스 중심)"""
         score = 0
         score_detail = {}
 
-        # 1. 뉴스 점수 (50점) - 핵심!
+        # 1. 공시 점수 (40점) - 최우선!
+        disclosure_score = self.calculate_disclosure_score(stock)
+        score += disclosure_score
+        score_detail['disclosure'] = disclosure_score
+
+        # 2. 뉴스 점수 (30점)
         news_score = self.calculate_news_score(stock)
         score += news_score
         score_detail['news'] = news_score
 
-        # 2. 테마/키워드 점수 (30점)
+        # 3. 테마/키워드 점수 (20점)
         theme_score = self.calculate_theme_score(stock)
         score += theme_score
         score_detail['theme_keywords'] = theme_score
 
-        # 3. 외국인/기관 점수 (20점) - 추후 구현
-        investor_score = 10  # 임시로 기본 10점
+        # 4. 외국인/기관 점수 (10점) - 추후 구현
+        investor_score = 5  # 임시로 기본 5점
         score += investor_score
         score_detail['investor'] = investor_score
 
         return score, score_detail
 
     def calculate_theme_score(self, stock):
-        """테마/키워드 점수 계산"""
+        """테마/키워드 점수 계산 (20점)"""
         stock_name = stock.get('name', '')
         stock_code = stock.get('code', '')
 
@@ -110,22 +131,56 @@ class StockScreener:
                             matched_themes.append(theme)
                             break
 
+        # 공시에서도 테마 키워드 찾기
+        for disclosure in stock.get('disclosures', []):
+            report_nm = disclosure.get('report_nm', '')
+            for theme, keywords in config.THEME_KEYWORDS.items():
+                for keyword in keywords:
+                    if keyword in report_nm:
+                        matched_themes.append(theme)
+                        break
+
         # 저장
         stock['matched_themes'] = list(set(matched_themes))
 
-        # 테마 매칭 개수에 따른 점수 (30점)
+        # 테마 매칭 개수에 따른 점수 (20점)
         theme_count = len(set(matched_themes))
         if theme_count >= 3:
-            return 30
-        elif theme_count == 2:
-            return 25
-        elif theme_count == 1:
             return 20
+        elif theme_count == 2:
+            return 17
+        elif theme_count == 1:
+            return 13
         else:
-            return 10
+            return 7
+
+    def calculate_disclosure_score(self, stock):
+        """공시 점수 계산 (40점 - 시초가 매매 핵심 지표)"""
+        if not self.disclosure_collector or not self.disclosure_data:
+            stock['disclosure_count'] = 0
+            stock['disclosures'] = []
+            return 0
+
+        stock_code = stock.get('code', '')
+        score, disclosures = self.disclosure_collector.calculate_disclosure_score(
+            stock_code, self.disclosure_data
+        )
+
+        # 저장
+        stock['disclosure_count'] = len(disclosures)
+        stock['disclosures'] = [
+            {
+                'report_nm': d.get('report_nm', ''),
+                'category': d.get('disclosure_category', ''),
+                'rcept_dt': d.get('rcept_dt', '')
+            }
+            for d in disclosures
+        ]
+
+        return score
 
     def calculate_news_score(self, stock):
-        """뉴스 점수 계산 (50점 - 시초가 매매 핵심 지표)"""
+        """뉴스 점수 계산 (30점)"""
         stock_name = stock.get('name', '')
 
         # 뉴스에서 종목명 언급 횟수
@@ -139,17 +194,17 @@ class StockScreener:
         # 저장
         stock['news_mentions'] = mention_count
 
-        # 언급 횟수에 따른 점수 (뉴스 많을수록 시초가 관심 집중)
+        # 언급 횟수에 따른 점수 (배점 조정 30점 만점)
         if mention_count >= 5:
-            return 50
-        elif mention_count >= 4:
-            return 45
-        elif mention_count >= 3:
-            return 40
-        elif mention_count >= 2:
             return 30
+        elif mention_count >= 4:
+            return 27
+        elif mention_count >= 3:
+            return 24
+        elif mention_count >= 2:
+            return 18
         elif mention_count >= 1:
-            return 20
+            return 12
         else:
             return 0
 
@@ -210,12 +265,21 @@ class StockScreener:
             print(f"   거래대금: {stock.get('trading_value', 0)/100000000:.0f}억원")
             print(f"   총점: {stock.get('total_score', 0):.0f}점")
             score_detail = stock.get('score_detail', {})
-            print(f"   - 뉴스: {score_detail.get('news', 0)}점 | 테마: {score_detail.get('theme_keywords', 0)}점 | 투자자: {score_detail.get('investor', 0)}점")
+            print(f"   - 공시: {score_detail.get('disclosure', 0)}점 | 뉴스: {score_detail.get('news', 0)}점 | 테마: {score_detail.get('theme_keywords', 0)}점 | 투자자: {score_detail.get('investor', 0)}점")
 
+            # 공시 정보
+            disclosure_count = stock.get('disclosure_count', 0)
+            if disclosure_count > 0:
+                print(f"   - 공시: {disclosure_count}건")
+                for disc in stock.get('disclosures', [])[:3]:  # 최대 3건만 표시
+                    print(f"     · [{disc.get('category', 'N/A')}] {disc.get('report_nm', 'N/A')}")
+
+            # 테마
             themes = stock.get('matched_themes', [])
             if themes:
                 print(f"   - 테마: {', '.join(themes)}")
 
+            # 뉴스
             news_count = stock.get('news_mentions', 0)
             if news_count > 0:
                 print(f"   - 뉴스 언급: {news_count}회")
@@ -232,19 +296,22 @@ class StockScreener:
             # 1. 시장 데이터 수집
             stocks = self.fetch_market_data()
 
-            # 2. 뉴스 데이터 수집
+            # 2. 공시 데이터 수집 (최우선!)
+            self.fetch_disclosures()
+
+            # 3. 뉴스 데이터 수집
             self.fetch_news()
 
-            # 3. 필터링 적용
+            # 4. 필터링 적용
             filtered_stocks = self.apply_filters(stocks)
 
-            # 4. 점수 계산 및 순위
+            # 5. 점수 계산 및 순위
             ranked_stocks = self.rank_stocks(filtered_stocks)
 
-            # 5. 결과 저장
+            # 6. 결과 저장
             self.save_results(ranked_stocks)
 
-            # 6. 결과 출력
+            # 7. 결과 출력
             self.print_summary(ranked_stocks)
 
             print("\n✅ 작업 완료!")
