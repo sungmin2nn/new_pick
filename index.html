@@ -870,8 +870,11 @@
                 const selectedDate = document.getElementById('filterDate').value;
 
                 if (selectedDate && allHistoryData[selectedDate]) {
+                    // 데이터베이스 필드명을 원본 JSON 필드명으로 변환
                     currentData = allHistoryData[selectedDate].map((item, index) => ({
                         ...item,
+                        code: item.stock_code || item.code,
+                        name: item.stock_name || item.name,
                         rank: index + 1,
                         date: selectedDate
                     }));
