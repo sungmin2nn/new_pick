@@ -10,6 +10,7 @@ import config
 from market_data import MarketDataCollector
 from news_collector import NewsCollector
 from disclosure_collector import DisclosureCollector
+from investor_collector import InvestorCollector
 from database import Database
 
 class StockScreener:
@@ -17,8 +18,10 @@ class StockScreener:
         self.candidates = []
         self.news_data = []
         self.disclosure_data = []
+        self.investor_data = {}
         self.market_collector = MarketDataCollector()
         self.news_collector = NewsCollector()
+        self.investor_collector = InvestorCollector()
 
         # DART API 키 (환경변수에서 읽기)
         dart_api_key = os.environ.get('DART_API_KEY', '')
@@ -77,6 +80,11 @@ class StockScreener:
             self.disclosure_data = []
         return self.disclosure_data
 
+    def fetch_investor_data(self):
+        """외국인/기관 매매 데이터 수집"""
+        self.investor_data = self.investor_collector.get_investor_data()
+        return self.investor_data
+
     def calculate_score(self, stock):
         """종목별 점수 계산 (총 100점 - 공시+뉴스 중심)"""
         score = 0
@@ -97,8 +105,8 @@ class StockScreener:
         score += theme_score
         score_detail['theme_keywords'] = theme_score
 
-        # 4. 외국인/기관 점수 (10점) - 추후 구현
-        investor_score = 5  # 임시로 기본 5점
+        # 4. 외국인/기관 점수 (10점)
+        investor_score = self.calculate_investor_score(stock)
         score += investor_score
         score_detail['investor'] = investor_score
 
@@ -180,33 +188,84 @@ class StockScreener:
         return score
 
     def calculate_news_score(self, stock):
-        """뉴스 점수 계산 (30점)"""
+        """뉴스 점수 계산 (30점 - 감성 분석 반영)"""
         stock_name = stock.get('name', '')
 
-        # 뉴스에서 종목명 언급 횟수
+        # 뉴스에서 종목명 언급 횟수 및 감성 분석
         mention_count = 0
+        positive_mentions = 0
+        negative_mentions = 0
+        sentiment_scores = []
+
         for news in self.news_data:
             title = news.get('title', '')
             summary = news.get('summary', '')
             if stock_name in title or stock_name in summary:
                 mention_count += 1
 
+                # 감성 정보 수집
+                sentiment = news.get('sentiment', 'neutral')
+                sentiment_score = news.get('sentiment_score', 0)
+
+                if sentiment == 'positive':
+                    positive_mentions += 1
+                    sentiment_scores.append(sentiment_score)
+                elif sentiment == 'negative':
+                    negative_mentions += 1
+                    sentiment_scores.append(-sentiment_score)
+                else:
+                    sentiment_scores.append(0)
+
         # 저장
         stock['news_mentions'] = mention_count
+        stock['positive_news'] = positive_mentions
+        stock['negative_news'] = negative_mentions
 
-        # 언급 횟수에 따른 점수 (배점 조정 30점 만점)
-        if mention_count >= 5:
-            return 30
-        elif mention_count >= 4:
-            return 27
-        elif mention_count >= 3:
-            return 24
-        elif mention_count >= 2:
-            return 18
-        elif mention_count >= 1:
-            return 12
-        else:
+        if mention_count == 0:
             return 0
+
+        # 기본 점수 (언급 횟수 기반)
+        if mention_count >= 5:
+            base_score = 20
+        elif mention_count >= 4:
+            base_score = 18
+        elif mention_count >= 3:
+            base_score = 15
+        elif mention_count >= 2:
+            base_score = 12
+        else:
+            base_score = 8
+
+        # 감성 보너스/페널티 (최대 ±10점)
+        avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
+        sentiment_bonus = min(max(avg_sentiment * 2, -10), 10)
+
+        # 부정 뉴스가 많으면 대폭 감점
+        if negative_mentions > positive_mentions:
+            sentiment_bonus = min(sentiment_bonus, -5)
+
+        final_score = base_score + sentiment_bonus
+
+        # 최종 점수는 0~30점 범위
+        return max(0, min(30, final_score))
+
+    def calculate_investor_score(self, stock):
+        """외국인/기관 점수 계산 (10점)"""
+        stock_code = stock.get('code', '')
+
+        if not self.investor_data or stock_code not in self.investor_data:
+            stock['foreign_buy'] = 0
+            stock['institution_buy'] = 0
+            return 0
+
+        score = self.investor_collector.calculate_investor_score(stock_code, self.investor_data)
+
+        # 저장
+        investor_info = self.investor_data.get(stock_code, {})
+        stock['foreign_buy'] = investor_info.get('foreign_buy', 0)
+        stock['institution_buy'] = investor_info.get('institution_buy', 0)
+
+        return score
 
     def rank_stocks(self, stocks):
         """종목 점수 계산 및 순위 매기기"""
@@ -281,8 +340,16 @@ class StockScreener:
 
             # 뉴스
             news_count = stock.get('news_mentions', 0)
+            positive_news = stock.get('positive_news', 0)
+            negative_news = stock.get('negative_news', 0)
             if news_count > 0:
-                print(f"   - 뉴스 언급: {news_count}회")
+                print(f"   - 뉴스 언급: {news_count}회 (긍정 {positive_news}, 부정 {negative_news})")
+
+            # 외국인/기관
+            foreign_buy = stock.get('foreign_buy', 0)
+            institution_buy = stock.get('institution_buy', 0)
+            if foreign_buy > 0 or institution_buy > 0:
+                print(f"   - 외국인: {foreign_buy:,}주 | 기관: {institution_buy:,}주")
 
         if len(stocks) > 10:
             print(f"\n... 외 {len(stocks) - 10}개 종목")
@@ -302,16 +369,19 @@ class StockScreener:
             # 3. 뉴스 데이터 수집
             self.fetch_news()
 
-            # 4. 필터링 적용
+            # 4. 외국인/기관 매매 데이터 수집
+            self.fetch_investor_data()
+
+            # 5. 필터링 적용
             filtered_stocks = self.apply_filters(stocks)
 
-            # 5. 점수 계산 및 순위
+            # 6. 점수 계산 및 순위
             ranked_stocks = self.rank_stocks(filtered_stocks)
 
-            # 6. 결과 저장
+            # 7. 결과 저장
             self.save_results(ranked_stocks)
 
-            # 7. 결과 출력
+            # 8. 결과 출력
             self.print_summary(ranked_stocks)
 
             print("\n✅ 작업 완료!")
