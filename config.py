@@ -1,18 +1,17 @@
 # 장전 종목 선정 시스템 설정
 
-# 필터 기준
-MIN_TRADING_VALUE = 50_000_000_000  # 거래대금 500억 이상
-MIN_PRICE_CHANGE = 1.0  # 상승률 +1% 이상
+# 필터 기준 (시초가 매매 전략)
+MIN_TRADING_VALUE = 30_000_000_000  # 거래대금 300억 이상 (완화)
+MIN_PRICE_CHANGE = -50.0  # 등락률 제한 없음 (전날 하락종목도 포함)
 MIN_MARKET_CAP = 50_000_000_000  # 시가총액 500억 이상
 MAX_PRICE = 100_000  # 주가 10만원 이하
-VOLUME_SPIKE_MULTIPLIER = 1.2  # 평균 거래량 대비 1.2배 이상
+VOLUME_SPIKE_MULTIPLIER = 1.0  # 거래량 제한 없음
 
-# 점수 배점 (총 100점)
+# 점수 배점 (총 100점 - 뉴스 중심)
 SCORE_WEIGHTS = {
-    'price_momentum': 30,  # 가격 모멘텀
-    'volume': 25,          # 거래량
-    'theme_keywords': 25,  # 테마/키워드
-    'news': 20             # 뉴스
+    'news': 50,            # 뉴스 (핵심!)
+    'theme_keywords': 30,  # 테마/키워드
+    'investor': 20         # 외국인/기관 (예정)
 }
 
 # 테마 키워드
@@ -36,4 +35,4 @@ NEWS_SOURCES = [
 # 출력 설정
 OUTPUT_DIR = 'data'
 JSON_FILE = 'morning_candidates.json'
-TOP_N = 20  # 상위 N개 선정
+TOP_N = 3  # 상위 N개 선정

@@ -62,54 +62,24 @@ class StockScreener:
         return self.news_data
 
     def calculate_score(self, stock):
-        """종목별 점수 계산 (총 100점)"""
+        """종목별 점수 계산 (총 100점 - 뉴스 중심)"""
         score = 0
         score_detail = {}
 
-        # 1. 가격 모멘텀 점수 (30점)
-        price_change = stock.get('price_change_percent', 0)
-        if price_change >= 10:
-            price_score = 30
-        elif price_change >= 7:
-            price_score = 25
-        elif price_change >= 5:
-            price_score = 20
-        elif price_change >= 3:
-            price_score = 15
-        else:
-            price_score = 10
+        # 1. 뉴스 점수 (50점) - 핵심!
+        news_score = self.calculate_news_score(stock)
+        score += news_score
+        score_detail['news'] = news_score
 
-        score += price_score
-        score_detail['price_momentum'] = price_score
-
-        # 2. 거래량 점수 (25점)
-        avg_volume = stock.get('avg_volume_20d', 1)
-        current_volume = stock.get('volume', 0)
-        volume_ratio = current_volume / avg_volume if avg_volume > 0 else 0
-
-        if volume_ratio >= 3:
-            volume_score = 25
-        elif volume_ratio >= 2.5:
-            volume_score = 20
-        elif volume_ratio >= 2:
-            volume_score = 15
-        elif volume_ratio >= 1.5:
-            volume_score = 10
-        else:
-            volume_score = 5
-
-        score += volume_score
-        score_detail['volume'] = volume_score
-
-        # 3. 테마/키워드 점수 (25점)
+        # 2. 테마/키워드 점수 (30점)
         theme_score = self.calculate_theme_score(stock)
         score += theme_score
         score_detail['theme_keywords'] = theme_score
 
-        # 4. 뉴스 점수 (20점)
-        news_score = self.calculate_news_score(stock)
-        score += news_score
-        score_detail['news'] = news_score
+        # 3. 외국인/기관 점수 (20점) - 추후 구현
+        investor_score = 10  # 임시로 기본 10점
+        score += investor_score
+        score_detail['investor'] = investor_score
 
         return score, score_detail
 
@@ -143,22 +113,22 @@ class StockScreener:
         # 저장
         stock['matched_themes'] = list(set(matched_themes))
 
-        # 테마 매칭 개수에 따른 점수
+        # 테마 매칭 개수에 따른 점수 (30점)
         theme_count = len(set(matched_themes))
         if theme_count >= 3:
-            return 25
+            return 30
         elif theme_count == 2:
-            return 20
+            return 25
         elif theme_count == 1:
-            return 15
+            return 20
         else:
-            return 5
+            return 10
 
     def calculate_news_score(self, stock):
-        """뉴스 점수 계산"""
+        """뉴스 점수 계산 (50점 - 시초가 매매 핵심 지표)"""
         stock_name = stock.get('name', '')
 
-        # 오늘 뉴스에서 종목명 언급 횟수
+        # 뉴스에서 종목명 언급 횟수
         mention_count = 0
         for news in self.news_data:
             title = news.get('title', '')
@@ -169,15 +139,19 @@ class StockScreener:
         # 저장
         stock['news_mentions'] = mention_count
 
-        # 언급 횟수에 따른 점수
+        # 언급 횟수에 따른 점수 (뉴스 많을수록 시초가 관심 집중)
         if mention_count >= 5:
-            return 20
+            return 50
+        elif mention_count >= 4:
+            return 45
         elif mention_count >= 3:
-            return 15
+            return 40
+        elif mention_count >= 2:
+            return 30
         elif mention_count >= 1:
-            return 10
+            return 20
         else:
-            return 5
+            return 0
 
     def rank_stocks(self, stocks):
         """종목 점수 계산 및 순위 매기기"""
@@ -236,8 +210,7 @@ class StockScreener:
             print(f"   거래대금: {stock.get('trading_value', 0)/100000000:.0f}억원")
             print(f"   총점: {stock.get('total_score', 0):.0f}점")
             score_detail = stock.get('score_detail', {})
-            print(f"   - 가격: {score_detail.get('price_momentum', 0)}점 | 거래량: {score_detail.get('volume', 0)}점")
-            print(f"   - 테마: {score_detail.get('theme_keywords', 0)}점 | 뉴스: {score_detail.get('news', 0)}점")
+            print(f"   - 뉴스: {score_detail.get('news', 0)}점 | 테마: {score_detail.get('theme_keywords', 0)}점 | 투자자: {score_detail.get('investor', 0)}점")
 
             themes = stock.get('matched_themes', [])
             if themes:
