@@ -170,8 +170,10 @@ class StockScreener:
             return 0
 
         stock_code = stock.get('code', '')
+        market_cap = stock.get('market_cap', 0)
+
         score, disclosures = self.disclosure_collector.calculate_disclosure_score(
-            stock_code, self.disclosure_data
+            stock_code, self.disclosure_data, market_cap
         )
 
         # 저장
@@ -180,7 +182,8 @@ class StockScreener:
             {
                 'report_nm': d.get('report_nm', ''),
                 'category': d.get('disclosure_category', ''),
-                'rcept_dt': d.get('rcept_dt', '')
+                'rcept_dt': d.get('rcept_dt', ''),
+                'amount': d.get('amount', 0)
             }
             for d in disclosures
         ]
@@ -267,6 +270,42 @@ class StockScreener:
 
         return score
 
+    def identify_leading_stocks(self, stocks):
+        """테마별 대장주 식별"""
+        print("\n👑 대장주 식별 중...")
+
+        # 테마별로 종목 그룹핑
+        theme_stocks = {}
+        for stock in stocks:
+            themes = stock.get('matched_themes', [])
+            for theme in themes:
+                if theme not in theme_stocks:
+                    theme_stocks[theme] = []
+                theme_stocks[theme].append(stock)
+
+        # 테마별 대장주 결정 (시총 * 거래대금 기준)
+        leading_stocks = set()
+        for theme, theme_stock_list in theme_stocks.items():
+            if len(theme_stock_list) < 2:  # 종목이 1개면 자동 대장주
+                if theme_stock_list:
+                    leading_stocks.add(theme_stock_list[0]['code'])
+                continue
+
+            # 시총 * 거래대금으로 정렬
+            sorted_stocks = sorted(
+                theme_stock_list,
+                key=lambda x: x.get('market_cap', 0) * x.get('trading_value', 0),
+                reverse=True
+            )
+
+            # 1위 종목이 대장주
+            if sorted_stocks:
+                leading_stock = sorted_stocks[0]
+                leading_stocks.add(leading_stock['code'])
+                print(f"  ✓ {theme} 대장주: {leading_stock.get('name')} (시총 {leading_stock.get('market_cap', 0)/1000000000000:.1f}조)")
+
+        return leading_stocks
+
     def rank_stocks(self, stocks):
         """종목 점수 계산 및 순위 매기기"""
         print("\n📈 점수 계산 및 순위 매기기...")
@@ -277,6 +316,18 @@ class StockScreener:
             stock['total_score'] = score
             stock['score_detail'] = score_detail
             scored_stocks.append(stock)
+
+        # 대장주 식별
+        leading_stocks = self.identify_leading_stocks(scored_stocks)
+
+        # 대장주 가산점 부여
+        for stock in scored_stocks:
+            if stock['code'] in leading_stocks:
+                stock['is_leading'] = True
+                stock['total_score'] += 5  # 대장주 가산점 5점
+                print(f"  ⭐ 대장주 가산점: {stock.get('name')} (+5점)")
+            else:
+                stock['is_leading'] = False
 
         # 점수순 정렬
         scored_stocks.sort(key=lambda x: x['total_score'], reverse=True)
@@ -319,7 +370,9 @@ class StockScreener:
         print("="*60)
 
         for i, stock in enumerate(stocks[:10], 1):
-            print(f"\n{i}. {stock.get('name', 'N/A')} ({stock.get('code', 'N/A')}) - {stock.get('market', 'N/A')}")
+            # 대장주 표시
+            leading_badge = " 👑대장주" if stock.get('is_leading', False) else ""
+            print(f"\n{i}. {stock.get('name', 'N/A')} ({stock.get('code', 'N/A')}) - {stock.get('market', 'N/A')}{leading_badge}")
             print(f"   현재가: {stock.get('current_price', 0):,}원 ({stock.get('price_change_percent', 0):+.2f}%)")
             print(f"   거래대금: {stock.get('trading_value', 0)/100000000:.0f}억원")
             print(f"   총점: {stock.get('total_score', 0):.0f}점")
@@ -331,7 +384,9 @@ class StockScreener:
             if disclosure_count > 0:
                 print(f"   - 공시: {disclosure_count}건")
                 for disc in stock.get('disclosures', [])[:3]:  # 최대 3건만 표시
-                    print(f"     · [{disc.get('category', 'N/A')}] {disc.get('report_nm', 'N/A')}")
+                    amount = disc.get('amount', 0)
+                    amount_str = f" ({amount}억원)" if amount > 0 else ""
+                    print(f"     · [{disc.get('category', 'N/A')}] {disc.get('report_nm', 'N/A')}{amount_str}")
 
             # 테마
             themes = stock.get('matched_themes', [])

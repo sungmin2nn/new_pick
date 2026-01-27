@@ -6,6 +6,7 @@ DART 공시 정보 수집
 import requests
 from datetime import datetime, timedelta
 import time
+import re
 
 class DisclosureCollector:
     def __init__(self, api_key):
@@ -159,12 +160,44 @@ class DisclosureCollector:
 
             if matched_category:
                 disc['disclosure_category'] = matched_category
+
+                # 금액 추출
+                amount = self._extract_amount(report_nm)
+                disc['amount'] = amount
+
                 positive.append(disc)
 
         return positive
 
-    def calculate_disclosure_score(self, stock_code, disclosures):
-        """종목별 공시 점수 계산 (40점)"""
+    def _extract_amount(self, text):
+        """공시 내용에서 금액 추출 (억원 단위)"""
+        try:
+            # 패턴: "500억원", "1,000억", "5000억원" 등
+            patterns = [
+                r'(\d+[,\d]*)\s*억\s*원',
+                r'(\d+[,\d]*)\s*억',
+                r'(\d+[,\d]*\.?\d*)\s*조\s*원',
+                r'(\d+[,\d]*\.?\d*)\s*조',
+            ]
+
+            for pattern in patterns:
+                match = re.search(pattern, text)
+                if match:
+                    amount_str = match.group(1).replace(',', '')
+
+                    # 조원 단위면 억원으로 변환
+                    if '조' in pattern:
+                        return int(float(amount_str) * 10000)  # 1조 = 10000억
+                    else:
+                        return int(amount_str)
+
+            return 0
+
+        except Exception:
+            return 0
+
+    def calculate_disclosure_score(self, stock_code, disclosures, market_cap=0):
+        """종목별 공시 점수 계산 (40점 - 금액 반영)"""
         stock_disclosures = []
 
         # 해당 종목 공시 찾기
@@ -184,20 +217,41 @@ class DisclosureCollector:
 
         for disc in stock_disclosures:
             category = disc.get('disclosure_category', '기타')
+            amount = disc.get('amount', 0)  # 억원 단위
 
-            # 카테고리별 점수
+            # 카테고리별 기본 점수
             if category == '실적':
-                score += 20  # 실적 관련이 가장 중요
+                base_score = 20  # 실적 관련이 가장 중요
             elif category == '계약':
-                score += 15
+                base_score = 15
             elif category == '투자':
-                score += 12
+                base_score = 12
             elif category == '기술':
-                score += 10
+                base_score = 10
             elif category == '배당':
-                score += 8
+                base_score = 8
             else:
-                score += 5
+                base_score = 5
+
+            # 금액 가산점 (시총 대비 계약 규모)
+            amount_bonus = 0
+            if amount > 0 and market_cap > 0:
+                # 시총 억원 단위로 변환
+                market_cap_in_100m = market_cap / 100000000
+
+                # 계약 규모가 시총의 10% 이상이면 대형 계약
+                ratio = (amount / market_cap_in_100m) * 100
+
+                if ratio >= 20:  # 시총의 20% 이상
+                    amount_bonus = 10
+                elif ratio >= 10:  # 시총의 10% 이상
+                    amount_bonus = 7
+                elif ratio >= 5:   # 시총의 5% 이상
+                    amount_bonus = 5
+                elif ratio >= 1:   # 시총의 1% 이상
+                    amount_bonus = 3
+
+            score += (base_score + amount_bonus)
 
         # 최대 40점으로 제한
         score = min(score, 40)
