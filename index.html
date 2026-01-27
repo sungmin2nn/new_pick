@@ -505,8 +505,8 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-button active" onclick="switchTab('stocks')">📊 종목 선정</button>
-            <button class="tab-button" onclick="switchTab('system')">⚙️ 시스템 정보</button>
+            <button class="tab-button active" id="stocksTabBtn">📊 종목 선정</button>
+            <button class="tab-button" id="systemTabBtn">⚙️ 시스템 정보</button>
         </div>
 
         <div id="stocksTab" class="tab-content active">
@@ -791,26 +791,6 @@
     </div>
 
     <script>
-        // 탭 전환 함수
-        function switchTab(tab) {
-            // 탭 버튼 활성화
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // 탭 콘텐츠 표시
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-
-            if (tab === 'stocks') {
-                document.getElementById('stocksTab').classList.add('active');
-            } else if (tab === 'system') {
-                document.getElementById('systemTab').classList.add('active');
-            }
-        }
-
         // 종목 테이블 관련 변수
         let currentData = [];
         let sortColumn = 'rank';
@@ -956,8 +936,30 @@
             return (num / 100000000).toFixed(0);
         }
 
+        // 탭 전환 함수
+        function switchTab(tab) {
+            // 탭 버튼 활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (tab === 'stocks') {
+                document.getElementById('stocksTabBtn').classList.add('active');
+                document.getElementById('stocksTab').classList.add('active');
+                document.getElementById('systemTab').classList.remove('active');
+            } else if (tab === 'system') {
+                document.getElementById('systemTabBtn').classList.add('active');
+                document.getElementById('systemTab').classList.add('active');
+                document.getElementById('stocksTab').classList.remove('active');
+            }
+        }
+
         // 정렬 이벤트
         document.addEventListener('DOMContentLoaded', () => {
+            // 탭 버튼 이벤트
+            document.getElementById('stocksTabBtn').addEventListener('click', () => switchTab('stocks'));
+            document.getElementById('systemTabBtn').addEventListener('click', () => switchTab('system'));
+
             document.querySelectorAll('th.sortable').forEach(th => {
                 th.addEventListener('click', () => {
                     const column = th.dataset.sort;
