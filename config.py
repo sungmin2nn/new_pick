@@ -1,11 +1,11 @@
 # 장전 종목 선정 시스템 설정
 
 # 필터 기준
-MIN_TRADING_VALUE = 100_000_000_000  # 거래대금 1,000억 이상
-MIN_PRICE_CHANGE = 3.0  # 상승률 +3% 이상
-MIN_MARKET_CAP = 100_000_000_000  # 시가총액 1,000억 이상
+MIN_TRADING_VALUE = 50_000_000_000  # 거래대금 500억 이상
+MIN_PRICE_CHANGE = 1.0  # 상승률 +1% 이상
+MIN_MARKET_CAP = 50_000_000_000  # 시가총액 500억 이상
 MAX_PRICE = 100_000  # 주가 10만원 이하
-VOLUME_SPIKE_MULTIPLIER = 1.5  # 평균 거래량 대비 1.5배 이상
+VOLUME_SPIKE_MULTIPLIER = 1.2  # 평균 거래량 대비 1.2배 이상
 
 # 점수 배점 (총 100점)
 SCORE_WEIGHTS = {

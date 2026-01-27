@@ -6,39 +6,22 @@
 import json
 import os
 from datetime import datetime, timedelta
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
 import config
+from market_data import MarketDataCollector
+from news_collector import NewsCollector
+from database import Database
 
 class StockScreener:
     def __init__(self):
         self.candidates = []
         self.news_data = []
+        self.market_collector = MarketDataCollector()
+        self.news_collector = NewsCollector()
+        self.db = Database()
 
     def fetch_market_data(self):
         """코스피/코스닥 전종목 데이터 수집"""
-        print("📊 시장 데이터 수집 중...")
-
-        # 네이버 금융 API를 통한 시장 데이터 수집
-        markets = ['KOSPI', 'KOSDAQ']
-        all_stocks = []
-
-        for market in markets:
-            try:
-                # 실제 구현시 네이버 금융 API 또는 한국투자증권 API 사용
-                # 여기서는 구조만 작성
-                url = f'https://finance.naver.com/sise/sise_market_sum.naver?sosok={0 if market == "KOSPI" else 1}'
-                headers = {'User-Agent': 'Mozilla/5.0'}
-
-                # 임시로 샘플 데이터 구조 반환
-                # 실제로는 페이지 크롤링 또는 API 호출 필요
-                print(f"  - {market} 데이터 수집")
-
-            except Exception as e:
-                print(f"  ⚠️  {market} 데이터 수집 실패: {e}")
-
-        return all_stocks
+        return self.market_collector.get_market_data()
 
     def apply_filters(self, stocks):
         """필터링 조건 적용"""
@@ -75,24 +58,8 @@ class StockScreener:
 
     def fetch_news(self):
         """뉴스 데이터 수집"""
-        print("\n📰 뉴스 수집 중...")
-        news_list = []
-
-        for source_url in config.NEWS_SOURCES:
-            try:
-                headers = {'User-Agent': 'Mozilla/5.0'}
-                response = requests.get(source_url, headers=headers, timeout=10)
-                soup = BeautifulSoup(response.text, 'html.parser')
-
-                # 뉴스 제목과 링크 추출 (네이버 금융 구조에 맞게)
-                # 실제 구현시 상세 파싱 필요
-                print(f"  - 뉴스 소스 수집 완료")
-
-            except Exception as e:
-                print(f"  ⚠️  뉴스 수집 실패: {e}")
-
-        self.news_data = news_list
-        return news_list
+        self.news_data = self.news_collector.get_stock_news()
+        return self.news_data
 
     def calculate_score(self, stock):
         """종목별 점수 계산 (총 100점)"""
@@ -160,6 +127,22 @@ class StockScreener:
                     matched_themes.append(theme)
                     break
 
+        # 뉴스에서도 테마 키워드 찾기
+        for news in self.news_data:
+            if stock_name in news.get('title', '') or stock_name in news.get('summary', ''):
+                title = news.get('title', '')
+                summary = news.get('summary', '')
+                text = title + ' ' + summary
+
+                for theme, keywords in config.THEME_KEYWORDS.items():
+                    for keyword in keywords:
+                        if keyword in text:
+                            matched_themes.append(theme)
+                            break
+
+        # 저장
+        stock['matched_themes'] = list(set(matched_themes))
+
         # 테마 매칭 개수에 따른 점수
         theme_count = len(set(matched_themes))
         if theme_count >= 3:
@@ -178,8 +161,13 @@ class StockScreener:
         # 오늘 뉴스에서 종목명 언급 횟수
         mention_count = 0
         for news in self.news_data:
-            if stock_name in news.get('title', ''):
+            title = news.get('title', '')
+            summary = news.get('summary', '')
+            if stock_name in title or stock_name in summary:
                 mention_count += 1
+
+        # 저장
+        stock['news_mentions'] = mention_count
 
         # 언급 횟수에 따른 점수
         if mention_count >= 5:
@@ -208,7 +196,7 @@ class StockScreener:
         return scored_stocks[:config.TOP_N]
 
     def save_results(self, stocks):
-        """결과 저장 (JSON)"""
+        """결과 저장 (JSON + DB)"""
         print("\n💾 결과 저장 중...")
 
         # 디렉토리 생성
@@ -227,7 +215,11 @@ class StockScreener:
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
 
-        print(f"  ✓ 저장 완료: {output_path}")
+        print(f"  ✓ JSON 저장 완료: {output_path}")
+
+        # 데이터베이스에도 저장
+        self.db.save_candidates(stocks)
+
         print(f"  ✓ 선정 종목 수: {len(stocks)}개")
 
         return output_path
@@ -239,13 +231,21 @@ class StockScreener:
         print("="*60)
 
         for i, stock in enumerate(stocks[:10], 1):
-            print(f"\n{i}. {stock.get('name', 'N/A')} ({stock.get('code', 'N/A')})")
-            print(f"   총점: {stock.get('total_score', 0)}점")
+            print(f"\n{i}. {stock.get('name', 'N/A')} ({stock.get('code', 'N/A')}) - {stock.get('market', 'N/A')}")
+            print(f"   현재가: {stock.get('current_price', 0):,}원 ({stock.get('price_change_percent', 0):+.2f}%)")
+            print(f"   거래대금: {stock.get('trading_value', 0)/100000000:.0f}억원")
+            print(f"   총점: {stock.get('total_score', 0):.0f}점")
             score_detail = stock.get('score_detail', {})
-            print(f"   - 가격: {score_detail.get('price_momentum', 0)}점")
-            print(f"   - 거래량: {score_detail.get('volume', 0)}점")
-            print(f"   - 테마: {score_detail.get('theme_keywords', 0)}점")
-            print(f"   - 뉴스: {score_detail.get('news', 0)}점")
+            print(f"   - 가격: {score_detail.get('price_momentum', 0)}점 | 거래량: {score_detail.get('volume', 0)}점")
+            print(f"   - 테마: {score_detail.get('theme_keywords', 0)}점 | 뉴스: {score_detail.get('news', 0)}점")
+
+            themes = stock.get('matched_themes', [])
+            if themes:
+                print(f"   - 테마: {', '.join(themes)}")
+
+            news_count = stock.get('news_mentions', 0)
+            if news_count > 0:
+                print(f"   - 뉴스 언급: {news_count}회")
 
         if len(stocks) > 10:
             print(f"\n... 외 {len(stocks) - 10}개 종목")
