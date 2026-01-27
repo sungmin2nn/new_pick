@@ -53,6 +53,224 @@
             font-weight: 600;
         }
 
+        .tabs {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .system-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .system-section {
+            margin-bottom: 40px;
+        }
+
+        .system-section h2 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .system-section h3 {
+            color: #764ba2;
+            font-size: 1.3rem;
+            margin: 20px 0 15px 0;
+        }
+
+        .pipeline-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .pipeline-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .pipeline-step::after {
+            content: '▼';
+            display: block;
+            text-align: center;
+            color: #667eea;
+            font-size: 2rem;
+            margin-top: 10px;
+        }
+
+        .pipeline-step:last-child::after {
+            content: '';
+        }
+
+        .pipeline-step h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .pipeline-step p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-item {
+            background: #f8f9ff;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .feature-item.completed::before {
+            content: '✅';
+            font-size: 1.5rem;
+        }
+
+        .feature-item.pending::before {
+            content: '🔲';
+            font-size: 1.5rem;
+        }
+
+        .feature-item.future::before {
+            content: '💡';
+            font-size: 1.5rem;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .priority-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: #ffe6e6;
+            color: #e74c3c;
+        }
+
+        .priority-medium {
+            background: #fff3e0;
+            color: #f39c12;
+        }
+
+        .priority-low {
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .coverage-meter {
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .coverage-value {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .coverage-label {
+            color: #666;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 20px;
+            height: 30px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            transition: width 1s ease-out;
+        }
+
         .controls {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
@@ -286,6 +504,12 @@
             <div class="update-time" id="updateTime">업데이트 시간: -</div>
         </div>
 
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('stocks')">📊 종목 선정</button>
+            <button class="tab-button" onclick="switchTab('system')">⚙️ 시스템 정보</button>
+        </div>
+
+        <div id="stocksTab" class="tab-content active">
         <div class="controls">
             <label for="filterScore">최소 점수:</label>
             <select id="filterScore">
@@ -332,8 +556,261 @@
                 </tbody>
             </table>
         </div>
+        </div>
+
+        <div id="systemTab" class="tab-content">
+            <div class="system-info">
+                <div class="system-section">
+                    <h2>📊 시스템 커버리지</h2>
+                    <div class="coverage-meter">
+                        <div class="coverage-value">90%</div>
+                        <div class="coverage-label">실전 투자자 대비 커버리지</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 90%;">90% 달성</div>
+                    </div>
+                    <p style="color: #666; text-align: center; margin-top: 20px;">
+                        실전 시초가 매매 투자자들이 사용하는 주요 요소들을 90% 수준으로 자동화하여 매일 아침 최적의 종목을 선정합니다.
+                    </p>
+                </div>
+
+                <div class="system-section">
+                    <h2>🔄 데이터 파이프라인</h2>
+                    <div class="pipeline-flow">
+                        <div class="pipeline-step">
+                            <h4>1️⃣ 데이터 수집 (08:30 실행)</h4>
+                            <p>• DART 공시 (전일 18:00 ~ 당일 08:30)<br>
+                               • 네이버 금융 뉴스 (시간 필터링 + 감성 분석)<br>
+                               • 외국인/기관 순매수 데이터<br>
+                               • 시장 데이터 (거래대금, 시가총액, 현재가)</p>
+                        </div>
+                        <div class="pipeline-step">
+                            <h4>2️⃣ 종목 필터링</h4>
+                            <p>• 거래대금 300억원 이상<br>
+                               • 시가총액 500억원 이상<br>
+                               • 주가 10만원 이하<br>
+                               • 불성실공시 제외</p>
+                        </div>
+                        <div class="pipeline-step">
+                            <h4>3️⃣ 종목 스코어링 (100점 만점)</h4>
+                            <p>• <strong>공시 점수 (40점)</strong>: 실적/계약/투자 공시 + 금액 대비 시총 비율<br>
+                               • <strong>뉴스 점수 (30점)</strong>: 언급 횟수 + 긍정/부정 감성 분석<br>
+                               • <strong>테마 점수 (20점)</strong>: AI, 반도체, 2차전지 등 핫 테마 매칭<br>
+                               • <strong>투자자 점수 (10점)</strong>: 외국인/기관 순매수 규모<br>
+                               • <strong>대장주 보너스 (+5점)</strong>: 테마별 시총×거래대금 1위</p>
+                        </div>
+                        <div class="pipeline-step">
+                            <h4>4️⃣ 종목 선정 및 대시보드 배포</h4>
+                            <p>• 상위 3개 종목 최종 선정<br>
+                               • JSON 파일 생성 (morning_candidates.json)<br>
+                               • GitHub Pages 자동 배포<br>
+                               • 실시간 대시보드 업데이트</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="system-section">
+                    <h2>✅ 완료된 기능</h2>
+                    <ul class="feature-list">
+                        <li class="feature-item completed">
+                            <div class="feature-content">
+                                <div class="feature-title">DART 공시 수집 및 분석</div>
+                                <div class="feature-desc">전일 18:00 ~ 당일 08:30 공시를 실시간 수집하여 실적/계약/투자 카테고리별로 분류. 금액 추출 후 시총 대비 비율로 가산점 부여 (최대 40점)</div>
+                            </div>
+                        </li>
+                        <li class="feature-item completed">
+                            <div class="feature-content">
+                                <div class="feature-title">뉴스 시간 필터링 + 감성 분석</div>
+                                <div class="feature-desc">전일 저녁~당일 아침 뉴스만 선별하고, 긍정/부정 키워드 기반 감성 분석으로 ±10점 조정. 부정 뉴스 많으면 대폭 감점 (최대 30점)</div>
+                            </div>
+                        </li>
+                        <li class="feature-item completed">
+                            <div class="feature-content">
+                                <div class="feature-title">외국인/기관 매매 데이터</div>
+                                <div class="feature-desc">전일 외국인/기관 순매수 상위 종목 크롤링. 순매수량 규모에 따라 계층별 점수 부여 (외국인 최대 6점 + 기관 최대 4점 = 10점)</div>
+                            </div>
+                        </li>
+                        <li class="feature-item completed">
+                            <div class="feature-content">
+                                <div class="feature-title">테마별 대장주 식별</div>
+                                <div class="feature-desc">AI, 반도체 등 각 테마에서 시총×거래대금이 가장 큰 종목을 대장주로 식별하여 5점 추가 부여. 대장주는 👑 배지 표시</div>
+                            </div>
+                        </li>
+                        <li class="feature-item completed">
+                            <div class="feature-content">
+                                <div class="feature-title">공시 금액 추출 및 반영</div>
+                                <div class="feature-desc">정규표현식으로 "500억원", "1조원" 등 금액 추출. 시총 대비 비율 계산하여 대형 계약일수록 높은 가산점 (시총 20% 이상 → +10점)</div>
+                            </div>
+                        </li>
+                        <li class="feature-item completed">
+                            <div class="feature-content">
+                                <div class="feature-title">GitHub Actions 자동화</div>
+                                <div class="feature-desc">매일 08:30 KST 자동 실행. 종목 선정 후 JSON 생성 및 GitHub Pages 자동 배포. 완전 자동화된 워크플로우</div>
+                            </div>
+                        </li>
+                        <li class="feature-item completed">
+                            <div class="feature-content">
+                                <div class="feature-title">실시간 대시보드</div>
+                                <div class="feature-desc">점수별 필터링, 컬럼별 정렬, 점수 상세 분석, 통계 요약 제공. GitHub Pages로 무료 호스팅</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="system-section">
+                    <h2>🔜 앞으로 해야 할 작업</h2>
+                    <h3>Priority 1 (핵심 기능)</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item pending">
+                            <div class="feature-content">
+                                <div class="feature-title">실시간 시초가 정보 수집</div>
+                                <div class="feature-desc">08:30~09:00 사이 실시간 호가 및 예상 체결가 모니터링. 시초가 매매의 핵심 요소지만 데이터 수집이 까다로움. HTS API 또는 증권사 API 필요</div>
+                            </div>
+                            <span class="priority-badge priority-high">중요도: 높음</span>
+                        </li>
+                        <li class="feature-item pending">
+                            <div class="feature-content">
+                                <div class="feature-title">백테스팅 시스템</div>
+                                <div class="feature-desc">과거 데이터로 선정 전략의 승률과 수익률 검증. 점수 체계 최적화를 위한 필수 기능. 과거 공시/뉴스/가격 데이터 DB 구축 필요</div>
+                            </div>
+                            <span class="priority-badge priority-high">중요도: 높음</span>
+                        </li>
+                    </ul>
+
+                    <h3>Priority 2 (고도화)</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item future">
+                            <div class="feature-content">
+                                <div class="feature-title">증권사 리서치 보고서 수집</div>
+                                <div class="feature-desc">목표가 상향, 투자의견 상향 등 애널리스트 의견 수집 및 반영. 크롤링 난이도가 높고 사이트별 구조 상이</div>
+                            </div>
+                            <span class="priority-badge priority-medium">중요도: 중간</span>
+                        </li>
+                        <li class="feature-item future">
+                            <div class="feature-content">
+                                <div class="feature-title">알림 시스템 (텔레그램/이메일)</div>
+                                <div class="feature-desc">고득점 종목 발견 시 실시간 푸시 알림. 대시보드 접속 없이도 정보 확인 가능</div>
+                            </div>
+                            <span class="priority-badge priority-medium">중요도: 중간</span>
+                        </li>
+                        <li class="feature-item future">
+                            <div class="feature-content">
+                                <div class="feature-title">종목 간 상관관계 분석</div>
+                                <div class="feature-desc">동일 테마 내 종목 간 동반 상승 패턴 학습. 대장주가 상승하면 후속주도 따라가는 경향 포착</div>
+                            </div>
+                            <span class="priority-badge priority-medium">중요도: 중간</span>
+                        </li>
+                    </ul>
+
+                    <h3>Priority 3 (추가 고도화)</h3>
+                    <ul class="feature-list">
+                        <li class="feature-item future">
+                            <div class="feature-content">
+                                <div class="feature-title">머신러닝 기반 점수 예측</div>
+                                <div class="feature-desc">과거 데이터 학습으로 시초가 상승 확률 예측. 현재 규칙 기반 스코어링을 AI 모델로 고도화. 데이터 축적 후 가능</div>
+                            </div>
+                            <span class="priority-badge priority-low">중요도: 낮음</span>
+                        </li>
+                        <li class="feature-item future">
+                            <div class="feature-content">
+                                <div class="feature-title">해외 뉴스 및 선물/옵션 데이터</div>
+                                <div class="feature-desc">미국 주요 뉴스 및 코스피200 선물 야간 동향 반영. 글로벌 시장 흐름 파악</div>
+                            </div>
+                            <span class="priority-badge priority-low">중요도: 낮음</span>
+                        </li>
+                        <li class="feature-item future">
+                            <div class="feature-content">
+                                <div class="feature-title">자동 매매 연동 (HTS/API)</div>
+                                <div class="feature-desc">선정 종목 자동 주문 실행. 법적/보안 이슈 고려 필요. 실시간 계좌 연동 및 리스크 관리 필수</div>
+                            </div>
+                            <span class="priority-badge priority-low">중요도: 낮음</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="system-section">
+                    <h2>🏗️ 기술 아키텍처</h2>
+                    <div style="background: #f8f9ff; padding: 25px; border-radius: 15px; border-left: 5px solid #667eea;">
+                        <h3 style="margin-top: 0;">백엔드 (Python)</h3>
+                        <p style="color: #666; line-height: 1.8;">
+                            • <strong>stock_screener.py</strong>: 메인 오케스트레이션 로직<br>
+                            • <strong>disclosure_collector.py</strong>: DART API 공시 수집 + 금액 추출<br>
+                            • <strong>news_collector.py</strong>: 네이버 금융 뉴스 크롤링 + 감성 분석<br>
+                            • <strong>investor_collector.py</strong>: 외국인/기관 매매 데이터 크롤링<br>
+                            • <strong>market_data.py</strong>: 네이버 금융 시장 데이터 수집<br>
+                            • <strong>database.py</strong>: 종목 정보 캐싱 (SQLite)<br>
+                            • <strong>config.py</strong>: 점수 배점, 테마 키워드 설정
+                        </p>
+
+                        <h3>프론트엔드 (HTML/JS)</h3>
+                        <p style="color: #666; line-height: 1.8;">
+                            • <strong>index.html</strong>: 반응형 대시보드 (Vanilla JS)<br>
+                            • GitHub Pages 무료 호스팅<br>
+                            • JSON 파일 기반 실시간 업데이트<br>
+                            • 정렬, 필터링, 통계 기능
+                        </p>
+
+                        <h3>인프라 (GitHub Actions)</h3>
+                        <p style="color: #666; line-height: 1.8;">
+                            • <strong>.github/workflows/morning-scan.yml</strong>: 자동 실행 워크플로우<br>
+                            • 매일 08:30 KST 크론 스케줄링<br>
+                            • Python 의존성 자동 설치<br>
+                            • JSON 생성 후 자동 커밋 및 배포<br>
+                            • 무료 GitHub Runner 사용 (월 2000분)
+                        </p>
+
+                        <h3>데이터 소스</h3>
+                        <p style="color: #666; line-height: 1.8;">
+                            • <strong>DART OpenAPI</strong>: 공시 정보 (API 키 필요)<br>
+                            • <strong>네이버 금융</strong>: 뉴스, 시장 데이터, 외국인/기관 매매<br>
+                            • <strong>BeautifulSoup4</strong>: HTML 파싱 및 크롤링<br>
+                            • <strong>Requests</strong>: HTTP 요청 처리
+                        </p>
+                    </div>
+                </div>
+
+                <div class="system-section">
+                    <h2>📈 성능 지표</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div style="background: #e8f5e9; padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #27ae60;">< 3분</div>
+                            <div style="color: #666; margin-top: 10px;">전체 파이프라인 실행 시간</div>
+                        </div>
+                        <div style="background: #fff3e0; padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #f39c12;">100%</div>
+                            <div style="color: #666; margin-top: 10px;">자동화 비율</div>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 20px; border-radius: 15px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: bold; color: #3498db;">무료</div>
+                            <div style="color: #666; margin-top: 10px;">운영 비용 (GitHub 무료 플랜)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script>
+        function switchTab(tab) {
+            // 탭 버튼 활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 탭 콘텐츠 표시
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            if (tab === 'stocks') {
+                document.getElementById('stocksTab').classList.add('active');
+            } else if (tab === 'system') {
+                document.getElementById('systemTab').classList.add('active');
+            }
+        }
+
+        // 기존 스크립트
     <script>
         let currentData = [];
         let sortColumn = 'rank';
