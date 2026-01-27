@@ -38,10 +38,19 @@ class Database:
                 news_score REAL,
                 matched_themes TEXT,
                 news_mentions INTEGER,
+                selection_reason TEXT,
                 created_at TEXT NOT NULL,
                 UNIQUE(date, stock_code)
             )
         ''')
+
+        # selection_reason 컬럼 추가 (기존 테이블에 없을 경우)
+        try:
+            cursor.execute('ALTER TABLE morning_candidates ADD COLUMN selection_reason TEXT')
+            conn.commit()
+        except sqlite3.OperationalError:
+            # 이미 컬럼이 존재하면 무시
+            pass
 
         # 인덱스 생성
         cursor.execute('''
@@ -78,8 +87,9 @@ class Database:
                         total_score, price_score, volume_score,
                         theme_score, news_score,
                         matched_themes, news_mentions,
+                        selection_reason,
                         created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     date,
                     candidate.get('code', ''),
@@ -96,6 +106,7 @@ class Database:
                     score_detail.get('news', 0),
                     json.dumps(candidate.get('matched_themes', []), ensure_ascii=False),
                     candidate.get('news_mentions', 0),
+                    candidate.get('selection_reason', '-'),
                     datetime.now().isoformat()
                 ))
                 saved_count += 1
