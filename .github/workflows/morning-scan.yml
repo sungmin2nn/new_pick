@@ -33,10 +33,15 @@ jobs:
       run: |
         python stock_screener.py
 
+    - name: Export history
+      run: |
+        python export_history.py
+
     - name: Commit and push results
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         cp data/morning_candidates.json morning_candidates.json
-        git add data/morning_candidates.json morning_candidates.json
+        cp data/history.json history.json
+        git add data/morning_candidates.json morning_candidates.json data/history.json history.json data/morning_candidates.db
         git diff --quiet && git diff --staged --quiet || (git commit -m "🔮 장전 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git push)

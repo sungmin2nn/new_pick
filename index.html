@@ -518,6 +518,11 @@
 
         <div id="stocksTab" class="tab-content active">
         <div class="controls">
+            <label for="filterDate">선정 날짜:</label>
+            <select id="filterDate">
+                <option value="">로딩 중...</option>
+            </select>
+
             <label for="filterScore">최소 점수:</label>
             <select id="filterScore">
                 <option value="0">전체</option>
@@ -550,6 +555,7 @@
             <table id="stockTable" style="display: none;">
                 <thead>
                     <tr>
+                        <th class="sortable" data-sort="date">선정일</th>
                         <th class="sortable" data-sort="rank">순위</th>
                         <th class="sortable" data-sort="name">종목명</th>
                         <th class="sortable" data-sort="score">총점</th>
@@ -799,9 +805,61 @@
 
     <script>
         // 종목 테이블 관련 변수
+        let allHistoryData = {};
+        let availableDates = [];
         let currentData = [];
         let sortColumn = 'rank';
         let sortDirection = 'asc';
+
+        async function loadHistory() {
+            try {
+                // 히스토리 데이터 로드
+                let response = await fetch('data/history.json');
+                if (!response.ok) {
+                    response = await fetch('history.json');
+                }
+
+                if (response.ok) {
+                    const historyData = await response.json();
+                    allHistoryData = historyData.data_by_date || {};
+                    availableDates = historyData.dates || [];
+                } else {
+                    allHistoryData = {};
+                    availableDates = [];
+                }
+
+                updateDateSelector();
+
+                if (availableDates.length > 0) {
+                    document.getElementById('filterDate').value = availableDates[0];
+                }
+
+                await loadData();
+            } catch (error) {
+                console.error('히스토리 로드 실패:', error);
+                await loadData();
+            }
+        }
+
+        function updateDateSelector() {
+            const dateSelect = document.getElementById('filterDate');
+            dateSelect.innerHTML = '';
+
+            if (availableDates.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '오늘';
+                dateSelect.appendChild(option);
+                return;
+            }
+
+            availableDates.forEach((date, index) => {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = index === 0 ? `${date} (최신)` : date;
+                dateSelect.appendChild(option);
+            });
+        }
 
         async function loadData() {
             try {
@@ -809,18 +867,31 @@
                 document.getElementById('error').style.display = 'none';
                 document.getElementById('stockTable').style.display = 'none';
 
-                // 두 경로 모두 시도 (data/ 폴더와 루트)
-                let response = await fetch('data/morning_candidates.json');
-                if (!response.ok) {
-                    response = await fetch('morning_candidates.json');
+                const selectedDate = document.getElementById('filterDate').value;
+
+                if (selectedDate && allHistoryData[selectedDate]) {
+                    currentData = allHistoryData[selectedDate].map((item, index) => ({
+                        ...item,
+                        rank: index + 1,
+                        date: selectedDate
+                    }));
+                    document.getElementById('updateTime').textContent = `업데이트: ${selectedDate}`;
+                } else {
+                    let response = await fetch('data/morning_candidates.json');
+                    if (!response.ok) {
+                        response = await fetch('morning_candidates.json');
+                    }
+                    if (!response.ok) throw new Error('데이터를 불러올 수 없습니다');
+
+                    const data = await response.json();
+                    currentData = (data.candidates || []).map((item, index) => ({
+                        ...item,
+                        rank: index + 1,
+                        date: data.date || new Date().toISOString().split('T')[0]
+                    }));
+                    document.getElementById('updateTime').textContent =
+                        `업데이트: ${new Date(data.generated_at).toLocaleString('ko-KR')}`;
                 }
-                if (!response.ok) throw new Error('데이터를 불러올 수 없습니다');
-
-                const data = await response.json();
-                currentData = data.candidates || [];
-
-                document.getElementById('updateTime').textContent =
-                    `업데이트: ${new Date(data.generated_at).toLocaleString('ko-KR')}`;
 
                 updateStats();
                 renderTable();
@@ -859,6 +930,10 @@
             filtered.sort((a, b) => {
                 let aVal, bVal;
                 switch(sortColumn) {
+                    case 'date':
+                        aVal = a.date || '';
+                        bVal = b.date || '';
+                        break;
                     case 'rank':
                         aVal = currentData.indexOf(a);
                         bVal = currentData.indexOf(b);
@@ -908,9 +983,10 @@
                 const changeSymbol = (stock.price_change_percent || 0) >= 0 ? '+' : '';
 
                 row.innerHTML = `
+                    <td><strong>${stock.date || 'N/A'}</strong></td>
                     <td><span class="rank ${originalRank <= 3 ? 'top3' : ''}">${originalRank}</span></td>
                     <td>
-                        <div class="stock-name">${stock.name || 'N/A'}</div>
+                        <div class="stock-name">${stock.name || 'N/A'} ${stock.is_leading ? '👑' : ''}</div>
                         <div class="stock-code">${stock.code || 'N/A'}</div>
                     </td>
                     <td><span class="score ${scoreClass}">${(stock.total_score || 0).toFixed(0)}점</span></td>
@@ -961,12 +1037,13 @@
             }
         }
 
-        // 정렬 이벤트
+        // 이벤트 리스너
         document.addEventListener('DOMContentLoaded', () => {
             // 탭 버튼 이벤트
             document.getElementById('stocksTabBtn').addEventListener('click', () => switchTab('stocks'));
             document.getElementById('systemTabBtn').addEventListener('click', () => switchTab('system'));
 
+            // 테이블 정렬 이벤트
             document.querySelectorAll('th.sortable').forEach(th => {
                 th.addEventListener('click', () => {
                     const column = th.dataset.sort;
@@ -980,12 +1057,19 @@
                 });
             });
 
+            // 날짜 필터 이벤트
+            document.getElementById('filterDate').addEventListener('change', () => {
+                loadData();
+            });
+
+            // 점수 필터 이벤트
             document.getElementById('filterScore').addEventListener('change', () => {
                 updateStats();
                 renderTable();
             });
 
-            loadData();
+            // 초기 데이터 로드
+            loadHistory();
         });
     </script>
 </body>
