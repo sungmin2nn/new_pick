@@ -513,6 +513,7 @@
 
         <div class="tabs">
             <button class="tab-button active" id="stocksTabBtn">📊 종목 선정</button>
+            <button class="tab-button" id="backtestTabBtn">📈 백테스팅</button>
             <button class="tab-button" id="systemTabBtn">⚙️ 시스템 정보</button>
         </div>
 
@@ -573,6 +574,58 @@
                 </tbody>
             </table>
         </div>
+        </div>
+
+        <div id="backtestTab" class="tab-content">
+            <div class="controls">
+                <label for="backtestDate">백테스팅 날짜:</label>
+                <select id="backtestDate">
+                    <option value="">로딩 중...</option>
+                </select>
+                <button onclick="loadBacktestData()">🔄 새로고침</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="label">총 종목 수</div>
+                    <div class="value" id="btStatTotal">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">익절 성공</div>
+                    <div class="value" id="btStatProfit" style="color: #f56565;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">손절 발생</div>
+                    <div class="value" id="btStatLoss" style="color: #4299e1;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">승률</div>
+                    <div class="value" id="btStatWinRate">-</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div id="backtestLoading" class="loading">데이터를 불러오는 중...</div>
+                <div id="backtestError" class="error" style="display: none;"></div>
+                <table id="backtestTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>종목명</th>
+                            <th>시초가</th>
+                            <th>익절가 (+3%)</th>
+                            <th>손절가 (-2%)</th>
+                            <th>결과</th>
+                            <th>도달 시간</th>
+                            <th>최대 수익</th>
+                            <th>최대 손실</th>
+                            <th>종가 등락</th>
+                            <th>선정 점수</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backtestTableBody">
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="systemTab" class="tab-content">
@@ -815,6 +868,10 @@
         let sortColumn = 'rank';
         let sortDirection = 'asc';
 
+        // 백테스팅 관련 변수
+        let backtestDates = [];
+        let currentBacktestData = null;
+
         async function loadHistory() {
             try {
                 // 히스토리 데이터 로드
@@ -1048,6 +1105,181 @@
             return (num / 100000000).toFixed(0);
         }
 
+        // 백테스팅 데이터 로드
+        async function loadBacktestDates() {
+            try {
+                // data/intraday/ 디렉토리의 파일 목록을 가져올 수 없으므로
+                // history.json의 날짜를 기준으로 백테스팅 데이터 확인
+                backtestDates = [];
+
+                for (const date of availableDates) {
+                    const dateStr = date.replace(/-/g, '');
+                    try {
+                        const response = await fetch(`data/intraday/intraday_${dateStr}.json`);
+                        if (response.ok) {
+                            backtestDates.push(dateStr);
+                        }
+                    } catch (e) {
+                        // 파일이 없으면 무시
+                    }
+                }
+
+                updateBacktestDateSelector();
+
+                if (backtestDates.length > 0) {
+                    document.getElementById('backtestDate').value = backtestDates[0];
+                    await loadBacktestData();
+                }
+            } catch (error) {
+                console.error('백테스팅 날짜 로드 실패:', error);
+            }
+        }
+
+        function updateBacktestDateSelector() {
+            const dateSelect = document.getElementById('backtestDate');
+            dateSelect.innerHTML = '';
+
+            if (backtestDates.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '백테스팅 데이터 없음';
+                dateSelect.appendChild(option);
+                return;
+            }
+
+            backtestDates.forEach((dateStr, index) => {
+                const option = document.createElement('option');
+                option.value = dateStr;
+                const formatted = `${dateStr.substr(0,4)}-${dateStr.substr(4,2)}-${dateStr.substr(6,2)}`;
+                option.textContent = index === 0 ? `${formatted} (최신)` : formatted;
+                dateSelect.appendChild(option);
+            });
+        }
+
+        async function loadBacktestData() {
+            try {
+                document.getElementById('backtestLoading').style.display = 'block';
+                document.getElementById('backtestError').style.display = 'none';
+                document.getElementById('backtestTable').style.display = 'none';
+
+                const selectedDate = document.getElementById('backtestDate').value;
+
+                if (!selectedDate) {
+                    document.getElementById('backtestLoading').style.display = 'none';
+                    document.getElementById('backtestError').style.display = 'block';
+                    document.getElementById('backtestError').textContent = '백테스팅 데이터가 없습니다.';
+                    return;
+                }
+
+                const response = await fetch(`data/intraday/intraday_${selectedDate}.json`);
+                if (!response.ok) throw new Error('백테스팅 데이터를 불러올 수 없습니다');
+
+                currentBacktestData = await response.json();
+
+                updateBacktestStats();
+                renderBacktestTable();
+
+                document.getElementById('backtestLoading').style.display = 'none';
+                document.getElementById('backtestTable').style.display = 'table';
+
+            } catch (error) {
+                console.error('백테스팅 데이터 로드 실패:', error);
+                document.getElementById('backtestLoading').style.display = 'none';
+                document.getElementById('backtestError').style.display = 'block';
+                document.getElementById('backtestError').textContent =
+                    '⚠️ 백테스팅 데이터를 불러올 수 없습니다. 장 마감 후 데이터가 수집됩니다.';
+            }
+        }
+
+        function updateBacktestStats() {
+            if (!currentBacktestData || !currentBacktestData.stocks) {
+                return;
+            }
+
+            const stocks = Object.values(currentBacktestData.stocks);
+            const total = stocks.length;
+
+            let profitCount = 0;
+            let lossCount = 0;
+            let noneCount = 0;
+
+            stocks.forEach(stock => {
+                const pl = stock.profit_loss_analysis;
+                if (pl) {
+                    if (pl.first_hit === 'profit') {
+                        profitCount++;
+                    } else if (pl.first_hit === 'loss') {
+                        lossCount++;
+                    } else {
+                        noneCount++;
+                    }
+                }
+            });
+
+            const winRate = total > 0 ? (profitCount / total * 100).toFixed(1) : 0;
+
+            document.getElementById('btStatTotal').textContent = total + '개';
+            document.getElementById('btStatProfit').textContent = profitCount + '개';
+            document.getElementById('btStatLoss').textContent = lossCount + '개';
+            document.getElementById('btStatWinRate').textContent = winRate + '%';
+        }
+
+        function renderBacktestTable() {
+            if (!currentBacktestData || !currentBacktestData.stocks) {
+                return;
+            }
+
+            const tbody = document.getElementById('backtestTableBody');
+            tbody.innerHTML = '';
+
+            const stocks = Object.values(currentBacktestData.stocks);
+
+            stocks.forEach(stock => {
+                const pl = stock.profit_loss_analysis;
+
+                if (!pl) {
+                    return;
+                }
+
+                const row = document.createElement('tr');
+
+                let resultText = '';
+                let resultColor = '';
+
+                if (pl.first_hit === 'profit') {
+                    resultText = '✅ 익절';
+                    resultColor = '#f56565';
+                } else if (pl.first_hit === 'loss') {
+                    resultText = '❌ 손절';
+                    resultColor = '#4299e1';
+                } else {
+                    resultText = '⚪ 미도달';
+                    resultColor = '#718096';
+                }
+
+                const closingColor = pl.closing_percent >= 0 ? '#f56565' : '#4299e1';
+                const closingSymbol = pl.closing_percent >= 0 ? '+' : '';
+
+                row.innerHTML = `
+                    <td>
+                        <div class="stock-name">${stock.name}</div>
+                        <div class="stock-code">${stock.code}</div>
+                    </td>
+                    <td>${pl.opening_price.toLocaleString()}원</td>
+                    <td>${pl.profit_target_price.toLocaleString()}원</td>
+                    <td>${pl.loss_target_price.toLocaleString()}원</td>
+                    <td style="font-weight: 600; color: ${resultColor};">${resultText}</td>
+                    <td>${pl.first_hit_time || '-'}</td>
+                    <td style="color: #f56565; font-weight: 600;">+${pl.max_profit_percent.toFixed(2)}%</td>
+                    <td style="color: #4299e1; font-weight: 600;">${pl.max_loss_percent.toFixed(2)}%</td>
+                    <td style="color: ${closingColor}; font-weight: 600;">${closingSymbol}${pl.closing_percent.toFixed(2)}%</td>
+                    <td><span class="score-badge">${stock.selection_score}점</span></td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
         // 탭 전환 함수
         function switchTab(tab) {
             // 탭 버튼 활성화
@@ -1058,11 +1290,22 @@
             if (tab === 'stocks') {
                 document.getElementById('stocksTabBtn').classList.add('active');
                 document.getElementById('stocksTab').classList.add('active');
+                document.getElementById('backtestTab').classList.remove('active');
                 document.getElementById('systemTab').classList.remove('active');
+            } else if (tab === 'backtest') {
+                document.getElementById('backtestTabBtn').classList.add('active');
+                document.getElementById('backtestTab').classList.add('active');
+                document.getElementById('stocksTab').classList.remove('active');
+                document.getElementById('systemTab').classList.remove('active');
+                // 백테스팅 탭 전환 시 데이터 로드
+                if (backtestDates.length === 0) {
+                    loadBacktestDates();
+                }
             } else if (tab === 'system') {
                 document.getElementById('systemTabBtn').classList.add('active');
                 document.getElementById('systemTab').classList.add('active');
                 document.getElementById('stocksTab').classList.remove('active');
+                document.getElementById('backtestTab').classList.remove('active');
             }
         }
 
@@ -1070,6 +1313,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // 탭 버튼 이벤트
             document.getElementById('stocksTabBtn').addEventListener('click', () => switchTab('stocks'));
+            document.getElementById('backtestTabBtn').addEventListener('click', () => switchTab('backtest'));
             document.getElementById('systemTabBtn').addEventListener('click', () => switchTab('system'));
 
             // 테이블 정렬 이벤트
@@ -1095,6 +1339,11 @@
             document.getElementById('filterScore').addEventListener('change', () => {
                 updateStats();
                 renderTable();
+            });
+
+            // 백테스팅 날짜 필터 이벤트
+            document.getElementById('backtestDate').addEventListener('change', () => {
+                loadBacktestData();
             });
 
             // 초기 데이터 로드
