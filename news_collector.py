@@ -82,28 +82,37 @@ class NewsCollector:
             response = self.session.get(url, headers=self.headers, timeout=10)
             soup = BeautifulSoup(response.text, 'html.parser')
 
-            # 뉴스 리스트 추출
-            news_list = soup.find('ul', {'class': 'newsList'})
+            # 뉴스 리스트 추출 (2026년 구조 변경 대응)
+            news_list = soup.find('ul', {'class': 'realtimeNewsList'})
 
             if news_list:
-                items = news_list.find_all('li')
+                # dd 태그에서 뉴스 추출
+                subjects = news_list.find_all('dd', {'class': 'articleSubject'})
+                summaries = news_list.find_all('dd', {'class': 'articleSummary'})
 
-                for item in items:
+                for i, subject in enumerate(subjects):
                     try:
-                        title_tag = item.find('a', {'class': 'tit'})
+                        title_tag = subject.find('a')
                         if not title_tag:
                             continue
 
                         title = title_tag.text.strip()
                         link = 'https://finance.naver.com' + title_tag.get('href', '')
 
-                        # 요약
-                        summary_tag = item.find('span', {'class': 'txt'})
-                        summary = summary_tag.text.strip() if summary_tag else ''
+                        # 요약 및 시간
+                        summary = ''
+                        pub_time = ''
+                        if i < len(summaries):
+                            summary_dd = summaries[i]
+                            # 요약 텍스트 (span 제외)
+                            for text in summary_dd.stripped_strings:
+                                if text and not text in ['연합뉴스TV', '매일경제', '서울경제', '한국경제', '이데일리', '파이낸셜뉴스', '|']:
+                                    summary = text
+                                    break
 
-                        # 시간
-                        time_tag = item.find('span', {'class': 'wdate'})
-                        pub_time = time_tag.text.strip() if time_tag else ''
+                            # 시간
+                            time_tag = summary_dd.find('span', {'class': 'wdate'})
+                            pub_time = time_tag.text.strip() if time_tag else ''
 
                         # 시간 필터링 (전일 18:00 ~ 당일 08:30)
                         if not self._is_relevant_time(pub_time):
@@ -139,25 +148,37 @@ class NewsCollector:
             response = self.session.get(url, headers=self.headers, timeout=10)
             soup = BeautifulSoup(response.text, 'html.parser')
 
-            news_list = soup.find('ul', {'class': 'newsList'})
+            news_list = soup.find('ul', {'class': 'realtimeNewsList'})
 
             if news_list:
-                items = news_list.find_all('li')
+                # dd 태그에서 뉴스 추출
+                subjects = news_list.find_all('dd', {'class': 'articleSubject'})
+                summaries = news_list.find_all('dd', {'class': 'articleSummary'})
 
-                for item in items[:30]:  # 상위 30개
+                # 상위 30개
+                for i, subject in enumerate(subjects[:30]):
                     try:
-                        title_tag = item.find('a', {'class': 'tit'})
+                        title_tag = subject.find('a')
                         if not title_tag:
                             continue
 
                         title = title_tag.text.strip()
                         link = 'https://finance.naver.com' + title_tag.get('href', '')
 
-                        summary_tag = item.find('span', {'class': 'txt'})
-                        summary = summary_tag.text.strip() if summary_tag else ''
+                        # 요약 및 시간
+                        summary = ''
+                        pub_time = ''
+                        if i < len(summaries):
+                            summary_dd = summaries[i]
+                            # 요약 텍스트 (span 제외)
+                            for text in summary_dd.stripped_strings:
+                                if text and not text in ['연합뉴스TV', '매일경제', '서울경제', '한국경제', '이데일리', '파이낸셜뉴스', '|']:
+                                    summary = text
+                                    break
 
-                        time_tag = item.find('span', {'class': 'wdate'})
-                        pub_time = time_tag.text.strip() if time_tag else ''
+                            # 시간
+                            time_tag = summary_dd.find('span', {'class': 'wdate'})
+                            pub_time = time_tag.text.strip() if time_tag else ''
 
                         # 시간 필터링
                         if not self._is_relevant_time(pub_time):

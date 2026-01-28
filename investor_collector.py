@@ -1,166 +1,115 @@
 """
 외국인/기관 매매 정보 수집
-네이버 금융에서 전일 외국인/기관 순매수 정보 크롤링
+pykrx 라이브러리를 사용한 한국거래소(KRX) 공식 데이터 수집
 """
 
-import requests
-from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 import time
 
 class InvestorCollector:
     def __init__(self):
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-        }
-        self.session = requests.Session()
+        self.use_pykrx = True
+        try:
+            from pykrx import stock
+            self.pykrx_stock = stock
+        except ImportError:
+            print("  ⚠️  pykrx 라이브러리가 설치되지 않았습니다. 투자자 데이터를 수집하지 않습니다.")
+            self.use_pykrx = False
 
     def get_investor_data(self):
         """전일 외국인/기관 순매수 상위 종목 수집"""
         print("\n💼 외국인/기관 매매 정보 수집 중...")
 
-        all_data = {}
+        if not self.use_pykrx:
+            print("  ⚠️  pykrx를 사용할 수 없습니다. 투자자 점수는 0점으로 처리됩니다.")
+            return {}
 
         try:
-            # 외국인 순매수 상위
-            self._collect_foreign_buy('ALL', all_data)
-            time.sleep(0.3)
+            # 전일 날짜 계산 (장 마감일 기준)
+            today = datetime.now()
+            yesterday = today - timedelta(days=1)
 
-            # 기관 순매수 상위
-            self._collect_institution_buy('ALL', all_data)
+            # 주말 처리
+            while yesterday.weekday() >= 5:  # 5=토요일, 6=일요일
+                yesterday = yesterday - timedelta(days=1)
+
+            date_str = yesterday.strftime('%Y%m%d')
+
+            print(f"  📅 조회 날짜: {date_str}")
+
+            all_data = {}
+
+            # KOSPI + KOSDAQ 외국인/기관 순매수 데이터 수집
+            for market in ['KOSPI', 'KOSDAQ']:
+                try:
+                    # 외국인 순매수 상위 종목
+                    foreign_df = self.pykrx_stock.get_market_net_purchases_of_equities_by_ticker(
+                        date_str,
+                        date_str,
+                        market,
+                        "외국인"
+                    )
+
+                    if foreign_df is not None and not foreign_df.empty:
+                        # 순매수 상위 30개
+                        foreign_top = foreign_df.nlargest(30, '순매수량')
+
+                        for ticker in foreign_top.index:
+                            if ticker not in all_data:
+                                # 종목명 조회
+                                name = self.pykrx_stock.get_market_ticker_name(ticker)
+                                all_data[ticker] = {
+                                    'name': name,
+                                    'code': ticker,
+                                    'foreign_buy': 0,
+                                    'institution_buy': 0
+                                }
+
+                            # 순매수량 (주)
+                            all_data[ticker]['foreign_buy'] = int(foreign_top.loc[ticker, '순매수량'])
+
+                    time.sleep(0.5)  # API 호출 간격
+
+                    # 기관 순매수 상위 종목
+                    inst_df = self.pykrx_stock.get_market_net_purchases_of_equities_by_ticker(
+                        date_str,
+                        date_str,
+                        market,
+                        "기관"
+                    )
+
+                    if inst_df is not None and not inst_df.empty:
+                        # 순매수 상위 30개
+                        inst_top = inst_df.nlargest(30, '순매수량')
+
+                        for ticker in inst_top.index:
+                            if ticker not in all_data:
+                                name = self.pykrx_stock.get_market_ticker_name(ticker)
+                                all_data[ticker] = {
+                                    'name': name,
+                                    'code': ticker,
+                                    'foreign_buy': 0,
+                                    'institution_buy': 0
+                                }
+
+                            all_data[ticker]['institution_buy'] = int(inst_top.loc[ticker, '순매수량'])
+
+                    foreign_count = len([k for k, v in all_data.items() if v['foreign_buy'] > 0])
+                    inst_count = len([k for k, v in all_data.items() if v['institution_buy'] > 0])
+                    print(f"  ✓ {market}: 외국인 {foreign_count}개, 기관 {inst_count}개")
+
+                    time.sleep(0.5)  # API 호출 간격
+
+                except Exception as e:
+                    print(f"  ⚠️  {market} 데이터 수집 실패: {e}")
 
             print(f"  ✓ 총 {len(all_data)}개 종목의 매매 정보 수집 완료")
 
             return all_data
 
         except Exception as e:
-            print(f"  ⚠️  매매 정보 수집 실패: {e}")
+            print(f"  ⚠️  투자자 매매 정보 수집 실패: {e}")
             return {}
-
-    def _collect_foreign_buy(self, market, data_dict):
-        """외국인 순매수 상위 종목"""
-        try:
-            # 페이지 번호 1 (상위 30개만)
-            page = 1
-
-            url = f'https://finance.naver.com/sise/sise_group_detail.naver?type=foreign&no=0&page={page}'
-            response = self.session.get(url, headers=self.headers, timeout=5)
-
-            if response.status_code != 200:
-                print(f"  ⚠️  {market} 외국인 순매수 접근 실패: HTTP {response.status_code}")
-                return
-
-            soup = BeautifulSoup(response.text, 'html.parser')
-
-            # 테이블 파싱
-            table = soup.find('table', {'class': 'type_2'})
-            if not table:
-                return
-
-            rows = table.find('tbody').find_all('tr')
-
-            for row in rows:
-                cols = row.find_all('td')
-                if len(cols) < 10:
-                    continue
-
-                try:
-                    # 종목명
-                    name_tag = cols[1].find('a')
-                    if not name_tag:
-                        continue
-
-                    stock_name = name_tag.text.strip()
-                    stock_code = name_tag.get('href', '').split('code=')[-1] if 'code=' in name_tag.get('href', '') else ''
-
-                    # 외국인 순매수량
-                    foreign_buy = cols[9].text.strip().replace(',', '')
-                    if not foreign_buy or foreign_buy == '':
-                        continue
-
-                    foreign_buy_value = int(foreign_buy) if foreign_buy.replace('-', '').isdigit() else 0
-
-                    # 순매수인 경우만 (양수)
-                    if foreign_buy_value > 0:
-                        if stock_code not in data_dict:
-                            data_dict[stock_code] = {
-                                'name': stock_name,
-                                'code': stock_code,
-                                'foreign_buy': 0,
-                                'institution_buy': 0
-                            }
-
-                        data_dict[stock_code]['foreign_buy'] = foreign_buy_value
-
-                except Exception:
-                    continue
-
-            print(f"  ✓ {market} 외국인 순매수: {len([k for k, v in data_dict.items() if v['foreign_buy'] > 0])}개 종목")
-
-        except Exception as e:
-            print(f"  ⚠️  {market} 외국인 순매수 수집 실패: {e}")
-
-    def _collect_institution_buy(self, market, data_dict):
-        """기관 순매수 상위 종목"""
-        try:
-            # 페이지 번호 1 (상위 30개만)
-            page = 1
-
-            url = f'https://finance.naver.com/sise/sise_group_detail.naver?type=institution&no=0&page={page}'
-            response = self.session.get(url, headers=self.headers, timeout=5)
-
-            if response.status_code != 200:
-                print(f"  ⚠️  {market} 기관 순매수 접근 실패: HTTP {response.status_code}")
-                return
-
-            soup = BeautifulSoup(response.text, 'html.parser')
-
-            # 테이블 파싱
-            table = soup.find('table', {'class': 'type_2'})
-            if not table:
-                return
-
-            rows = table.find('tbody').find_all('tr')
-
-            for row in rows:
-                cols = row.find_all('td')
-                if len(cols) < 10:
-                    continue
-
-                try:
-                    # 종목명
-                    name_tag = cols[1].find('a')
-                    if not name_tag:
-                        continue
-
-                    stock_name = name_tag.text.strip()
-                    stock_code = name_tag.get('href', '').split('code=')[-1] if 'code=' in name_tag.get('href', '') else ''
-
-                    # 기관 순매수량
-                    institution_buy = cols[9].text.strip().replace(',', '')
-                    if not institution_buy or institution_buy == '':
-                        continue
-
-                    institution_buy_value = int(institution_buy) if institution_buy.replace('-', '').isdigit() else 0
-
-                    # 순매수인 경우만 (양수)
-                    if institution_buy_value > 0:
-                        if stock_code not in data_dict:
-                            data_dict[stock_code] = {
-                                'name': stock_name,
-                                'code': stock_code,
-                                'foreign_buy': 0,
-                                'institution_buy': 0
-                            }
-
-                        data_dict[stock_code]['institution_buy'] = institution_buy_value
-
-                except Exception:
-                    continue
-
-            print(f"  ✓ {market} 기관 순매수: {len([k for k, v in data_dict.items() if v['institution_buy'] > 0])}개 종목")
-
-        except Exception as e:
-            print(f"  ⚠️  {market} 기관 순매수 수집 실패: {e}")
 
     def calculate_investor_score(self, stock_code, investor_data):
         """종목별 외국인/기관 점수 계산 (10점)"""
@@ -202,18 +151,23 @@ class InvestorCollector:
 if __name__ == '__main__':
     # 테스트
     collector = InvestorCollector()
-    data = collector.get_investor_data()
 
-    print(f"\n✅ 수집 완료: {len(data)}개 종목")
+    if collector.use_pykrx:
+        data = collector.get_investor_data()
 
-    if data:
-        print("\n💼 외국인/기관 순매수 상위 10개:")
-        sorted_stocks = sorted(
-            data.items(),
-            key=lambda x: x[1]['foreign_buy'] + x[1]['institution_buy'],
-            reverse=True
-        )
+        print(f"\n✅ 수집 완료: {len(data)}개 종목")
 
-        for i, (code, info) in enumerate(sorted_stocks[:10], 1):
-            print(f"{i}. {info['name']} ({code})")
-            print(f"   외국인: {info['foreign_buy']:,}주 | 기관: {info['institution_buy']:,}주")
+        if data:
+            print("\n💼 외국인/기관 순매수 상위 10개:")
+            sorted_stocks = sorted(
+                data.items(),
+                key=lambda x: x[1]['foreign_buy'] + x[1]['institution_buy'],
+                reverse=True
+            )
+
+            for i, (code, info) in enumerate(sorted_stocks[:10], 1):
+                print(f"{i}. {info['name']} ({code})")
+                print(f"   외국인: {info['foreign_buy']:,}주 | 기관: {info['institution_buy']:,}주")
+                print(f"   점수: {collector.calculate_investor_score(code, data)}점")
+    else:
+        print("\n⚠️  pykrx가 설치되지 않아 테스트를 실행할 수 없습니다.")
