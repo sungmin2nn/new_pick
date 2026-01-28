@@ -6,62 +6,134 @@
 from datetime import datetime, timedelta
 import json
 import os
+import requests
+from bs4 import BeautifulSoup
+import time
+import re
 
 class IntradayCollector:
     def __init__(self):
-        self.use_pykrx = True
-        try:
-            from pykrx import stock
-            self.pykrx_stock = stock
-        except ImportError:
-            print("⚠️  pykrx 라이브러리가 설치되지 않았습니다.")
-            self.use_pykrx = False
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Referer': 'https://finance.naver.com/'
+        })
 
     def get_minute_data(self, stock_code, date_str, freq='1'):
         """
-        특정 종목의 분봉 데이터 수집
+        네이버 증권에서 분봉 데이터 수집
+
+        주의: 네이버 금융은 당일 장중 데이터만 제공합니다.
+        과거 데이터는 조회할 수 없습니다.
 
         Args:
             stock_code: 종목코드 (6자리)
-            date_str: 날짜 (YYYYMMDD)
-            freq: 분봉 간격 ('1', '5', '10', '30', '60')
+            date_str: 날짜 (YYYYMMDD) - 당일만 가능
+            freq: 분봉 간격 ('1') - 네이버는 1분봉만 제공
 
         Returns:
             분봉 데이터 리스트
         """
-        if not self.use_pykrx:
-            return []
-
         try:
-            print(f"  📊 {stock_code} 분봉 데이터 수집 중... (freq={freq}분)")
+            print(f"  📊 {stock_code} 분봉 데이터 수집 중... (Naver Finance)")
 
-            df = self.pykrx_stock.get_market_ohlcv_by_minute(
-                date_str,
-                stock_code,
-                freq=freq
-            )
-
-            if df is None or df.empty:
-                print(f"    ⚠️  데이터 없음")
-                return []
-
-            # DataFrame을 리스트로 변환
             minute_data = []
-            for timestamp, row in df.iterrows():
-                minute_data.append({
-                    'time': timestamp.strftime('%H:%M:%S'),
-                    'open': int(row['시가']),
-                    'high': int(row['고가']),
-                    'low': int(row['저가']),
-                    'close': int(row['종가']),
-                    'volume': int(row['거래량'])
-                })
+            page = 1
+            max_pages = 50  # 최대 50페이지 (약 400개 데이터)
 
-            print(f"    ✓ {len(minute_data)}개 데이터 수집 완료")
+            # thistime 파라미터: 현재 시간 또는 당일 장 마감 시간 사용
+            thistime = datetime.now().strftime('%Y%m%d%H%M%S')
+
+            while page <= max_pages:
+                url = f"https://finance.naver.com/item/sise_time.naver?code={stock_code}&thistime={thistime}&page={page}"
+
+                try:
+                    response = self.session.get(url, timeout=10)
+                    response.raise_for_status()
+                except Exception as e:
+                    print(f"    ⚠️  페이지 {page} 요청 실패: {e}")
+                    break
+
+                soup = BeautifulSoup(response.text, 'html.parser')
+
+                # 데이터 테이블 찾기
+                table = soup.select_one('table.type2')
+                if not table:
+                    print(f"    ⚠️  페이지 {page} 테이블 없음")
+                    break
+
+                rows = table.select('tr')
+                data_found = False
+
+                for row in rows:
+                    cols = row.select('td')
+                    if len(cols) < 7:
+                        continue
+
+                    # 시간 (첫 번째 td의 span)
+                    time_span = cols[0].select_one('span')
+                    if not time_span:
+                        continue
+
+                    time_text = time_span.get_text(strip=True)
+                    if not time_text or ':' not in time_text:
+                        continue
+
+                    # 체결가 (두 번째 td의 span)
+                    price_span = cols[1].select_one('span')
+                    if not price_span:
+                        continue
+                    price_text = price_span.get_text(strip=True).replace(',', '').replace('원', '')
+
+                    # 거래량 (일곱 번째 td의 span)
+                    volume_span = cols[6].select_one('span')
+                    volume_text = '0'
+                    if volume_span:
+                        volume_text = volume_span.get_text(strip=True).replace(',', '')
+
+                    try:
+                        # 시간 파싱 (HH:MM)
+                        time_parts = time_text.split(':')
+                        if len(time_parts) != 2:
+                            continue
+
+                        close_price = int(price_text)
+                        volume = int(volume_text) if volume_text else 0
+
+                        # 네이버는 체결가만 제공하므로 OHLC를 체결가로 동일하게 설정
+                        minute_data.append({
+                            'time': f"{time_text}:00",
+                            'open': close_price,
+                            'high': close_price,
+                            'low': close_price,
+                            'close': close_price,
+                            'volume': volume
+                        })
+                        data_found = True
+
+                    except (ValueError, IndexError) as e:
+                        continue
+
+                if not data_found:
+                    # 데이터 없으면 중단
+                    break
+
+                page += 1
+                time.sleep(0.2)  # 요청 간격
+
+            if minute_data:
+                # 시간순으로 정렬 (오래된 것부터)
+                minute_data.sort(key=lambda x: x['time'])
+                print(f"    ✓ {len(minute_data)}개 데이터 수집 완료")
+            else:
+                print(f"    ⚠️  데이터 없음 (장중이 아니거나 당일이 아닙니다)")
+
             return minute_data
 
         except Exception as e:
             print(f"    ⚠️  분봉 데이터 수집 실패: {e}")
+            import traceback
+            traceback.print_exc()
             return []
 
     def analyze_profit_loss(self, stock_code, date_str, profit_target=3.0, loss_target=-2.0):
@@ -164,14 +236,10 @@ class IntradayCollector:
 
         Args:
             candidates: 선정 종목 리스트 (morning_candidates.json의 candidates)
-            date_str: 날짜 (YYYYMMDD), None이면 오늘
+            date_str: 날짜 (YYYYMMDD), None이면 오늘 (네이버는 당일만 조회 가능)
             profit_target: 익절 목표 (%, 기본 +3%)
             loss_target: 손절 목표 (%, 기본 -2%)
         """
-        if not self.use_pykrx:
-            print("⚠️  pykrx를 사용할 수 없습니다.")
-            return {}
-
         if date_str is None:
             date_str = datetime.now().strftime('%Y%m%d')
 
@@ -225,10 +293,6 @@ class IntradayCollector:
 if __name__ == '__main__':
     # 테스트: morning_candidates.json 읽어서 수집
     collector = IntradayCollector()
-
-    if not collector.use_pykrx:
-        print("pykrx가 설치되지 않았습니다.")
-        exit(1)
 
     # morning_candidates.json 로드
     try:
