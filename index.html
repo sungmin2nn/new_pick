@@ -979,17 +979,24 @@
 
         async function loadHistory() {
             try {
+                console.log('[loadHistory] 시작');
                 // 히스토리 데이터 로드
                 let response = await fetch('data/history.json');
+                console.log('[loadHistory] data/history.json 응답:', response.status, response.ok);
+
                 if (!response.ok) {
+                    console.log('[loadHistory] history.json 로드 시도 (루트)');
                     response = await fetch('history.json');
+                    console.log('[loadHistory] history.json 응답:', response.status, response.ok);
                 }
 
                 if (response.ok) {
                     const historyData = await response.json();
                     allHistoryData = historyData.data_by_date || {};
                     availableDates = historyData.dates || [];
+                    console.log('[loadHistory] 히스토리 로드 완료:', availableDates.length, '개 날짜');
                 } else {
+                    console.log('[loadHistory] 히스토리 없음, 빈 데이터 사용');
                     allHistoryData = {};
                     availableDates = [];
                 }
@@ -998,15 +1005,19 @@
 
                 if (availableDates.length > 0) {
                     document.getElementById('filterDate').value = availableDates[0];
+                    console.log('[loadHistory] 선택된 날짜:', availableDates[0]);
                 }
 
+                console.log('[loadHistory] loadData() 호출 전');
                 await loadData();
+                console.log('[loadHistory] 완료');
             } catch (error) {
-                console.error('히스토리 로드 실패:', error);
+                console.error('[loadHistory] 에러:', error);
                 // 에러 발생 시에도 날짜 셀렉터 업데이트
                 allHistoryData = {};
                 availableDates = [];
                 updateDateSelector();
+                console.log('[loadHistory] 에러 후 loadData() 호출');
                 await loadData();
             }
         }
@@ -1033,13 +1044,16 @@
 
         async function loadData() {
             try {
+                console.log('[loadData] 시작');
                 document.getElementById('loading').style.display = 'block';
                 document.getElementById('error').style.display = 'none';
                 document.getElementById('stockTable').style.display = 'none';
 
                 const selectedDate = document.getElementById('filterDate').value;
+                console.log('[loadData] 선택된 날짜:', selectedDate);
 
                 if (selectedDate && allHistoryData[selectedDate]) {
+                    console.log('[loadData] 히스토리 데이터 사용');
                     // 데이터베이스 필드명을 원본 JSON 필드명으로 변환
                     currentData = allHistoryData[selectedDate].map((item, index) => ({
                         ...item,
@@ -1059,18 +1073,31 @@
                     }));
                     document.getElementById('updateTime').textContent = `업데이트: ${selectedDate}`;
                 } else {
+                    console.log('[loadData] morning_candidates.json 로드 시도');
                     let response = await fetch('data/morning_candidates.json');
+                    console.log('[loadData] data/morning_candidates.json 응답:', response.status, response.ok);
+
                     if (!response.ok) {
+                        console.log('[loadData] morning_candidates.json 로드 시도 (루트)');
                         response = await fetch('morning_candidates.json');
+                        console.log('[loadData] morning_candidates.json 응답:', response.status, response.ok);
                     }
-                    if (!response.ok) throw new Error('데이터를 불러올 수 없습니다');
+
+                    if (!response.ok) {
+                        throw new Error(`데이터를 불러올 수 없습니다 (HTTP ${response.status})`);
+                    }
 
                     const data = await response.json();
+                    console.log('[loadData] JSON 파싱 완료:', data);
+
                     currentData = (data.candidates || []).map((item, index) => ({
                         ...item,
                         rank: index + 1,
                         date: data.date || new Date().toISOString().split('T')[0]
                     }));
+
+                    console.log('[loadData] currentData 설정 완료:', currentData.length, '개');
+
                     document.getElementById('updateTime').textContent =
                         `업데이트: ${new Date(data.generated_at).toLocaleString('ko-KR')}`;
                 }
@@ -1080,13 +1107,14 @@
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('stockTable').style.display = 'table';
+                console.log('[loadData] 완료');
 
             } catch (error) {
-                console.error('데이터 로드 실패:', error);
+                console.error('[loadData] 에러:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
                 document.getElementById('error').textContent =
-                    '⚠️ 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.';
+                    `⚠️ 데이터를 불러올 수 없습니다: ${error.message}`;
             }
         }
 
