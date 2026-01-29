@@ -366,14 +366,16 @@
         th {
             background: #e6f3ff;
             color: #2c5282;
-            padding: 14px;
-            text-align: left;
-            font-weight: 600;
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
             position: sticky;
             top: 0;
             cursor: pointer;
             user-select: none;
             border-bottom: 2px solid #90cdf4;
+            white-space: nowrap;
         }
 
         th:hover {
@@ -396,8 +398,11 @@
         }
 
         td {
-            padding: 14px;
+            padding: 10px 8px;
             border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            text-align: center;
+            vertical-align: middle;
         }
 
         tr:hover {
@@ -405,7 +410,7 @@
         }
 
         .rank {
-            font-weight: bold;
+            font-weight: 700;
             color: #4299e1;
             font-size: 1.1rem;
         }
@@ -415,17 +420,20 @@
         }
 
         .stock-name {
-            font-weight: 600;
+            font-weight: 700;
             color: #2d3748;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
         }
 
         .stock-code {
             color: #a0aec0;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
 
         .score {
-            font-weight: bold;
+            font-weight: 700;
             font-size: 1.1rem;
         }
 
@@ -444,7 +452,10 @@
         .score-detail {
             display: flex;
             gap: 5px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 4px;
         }
 
         .score-badge {
@@ -452,10 +463,14 @@
             border-radius: 6px;
             background: #edf2f7;
             color: #4a5568;
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: 0.8rem;
         }
 
         .price-change {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 0.9rem;
         }
 
         .price-change.positive {
@@ -1209,21 +1224,21 @@
                 const changeSymbol = (stock.price_change_percent || 0) >= 0 ? '+' : '';
 
                 row.innerHTML = `
-                    <td><strong>${stock.date || 'N/A'}</strong></td>
+                    <td style="font-weight: 600; font-size: 0.8rem;">${stock.date || 'N/A'}</td>
                     <td><span class="rank ${originalRank <= 3 ? 'top3' : ''}">${originalRank}</span></td>
-                    <td>
+                    <td style="text-align: left; padding-left: 12px;">
                         <div class="stock-name">${stock.name || 'N/A'} ${stock.is_leading ? '👑' : ''}</div>
                         <div class="stock-code">${stock.code || 'N/A'}</div>
                     </td>
-                    <td><span class="score ${scoreClass}">${(stock.total_score || 0).toFixed(0)}점</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.disclosure || 0)}점</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.news || 0)}점</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.theme_keywords || 0)}점</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.investor || 0)}점</span></td>
-                    <td style="font-size: 0.9rem; color: #4a5568;">${stock.selection_reason || '-'}</td>
-                    <td>${(stock.current_price || 0).toLocaleString()}원</td>
+                    <td><span class="score ${scoreClass}">${(stock.total_score || 0).toFixed(0)}</span></td>
+                    <td><span class="score-badge">${(stock.score_detail?.disclosure || 0)}</span></td>
+                    <td><span class="score-badge">${(stock.score_detail?.news || 0)}</span></td>
+                    <td><span class="score-badge">${(stock.score_detail?.theme_keywords || 0)}</span></td>
+                    <td><span class="score-badge">${(stock.score_detail?.investor || 0)}</span></td>
+                    <td style="font-size: 0.75rem; color: #4a5568; text-align: left; padding-left: 10px; max-width: 200px; line-height: 1.4;">${stock.selection_reason || '-'}</td>
+                    <td style="font-size: 0.85rem; font-weight: 600;">${(stock.current_price || 0).toLocaleString()}</td>
                     <td><span class="price-change ${changeClass}">${changeSymbol}${(stock.price_change_percent || 0).toFixed(2)}%</span></td>
-                    <td>${formatNumber(stock.trading_value || 0)}억</td>
+                    <td style="font-size: 0.85rem; font-weight: 600;">${formatNumber(stock.trading_value || 0)}억</td>
                 `;
 
                 tbody.appendChild(row);
