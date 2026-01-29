@@ -597,11 +597,28 @@
                     <button onclick="setQuickPeriod('7days')" style="padding: 10px 20px; background: #e6f3ff; color: #2c5282; border: 2px solid #90cdf4; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;">7일</button>
                 </div>
 
-                <div style="display: flex; gap: 15px; align-items: center;">
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                     <label style="font-size: 1.1rem; font-weight: 700; color: #2d3748;">💰 초기 투자금</label>
-                    <input type="number" id="initialInvestment" value="10000000" min="100000" step="100000" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem; width: 180px;">
+                    <input type="number" id="initialInvestment" value="1000000" min="100000" step="100000" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem; width: 180px;">
                     <span style="color: #718096; font-size: 0.95rem;">원</span>
-                    <button onclick="runPeriodBacktest()" style="padding: 10px 30px; background: #90cdf4; color: #1a365d; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 700;">🚀 백테스팅 실행</button>
+                </div>
+
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <label style="font-size: 1.1rem; font-weight: 700; color: #2d3748;">💵 종목당 제한 금액</label>
+                    <input type="number" id="maxPerStock" value="100000" min="10000" step="10000" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem; width: 180px;">
+                    <span style="color: #718096; font-size: 0.95rem;">원</span>
+                </div>
+
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <label style="font-size: 1.1rem; font-weight: 700; color: #2d3748;">🔧 고가 종목 처리</label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="buyExpensiveStocks" checked style="width: 20px; height: 20px; cursor: pointer;">
+                        <span style="font-size: 0.95rem; color: #4a5568;">1주 가격이 제한금액 초과 시 1주만 매수</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: center;">
+                    <button onclick="runPeriodBacktest()" style="padding: 12px 40px; background: #90cdf4; color: #1a365d; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">🚀 백테스팅 실행</button>
                 </div>
             </div>
 
@@ -699,8 +716,11 @@
                             <th>날짜</th>
                             <th>종목명</th>
                             <th>시초가</th>
+                            <th>매수 주식 수</th>
+                            <th>투자 금액</th>
                             <th>결과</th>
                             <th>수익률</th>
+                            <th>손익 금액</th>
                             <th>도달 시간</th>
                             <th>자산 변화</th>
                         </tr>
@@ -1433,6 +1453,9 @@
 
             // 초기 데이터 로드
             loadHistory();
+
+            // 백테스팅 탭 기본 기간 설정 (7일)
+            setQuickPeriod('7days');
         });
 
         // 기간 단축 버튼 함수
@@ -1479,6 +1502,8 @@
             const startDateStr = document.getElementById('periodStartDate').value;
             const endDateStr = document.getElementById('periodEndDate').value;
             const initialCapital = parseFloat(document.getElementById('initialInvestment').value);
+            const maxPerStock = parseFloat(document.getElementById('maxPerStock').value);
+            const buyExpensive = document.getElementById('buyExpensiveStocks').checked;
 
             if (!startDateStr || !endDateStr) {
                 alert('시작일과 종료일을 선택해주세요.');
@@ -1487,6 +1512,11 @@
 
             if (initialCapital < 100000) {
                 alert('투자금은 최소 10만원 이상이어야 합니다.');
+                return;
+            }
+
+            if (maxPerStock < 10000) {
+                alert('종목당 제한 금액은 최소 1만원 이상이어야 합니다.');
                 return;
             }
 
@@ -1529,56 +1559,99 @@
                         const dayOfWeek = tradeDate.getDay();
 
                         let dailyReturn = 0;
+                        let dailyTradeCount = 0;
 
                         for (const stock of stocks) {
                             const pl = stock.profit_loss_analysis;
                             if (!pl) continue;
 
+                            const openingPrice = pl.opening_price;
+
+                            // 주식 수 계산
+                            let shares = 0;
+                            let investAmount = 0;
+
+                            if (openingPrice > maxPerStock) {
+                                // 1주 가격이 제한금액 초과
+                                if (buyExpensive) {
+                                    shares = 1;
+                                    investAmount = openingPrice;
+                                } else {
+                                    // 매수 안 함 (스킵)
+                                    continue;
+                                }
+                            } else {
+                                // 제한금액 내에서 최대 주식 수 계산
+                                shares = Math.floor(maxPerStock / openingPrice);
+                                investAmount = shares * openingPrice;
+                            }
+
+                            // 자본이 부족하면 스킵
+                            if (investAmount > capital) {
+                                continue;
+                            }
+
+                            // 실제 매도가 계산
+                            let sellPrice = 0;
                             let returnPercent = 0;
 
                             if (pl.first_hit === 'profit') {
+                                sellPrice = pl.profit_target_price;
                                 returnPercent = pl.profit_target_percent;
                             } else if (pl.first_hit === 'loss') {
+                                sellPrice = pl.loss_target_price;
                                 returnPercent = pl.loss_target_percent;
                             } else {
+                                sellPrice = pl.closing_price;
                                 returnPercent = pl.closing_percent;
                             }
 
-                            const tradeReturn = capital * (returnPercent / 100);
-                            capital += tradeReturn;
-                            dailyReturn += returnPercent;
+                            // 실제 손익 계산
+                            const sellAmount = shares * sellPrice;
+                            const profit = sellAmount - investAmount;
+                            const actualReturnPercent = (profit / investAmount) * 100;
+
+                            // 자본 업데이트
+                            capital = capital - investAmount + sellAmount;
+                            dailyReturn += actualReturnPercent;
+                            dailyTradeCount++;
 
                             trades.push({
                                 date: dateFormatted,
                                 dateObj: tradeDate,
                                 stock_name: stock.name,
                                 stock_code: stock.code,
-                                opening_price: pl.opening_price,
+                                opening_price: openingPrice,
+                                shares: shares,
+                                invest_amount: investAmount,
+                                sell_price: sellPrice,
+                                sell_amount: sellAmount,
+                                profit: profit,
                                 result: pl.first_hit,
-                                return_percent: returnPercent,
+                                return_percent: actualReturnPercent,
                                 hit_time: pl.first_hit_time || '-',
                                 capital_after: capital,
                                 selection_score: stock.selection_score || 0
                             });
 
                             // 연승/연패 계산
-                            if (returnPercent > 0) {
+                            if (profit > 0) {
                                 consecutiveWins++;
                                 consecutiveLosses = 0;
                                 maxWinStreak = Math.max(maxWinStreak, consecutiveWins);
-                            } else if (returnPercent < 0) {
+                            } else if (profit < 0) {
                                 consecutiveLosses++;
                                 consecutiveWins = 0;
                                 maxLossStreak = Math.max(maxLossStreak, consecutiveLosses);
                             }
 
                             // 요일별 통계
-                            dayOfWeekStats[dayOfWeek].push(returnPercent);
+                            dayOfWeekStats[dayOfWeek].push(actualReturnPercent);
                         }
 
                         equityCurve.push({date: dateFormatted, capital: capital});
-                        if (stocks.length > 0) {
-                            dailyReturns.push(dailyReturn / stocks.length);
+                        if (dailyTradeCount > 0) {
+                            dailyReturns.push(dailyReturn / dailyTradeCount);
                         }
 
                     } catch (e) {
@@ -1767,6 +1840,8 @@
 
                 const returnColor = trade.return_percent >= 0 ? '#f56565' : '#4299e1';
                 const returnSymbol = trade.return_percent >= 0 ? '+' : '';
+                const profitColor = trade.profit >= 0 ? '#f56565' : '#4299e1';
+                const profitSymbol = trade.profit >= 0 ? '+' : '';
 
                 row.innerHTML = `
                     <td>${trade.date}</td>
@@ -1775,8 +1850,11 @@
                         <div class="stock-code">${trade.stock_code}</div>
                     </td>
                     <td>${trade.opening_price.toLocaleString()}원</td>
+                    <td style="font-weight: 600; color: #2c5282;">${trade.shares.toLocaleString()}주</td>
+                    <td style="font-weight: 600; color: #2c5282;">${trade.invest_amount.toLocaleString()}원</td>
                     <td style="font-weight: 600; color: ${resultColor};">${resultText}</td>
                     <td style="font-weight: 600; color: ${returnColor};">${returnSymbol}${trade.return_percent.toFixed(2)}%</td>
+                    <td style="font-weight: 600; color: ${profitColor};">${profitSymbol}${trade.profit.toLocaleString()}원</td>
                     <td>${trade.hit_time}</td>
                     <td style="font-weight: 600; color: #2c5282;">${trade.capital_after.toLocaleString()}원</td>
                 `;
