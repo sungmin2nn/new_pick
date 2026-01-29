@@ -6,6 +6,7 @@
 import json
 import os
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 import config
 from utils import get_kst_now, format_kst_time
 from market_data import MarketDataCollector
@@ -13,6 +14,9 @@ from news_collector import NewsCollector
 from disclosure_collector import DisclosureCollector
 from investor_collector import InvestorCollector
 from database import Database
+
+# .env 파일에서 환경변수 로드
+load_dotenv()
 
 class StockScreener:
     def __init__(self):
@@ -35,36 +39,35 @@ class StockScreener:
         return self.market_collector.get_market_data()
 
     def apply_filters(self, stocks):
-        """필터링 조건 적용"""
-        print("\n🔍 필터링 적용 중...")
+        """최소 필터링 조건 적용 (극소형만 제외)"""
+        print("\n🔍 최소 필터 적용 중...")
         filtered = []
 
         for stock in stocks:
-            # 거래대금 체크
+            # 극소형 제외 (거래대금 100억 미만)
             if stock.get('trading_value', 0) < config.MIN_TRADING_VALUE:
                 continue
 
-            # 상승률 체크
-            if stock.get('price_change_percent', 0) < config.MIN_PRICE_CHANGE:
-                continue
-
-            # 시가총액 체크
+            # 극소형 제외 (시가총액 100억 미만)
             if stock.get('market_cap', 0) < config.MIN_MARKET_CAP:
                 continue
 
-            # 주가 상한 체크
-            if stock.get('current_price', 0) > config.MAX_PRICE:
+            # 폭락주 제외 (등락률 -30% 미만)
+            if stock.get('price_change_percent', 0) < config.MIN_PRICE_CHANGE:
                 continue
 
-            # 거래량 급증 체크
-            avg_volume = stock.get('avg_volume_20d', 1)
-            current_volume = stock.get('volume', 0)
-            if current_volume < avg_volume * config.VOLUME_SPIKE_MULTIPLIER:
+            # 페니스탁 제외 (100원 미만)
+            current_price = stock.get('current_price', 0)
+            if current_price < config.MIN_PRICE:
+                continue
+
+            # 극단적 고가 제외 (100만원 초과)
+            if current_price > config.MAX_PRICE:
                 continue
 
             filtered.append(stock)
 
-        print(f"  ✓ 필터링 완료: {len(filtered)}개 종목 선정")
+        print(f"  ✓ 필터링 완료: {len(filtered)}개 종목 (기존 대비 완화)")
         return filtered
 
     def fetch_news(self):
@@ -76,8 +79,11 @@ class StockScreener:
         """공시 데이터 수집"""
         if self.disclosure_collector:
             self.disclosure_data = self.disclosure_collector.get_recent_disclosures()
+            if len(self.disclosure_data) == 0:
+                print("  ⚠️  시간대(전일 18:00~당일 08:30)에 긍정적 공시가 없습니다.")
         else:
             print("\n⚠️  DART API 키가 설정되지 않았습니다. 공시 점수는 0점으로 처리됩니다.")
+            print("   GitHub Secrets 또는 .env 파일에 DART_API_KEY를 설정해주세요.")
             self.disclosure_data = []
         return self.disclosure_data
 
@@ -87,7 +93,7 @@ class StockScreener:
         return self.investor_data
 
     def calculate_score(self, stock):
-        """종목별 점수 계산 (총 100점 - 공시+뉴스 중심)"""
+        """종목별 점수 계산 (총 120점)"""
         score = 0
         score_detail = {}
         reasons = []
@@ -100,17 +106,17 @@ class StockScreener:
             disclosures = stock.get('disclosures', [])
             if disclosures:
                 categories = [d.get('disclosure_category', '기타') for d in disclosures[:2]]
-                reasons.append(f"{'·'.join(set(categories))} 공시 발표")
+                reasons.append(f"{'·'.join(set(categories))} 공시")
 
-        # 2. 뉴스 점수 (30점)
+        # 2. 뉴스 점수 (25점)
         news_score = self.calculate_news_score(stock)
         score += news_score
         score_detail['news'] = news_score
         if stock.get('news_mentions', 0) > 0:
             sentiment = "긍정" if stock.get('positive_news', 0) > stock.get('negative_news', 0) else "중립"
-            reasons.append(f"뉴스 {stock.get('news_mentions')}건 언급 ({sentiment})")
+            reasons.append(f"뉴스 {stock.get('news_mentions')}건 ({sentiment})")
 
-        # 3. 테마/키워드 점수 (20점)
+        # 3. 테마/키워드 점수 (15점)
         theme_score = self.calculate_theme_score(stock)
         score += theme_score
         score_detail['theme_keywords'] = theme_score
@@ -127,6 +133,41 @@ class StockScreener:
                 reasons.append("외국인 순매수")
             if stock.get('institution_buy', 0) > 0:
                 reasons.append("기관 순매수")
+
+        # 5. 거래대금 점수 (15점) - 신규!
+        trading_value_score = self.calculate_trading_value_score(stock)
+        score += trading_value_score
+        score_detail['trading_value'] = trading_value_score
+
+        # 6. 시가총액 점수 (10점) - 신규!
+        market_cap_score = self.calculate_market_cap_score(stock)
+        score += market_cap_score
+        score_detail['market_cap'] = market_cap_score
+
+        # 7. 가격 모멘텀 점수 (5점)
+        momentum_score = self.calculate_price_momentum_score(stock)
+        score += momentum_score
+        score_detail['price_momentum'] = momentum_score
+
+        # 8. 거래량 급증 점수 (10점) - 신규!
+        volume_surge_score = self.calculate_volume_surge_score(stock)
+        score += volume_surge_score
+        score_detail['volume_surge'] = volume_surge_score
+
+        # 9. 회전율 점수 (5점) - 신규!
+        turnover_score = self.calculate_turnover_rate_score(stock)
+        score += turnover_score
+        score_detail['turnover_rate'] = turnover_score
+
+        # 10. 재료 중복도 점수 (5점) - 신규!
+        overlap_score = self.calculate_material_overlap_score(stock, disclosure_score, news_score, theme_score)
+        score += overlap_score
+        score_detail['material_overlap'] = overlap_score
+
+        # 11. 뉴스 시간대 점수 (5점) - 신규!
+        news_timing_score = self.calculate_news_timing_score(stock)
+        score += news_timing_score
+        score_detail['news_timing'] = news_timing_score
 
         # 선정 사유 저장
         stock['selection_reason'] = ' / '.join(reasons) if reasons else '-'
@@ -172,16 +213,16 @@ class StockScreener:
         # 저장
         stock['matched_themes'] = list(set(matched_themes))
 
-        # 테마 매칭 개수에 따른 점수 (20점)
+        # 테마 매칭 개수에 따른 점수 (15점, 기존 20점 → 15점)
         theme_count = len(set(matched_themes))
         if theme_count >= 3:
-            return 20
+            return 15
         elif theme_count == 2:
-            return 17
+            return 12
         elif theme_count == 1:
-            return 13
+            return 8
         else:
-            return 7
+            return 3  # 테마 없어도 최소 3점
 
     def calculate_disclosure_score(self, stock):
         """공시 점수 계산 (40점 - 시초가 매매 핵심 지표)"""
@@ -270,8 +311,147 @@ class StockScreener:
 
         final_score = base_score + sentiment_bonus
 
-        # 최종 점수는 0~30점 범위
-        return max(0, min(30, final_score))
+        # 최종 점수는 0~25점 범위 (기존 30점 → 25점)
+        return max(0, min(25, final_score))
+
+    def calculate_trading_value_score(self, stock):
+        """거래대금 점수 계산 (15점 만점)"""
+        trading_value = stock.get('trading_value', 0)
+
+        for threshold, score in config.TRADING_VALUE_TIERS:
+            if trading_value >= threshold:
+                return score
+
+        return 0  # 100억 미만
+
+    def calculate_market_cap_score(self, stock):
+        """시가총액 점수 계산 (10점 만점)"""
+        market_cap = stock.get('market_cap', 0)
+
+        for threshold, score in config.MARKET_CAP_TIERS:
+            if market_cap >= threshold:
+                return score
+
+        return 0  # 100억 미만
+
+    def calculate_price_momentum_score(self, stock):
+        """가격 모멘텀 점수 계산 (5점 만점)"""
+        price_change = stock.get('price_change_percent', 0)
+
+        for threshold, score in config.PRICE_MOMENTUM_TIERS:
+            if price_change >= threshold:
+                return score
+
+        return 0  # -10% 미만 (폭락)
+
+    def calculate_volume_surge_score(self, stock):
+        """거래량 급증 점수 계산 (10점 만점)"""
+        current_volume = stock.get('volume', 0)
+        avg_volume = stock.get('avg_volume_20d', 1)
+
+        if avg_volume == 0:
+            return 0
+
+        volume_ratio = current_volume / avg_volume
+
+        for threshold, score in config.VOLUME_SURGE_TIERS:
+            if volume_ratio >= threshold:
+                return score
+
+        return 0
+
+    def calculate_turnover_rate_score(self, stock):
+        """회전율 점수 계산 (5점 만점)"""
+        trading_value = stock.get('trading_value', 0)
+        market_cap = stock.get('market_cap', 1)
+
+        if market_cap == 0:
+            return 0
+
+        # 회전율 = (거래대금 / 시가총액) * 100
+        turnover_rate = (trading_value / market_cap) * 100
+
+        for threshold, score in config.TURNOVER_RATE_TIERS:
+            if turnover_rate >= threshold:
+                return score
+
+        return 0
+
+    def calculate_material_overlap_score(self, stock, disclosure_score, news_score, theme_score):
+        """재료 중복도 점수 계산 (5점 만점)"""
+        # 공시, 뉴스, 테마 각각 점수가 있는지 확인
+        has_disclosure = disclosure_score > 0
+        has_news = news_score > 0
+        has_theme = theme_score > 3  # 테마 최소 점수 3점 이상
+
+        material_count = sum([has_disclosure, has_news, has_theme])
+
+        if material_count >= 3:
+            return config.MATERIAL_OVERLAP_BONUS['all_three']
+        elif material_count == 2:
+            return config.MATERIAL_OVERLAP_BONUS['two']
+        else:
+            return config.MATERIAL_OVERLAP_BONUS['one']
+
+    def calculate_news_timing_score(self, stock):
+        """뉴스 시간대 점수 계산 (5점 만점)"""
+        from datetime import datetime, timedelta
+
+        # 종목이 언급된 뉴스 찾기
+        stock_name = stock.get('name', '')
+        relevant_news = []
+
+        for news in self.news_data:
+            title = news.get('title', '')
+            summary = news.get('summary', '')
+            if stock_name in title or stock_name in summary:
+                relevant_news.append(news)
+
+        if not relevant_news:
+            return 0
+
+        # 가장 최신 뉴스의 시간대 확인
+        now = datetime.now()
+        today_morning_start = now.replace(hour=6, minute=0, second=0, microsecond=0)
+        today_morning_end = now.replace(hour=8, minute=30, second=0, microsecond=0)
+        yesterday_evening_start = (now - timedelta(days=1)).replace(hour=18, minute=0, second=0, microsecond=0)
+        yesterday_evening_end = (now - timedelta(days=1)).replace(hour=23, minute=59, second=0, microsecond=0)
+        yesterday_afternoon_start = (now - timedelta(days=1)).replace(hour=15, minute=0, second=0, microsecond=0)
+        yesterday_afternoon_end = (now - timedelta(days=1)).replace(hour=18, minute=0, second=0, microsecond=0)
+
+        best_score = 0
+
+        for news in relevant_news:
+            pub_time_str = news.get('pub_time', '')
+            if not pub_time_str:
+                continue
+
+            try:
+                # 시간 파싱
+                if '.' in pub_time_str:  # "2024.01.28 07:30" 형식
+                    news_time = datetime.strptime(pub_time_str, '%Y.%m.%d %H:%M')
+                elif ':' in pub_time_str:  # "07:30" 형식 (오늘)
+                    time_parts = pub_time_str.split(':')
+                    hour = int(time_parts[0])
+                    minute = int(time_parts[1])
+                    news_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+                else:
+                    continue
+
+                # 시간대별 점수
+                if today_morning_start <= news_time <= today_morning_end:
+                    best_score = max(best_score, config.NEWS_TIMING_BONUS['morning'])
+                elif yesterday_evening_start <= news_time <= yesterday_evening_end:
+                    best_score = max(best_score, config.NEWS_TIMING_BONUS['evening'])
+                elif yesterday_afternoon_start <= news_time <= yesterday_afternoon_end:
+                    best_score = max(best_score, config.NEWS_TIMING_BONUS['afternoon'])
+                else:
+                    best_score = max(best_score, config.NEWS_TIMING_BONUS['other'])
+
+            except Exception:
+                continue
+
+        return best_score
 
     def calculate_investor_score(self, stock):
         """외국인/기관 점수 계산 (10점)"""
@@ -396,9 +576,11 @@ class StockScreener:
             print(f"\n{i}. {stock.get('name', 'N/A')} ({stock.get('code', 'N/A')}) - {stock.get('market', 'N/A')}{leading_badge}")
             print(f"   현재가: {stock.get('current_price', 0):,}원 ({stock.get('price_change_percent', 0):+.2f}%)")
             print(f"   거래대금: {stock.get('trading_value', 0)/100000000:.0f}억원")
-            print(f"   총점: {stock.get('total_score', 0):.0f}점")
+            print(f"   총점: {stock.get('total_score', 0):.0f}점/145점")
             score_detail = stock.get('score_detail', {})
-            print(f"   - 공시: {score_detail.get('disclosure', 0)}점 | 뉴스: {score_detail.get('news', 0)}점 | 테마: {score_detail.get('theme_keywords', 0)}점 | 투자자: {score_detail.get('investor', 0)}점")
+            print(f"   - 공시: {score_detail.get('disclosure', 0):.0f}점 | 뉴스: {score_detail.get('news', 0):.0f}점 | 테마: {score_detail.get('theme_keywords', 0):.0f}점 | 투자자: {score_detail.get('investor', 0):.0f}점")
+            print(f"   - 거래대금: {score_detail.get('trading_value', 0):.0f}점 | 시총: {score_detail.get('market_cap', 0):.0f}점 | 모멘텀: {score_detail.get('price_momentum', 0):.0f}점")
+            print(f"   - 거래량: {score_detail.get('volume_surge', 0):.0f}점 | 회전율: {score_detail.get('turnover_rate', 0):.0f}점 | 재료중복: {score_detail.get('material_overlap', 0):.0f}점 | 뉴스시간: {score_detail.get('news_timing', 0):.0f}점")
 
             # 공시 정보
             disclosure_count = stock.get('disclosure_count', 0)
