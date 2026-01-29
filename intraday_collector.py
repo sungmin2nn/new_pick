@@ -10,6 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
+from utils import get_kst_now, format_kst_time
 
 class IntradayCollector:
     def __init__(self):
@@ -41,8 +42,8 @@ class IntradayCollector:
             page = 1
             max_pages = 50  # 최대 50페이지 (약 400개 데이터)
 
-            # thistime 파라미터: 현재 시간 또는 당일 장 마감 시간 사용
-            thistime = datetime.now().strftime('%Y%m%d%H%M%S')
+            # thistime 파라미터: 한국 시간 기준
+            thistime = format_kst_time(format_str='%Y%m%d%H%M%S')
 
             while page <= max_pages:
                 url = f"https://finance.naver.com/item/sise_time.naver?code={stock_code}&thistime={thistime}&page={page}"
@@ -241,9 +242,9 @@ class IntradayCollector:
             loss_target: 손절 목표 (%, 기본 -2%)
         """
         if date_str is None:
-            date_str = datetime.now().strftime('%Y%m%d')
+            date_str = format_kst_time(format_str='%Y%m%d')
 
-        print(f"\n📈 시초가 매매 분석 시작 - {date_str}")
+        print(f"\n📈 시초가 매매 분석 시작 (KST) - {date_str}")
         print(f"   익절 목표: +{profit_target}% / 손절 목표: {loss_target}%")
 
         intraday_data = {}
@@ -271,13 +272,13 @@ class IntradayCollector:
     def save_intraday_data(self, intraday_data, date_str=None):
         """장중 데이터를 JSON 파일로 저장"""
         if date_str is None:
-            date_str = datetime.now().strftime('%Y%m%d')
+            date_str = format_kst_time(format_str='%Y%m%d')
 
         os.makedirs('data/intraday', exist_ok=True)
         output_path = f'data/intraday/intraday_{date_str}.json'
 
         result = {
-            'generated_at': datetime.now().isoformat(),
+            'generated_at': format_kst_time(format_str='%Y-%m-%dT%H:%M:%S'),
             'date': date_str,
             'count': len(intraday_data),
             'stocks': intraday_data

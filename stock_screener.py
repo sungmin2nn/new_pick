@@ -7,6 +7,7 @@ import json
 import os
 from datetime import datetime, timedelta
 import config
+from utils import get_kst_now, format_kst_time
 from market_data import MarketDataCollector
 from news_collector import NewsCollector
 from disclosure_collector import DisclosureCollector
@@ -365,8 +366,8 @@ class StockScreener:
         output_path = os.path.join(config.OUTPUT_DIR, config.JSON_FILE)
 
         result = {
-            'generated_at': datetime.now().isoformat(),
-            'date': datetime.now().strftime('%Y-%m-%d'),
+            'generated_at': format_kst_time(format_str='%Y-%m-%dT%H:%M:%S'),
+            'date': format_kst_time(format_str='%Y-%m-%d'),
             'count': len(stocks),
             'candidates': stocks
         }
@@ -386,7 +387,7 @@ class StockScreener:
     def print_summary(self, stocks):
         """결과 요약 출력"""
         print("\n" + "="*60)
-        print(f"🎯 장전 종목 선정 완료 - {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+        print(f"🎯 장전 종목 선정 완료 - {format_kst_time(format_str='%Y-%m-%d %H:%M')}")
         print("="*60)
 
         for i, stock in enumerate(stocks[:10], 1):
@@ -432,7 +433,7 @@ class StockScreener:
     def run(self):
         """메인 실행 함수"""
         print("🚀 장전 종목 선정 시스템 시작")
-        print(f"⏰ 실행 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"⏰ 실행 시간 (KST): {format_kst_time()}")
 
         try:
             # 1. 시장 데이터 수집

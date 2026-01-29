@@ -6,6 +6,7 @@ GitHub Pages에서 사용할 수 있도록 최근 30일 데이터를 JSON 파일
 import json
 from datetime import datetime
 from database import Database
+from utils import format_kst_time
 
 def export_history():
     """최근 30일 데이터를 JSON으로 내보내기"""
@@ -24,7 +25,7 @@ def export_history():
 
     # JSON 파일로 저장
     result = {
-        'generated_at': datetime.now().isoformat(),
+        'generated_at': format_kst_time(format_str='%Y-%m-%dT%H:%M:%S'),
         'dates': sorted(data_by_date.keys(), reverse=True),
         'data_by_date': data_by_date
     }

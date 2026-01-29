@@ -5,6 +5,7 @@ pykrx 라이브러리를 사용한 한국거래소(KRX) 공식 데이터 수집
 
 from datetime import datetime, timedelta
 import time
+from utils import get_kst_now
 
 class InvestorCollector:
     def __init__(self):
@@ -25,8 +26,8 @@ class InvestorCollector:
             return {}
 
         try:
-            # 전일 날짜 계산 (장 마감일 기준)
-            today = datetime.now()
+            # 전일 날짜 계산 (한국 시간 기준 장 마감일)
+            today = get_kst_now()
             yesterday = today - timedelta(days=1)
 
             # 주말 처리
