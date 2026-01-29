@@ -1003,6 +1003,10 @@
                 await loadData();
             } catch (error) {
                 console.error('히스토리 로드 실패:', error);
+                // 에러 발생 시에도 날짜 셀렉터 업데이트
+                allHistoryData = {};
+                availableDates = [];
+                updateDateSelector();
                 await loadData();
             }
         }
