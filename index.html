@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔮 장전 종목 선정</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -577,49 +578,131 @@
         </div>
 
         <div id="backtestTab" class="tab-content">
-            <div class="controls">
-                <label for="backtestDate">백테스팅 날짜:</label>
-                <select id="backtestDate">
-                    <option value="">로딩 중...</option>
-                </select>
-                <button onclick="loadBacktestData()">🔄 새로고침</button>
+            <!-- 기간 및 투자금 설정 -->
+            <div class="controls" style="flex-direction: column; gap: 20px; align-items: stretch;">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                    <label style="font-size: 1.1rem; font-weight: 700; color: #2d3748;">📅 기간 설정</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="date" id="periodStartDate" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem;">
+                        <span style="color: #718096;">~</span>
+                        <input type="date" id="periodEndDate" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="setQuickPeriod('year')" style="padding: 10px 20px; background: #e6f3ff; color: #2c5282; border: 2px solid #90cdf4; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;">올해</button>
+                    <button onclick="setQuickPeriod('month')" style="padding: 10px 20px; background: #e6f3ff; color: #2c5282; border: 2px solid #90cdf4; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;">이번달</button>
+                    <button onclick="setQuickPeriod('week')" style="padding: 10px 20px; background: #e6f3ff; color: #2c5282; border: 2px solid #90cdf4; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;">이번주</button>
+                    <button onclick="setQuickPeriod('30days')" style="padding: 10px 20px; background: #e6f3ff; color: #2c5282; border: 2px solid #90cdf4; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;">30일</button>
+                    <button onclick="setQuickPeriod('7days')" style="padding: 10px 20px; background: #e6f3ff; color: #2c5282; border: 2px solid #90cdf4; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;">7일</button>
+                </div>
+
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-size: 1.1rem; font-weight: 700; color: #2d3748;">💰 초기 투자금</label>
+                    <input type="number" id="initialInvestment" value="10000000" min="100000" step="100000" style="padding: 10px 15px; border: 2px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem; width: 180px;">
+                    <span style="color: #718096; font-size: 0.95rem;">원</span>
+                    <button onclick="runPeriodBacktest()" style="padding: 10px 30px; background: #90cdf4; color: #1a365d; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 700;">🚀 백테스팅 실행</button>
+                </div>
             </div>
 
+            <!-- 핵심 통계 -->
             <div class="stats">
                 <div class="stat-card">
-                    <div class="label">총 종목 수</div>
-                    <div class="value" id="btStatTotal">-</div>
+                    <div class="label">최종 자산</div>
+                    <div class="value" id="btFinalCapital" style="color: #2c5282;">-</div>
                 </div>
                 <div class="stat-card">
-                    <div class="label">익절 성공</div>
-                    <div class="value" id="btStatProfit" style="color: #f56565;">-</div>
+                    <div class="label">누적 수익률</div>
+                    <div class="value" id="btTotalReturn" style="color: #f56565;">-</div>
                 </div>
                 <div class="stat-card">
-                    <div class="label">손절 발생</div>
-                    <div class="value" id="btStatLoss" style="color: #4299e1;">-</div>
+                    <div class="label">총 거래 수</div>
+                    <div class="value" id="btTotalTrades">-</div>
                 </div>
                 <div class="stat-card">
                     <div class="label">승률</div>
-                    <div class="value" id="btStatWinRate">-</div>
+                    <div class="value" id="btWinRate">-</div>
                 </div>
             </div>
 
-            <div class="table-container">
+            <!-- 수익 곡선 차트 -->
+            <div class="table-container" id="equityChartContainer" style="display: none;">
+                <h3 style="color: #2d3748; margin-bottom: 20px; font-size: 1.3rem;">📈 자본 증가 곡선</h3>
+                <canvas id="equityChart" style="max-height: 400px;"></canvas>
+            </div>
+
+            <!-- 상세 통계 -->
+            <div class="stats" id="detailedStatsContainer" style="display: none; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="stat-card">
+                    <div class="label">익절</div>
+                    <div class="value" id="btProfitCount" style="color: #f56565; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">손절</div>
+                    <div class="value" id="btLossCount" style="color: #4299e1; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">장마감 매도</div>
+                    <div class="value" id="btNoneCount" style="color: #718096; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">MDD</div>
+                    <div class="value" id="btMDD" style="color: #e53e3e; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Profit Factor</div>
+                    <div class="value" id="btProfitFactor" style="color: #38a169; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">연승 최대</div>
+                    <div class="value" id="btMaxWinStreak" style="color: #f56565; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">연패 최대</div>
+                    <div class="value" id="btMaxLossStreak" style="color: #4299e1; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">거래당 기대값</div>
+                    <div class="value" id="btExpectedValue" style="color: #2c5282; font-size: 1.5rem;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Sharpe Ratio</div>
+                    <div class="value" id="btSharpeRatio" style="color: #805ad5; font-size: 1.5rem;">-</div>
+                </div>
+            </div>
+
+            <!-- 요일별 분석 -->
+            <div class="table-container" id="dayOfWeekContainer" style="display: none;">
+                <h3 style="color: #2d3748; margin-bottom: 15px; font-size: 1.2rem;">📆 요일별 성과</h3>
+                <table style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>요일</th>
+                            <th>거래 수</th>
+                            <th>승률</th>
+                            <th>평균 수익률</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dayOfWeekTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 거래 내역 테이블 -->
+            <div class="table-container" id="tradeHistoryContainer" style="display: none;">
+                <h3 style="color: #2d3748; margin-bottom: 15px; font-size: 1.2rem;">📋 전체 거래 내역</h3>
                 <div id="backtestLoading" class="loading">데이터를 불러오는 중...</div>
                 <div id="backtestError" class="error" style="display: none;"></div>
                 <table id="backtestTable" style="display: none;">
                     <thead>
                         <tr>
+                            <th>날짜</th>
                             <th>종목명</th>
                             <th>시초가</th>
-                            <th>익절가 (+3%)</th>
-                            <th>손절가 (-2%)</th>
                             <th>결과</th>
+                            <th>수익률</th>
                             <th>도달 시간</th>
-                            <th>최대 수익</th>
-                            <th>최대 손실</th>
-                            <th>종가 등락</th>
-                            <th>선정 점수</th>
+                            <th>자산 변화</th>
                         </tr>
                     </thead>
                     <tbody id="backtestTableBody">
@@ -871,6 +954,8 @@
         // 백테스팅 관련 변수
         let backtestDates = [];
         let currentBacktestData = null;
+        let equityChartInstance = null;
+        let periodBacktestResults = null;
 
         async function loadHistory() {
             try {
@@ -1349,6 +1434,387 @@
             // 초기 데이터 로드
             loadHistory();
         });
+
+        // 기간 단축 버튼 함수
+        function setQuickPeriod(period) {
+            const endDate = new Date();
+            let startDate = new Date();
+
+            switch(period) {
+                case 'year':
+                    startDate = new Date(endDate.getFullYear(), 0, 1);
+                    break;
+                case 'month':
+                    startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+                    break;
+                case 'week':
+                    const dayOfWeek = endDate.getDay();
+                    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                    startDate = new Date(endDate);
+                    startDate.setDate(endDate.getDate() - diff);
+                    break;
+                case '30days':
+                    startDate = new Date(endDate);
+                    startDate.setDate(endDate.getDate() - 30);
+                    break;
+                case '7days':
+                    startDate = new Date(endDate);
+                    startDate.setDate(endDate.getDate() - 7);
+                    break;
+            }
+
+            document.getElementById('periodStartDate').value = formatDateInput(startDate);
+            document.getElementById('periodEndDate').value = formatDateInput(endDate);
+        }
+
+        function formatDateInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 기간 백테스팅 실행
+        async function runPeriodBacktest() {
+            const startDateStr = document.getElementById('periodStartDate').value;
+            const endDateStr = document.getElementById('periodEndDate').value;
+            const initialCapital = parseFloat(document.getElementById('initialInvestment').value);
+
+            if (!startDateStr || !endDateStr) {
+                alert('시작일과 종료일을 선택해주세요.');
+                return;
+            }
+
+            if (initialCapital < 100000) {
+                alert('투자금은 최소 10만원 이상이어야 합니다.');
+                return;
+            }
+
+            document.getElementById('backtestLoading').style.display = 'block';
+            document.getElementById('backtestError').style.display = 'none';
+
+            try {
+                // 날짜 범위 생성
+                const startDate = new Date(startDateStr);
+                const endDate = new Date(endDateStr);
+                const tradingDays = [];
+
+                for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                    const dayOfWeek = d.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        tradingDays.push(formatDateToYYYYMMDD(new Date(d)));
+                    }
+                }
+
+                // 각 날짜의 백테스팅 데이터 로드
+                let capital = initialCapital;
+                const trades = [];
+                const equityCurve = [{date: startDateStr, capital: capital}];
+                let consecutiveWins = 0;
+                let consecutiveLosses = 0;
+                let maxWinStreak = 0;
+                let maxLossStreak = 0;
+                let dailyReturns = [];
+                let dayOfWeekStats = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []};
+
+                for (const dateStr of tradingDays) {
+                    try {
+                        const response = await fetch(`data/intraday/intraday_${dateStr}.json`);
+                        if (!response.ok) continue;
+
+                        const data = await response.json();
+                        const stocks = Object.values(data.stocks || {});
+                        const dateFormatted = `${dateStr.substr(0,4)}-${dateStr.substr(4,2)}-${dateStr.substr(6,2)}`;
+                        const tradeDate = new Date(dateFormatted);
+                        const dayOfWeek = tradeDate.getDay();
+
+                        let dailyReturn = 0;
+
+                        for (const stock of stocks) {
+                            const pl = stock.profit_loss_analysis;
+                            if (!pl) continue;
+
+                            let returnPercent = 0;
+
+                            if (pl.first_hit === 'profit') {
+                                returnPercent = pl.profit_target_percent;
+                            } else if (pl.first_hit === 'loss') {
+                                returnPercent = pl.loss_target_percent;
+                            } else {
+                                returnPercent = pl.closing_percent;
+                            }
+
+                            const tradeReturn = capital * (returnPercent / 100);
+                            capital += tradeReturn;
+                            dailyReturn += returnPercent;
+
+                            trades.push({
+                                date: dateFormatted,
+                                dateObj: tradeDate,
+                                stock_name: stock.name,
+                                stock_code: stock.code,
+                                opening_price: pl.opening_price,
+                                result: pl.first_hit,
+                                return_percent: returnPercent,
+                                hit_time: pl.first_hit_time || '-',
+                                capital_after: capital,
+                                selection_score: stock.selection_score || 0
+                            });
+
+                            // 연승/연패 계산
+                            if (returnPercent > 0) {
+                                consecutiveWins++;
+                                consecutiveLosses = 0;
+                                maxWinStreak = Math.max(maxWinStreak, consecutiveWins);
+                            } else if (returnPercent < 0) {
+                                consecutiveLosses++;
+                                consecutiveWins = 0;
+                                maxLossStreak = Math.max(maxLossStreak, consecutiveLosses);
+                            }
+
+                            // 요일별 통계
+                            dayOfWeekStats[dayOfWeek].push(returnPercent);
+                        }
+
+                        equityCurve.push({date: dateFormatted, capital: capital});
+                        if (stocks.length > 0) {
+                            dailyReturns.push(dailyReturn / stocks.length);
+                        }
+
+                    } catch (e) {
+                        console.warn(`${dateStr} 데이터 로드 실패:`, e);
+                    }
+                }
+
+                // 통계 계산
+                periodBacktestResults = calculateBacktestStatistics(trades, capital, initialCapital, equityCurve, dailyReturns, dayOfWeekStats, maxWinStreak, maxLossStreak);
+
+                // UI 업데이트
+                displayBacktestResults(periodBacktestResults);
+                renderEquityCurve(equityCurve);
+                renderTradeHistory(trades);
+                renderDayOfWeekAnalysis(dayOfWeekStats);
+
+                document.getElementById('backtestLoading').style.display = 'none';
+
+            } catch (error) {
+                console.error('백테스팅 실행 실패:', error);
+                document.getElementById('backtestLoading').style.display = 'none';
+                document.getElementById('backtestError').style.display = 'block';
+                document.getElementById('backtestError').textContent = '⚠️ 백테스팅 실행 중 오류가 발생했습니다.';
+            }
+        }
+
+        function formatDateToYYYYMMDD(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+
+        function calculateBacktestStatistics(trades, finalCapital, initialCapital, equityCurve, dailyReturns, dayOfWeekStats, maxWinStreak, maxLossStreak) {
+            const totalTrades = trades.length;
+            const profitTrades = trades.filter(t => t.return_percent > 0);
+            const lossTrades = trades.filter(t => t.return_percent < 0);
+            const noneTrades = trades.filter(t => t.return_percent === 0 || (t.result === 'none' && t.return_percent !== 0));
+
+            const winRate = totalTrades > 0 ? (profitTrades.length / totalTrades * 100) : 0;
+            const totalReturn = ((finalCapital - initialCapital) / initialCapital * 100);
+
+            // MDD 계산
+            let peak = initialCapital;
+            let maxDrawdown = 0;
+
+            equityCurve.forEach(point => {
+                if (point.capital > peak) {
+                    peak = point.capital;
+                }
+                const drawdown = ((peak - point.capital) / peak * 100);
+                if (drawdown > maxDrawdown) {
+                    maxDrawdown = drawdown;
+                }
+            });
+
+            // Profit Factor 계산
+            const totalProfit = profitTrades.reduce((sum, t) => sum + Math.abs(t.return_percent), 0);
+            const totalLoss = lossTrades.reduce((sum, t) => sum + Math.abs(t.return_percent), 0);
+            const profitFactor = totalLoss > 0 ? (totalProfit / totalLoss) : (totalProfit > 0 ? 999 : 0);
+
+            // Expected Value (평균 수익률)
+            const expectedValue = totalTrades > 0 ? (trades.reduce((sum, t) => sum + t.return_percent, 0) / totalTrades) : 0;
+
+            // Sharpe Ratio 계산 (일간 수익률 기준)
+            const avgReturn = dailyReturns.reduce((sum, r) => sum + r, 0) / dailyReturns.length || 0;
+            const variance = dailyReturns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / dailyReturns.length || 0;
+            const stdDev = Math.sqrt(variance);
+            const sharpeRatio = stdDev > 0 ? (avgReturn / stdDev) : 0;
+
+            return {
+                totalTrades,
+                profitCount: profitTrades.length,
+                lossCount: lossTrades.length,
+                noneCount: noneTrades.length,
+                winRate,
+                totalReturn,
+                finalCapital,
+                initialCapital,
+                maxDrawdown,
+                profitFactor,
+                expectedValue,
+                sharpeRatio,
+                maxWinStreak,
+                maxLossStreak
+            };
+        }
+
+        function displayBacktestResults(results) {
+            document.getElementById('btFinalCapital').textContent = results.finalCapital.toLocaleString() + '원';
+            document.getElementById('btTotalReturn').textContent = (results.totalReturn >= 0 ? '+' : '') + results.totalReturn.toFixed(2) + '%';
+            document.getElementById('btTotalTrades').textContent = results.totalTrades + '건';
+            document.getElementById('btWinRate').textContent = results.winRate.toFixed(1) + '%';
+
+            document.getElementById('btProfitCount').textContent = results.profitCount + '건';
+            document.getElementById('btLossCount').textContent = results.lossCount + '건';
+            document.getElementById('btNoneCount').textContent = results.noneCount + '건';
+            document.getElementById('btMDD').textContent = results.maxDrawdown.toFixed(2) + '%';
+            document.getElementById('btProfitFactor').textContent = results.profitFactor.toFixed(2);
+            document.getElementById('btMaxWinStreak').textContent = results.maxWinStreak + '회';
+            document.getElementById('btMaxLossStreak').textContent = results.maxLossStreak + '회';
+            document.getElementById('btExpectedValue').textContent = (results.expectedValue >= 0 ? '+' : '') + results.expectedValue.toFixed(2) + '%';
+            document.getElementById('btSharpeRatio').textContent = results.sharpeRatio.toFixed(3);
+
+            document.getElementById('detailedStatsContainer').style.display = 'grid';
+        }
+
+        function renderEquityCurve(equityCurve) {
+            const ctx = document.getElementById('equityChart').getContext('2d');
+
+            if (equityChartInstance) {
+                equityChartInstance.destroy();
+            }
+
+            const labels = equityCurve.map(point => point.date);
+            const data = equityCurve.map(point => point.capital);
+
+            equityChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '자산 총액',
+                        data: data,
+                        borderColor: '#4299e1',
+                        backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return '자산: ' + context.parsed.y.toLocaleString() + '원';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '원';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('equityChartContainer').style.display = 'block';
+        }
+
+        function renderTradeHistory(trades) {
+            const tbody = document.getElementById('backtestTableBody');
+            tbody.innerHTML = '';
+
+            trades.forEach(trade => {
+                const row = document.createElement('tr');
+
+                let resultText = '';
+                let resultColor = '';
+
+                if (trade.result === 'profit') {
+                    resultText = '✅ 익절';
+                    resultColor = '#f56565';
+                } else if (trade.result === 'loss') {
+                    resultText = '❌ 손절';
+                    resultColor = '#4299e1';
+                } else {
+                    resultText = '⚪ 장마감';
+                    resultColor = '#718096';
+                }
+
+                const returnColor = trade.return_percent >= 0 ? '#f56565' : '#4299e1';
+                const returnSymbol = trade.return_percent >= 0 ? '+' : '';
+
+                row.innerHTML = `
+                    <td>${trade.date}</td>
+                    <td>
+                        <div class="stock-name">${trade.stock_name}</div>
+                        <div class="stock-code">${trade.stock_code}</div>
+                    </td>
+                    <td>${trade.opening_price.toLocaleString()}원</td>
+                    <td style="font-weight: 600; color: ${resultColor};">${resultText}</td>
+                    <td style="font-weight: 600; color: ${returnColor};">${returnSymbol}${trade.return_percent.toFixed(2)}%</td>
+                    <td>${trade.hit_time}</td>
+                    <td style="font-weight: 600; color: #2c5282;">${trade.capital_after.toLocaleString()}원</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('backtestTable').style.display = 'table';
+            document.getElementById('tradeHistoryContainer').style.display = 'block';
+        }
+
+        function renderDayOfWeekAnalysis(dayOfWeekStats) {
+            const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+            const tbody = document.getElementById('dayOfWeekTableBody');
+            tbody.innerHTML = '';
+
+            [1, 2, 3, 4, 5].forEach(day => {
+                const trades = dayOfWeekStats[day] || [];
+                if (trades.length === 0) return;
+
+                const wins = trades.filter(r => r > 0).length;
+                const winRate = (wins / trades.length * 100).toFixed(1);
+                const avgReturn = (trades.reduce((sum, r) => sum + r, 0) / trades.length).toFixed(2);
+                const returnColor = avgReturn >= 0 ? '#f56565' : '#4299e1';
+                const returnSymbol = avgReturn >= 0 ? '+' : '';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-weight: 600;">${dayNames[day]}요일</td>
+                    <td>${trades.length}건</td>
+                    <td>${winRate}%</td>
+                    <td style="font-weight: 600; color: ${returnColor};">${returnSymbol}${avgReturn}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('dayOfWeekContainer').style.display = 'block';
+        }
     </script>
 </body>
 </html>
