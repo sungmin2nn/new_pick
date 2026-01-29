@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 시스템 가이드 | 장전 종목 선정</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .nav {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav a {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .section h3 {
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: #764ba2;
+        }
+        .section h4 {
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .section p {
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .section ul, .section ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        .section li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+        td {
+            font-size: 14px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        .badge.high { background: #fee; color: #e74c3c; }
+        .badge.medium { background: #fff4e6; color: #f39c12; }
+        .badge.low { background: #e8f5e9; color: #27ae60; }
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .flow-diagram {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 장전 종목 선정 시스템 가이드</h1>
+            <p>시스템 구조, 점수 기준, 백테스팅 방법 완전 정리</p>
+        </div>
+
+        <div class="nav">
+            <a href="index.html">🏠 메인 대시보드</a>
+            <a href="data/backtest_report.html">📊 백테스팅 리포트</a>
+            <a href="#overview">시스템 개요</a>
+            <a href="#scoring">점수 시스템</a>
+            <a href="#backtesting">백테스팅</a>
+            <a href="#strategy">매매 전략</a>
+            <a href="#next-steps">다음 단계</a>
+        </div>
+
+        <!-- 시스템 개요 -->
+        <div class="section" id="overview">
+            <h2>📌 시스템 개요</h2>
+
+            <h3>목적</h3>
+            <p>시초가 매매를 위한 자동 종목 선정 시스템. 매일 아침 08:30에 자동 실행되어 <strong>공시, 뉴스, 테마</strong>를 기반으로 주목할 종목 <strong>5개</strong>를 선정합니다.</p>
+
+            <h3>실행 흐름</h3>
+            <div class="flow-diagram">
+매일 08:30 (종목 선정)<br>
+↓<br>
+<strong>1. 데이터 수집</strong><br>
+├─ 시장 데이터: 전일 종가, 거래대금, 시가총액<br>
+├─ 공시 데이터: DART API (전일 18:00 ~ 당일 08:30)<br>
+├─ 뉴스 데이터: 네이버 금융<br>
+└─ 투자자 데이터: pykrx (외국인/기관)<br>
+↓<br>
+<strong>2. 점수 계산 (145점 만점)</strong><br>
+↓<br>
+<strong>3. 상위 5개 선정</strong><br>
+↓<br>
+<strong>4. 저장 & 발행</strong><br>
+├─ JSON: morning_candidates.json<br>
+├─ DB: morning_candidates.db<br>
+└─ GitHub Pages: 자동 배포<br>
+<br>
+매일 16:30 (결과 수집)<br>
+↓<br>
+<strong>5. 백테스팅 데이터 수집</strong><br>
+├─ 시초가, 고가, 저가, 종가<br>
+├─ 익절/손절 도달 분석 (+3%/-2%)<br>
+└─ data/intraday/intraday_YYYYMMDD.json<br>
+↓<br>
+<strong>6. 리포트 생성</strong><br>
+└─ data/backtest_report.html
+            </div>
+
+            <h3>주요 파일</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>파일명</th>
+                        <th>역할</th>
+                        <th>실행 시점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>stock_screener.py</td>
+                        <td>메인 종목 선정 엔진</td>
+                        <td>매일 08:30</td>
+                    </tr>
+                    <tr>
+                        <td>intraday_collector.py</td>
+                        <td>장중 데이터 수집 & 백테스팅</td>
+                        <td>매일 16:30</td>
+                    </tr>
+                    <tr>
+                        <td>backtest_report.py</td>
+                        <td>백테스팅 리포트 생성</td>
+                        <td>수동 실행</td>
+                    </tr>
+                    <tr>
+                        <td>config.py</td>
+                        <td>점수 가중치 및 설정</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 점수 시스템 -->
+        <div class="section" id="scoring">
+            <h2>🎯 점수 시스템 (145점 만점)</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>배점</th>
+                        <th>설명</th>
+                        <th>중요도</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>공시</strong></td>
+                        <td>40점</td>
+                        <td>DART 공시 (실적, 계약, 투자 등)</td>
+                        <td><span class="badge high">최우선</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>뉴스</strong></td>
+                        <td>25점</td>
+                        <td>뉴스 언급 횟수 및 긍정도</td>
+                        <td><span class="badge high">높음</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>거래대금</strong></td>
+                        <td>15점</td>
+                        <td>거래대금 tier (1조 이상 15점)</td>
+                        <td><span class="badge medium">중간</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>테마</strong></td>
+                        <td>15점</td>
+                        <td>AI, 반도체, 2차전지 등</td>
+                        <td><span class="badge medium">중간</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>거래량급증</strong></td>
+                        <td>10점</td>
+                        <td>평균 대비 5배 이상 10점</td>
+                        <td><span class="badge medium">중간</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>투자자</strong></td>
+                        <td>10점</td>
+                        <td>외국인/기관 순매수</td>
+                        <td><span class="badge medium">중간</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>시가총액</strong></td>
+                        <td>10점</td>
+                        <td>시가총액 tier (10조 이상 10점)</td>
+                        <td><span class="badge low">보조</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>회전율</strong></td>
+                        <td>5점</td>
+                        <td>거래대금/시가총액 비율</td>
+                        <td><span class="badge low">보조</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>재료중복도</strong></td>
+                        <td>5점</td>
+                        <td>공시+뉴스+테마 동시 보유</td>
+                        <td><span class="badge low">보조</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>뉴스시간대</strong></td>
+                        <td>5점</td>
+                        <td>장전 뉴스(06:00-08:30) 우대</td>
+                        <td><span class="badge low">보조</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>가격모멘텀</strong></td>
+                        <td>5점</td>
+                        <td>전일 대비 등락률</td>
+                        <td><span class="badge low">보조</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>필터링 기준 (최소 조건)</h3>
+            <p>다음 조건을 모두 만족해야 선정 대상에 포함됩니다:</p>
+            <ul>
+                <li>거래대금: <strong>100억원 이상</strong> (극소형만 제외)</li>
+                <li>시가총액: <strong>100억원 이상</strong> (극소형만 제외)</li>
+                <li>주가: <strong>100원 ~ 100만원</strong></li>
+                <li>등락률: <strong>-30% 이상</strong> (폭락주 제외)</li>
+            </ul>
+
+            <div class="info">
+                <strong>참고:</strong> 거래대금과 시가총액은 필터가 아닌 <strong>점수로 반영</strong>됩니다. 100억원도 선정 가능하지만, 점수가 낮아 상위 5개에 들기 어렵습니다.
+            </div>
+
+            <h3>공시 점수 상세 (40점)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>카테고리</th>
+                        <th>점수</th>
+                        <th>키워드 예시</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>실적 개선</td>
+                        <td>40점</td>
+                        <td>영업이익, 실적 개선, 흑자전환</td>
+                    </tr>
+                    <tr>
+                        <td>대규모 계약</td>
+                        <td>35점</td>
+                        <td>공급계약, 수주, MOU</td>
+                    </tr>
+                    <tr>
+                        <td>투자 유치</td>
+                        <td>30점</td>
+                        <td>투자 유치, 증자, 자금 조달</td>
+                    </tr>
+                    <tr>
+                        <td>사업 확장</td>
+                        <td>25점</td>
+                        <td>신규 사업, 해외 진출, 설립</td>
+                    </tr>
+                    <tr>
+                        <td>기술 개발</td>
+                        <td>20점</td>
+                        <td>특허, 인증, 기술 개발</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>점수 가중치 조정 방법</h3>
+            <p><code>config.py</code> 파일에서 가중치를 조정할 수 있습니다:</p>
+            <div class="code-block">
+SCORE_WEIGHTS = {
+    'disclosure': 40,        # 공시 (최우선!)
+    'news': 25,              # 뉴스
+    'theme_keywords': 15,    # 테마/키워드
+    'investor': 10,          # 외국인/기관
+    'trading_value': 15,     # 거래대금
+    'market_cap': 10,        # 시가총액
+    'price_momentum': 5,     # 가격 모멘텀
+    'volume_surge': 10,      # 거래량 급증
+    'turnover_rate': 5,      # 회전율
+    'material_overlap': 5,   # 재료 중복도
+    'news_timing': 5,        # 뉴스 시간대
+}
+            </div>
+        </div>
+
+        <!-- 백테스팅 -->
+        <div class="section" id="backtesting">
+            <h2>📊 백테스팅</h2>
+
+            <h3>백테스팅이란?</h3>
+            <p>선정된 종목이 실제로 수익을 냈는지 검증하는 과정입니다. 매일 16:30에 자동으로 당일 결과를 수집하여 데이터를 축적합니다.</p>
+
+            <h3>수집 데이터</h3>
+            <ul>
+                <li><strong>시초가:</strong> 실제 매수 가격</li>
+                <li><strong>고가/저가:</strong> 당일 최고/최저 가격</li>
+                <li><strong>종가:</strong> 장 마감 가격</li>
+                <li><strong>익절 도달 시점:</strong> +3% 도달한 시간</li>
+                <li><strong>손절 도달 시점:</strong> -2% 도달한 시간</li>
+                <li><strong>최대 수익률:</strong> 고점 대비 수익률</li>
+                <li><strong>종가 수익률:</strong> 시초가 대비 종가 수익률</li>
+            </ul>
+
+            <h3>익절/손절 기준</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>기준</th>
+                        <th>설명</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>익절</td>
+                        <td>+3%</td>
+                        <td>시초가 대비 +3% 도달 시 익절 성공</td>
+                    </tr>
+                    <tr>
+                        <td>손절</td>
+                        <td>-2%</td>
+                        <td>시초가 대비 -2% 도달 시 손절 발생</td>
+                    </tr>
+                    <tr>
+                        <td>미도달</td>
+                        <td>-</td>
+                        <td>익절/손절 모두 미도달 (종가 수익률로 평가)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>백테스팅 리포트 보는 법</h3>
+            <ol>
+                <li><a href="data/backtest_report.html" target="_blank">백테스팅 리포트</a> 열기</li>
+                <li><strong>전체 통계:</strong> 승률, 평균 수익률 확인</li>
+                <li><strong>점수대별 분석:</strong> 어떤 점수대가 유효한지 확인</li>
+                <li><strong>날짜별 상세:</strong> 개별 종목 성과 확인</li>
+            </ol>
+
+            <div class="warning">
+                <strong>⚠️ 주의:</strong> 최소 <strong>2주(10거래일)</strong> 데이터가 쌓여야 의미 있는 분석이 가능합니다. 현재 데이터가 부족하면 매일 자동 수집될 때까지 기다려주세요.
+            </div>
+
+            <h3>리포트 수동 생성</h3>
+            <p>새로운 데이터가 추가되면 다음 명령으로 리포트를 재생성할 수 있습니다:</p>
+            <div class="code-block">
+python3 backtest_report.py
+            </div>
+        </div>
+
+        <!-- 매매 전략 -->
+        <div class="section" id="strategy">
+            <h2>💰 매매 전략 가이드</h2>
+
+            <h3>점수대별 추천 전략</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>점수 범위</th>
+                        <th>매수 방법</th>
+                        <th>목표 수익률</th>
+                        <th>손절 기준</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>70점 이상</td>
+                        <td>시초가 동시호가 전량 매수</td>
+                        <td>+10% 이상</td>
+                        <td>-5%</td>
+                    </tr>
+                    <tr>
+                        <td>50-70점</td>
+                        <td>시초가 50% + 장 시작 후 50%</td>
+                        <td>+7% 이상</td>
+                        <td>-5%</td>
+                    </tr>
+                    <tr>
+                        <td>30-50점</td>
+                        <td>장 시작 후 매수 (09:05~09:10)</td>
+                        <td>+5% 이상</td>
+                        <td>-3%</td>
+                    </tr>
+                    <tr>
+                        <td>30점 미만</td>
+                        <td>매수 보류 (관망)</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>시초가 매매 체크리스트</h3>
+            <div class="success">
+                <strong>매수 전 확인:</strong>
+                <ol style="margin-top: 10px;">
+                    <li>시초가 예상 확인 (증권사 앱)</li>
+                    <li>예상 체결가가 +10% 이상이면 재고려</li>
+                    <li>동시호가 거래량 확인 (너무 적으면 위험)</li>
+                    <li>공시 재확인 (호재 맞나?)</li>
+                </ol>
+            </div>
+
+            <div class="success">
+                <strong>매수 후 확인:</strong>
+                <ol style="margin-top: 10px;">
+                    <li>체결가 확인</li>
+                    <li>손절가 미리 설정 (-5%)</li>
+                    <li>1차 매도 목표가 설정 (+10%)</li>
+                    <li>09:30까지 집중 모니터링</li>
+                </ol>
+            </div>
+
+            <h3>분할 매도 예시</h3>
+            <div class="code-block">
+매수가: 10,000원 (100주)
+
+목표가 설정:
+1차: 11,000원 (+10%) → 50주 매도
+2차: 12,000원 (+20%) → 30주 매도
+3차: 13,000원 (+30%) → 20주 매도 (잔량)
+
+손절가:
+- 9,500원 (-5%) → 전량 매도
+            </div>
+
+            <h3>슬리피지 대응</h3>
+            <p><strong>슬리피지(Slippage):</strong> 원하는 가격과 실제 체결 가격의 차이</p>
+            <ul>
+                <li><strong>시초가 동시호가 매수:</strong> 예상 시초가 +2~3% 지정가 주문</li>
+                <li><strong>시장가 주문:</strong> 슬리피지 최대, 비추천</li>
+                <li><strong>장 시작 후 매수:</strong> 시초가 확인 후 판단 가능</li>
+            </ul>
+        </div>
+
+        <!-- 다음 단계 -->
+        <div class="section" id="next-steps">
+            <h2>🚀 다음 단계</h2>
+
+            <h3>1단계: 데이터 수집 (1-2주)</h3>
+            <ul>
+                <li>시스템이 매일 자동으로 데이터 수집</li>
+                <li>최소 10거래일 데이터 확보</li>
+                <li>백테스팅 리포트 주기적 확인</li>
+            </ul>
+
+            <h3>2단계: 첫 분석 (2주 후)</h3>
+            <ul>
+                <li>백테스팅 리포트에서 승률 확인</li>
+                <li>점수대별 성과 분석</li>
+                <li>어떤 공시 카테고리가 유효한지 확인</li>
+                <li>필요시 점수 가중치 조정</li>
+            </ul>
+
+            <h3>3단계: 모의투자 (1개월 후)</h3>
+            <ul>
+                <li>HTS 모의투자 계좌로 실전 시뮬레이션</li>
+                <li>슬리피지 체감</li>
+                <li>심리적 훈련 (손절 실행 연습)</li>
+            </ul>
+
+            <h3>4단계: 소액 실전 (2개월 후)</h3>
+            <ul>
+                <li>10만원 단위로 소액 시작</li>
+                <li>실전 데이터 축적</li>
+                <li>전략 지속 개선</li>
+            </ul>
+
+            <h3>지속적 개선 항목</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>방법</th>
+                        <th>시점</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>점수 가중치</td>
+                        <td>백테스팅 결과 기반 조정</td>
+                        <td>1개월마다</td>
+                    </tr>
+                    <tr>
+                        <td>필터 기준</td>
+                        <td>거래대금/시가총액 조정</td>
+                        <td>2개월마다</td>
+                    </tr>
+                    <tr>
+                        <td>테마 키워드</td>
+                        <td>시장 트렌드 반영</td>
+                        <td>분기마다</td>
+                    </tr>
+                    <tr>
+                        <td>익절/손절 기준</td>
+                        <td>실전 경험 기반 조정</td>
+                        <td>6개월마다</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info">
+                <strong>💡 Tip:</strong> 시스템은 "도구"일 뿐입니다. 최종 매매 판단은 본인이 해야 하며, 손실 책임도 본인에게 있습니다. 항상 소액으로 시작하고, 감당할 수 있는 범위 내에서 투자하세요.
+            </div>
+        </div>
+
+        <!-- 문제 해결 -->
+        <div class="section">
+            <h2>🔧 문제 해결</h2>
+
+            <h3>Q1. 공시 점수가 항상 0점입니다</h3>
+            <p><strong>A:</strong> DART_API_KEY가 설정되지 않았거나, 해당 시간대에 긍정적 공시가 없는 경우입니다.</p>
+            <ol>
+                <li>GitHub Repository Settings → Secrets → DART_API_KEY 확인</li>
+                <li><a href="https://opendart.fss.or.kr/" target="_blank">DART 오픈API</a>에서 API 키 발급</li>
+                <li>공시는 매일 발생하는 것이 아니므로 0점이 정상일 수 있음</li>
+            </ol>
+
+            <h3>Q2. 백테스팅 리포트가 비어있습니다</h3>
+            <p><strong>A:</strong> 아직 데이터가 수집되지 않았습니다.</p>
+            <ul>
+                <li>매일 16:30에 자동으로 데이터 수집</li>
+                <li>최소 1-2일 기다려주세요</li>
+                <li><code>data/intraday/</code> 폴더에 JSON 파일이 있는지 확인</li>
+            </ul>
+
+            <h3>Q3. 점수가 너무 낮습니다 (20-30점대)</h3>
+            <p><strong>A:</strong> 공시나 뉴스가 없으면 낮은 점수가 정상입니다.</p>
+            <ul>
+                <li>공시(40점) + 뉴스(25점) = 65점이 핵심</li>
+                <li>재료가 없는 날에는 점수가 낮을 수밖에 없음</li>
+                <li>점수가 낮다면 매수 보류 권장</li>
+            </ul>
+
+            <h3>Q4. 외국인/기관 점수가 0점입니다</h3>
+            <p><strong>A:</strong> pykrx 라이브러리가 설치되지 않았거나, KRX 데이터 조회 실패입니다.</p>
+            <ul>
+                <li>로컬 실행 시: <code>pip install pykrx</code></li>
+                <li>GitHub Actions는 자동 설치됨 (requirements.txt)</li>
+                <li>KRX 서버 오류 시 다음 실행을 기다려주세요</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>📞 문의 및 피드백</h2>
+            <p>시스템 개선 제안이나 버그 리포트는 GitHub Issues를 활용해주세요.</p>
+            <p style="margin-top: 15px; text-align: center; color: #999; font-size: 14px;">
+                Made with ❤️ by Claude Code | Last Updated: 2026-01-29
+            </p>
+        </div>
+    </div>
+</body>
+</html>

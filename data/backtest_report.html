@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>백테스팅 리포트</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .header .meta {
+            color: #666;
+            font-size: 14px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-card .label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .stat-card.positive .value { color: #e74c3c; }
+        .stat-card.negative .value { color: #3498db; }
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+        }
+        td {
+            font-size: 14px;
+        }
+        .positive { color: #e74c3c; font-weight: 600; }
+        .negative { color: #3498db; font-weight: 600; }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.profit { background: #fee; color: #e74c3c; }
+        .badge.loss { background: #eef; color: #3498db; }
+        .badge.none { background: #f0f0f0; color: #999; }
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 백테스팅 리포트</h1>
+            <div class="meta">
+                생성일시: 2026-01-29 21:45:06 |
+                분석 기간: 2일 |
+                총 종목: 6개
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">총 종목</div>
+                <div class="value">6개</div>
+            </div>
+            <div class="stat-card positive">
+                <div class="label">승률</div>
+                <div class="value">16.7%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 16.7%"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="label">평균 수익률</div>
+                <div class="value positive">
+                    +0.21%
+                </div>
+            </div>
+            <div class="stat-card positive">
+                <div class="label">익절 성공</div>
+                <div class="value">1건</div>
+            </div>
+            <div class="stat-card negative">
+                <div class="label">손절 발생</div>
+                <div class="value">3건</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">미도달</div>
+                <div class="value">2건</div>
+            </div>
+            <div class="stat-card positive">
+                <div class="label">최대 수익</div>
+                <div class="value">+4.83%</div>
+            </div>
+            <div class="stat-card negative">
+                <div class="label">최대 손실</div>
+                <div class="value">-2.67%</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>점수대별 성과 분석</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>점수 범위</th>
+                        <th>종목 수</th>
+                        <th>승률</th>
+                        <th>평균 수익률</th>
+                        <th>익절</th>
+                        <th>손절</th>
+                        <th>미도달</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><strong>30점 미만 (극저점)</strong></td>
+                        <td>6개</td>
+                        <td class="">16.7%</td>
+                        <td class="positive">+0.21%</td>
+                        <td>1</td>
+                        <td>3</td>
+                        <td>2</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>날짜별 상세 내역</h2>
+
+            <h3 style="margin-top: 25px; margin-bottom: 15px; color: #333;">2026-01-29</h3>
+            <div class="stats-grid" style="margin-bottom: 15px;">
+                <div class="stat-card">
+                    <div class="label">종목 수</div>
+                    <div class="value">3개</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">승률</div>
+                    <div class="value ">0.0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">평균 수익률</div>
+                    <div class="value positive">+0.07%</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>종목명</th>
+                        <th>점수</th>
+                        <th>결과</th>
+                        <th>시초가</th>
+                        <th>종가</th>
+                        <th>수익률</th>
+                        <th>도달시간</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><strong>NH투자증권</strong></td>
+                        <td>26점</td>
+                        <td><span class="badge loss">손절</span></td>
+                        <td>24,850원</td>
+                        <td>26,050원</td>
+                        <td class="positive">
+                            +4.83%
+                        </td>
+                        <td style="font-size: 12px; color: #999;">10:26:00</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>KODEX AI반도체</strong></td>
+                        <td>22점</td>
+                        <td><span class="badge loss">손절</span></td>
+                        <td>24,860원</td>
+                        <td>24,195원</td>
+                        <td class="negative">
+                            -2.67%
+                        </td>
+                        <td style="font-size: 12px; color: #999;">09:18:00</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>TIGER 반도체TOP10</strong></td>
+                        <td>18점</td>
+                        <td><span class="badge loss">손절</span></td>
+                        <td>28,960원</td>
+                        <td>28,395원</td>
+                        <td class="negative">
+                            -1.95%
+                        </td>
+                        <td style="font-size: 12px; color: #999;">09:19:00</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 25px; margin-bottom: 15px; color: #333;">2026-01-28</h3>
+            <div class="stats-grid" style="margin-bottom: 15px;">
+                <div class="stat-card">
+                    <div class="label">종목 수</div>
+                    <div class="value">3개</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">승률</div>
+                    <div class="value ">33.3%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">평균 수익률</div>
+                    <div class="value positive">+0.36%</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>종목명</th>
+                        <th>점수</th>
+                        <th>결과</th>
+                        <th>시초가</th>
+                        <th>종가</th>
+                        <th>수익률</th>
+                        <th>도달시간</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><strong>한화투자증권</strong></td>
+                        <td>27점</td>
+                        <td><span class="badge profit">익절</span></td>
+                        <td>6,100원</td>
+                        <td>6,050원</td>
+                        <td class="negative">
+                            -0.82%
+                        </td>
+                        <td style="font-size: 12px; color: #999;">09:56:00</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>KODEX AI반도체</strong></td>
+                        <td>22점</td>
+                        <td><span class="badge none">미도달</span></td>
+                        <td>22,710원</td>
+                        <td>23,370원</td>
+                        <td class="positive">
+                            +2.91%
+                        </td>
+                        <td style="font-size: 12px; color: #999;">-</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>대신증권</strong></td>
+                        <td>19점</td>
+                        <td><span class="badge none">미도달</span></td>
+                        <td>29,550원</td>
+                        <td>29,250원</td>
+                        <td class="negative">
+                            -1.02%
+                        </td>
+                        <td style="font-size: 12px; color: #999;">-</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</body>
+</html>
