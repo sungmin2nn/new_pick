@@ -572,18 +572,18 @@
             <table id="stockTable" style="display: none;">
                 <thead>
                     <tr>
-                        <th class="sortable" data-sort="date">선정일</th>
-                        <th class="sortable" data-sort="rank">순위</th>
-                        <th class="sortable" data-sort="name">종목명</th>
-                        <th class="sortable" data-sort="score">총점</th>
-                        <th class="sortable" data-sort="disclosure">공시</th>
-                        <th class="sortable" data-sort="news">뉴스</th>
-                        <th class="sortable" data-sort="theme">테마</th>
-                        <th class="sortable" data-sort="investor">투자자</th>
-                        <th>선정 사유</th>
-                        <th class="sortable" data-sort="price">현재가</th>
-                        <th class="sortable" data-sort="change">등락률</th>
-                        <th class="sortable" data-sort="volume">거래대금</th>
+                        <th class="sortable" data-sort="date" style="width: 80px;">선정일</th>
+                        <th class="sortable" data-sort="rank" style="width: 50px;">순위</th>
+                        <th class="sortable" data-sort="name" style="min-width: 120px;">종목명</th>
+                        <th class="sortable" data-sort="score" style="width: 80px;">총점</th>
+                        <th class="sortable" data-sort="disclosure" style="width: 50px;">공시</th>
+                        <th class="sortable" data-sort="news" style="width: 50px;">뉴스</th>
+                        <th class="sortable" data-sort="theme" style="width: 50px;">테마</th>
+                        <th class="sortable" data-sort="investor" style="width: 50px;">투자자</th>
+                        <th style="min-width: 180px;">선정 사유</th>
+                        <th class="sortable" data-sort="price" style="width: 90px;">현재가</th>
+                        <th class="sortable" data-sort="change" style="width: 80px;">등락률</th>
+                        <th class="sortable" data-sort="volume" style="width: 80px;">거래대금</th>
                     </tr>
                 </thead>
                 <tbody id="stockTableBody">
@@ -1223,19 +1223,23 @@
                 const changeClass = (stock.price_change_percent || 0) >= 0 ? 'positive' : 'negative';
                 const changeSymbol = (stock.price_change_percent || 0) >= 0 ? '+' : '';
 
+                // 총점 계산 (만점 100점)
+                const maxScore = 100;
+                const totalScore = (stock.total_score || 0).toFixed(0);
+
                 row.innerHTML = `
-                    <td style="font-weight: 600; font-size: 0.8rem;">${stock.date || 'N/A'}</td>
+                    <td style="font-weight: 600; font-size: 0.75rem;">${stock.date || 'N/A'}</td>
                     <td><span class="rank ${originalRank <= 3 ? 'top3' : ''}">${originalRank}</span></td>
                     <td style="text-align: left; padding-left: 12px;">
                         <div class="stock-name">${stock.name || 'N/A'} ${stock.is_leading ? '👑' : ''}</div>
                         <div class="stock-code">${stock.code || 'N/A'}</div>
                     </td>
-                    <td><span class="score ${scoreClass}">${(stock.total_score || 0).toFixed(0)}</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.disclosure || 0)}</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.news || 0)}</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.theme_keywords || 0)}</span></td>
-                    <td><span class="score-badge">${(stock.score_detail?.investor || 0)}</span></td>
-                    <td style="font-size: 0.75rem; color: #4a5568; text-align: left; padding-left: 10px; max-width: 200px; line-height: 1.4;">${stock.selection_reason || '-'}</td>
+                    <td><span class="score ${scoreClass}" style="font-size: 0.95rem;">${totalScore}/<span style="font-size: 0.75rem; opacity: 0.7;">${maxScore}</span></span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${(stock.score_detail?.disclosure || 0)}</span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${(stock.score_detail?.news || 0)}</span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${(stock.score_detail?.theme_keywords || 0)}</span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${(stock.score_detail?.investor || 0)}</span></td>
+                    <td style="font-size: 0.75rem; color: #4a5568; text-align: left; padding-left: 10px; line-height: 1.4;">${stock.selection_reason || '-'}</td>
                     <td style="font-size: 0.85rem; font-weight: 600;">${(stock.current_price || 0).toLocaleString()}</td>
                     <td><span class="price-change ${changeClass}">${changeSymbol}${(stock.price_change_percent || 0).toFixed(2)}%</span></td>
                     <td style="font-size: 0.85rem; font-weight: 600;">${formatNumber(stock.trading_value || 0)}억</td>
