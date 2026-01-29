@@ -51,8 +51,8 @@ class InvestorCollector:
                     )
 
                     if foreign_df is not None and not foreign_df.empty:
-                        # 순매수 상위 30개
-                        foreign_top = foreign_df.nlargest(30, '순매수량')
+                        # 순매수 상위 30개 (컬럼명: 순매수거래량)
+                        foreign_top = foreign_df.nlargest(30, '순매수거래량')
 
                         for ticker in foreign_top.index:
                             if ticker not in all_data:
@@ -65,8 +65,8 @@ class InvestorCollector:
                                     'institution_buy': 0
                                 }
 
-                            # 순매수량 (주)
-                            all_data[ticker]['foreign_buy'] = int(foreign_top.loc[ticker, '순매수량'])
+                            # 순매수거래량 (주)
+                            all_data[ticker]['foreign_buy'] = int(foreign_top.loc[ticker, '순매수거래량'])
 
                     time.sleep(0.5)  # API 호출 간격
 
@@ -79,20 +79,27 @@ class InvestorCollector:
                     )
 
                     if inst_df is not None and not inst_df.empty:
-                        # 순매수 상위 30개
-                        inst_top = inst_df.nlargest(30, '순매수량')
+                        # 순매수거래량이 양수인 것만 필터링
+                        inst_positive = inst_df[inst_df['순매수거래량'] > 0]
 
-                        for ticker in inst_top.index:
-                            if ticker not in all_data:
-                                name = self.pykrx_stock.get_market_ticker_name(ticker)
-                                all_data[ticker] = {
-                                    'name': name,
-                                    'code': ticker,
-                                    'foreign_buy': 0,
-                                    'institution_buy': 0
-                                }
+                        if len(inst_positive) == 0:
+                            # 순매수 종목이 없으면 스킵
+                            pass
+                        else:
+                            # 순매수 상위 30개 (컬럼명: 순매수거래량)
+                            inst_top = inst_positive.nlargest(30, '순매수거래량')
 
-                            all_data[ticker]['institution_buy'] = int(inst_top.loc[ticker, '순매수량'])
+                            for ticker in inst_top.index:
+                                if ticker not in all_data:
+                                    name = self.pykrx_stock.get_market_ticker_name(ticker)
+                                    all_data[ticker] = {
+                                        'name': name,
+                                        'code': ticker,
+                                        'foreign_buy': 0,
+                                        'institution_buy': 0
+                                    }
+
+                                all_data[ticker]['institution_buy'] = int(inst_top.loc[ticker, '순매수거래량'])
 
                     foreign_count = len([k for k, v in all_data.items() if v['foreign_buy'] > 0])
                     inst_count = len([k for k, v in all_data.items() if v['institution_buy'] > 0])
