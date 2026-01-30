@@ -384,7 +384,7 @@ const Analytics = {
     },
 
     /**
-     * 오늘의 종목 조회 (최신 날짜의 상위 3개)
+     * 오늘의 종목 조회 (최신 날짜의 상위 5개)
      */
     async getTodayStocks() {
         try {
@@ -397,7 +397,7 @@ const Analytics = {
             const latestDate = historyData.dates[0];
             const stocks = historyData.data_by_date[latestDate] || [];
 
-            return stocks.slice(0, 3).map((stock, index) => ({
+            return stocks.slice(0, 5).map((stock, index) => ({
                 rank: index + 1,
                 code: stock.stock_code || stock.code,
                 name: stock.stock_name || stock.name,
