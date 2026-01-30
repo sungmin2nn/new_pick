@@ -1235,10 +1235,10 @@
                         <div class="stock-code">${stock.code || 'N/A'}</div>
                     </td>
                     <td><span class="score ${scoreClass}" style="font-size: 0.95rem;">${totalScore}/<span style="font-size: 0.75rem; opacity: 0.7;">${maxScore}</span></span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.disclosure || 0)}</span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.news || 0)}</span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.theme_keywords || 0)}</span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.investor || 0)}</span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.disclosure || stock.disclosure_score || 0)}</span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.news || stock.news_score || 0)}</span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.theme_keywords || stock.theme_score || 0)}</span></td>
+                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.investor || stock.investor_score || 0)}</span></td>
                     <td style="font-size: 0.75rem; color: #4a5568; text-align: left; padding-left: 10px; line-height: 1.4;">${stock.selection_reason || '-'}</td>
                     <td style="font-size: 0.85rem; font-weight: 600;">${(stock.current_price || 0).toLocaleString()}</td>
                     <td><span class="price-change ${changeClass}">${changeSymbol}${(stock.price_change_percent || 0).toFixed(2)}%</span></td>
