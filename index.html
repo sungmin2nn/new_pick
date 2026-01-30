@@ -517,6 +517,121 @@
                 padding: 10px 5px;
             }
         }
+
+        /* 시스템 상태 배지 */
+        .system-status {
+            background: linear-gradient(135deg, #e6f3ff 0%, #f0f9ff 100%);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #48bb78;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-icon {
+            font-size: 1.5rem;
+        }
+
+        .status-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .status-detail {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-left: 8px;
+        }
+
+        .data-quality {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .quality-item {
+            font-size: 0.9rem;
+            padding: 4px 12px;
+            background: white;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        /* 점수 상태 아이콘 */
+        .score-with-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .score-status-icon {
+            font-size: 0.85rem;
+            cursor: help;
+        }
+
+        .score-status-icon.success {
+            color: #48bb78;
+        }
+
+        .score-status-icon.warning {
+            color: #ed8936;
+        }
+
+        .score-status-icon.error {
+            color: #f56565;
+        }
+
+        /* 툴팁 */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #2d3748;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2d3748 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -534,6 +649,14 @@
         </div>
 
         <div id="stocksTab" class="tab-content active">
+        <!-- 시스템 상태 배지 -->
+        <div class="system-status" id="systemStatus">
+            <div class="status-badge">
+                <span class="status-icon">⏳</span>
+                <span class="status-text">로딩 중...</span>
+            </div>
+        </div>
+
         <div class="controls">
             <label for="filterDate">선정 날짜:</label>
             <select id="filterDate">
@@ -1145,6 +1268,71 @@
             const avgChange = filtered.reduce((sum, s) => sum + (s.price_change_percent || 0), 0) / filtered.length || 0;
             document.getElementById('statAvgChange').textContent =
                 (avgChange >= 0 ? '+' : '') + avgChange.toFixed(2) + '%';
+
+            // 시스템 상태 업데이트
+            updateSystemStatus(filtered);
+        }
+
+        function updateSystemStatus(stocks) {
+            const statusDiv = document.getElementById('systemStatus');
+            if (!stocks || stocks.length === 0) {
+                statusDiv.innerHTML = `
+                    <div class="status-badge">
+                        <span class="status-icon">⚠️</span>
+                        <span class="status-text">데이터 없음</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // 데이터 품질 분석
+            const qualityStats = {
+                disclosure: { success: 0, total: stocks.length },
+                news: { success: 0, total: stocks.length },
+                investor: { success: 0, total: stocks.length },
+                theme: { success: 0, total: stocks.length }
+            };
+
+            stocks.forEach(stock => {
+                const meta = stock.score_metadata || {};
+                if (meta.disclosure?.status === 'success' && meta.disclosure?.value > 0) qualityStats.disclosure.success++;
+                if (meta.news?.status === 'success' && meta.news?.value > 0) qualityStats.news.success++;
+                if (meta.investor?.status === 'success' && meta.investor?.value > 0) qualityStats.investor.success++;
+                if (meta.theme_keywords?.status === 'success' && meta.theme_keywords?.value > 0) qualityStats.theme.success++;
+            });
+
+            const date = stocks[0]?.date || '오늘';
+            const count = stocks.length;
+
+            statusDiv.innerHTML = `
+                <div class="status-badge">
+                    <span class="status-icon">✅</span>
+                    <span class="status-text">시스템 정상</span>
+                    <span class="status-detail">${date} | ${count}개 종목</span>
+                </div>
+                <div class="data-quality">
+                    <span class="quality-item">공시 ${qualityStats.disclosure.success > 0 ? '✅' : '⚠️'}</span>
+                    <span class="quality-item">뉴스 ${qualityStats.news.success > 0 ? '✅' : '⚠️'}</span>
+                    <span class="quality-item">투자자 ${qualityStats.investor.success > 0 ? '✅' : '⚠️'}</span>
+                    <span class="quality-item">테마 ${qualityStats.theme.success > 0 ? '✅' : '⚠️'}</span>
+                </div>
+            `;
+        }
+
+        function getScoreIcon(metadata) {
+            if (!metadata) return '';
+            const status = metadata.status || 'success';
+            const value = metadata.value || 0;
+            const message = metadata.message || '';
+
+            if (value === 0 && status === 'no_data') {
+                return `<span class="score-status-icon warning tooltip">⚠️<span class="tooltiptext">${message}</span></span>`;
+            } else if (value > 0) {
+                return `<span class="score-status-icon success tooltip">✅<span class="tooltiptext">${message}</span></span>`;
+            } else if (status === 'error') {
+                return `<span class="score-status-icon error tooltip">❌<span class="tooltiptext">${message}</span></span>`;
+            }
+            return '';
         }
 
         function renderTable() {
@@ -1227,6 +1415,13 @@
                 const maxScore = 145;
                 const totalScore = Math.round(stock.total_score || 0);
 
+                // 메타데이터에서 아이콘 가져오기
+                const meta = stock.score_metadata || {};
+                const disclosureIcon = getScoreIcon(meta.disclosure);
+                const newsIcon = getScoreIcon(meta.news);
+                const themeIcon = getScoreIcon(meta.theme_keywords);
+                const investorIcon = getScoreIcon(meta.investor);
+
                 row.innerHTML = `
                     <td style="font-weight: 600; font-size: 0.75rem;">${stock.date || 'N/A'}</td>
                     <td><span class="rank ${originalRank <= 3 ? 'top3' : ''}">${originalRank}</span></td>
@@ -1235,10 +1430,30 @@
                         <div class="stock-code">${stock.code || 'N/A'}</div>
                     </td>
                     <td><span class="score ${scoreClass}" style="font-size: 0.95rem;">${totalScore}/<span style="font-size: 0.75rem; opacity: 0.7;">${maxScore}</span></span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.disclosure || stock.disclosure_score || 0)}</span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.news || stock.news_score || 0)}</span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.theme_keywords || stock.theme_score || 0)}</span></td>
-                    <td><span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.investor || stock.investor_score || 0)}</span></td>
+                    <td>
+                        <div class="score-with-status">
+                            <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.disclosure || stock.disclosure_score || 0)}</span>
+                            ${disclosureIcon}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="score-with-status">
+                            <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.news || stock.news_score || 0)}</span>
+                            ${newsIcon}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="score-with-status">
+                            <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.theme_keywords || stock.theme_score || 0)}</span>
+                            ${themeIcon}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="score-with-status">
+                            <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.investor || stock.investor_score || 0)}</span>
+                            ${investorIcon}
+                        </div>
+                    </td>
                     <td style="font-size: 0.75rem; color: #4a5568; text-align: left; padding-left: 10px; line-height: 1.4;">${stock.selection_reason || '-'}</td>
                     <td style="font-size: 0.85rem; font-weight: 600;">${(stock.current_price || 0).toLocaleString()}</td>
                     <td><span class="price-change ${changeClass}">${changeSymbol}${(stock.price_change_percent || 0).toFixed(2)}%</span></td>

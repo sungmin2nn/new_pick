@@ -542,6 +542,10 @@ class StockScreener:
         # 디렉토리 생성
         os.makedirs(config.OUTPUT_DIR, exist_ok=True)
 
+        # 각 종목에 메타데이터 추가
+        for stock in stocks:
+            stock['score_metadata'] = self.generate_score_metadata(stock)
+
         # JSON 파일로 저장
         output_path = os.path.join(config.OUTPUT_DIR, config.JSON_FILE)
 
@@ -563,6 +567,70 @@ class StockScreener:
         print(f"  ✓ 선정 종목 수: {len(stocks)}개")
 
         return output_path
+
+    def generate_score_metadata(self, stock):
+        """각 점수의 메타데이터 생성"""
+        score_detail = stock.get('score_detail', {})
+        metadata = {}
+
+        # 공시 메타데이터
+        disclosure_count = stock.get('disclosure_count', 0)
+        metadata['disclosure'] = {
+            'value': score_detail.get('disclosure', 0),
+            'status': 'success' if disclosure_count > 0 else 'no_data',
+            'count': disclosure_count,
+            'message': f"{disclosure_count}건 수집" if disclosure_count > 0 else "공시 없음"
+        }
+
+        # 뉴스 메타데이터
+        news_count = stock.get('news_mentions', 0)
+        positive = stock.get('positive_news', 0)
+        negative = stock.get('negative_news', 0)
+        metadata['news'] = {
+            'value': score_detail.get('news', 0),
+            'status': 'success' if news_count > 0 else 'no_data',
+            'count': news_count,
+            'positive': positive,
+            'negative': negative,
+            'message': f"{news_count}건 (긍정 {positive})" if news_count > 0 else "뉴스 없음"
+        }
+
+        # 테마 메타데이터
+        themes = stock.get('matched_themes', [])
+        metadata['theme_keywords'] = {
+            'value': score_detail.get('theme_keywords', 0),
+            'status': 'success' if themes else 'no_match',
+            'matched_themes': themes,
+            'message': ', '.join(themes) if themes else "테마 매칭 없음"
+        }
+
+        # 투자자 메타데이터
+        foreign = stock.get('foreign_buy', 0)
+        institution = stock.get('institution_buy', 0)
+        investor_msg = []
+        if foreign > 0:
+            investor_msg.append("외국인 순매수")
+        if institution > 0:
+            investor_msg.append("기관 순매수")
+
+        metadata['investor'] = {
+            'value': score_detail.get('investor', 0),
+            'status': 'success' if (foreign > 0 or institution > 0) else 'no_data',
+            'foreign_buy': foreign,
+            'institution_buy': institution,
+            'message': ', '.join(investor_msg) if investor_msg else "순매수 없음"
+        }
+
+        # 나머지 점수들은 항상 성공 (계산된 값)
+        for key in ['trading_value', 'market_cap', 'price_momentum', 'volume_surge',
+                    'turnover_rate', 'material_overlap', 'news_timing']:
+            metadata[key] = {
+                'value': score_detail.get(key, 0),
+                'status': 'success',
+                'message': 'OK'
+            }
+
+        return metadata
 
     def print_summary(self, stocks):
         """결과 요약 출력"""
