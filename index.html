@@ -1199,12 +1199,19 @@
                         name: item.stock_name || item.name,
                         rank: index + 1,
                         date: selectedDate,
-                        // score_detail 필드명 매핑
+                        // score_detail 필드명 매핑 (DB 필드명 -> JSON 필드명)
                         score_detail: {
-                            disclosure: item.price_score || 0,
+                            disclosure: item.disclosure_score || 0,
                             news: item.news_score || 0,
                             theme_keywords: item.theme_score || 0,
-                            investor: 0  // DB에는 investor 필드가 없음
+                            investor: item.investor_score || 0,
+                            trading_value: item.trading_value_score || 0,
+                            market_cap: item.market_cap_score || 0,
+                            price_momentum: item.price_momentum_score || 0,
+                            volume_surge: item.volume_surge_score || 0,
+                            turnover_rate: item.turnover_rate_score || 0,
+                            material_overlap: item.material_overlap_score || 0,
+                            news_timing: item.news_timing_score || 0
                         },
                         // selection_reason 필드 매핑
                         selection_reason: item.selection_reason || '-'
