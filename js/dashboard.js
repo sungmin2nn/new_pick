@@ -34,6 +34,9 @@ const Dashboard = {
         // 초기 데이터 로드
         await this.loadAndAnalyze();
 
+        // 시스템 정보 렌더링
+        this.renderSystemInfo();
+
         console.log('[Dashboard] 초기화 완료');
     },
 
@@ -409,6 +412,29 @@ const Dashboard = {
     renderTransactionTable() {
         TableUtils.init(this.state.trades);
         TableUtils.populateReasonFilter();
+    },
+
+    /**
+     * 시스템 정보 렌더링
+     */
+    renderSystemInfo() {
+        const container = document.getElementById('systemInfoContent');
+        if (!container) return;
+
+        const html = SYSTEM_INFO.features.map(feature => `
+            <div class="info-card">
+                <h3>${feature.icon} ${feature.title}</h3>
+                <ul>
+                    ${feature.items.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+            </div>
+        `).join('');
+
+        container.innerHTML = `
+            <div class="system-info-grid">
+                ${html}
+            </div>
+        `;
     },
 
     /**

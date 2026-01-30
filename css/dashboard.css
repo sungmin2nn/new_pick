@@ -333,6 +333,51 @@ section h3 {
     border-color: var(--accent-blue);
 }
 
+/* 시스템 정보 */
+.system-info-section {
+    margin-bottom: var(--space-xl);
+}
+
+.system-info-section.collapsed {
+    margin-bottom: var(--space-lg);
+}
+
+.system-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+.info-card {
+    background: var(--bg-secondary);
+    padding: var(--space-lg);
+    border-radius: 8px;
+}
+
+.info-card h3 {
+    margin: 0 0 var(--space-md) 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.info-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-card ul li {
+    padding: var(--space-sm) 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-card ul li:last-child {
+    border-bottom: none;
+}
+
 /* 모바일 반응형 */
 @media (max-width: 768px) {
     .dashboard-container {
