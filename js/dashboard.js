@@ -320,9 +320,9 @@ const Dashboard = {
         const html = `
             <thead>
                 <tr>
-                    <th style="width: 10%;">요일</th>
-                    <th style="width: 40%;">거래수 (익절/손절/미달)</th>
-                    <th style="width: 25%;">승률</th>
+                    <th style="width: 8%;">요일</th>
+                    <th style="width: 47%;">거래수 (익절/손절/미달수익/미달손실/미달유지)</th>
+                    <th style="width: 20%;">승률</th>
                     <th style="width: 25%;">평균수익률</th>
                 </tr>
             </thead>
@@ -330,7 +330,7 @@ const Dashboard = {
                 ${data.map(row => `
                     <tr>
                         <td>${row.day}</td>
-                        <td>${row.count} (${row.profitCount}/${row.lossCount}/${row.noneCount})</td>
+                        <td>${row.count} (${row.profitCount}/${row.lossCount}/${row.noneProfitCount}/${row.noneLossCount}/${row.noneNeutralCount})</td>
                         <td>${Utils.formatPercent(row.winRate)}</td>
                         <td>${Utils.formatPercentWithColor(row.avgReturn)}</td>
                     </tr>

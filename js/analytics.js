@@ -239,7 +239,9 @@ const Analytics = {
                 trades: [],
                 profitCount: 0,
                 lossCount: 0,
-                noneCount: 0
+                noneProfitCount: 0,  // 미달(수익): 0% ~ +3%
+                noneLossCount: 0,    // 미달(손실): -2% ~ 0%
+                noneNeutralCount: 0  // 미달(유지): 정확히 0%
             };
         });
 
@@ -247,9 +249,20 @@ const Analytics = {
             const day = Utils.getDayOfWeek(trade.date);
             if (byDay[day]) {
                 byDay[day].trades.push(trade);
-                if (trade.result === 'profit') byDay[day].profitCount++;
-                if (trade.result === 'loss') byDay[day].lossCount++;
-                if (trade.result === 'none') byDay[day].noneCount++;
+                if (trade.result === 'profit') {
+                    byDay[day].profitCount++;
+                } else if (trade.result === 'loss') {
+                    byDay[day].lossCount++;
+                } else if (trade.result === 'none') {
+                    // 미달 세부 구분
+                    if (trade.return_percent > 0) {
+                        byDay[day].noneProfitCount++;
+                    } else if (trade.return_percent < 0) {
+                        byDay[day].noneLossCount++;
+                    } else {
+                        byDay[day].noneNeutralCount++;
+                    }
+                }
             }
         });
 
@@ -266,7 +279,9 @@ const Analytics = {
                 count,
                 profitCount: data.profitCount,
                 lossCount: data.lossCount,
-                noneCount: data.noneCount,
+                noneProfitCount: data.noneProfitCount,
+                noneLossCount: data.noneLossCount,
+                noneNeutralCount: data.noneNeutralCount,
                 winRate,
                 avgReturn
             };
