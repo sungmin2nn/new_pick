@@ -1319,13 +1319,62 @@
             `;
         }
 
-        function getScoreIcon(metadata) {
-            if (!metadata) return '';
+        function generateFallbackMetadata(stock, scoreType) {
+            // 메타데이터가 없을 때 stock 데이터로부터 생성
+            const scoreDetail = stock.score_detail || {};
+            const value = scoreDetail[scoreType] || stock[`${scoreType}_score`] || 0;
+
+            if (scoreType === 'disclosure') {
+                const count = stock.disclosure_count || 0;
+                return {
+                    value: value,
+                    status: count > 0 ? 'success' : 'no_data',
+                    message: count > 0 ? `${count}건 수집` : '공시 없음'
+                };
+            } else if (scoreType === 'news') {
+                const count = stock.news_mentions || 0;
+                const positive = stock.positive_news || 0;
+                return {
+                    value: value,
+                    status: count > 0 ? 'success' : 'no_data',
+                    message: count > 0 ? `${count}건 (긍정 ${positive})` : '뉴스 없음'
+                };
+            } else if (scoreType === 'theme_keywords') {
+                const themes = stock.matched_themes || [];
+                const themesArr = typeof themes === 'string' ? JSON.parse(themes) : themes;
+                return {
+                    value: value,
+                    status: themesArr.length > 0 ? 'success' : 'no_match',
+                    message: themesArr.length > 0 ? themesArr.join(', ') : '테마 매칭 없음'
+                };
+            } else if (scoreType === 'investor') {
+                const foreign = stock.foreign_buy || 0;
+                const institution = stock.institution_buy || 0;
+                const msgs = [];
+                if (foreign > 0) msgs.push('외국인');
+                if (institution > 0) msgs.push('기관');
+                return {
+                    value: value,
+                    status: (foreign > 0 || institution > 0) ? 'success' : 'no_data',
+                    message: msgs.length > 0 ? `${msgs.join(', ')} 순매수` : '순매수 없음'
+                };
+            }
+            return { value: value, status: 'success', message: 'OK' };
+        }
+
+        function getScoreIcon(metadata, stock, scoreType) {
+            // 메타데이터가 없으면 stock에서 생성
+            if (!metadata) {
+                metadata = generateFallbackMetadata(stock, scoreType);
+            }
+
             const status = metadata.status || 'success';
             const value = metadata.value || 0;
             const message = metadata.message || '';
 
             if (value === 0 && status === 'no_data') {
+                return `<span class="score-status-icon warning tooltip">⚠️<span class="tooltiptext">${message}</span></span>`;
+            } else if (value === 0 && status === 'no_match') {
                 return `<span class="score-status-icon warning tooltip">⚠️<span class="tooltiptext">${message}</span></span>`;
             } else if (value > 0) {
                 return `<span class="score-status-icon success tooltip">✅<span class="tooltiptext">${message}</span></span>`;
@@ -1415,12 +1464,12 @@
                 const maxScore = 145;
                 const totalScore = Math.round(stock.total_score || 0);
 
-                // 메타데이터에서 아이콘 가져오기
+                // 메타데이터에서 아이콘 가져오기 (없으면 자동 생성)
                 const meta = stock.score_metadata || {};
-                const disclosureIcon = getScoreIcon(meta.disclosure);
-                const newsIcon = getScoreIcon(meta.news);
-                const themeIcon = getScoreIcon(meta.theme_keywords);
-                const investorIcon = getScoreIcon(meta.investor);
+                const disclosureIcon = getScoreIcon(meta.disclosure, stock, 'disclosure');
+                const newsIcon = getScoreIcon(meta.news, stock, 'news');
+                const themeIcon = getScoreIcon(meta.theme_keywords, stock, 'theme_keywords');
+                const investorIcon = getScoreIcon(meta.investor, stock, 'investor');
 
                 row.innerHTML = `
                     <td style="font-weight: 600; font-size: 0.75rem;">${stock.date || 'N/A'}</td>
