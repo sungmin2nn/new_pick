@@ -19,7 +19,7 @@ class Database:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        # morning_candidates 테이블 생성
+        # morning_candidates 테이블 생성 (145점 시스템)
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS morning_candidates (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,10 +32,17 @@ class Database:
                 volume REAL,
                 market_cap REAL,
                 total_score REAL,
-                price_score REAL,
-                volume_score REAL,
-                theme_score REAL,
+                disclosure_score REAL,
                 news_score REAL,
+                theme_score REAL,
+                investor_score REAL,
+                trading_value_score REAL,
+                market_cap_score REAL,
+                price_momentum_score REAL,
+                volume_surge_score REAL,
+                turnover_rate_score REAL,
+                material_overlap_score REAL,
+                news_timing_score REAL,
                 matched_themes TEXT,
                 news_mentions INTEGER,
                 selection_reason TEXT,
@@ -84,12 +91,15 @@ class Database:
                         date, stock_code, stock_name,
                         current_price, price_change_percent,
                         trading_value, volume, market_cap,
-                        total_score, price_score, volume_score,
-                        theme_score, news_score,
+                        total_score,
+                        disclosure_score, news_score, theme_score, investor_score,
+                        trading_value_score, market_cap_score, price_momentum_score,
+                        volume_surge_score, turnover_rate_score,
+                        material_overlap_score, news_timing_score,
                         matched_themes, news_mentions,
                         selection_reason,
                         created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     date,
                     candidate.get('code', ''),
@@ -101,9 +111,16 @@ class Database:
                     candidate.get('market_cap', 0),
                     candidate.get('total_score', 0),
                     score_detail.get('disclosure', 0),
-                    score_detail.get('investor', 0),
-                    score_detail.get('theme_keywords', 0),
                     score_detail.get('news', 0),
+                    score_detail.get('theme_keywords', 0),
+                    score_detail.get('investor', 0),
+                    score_detail.get('trading_value', 0),
+                    score_detail.get('market_cap', 0),
+                    score_detail.get('price_momentum', 0),
+                    score_detail.get('volume_surge', 0),
+                    score_detail.get('turnover_rate', 0),
+                    score_detail.get('material_overlap', 0),
+                    score_detail.get('news_timing', 0),
                     json.dumps(candidate.get('matched_themes', []), ensure_ascii=False),
                     candidate.get('news_mentions', 0),
                     candidate.get('selection_reason', '-'),
