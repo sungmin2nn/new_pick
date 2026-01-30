@@ -112,6 +112,11 @@ const Analytics = {
         const lossTrades = trades.filter(t => t.result === 'loss');
         const noneTrades = trades.filter(t => t.result === 'none');
 
+        // 미달 세부 구분
+        const noneProfitTrades = noneTrades.filter(t => t.return_percent > 0);
+        const noneLossTrades = noneTrades.filter(t => t.return_percent < 0);
+        const noneNeutralTrades = noneTrades.filter(t => t.return_percent === 0);
+
         const winRate = totalTrades > 0 ? (profitTrades.length / totalTrades * 100) : 0;
         const totalReturn = ((finalCapital - initialCapital) / initialCapital * 100);
 
@@ -160,6 +165,9 @@ const Analytics = {
             profitCount: profitTrades.length,
             lossCount: lossTrades.length,
             noneCount: noneTrades.length,
+            noneProfitCount: noneProfitTrades.length,
+            noneLossCount: noneLossTrades.length,
+            noneNeutralCount: noneNeutralTrades.length,
             avgWin,
             avgLoss,
             maxWinStreak,

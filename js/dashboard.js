@@ -214,8 +214,14 @@ const Dashboard = {
         // 자본 증가 곡선
         Charts.renderEquityCurve('equityChart', this.state.equityCurve);
 
-        // 결과 분포
-        Charts.renderResultDistribution('resultChart', stats.profitCount, stats.lossCount, stats.noneCount);
+        // 결과 분포 (5단계)
+        Charts.renderResultDistribution('resultChart',
+            stats.profitCount,
+            stats.lossCount,
+            stats.noneProfitCount,
+            stats.noneLossCount,
+            stats.noneNeutralCount
+        );
     },
 
     /**

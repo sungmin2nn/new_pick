@@ -77,9 +77,9 @@ const Charts = {
     },
 
     /**
-     * 결과 분포 차트 (도넛 차트)
+     * 결과 분포 차트 (도넛 차트) - 5단계
      */
-    renderResultDistribution(canvasId, profitCount, lossCount, noneCount) {
+    renderResultDistribution(canvasId, profitCount, lossCount, noneProfitCount, noneLossCount, noneNeutralCount) {
         this.destroyChart(canvasId);
 
         const canvas = document.getElementById(canvasId);
@@ -89,18 +89,20 @@ const Charts = {
         }
 
         const ctx = canvas.getContext('2d');
-        const total = profitCount + lossCount + noneCount;
+        const total = profitCount + lossCount + noneProfitCount + noneLossCount + noneNeutralCount;
 
         this.instances[canvasId] = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['익절', '손절', '미달'],
+                labels: ['익절', '손절', '미달(수익)', '미달(손실)', '미달(유지)'],
                 datasets: [{
-                    data: [profitCount, lossCount, noneCount],
+                    data: [profitCount, lossCount, noneProfitCount, noneLossCount, noneNeutralCount],
                     backgroundColor: [
                         '#f56565',  // 익절 - 빨강
                         '#4299e1',  // 손절 - 파랑
-                        '#a0aec0'   // 미달 - 회색
+                        '#ffa07a',  // 미달(수익) - 연한 빨강
+                        '#87ceeb',  // 미달(손실) - 연한 파랑
+                        '#d3d3d3'   // 미달(유지) - 회색
                     ],
                     borderWidth: 2,
                     borderColor: '#ffffff'
@@ -113,9 +115,9 @@ const Charts = {
                     legend: {
                         position: 'bottom',
                         labels: {
-                            padding: 15,
+                            padding: 10,
                             font: {
-                                size: 12
+                                size: 11
                             }
                         }
                     },
@@ -195,7 +197,7 @@ const Charts = {
     },
 
     /**
-     * 시간대별 패턴 차트 (바 차트)
+     * 시간대별 패턴 차트 (꺾은선 그래프)
      */
     renderTimeOfDayChart(canvasId, timeData) {
         this.destroyChart(canvasId);
@@ -209,19 +211,29 @@ const Charts = {
         const ctx = canvas.getContext('2d');
 
         this.instances[canvasId] = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: timeData.map(d => d.timeSlot),
                 datasets: [
                     {
                         label: '익절',
                         data: timeData.map(d => d.profitHits),
-                        backgroundColor: '#f56565'
+                        borderColor: '#f56565',
+                        backgroundColor: 'rgba(245, 101, 101, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     },
                     {
                         label: '손절',
                         data: timeData.map(d => d.lossHits),
-                        backgroundColor: '#4299e1'
+                        borderColor: '#4299e1',
+                        backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                        tension: 0.3,
+                        fill: false,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }
                 ]
             },
