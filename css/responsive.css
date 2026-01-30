@@ -20,6 +20,41 @@
         justify-content: space-between;
     }
 
+    /* 탭 버튼 */
+    .tabs {
+        margin: var(--space-sm);
+    }
+
+    .tab-button {
+        font-size: 0.8rem;
+        padding: var(--space-xs) var(--space-sm);
+    }
+
+    /* 백테스트 컨트롤 */
+    .backtest-controls {
+        padding: var(--space-md);
+    }
+
+    .control-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+
+    .quick-period-btns button {
+        font-size: 0.75rem;
+        padding: var(--space-xs) var(--space-md);
+    }
+
+    /* 통계 그리드 */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .system-info-grid {
+        grid-template-columns: 1fr;
+    }
+
     /* PC 테이블 숨김 */
     .table-desktop {
         display: none;
