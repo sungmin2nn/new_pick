@@ -1464,6 +1464,15 @@
                 const maxScore = 145;
                 const totalScore = Math.round(stock.total_score || 0);
 
+                // 대장주 보너스 계산
+                const leadingBonus = stock.is_leading ? 5 : 0;
+                const baseScore = totalScore - leadingBonus;
+
+                // 총점 표시 HTML 생성 (대장주 보너스 표시)
+                const totalScoreDisplay = leadingBonus > 0
+                    ? `<span class="tooltip">${baseScore}+${leadingBonus}<span class="tooltiptext">기본 ${baseScore}점 + 대장주 보너스 ${leadingBonus}점</span></span>`
+                    : `${totalScore}`;
+
                 // 메타데이터에서 아이콘 가져오기 (없으면 자동 생성)
                 const meta = stock.score_metadata || {};
                 const disclosureIcon = getScoreIcon(meta.disclosure, stock, 'disclosure');
@@ -1478,7 +1487,7 @@
                         <div class="stock-name">${stock.name || 'N/A'} ${stock.is_leading ? '👑' : ''}</div>
                         <div class="stock-code">${stock.code || 'N/A'}</div>
                     </td>
-                    <td><span class="score ${scoreClass}" style="font-size: 0.95rem;">${totalScore}/<span style="font-size: 0.75rem; opacity: 0.7;">${maxScore}</span></span></td>
+                    <td><span class="score ${scoreClass}" style="font-size: 0.95rem;">${totalScoreDisplay}/<span style="font-size: 0.75rem; opacity: 0.7;">${maxScore}</span></span></td>
                     <td>
                         <div class="score-with-status">
                             <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.disclosure || stock.disclosure_score || 0)}</span>
