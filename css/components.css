@@ -117,48 +117,6 @@
     font-size: 1rem;
 }
 
-/* 탭 */
-.tabs {
-    background: var(--bg-primary);
-    border-radius: 8px;
-    padding: 4px;
-    margin: 0 var(--space-md) var(--space-lg) var(--space-md);
-    display: flex;
-    gap: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.tab-button {
-    flex: 1;
-    padding: var(--space-sm) var(--space-lg);
-    background: transparent;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.tab-button:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-}
-
-.tab-button.active {
-    background: var(--accent-blue);
-    color: white;
-}
-
-.tab-content {
-    display: none !important;
-}
-
-.tab-content.active {
-    display: block !important;
-}
-
 /* 백테스트 컨트롤 */
 .backtest-controls {
     background: var(--bg-primary);

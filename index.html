@@ -3,195 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>장전 종목 선정</title>
+    <title>뉴스 트레이딩 대시보드</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/variables.css?v=7">
-    <link rel="stylesheet" href="css/base.css?v=7">
-    <link rel="stylesheet" href="css/components.css?v=7">
-    <link rel="stylesheet" href="css/responsive.css?v=7">
+    <link rel="stylesheet" href="css/variables.css?v=8">
+    <link rel="stylesheet" href="css/base.css?v=8">
+    <link rel="stylesheet" href="css/components.css?v=8">
+    <link rel="stylesheet" href="css/dashboard.css?v=8">
 </head>
 <body>
     <!-- 헤더 -->
     <header class="header">
         <div class="header-left">
-            <h1>🔮 장전 종목 선정</h1>
-            <div class="subtitle">매일 아침 08:30 자동 선정 | <a href="system_guide.html">📚 시스템 가이드</a> | <a href="data/backtest_report.html">📊 백테스팅 리포트</a></div>
-            <span class="update-time" id="updateTime">-</span>
-        </div>
-        <div class="header-right">
-            <select id="filterDate" class="filters">
-                <option value="">최신 데이터</option>
-            </select>
+            <h1>🔮 뉴스 트레이딩 대시보드</h1>
+            <div class="subtitle">매일 아침 08:30 자동 선정 | <a href="system_guide.html">📚 시스템 가이드</a></div>
         </div>
     </header>
 
-    <!-- 탭 네비게이션 -->
-    <div class="tabs">
-        <button class="tab-button active" id="stocksTabBtn">📊 종목 선정</button>
-        <button class="tab-button" id="backtestTabBtn">📈 백테스팅</button>
-        <button class="tab-button" id="systemTabBtn">⚙️ 시스템 정보</button>
-    </div>
+    <!-- 대시보드 컨테이너 -->
+    <div class="dashboard-container">
 
-    <!-- 종목 선정 탭 -->
-    <div id="stocksTab" class="tab-content active">
-    <div class="container">
-        <!-- 로딩 -->
-        <div id="loading" class="loading">데이터 로딩 중...</div>
-
-        <!-- 에러 -->
-        <div id="error" class="error" style="display: none;"></div>
-
-        <!-- 데스크톱 테이블 -->
-        <table id="stockTable" class="table-desktop" style="display: none;">
-            <thead>
-                <tr>
-                    <th>날짜</th>
-                    <th>순위</th>
-                    <th>종목명</th>
-                    <th>총점</th>
-                    <th>공시</th>
-                    <th>뉴스</th>
-                    <th>테마</th>
-                    <th>투자자</th>
-                    <th>거래대금</th>
-                    <th>시총</th>
-                    <th>가격</th>
-                    <th>거래량</th>
-                    <th>회전율</th>
-                    <th>중복도</th>
-                    <th>시간대</th>
-                    <th>선정사유</th>
-                    <th>현재가</th>
-                    <th>등락률</th>
-                    <th>거래대금</th>
-                </tr>
-            </thead>
-            <tbody id="stockTableBody"></tbody>
-        </table>
-
-        <!-- 모바일 카드 -->
-        <div id="mobileCards" class="table-mobile" style="display: none;"></div>
-    </div>
-    </div>
-
-    <!-- 백테스팅 탭 -->
-    <div id="backtestTab" class="tab-content">
-        <div class="container">
-            <!-- 기간 및 투자금 설정 -->
-            <div class="backtest-controls">
-                <div class="control-group">
-                    <label>📅 기간 설정</label>
-                    <div class="date-inputs">
-                        <input type="date" id="periodStartDate">
-                        <span>~</span>
-                        <input type="date" id="periodEndDate">
-                    </div>
+        <!-- 섹션 1: 기간 선택 -->
+        <section class="period-section">
+            <h2>📅 분석 기간</h2>
+            <div class="period-controls">
+                <div class="date-inputs">
+                    <input type="date" id="startDate">
+                    <span>~</span>
+                    <input type="date" id="endDate">
                 </div>
-                <div class="quick-period-btns">
-                    <button onclick="BacktestApp.setQuickPeriod('year')">올해</button>
-                    <button onclick="BacktestApp.setQuickPeriod('month')">이번달</button>
-                    <button onclick="BacktestApp.setQuickPeriod('week')">이번주</button>
-                    <button onclick="BacktestApp.setQuickPeriod('30days')">30일</button>
-                    <button onclick="BacktestApp.setQuickPeriod('7days')">7일</button>
-                </div>
-                <div class="control-group">
-                    <label>💰 초기 투자금</label>
-                    <input type="number" id="initialInvestment" value="1000000" min="100000" step="100000">
-                    <span>원</span>
-                </div>
-                <div class="control-group">
-                    <label>💵 종목당 제한 금액</label>
-                    <input type="number" id="maxPerStock" value="100000" min="10000" step="10000">
-                    <span>원</span>
-                </div>
-                <div class="control-group">
-                    <label>🔧 고가 종목 처리</label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="buyExpensiveStocks" checked>
-                        <span>1주 가격이 제한금액 초과 시 1주만 매수</span>
-                    </label>
-                </div>
-                <div class="run-btn-container">
-                    <button class="run-backtest-btn" onclick="BacktestApp.runBacktest()">🚀 백테스팅 실행</button>
+                <div class="quick-buttons">
+                    <button onclick="Dashboard.setQuickPeriod('all')">전체</button>
+                    <button onclick="Dashboard.setQuickPeriod('year')">올해</button>
+                    <button onclick="Dashboard.setQuickPeriod('month')">이번달</button>
+                    <button onclick="Dashboard.setQuickPeriod('30days')">30일</button>
+                    <button onclick="Dashboard.setQuickPeriod('7days')">7일</button>
                 </div>
             </div>
+        </section>
 
-            <!-- 백테스트 결과 -->
-            <div id="backtestResults" style="display: none;">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">최종 자산</div>
-                        <div class="stat-value" id="btFinalCapital">-</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">누적 수익률</div>
-                        <div class="stat-value" id="btTotalReturn">-</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">총 거래 수</div>
-                        <div class="stat-value" id="btTotalTrades">-</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">승률</div>
-                        <div class="stat-value" id="btWinRate">-</div>
-                    </div>
+        <!-- 섹션 2: 전체 성과 -->
+        <section class="stats-section">
+            <h2>📊 전체 성과</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">최종 자산</div>
+                    <div class="stat-value" id="finalCapital">-</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-label">누적 수익률</div>
+                    <div class="stat-value" id="totalReturn">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">총 거래 수</div>
+                    <div class="stat-value" id="totalTrades">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">승률</div>
+                    <div class="stat-value" id="winRate">-</div>
+                </div>
+            </div>
+        </section>
 
+        <!-- 섹션 3: 차트 -->
+        <section class="charts-section">
+            <div class="chart-row">
                 <div class="chart-container">
                     <h3>📈 자본 증가 곡선</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="equityChart"></canvas>
-                    </div>
+                    <canvas id="equityChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>🍩 결과 분포</h3>
+                    <canvas id="resultChart"></canvas>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- 시스템 정보 탭 -->
-    <div id="systemTab" class="tab-content">
-        <div class="container">
-            <div class="system-info-grid">
-                <div class="info-card">
-                    <h3>🎯 핵심 기능</h3>
-                    <ul>
-                        <li>공시 수집 및 분석</li>
-                        <li>뉴스 모니터링</li>
-                        <li>테마 키워드 매칭</li>
-                        <li>투자자 동향 분석</li>
-                        <li>시장 데이터 분석</li>
-                    </ul>
+        <!-- 섹션 4: 상세 분석 (접기/펼치기) -->
+        <section class="analytics-section">
+            <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                <h2>📊 상세 분석</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="section-content">
+
+                <!-- 점수대별 성과 -->
+                <div class="analysis-subsection">
+                    <h3>점수대별 성과</h3>
+                    <table class="analysis-table" id="scoreRangeTable"></table>
                 </div>
-                <div class="info-card">
-                    <h3>⚙️ 점수 체계</h3>
-                    <ul>
-                        <li>총점: 145점</li>
-                        <li>공시: 최대 20점</li>
-                        <li>뉴스: 최대 15점</li>
-                        <li>테마: 최대 15점</li>
-                        <li>투자자: 최대 15점</li>
-                        <li>대장주 보너스: +5점</li>
-                    </ul>
+
+                <!-- 일자별 성과 -->
+                <div class="analysis-subsection">
+                    <h3>일자별 성과</h3>
+                    <table class="analysis-table" id="dailyTable"></table>
                 </div>
-                <div class="info-card">
-                    <h3>🕐 실행 시간</h3>
-                    <ul>
-                        <li>매일 08:30 - 장전 종목 선정</li>
-                        <li>실시간 데이터 업데이트</li>
-                        <li>자동 백테스팅</li>
-                    </ul>
+
+                <!-- 요일별 패턴 -->
+                <div class="analysis-subsection">
+                    <h3>요일별 패턴</h3>
+                    <canvas id="dayOfWeekChart"></canvas>
+                    <table class="analysis-table" id="dayOfWeekTable"></table>
+                </div>
+
+                <!-- 선정사유별 성과 -->
+                <div class="analysis-subsection">
+                    <h3>선정사유별 성과</h3>
+                    <table class="analysis-table" id="reasonTable"></table>
+                </div>
+
+                <!-- 시간대별 패턴 -->
+                <div class="analysis-subsection">
+                    <h3>시간대별 익절/손절 패턴</h3>
+                    <canvas id="timeOfDayChart"></canvas>
+                </div>
+
+                <!-- 수익률 분포 -->
+                <div class="analysis-subsection">
+                    <h3>수익률 분포</h3>
+                    <canvas id="returnDistChart"></canvas>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 섹션 5: 오늘의 종목 -->
+        <section class="today-section">
+            <h2>🌟 오늘의 종목 (상위 3개)</h2>
+            <div class="today-cards" id="todayCards">
+                <p style="text-align: center; color: var(--text-secondary);">로딩 중...</p>
+            </div>
+        </section>
+
+        <!-- 섹션 6: 거래 내역 테이블 -->
+        <section class="table-section">
+            <div class="section-header">
+                <h2>📋 전체 거래 내역</h2>
+                <div class="table-controls">
+                    <input type="text" id="searchInput" placeholder="종목명 또는 코드 검색">
+                    <select id="resultFilter">
+                        <option value="all">전체</option>
+                        <option value="profit">익절만</option>
+                        <option value="loss">손절만</option>
+                        <option value="none">미달만</option>
+                    </select>
+                    <select id="reasonFilter">
+                        <option value="all">모든 사유</option>
+                    </select>
+                    <button onclick="Dashboard.exportToCSV()">CSV 내보내기</button>
                 </div>
             </div>
-        </div>
+            <div class="table-wrapper">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th onclick="TableUtils.sortBy('date')">날짜</th>
+                            <th onclick="TableUtils.sortBy('name')">종목명</th>
+                            <th onclick="TableUtils.sortBy('code')">종목코드</th>
+                            <th onclick="TableUtils.sortBy('score')">총점</th>
+                            <th>선정사유</th>
+                            <th>매수가</th>
+                            <th>매도가</th>
+                            <th onclick="TableUtils.sortBy('return')">수익률</th>
+                            <th onclick="TableUtils.sortBy('profit')">손익금액</th>
+                            <th>결과</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: var(--space-xl); color: var(--text-secondary);">
+                                데이터를 불러오는 중...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="tablePagination"></div>
+        </section>
+
     </div>
 
-    <!-- JavaScript -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="js/config.js?v=7"></script>
-    <script src="js/api.js?v=7"></script>
-    <script src="js/render.js?v=7"></script>
-    <script src="js/backtest.js?v=7"></script>
-    <script src="js/tabs.js?v=7"></script>
-    <script src="js/app.js?v=7"></script>
+    <script src="js/config.js?v=8"></script>
+    <script src="js/utils.js?v=8"></script>
+    <script src="js/analytics.js?v=8"></script>
+    <script src="js/charts.js?v=8"></script>
+    <script src="js/table.js?v=8"></script>
+    <script src="js/dashboard.js?v=8"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Dashboard.init();
+        });
+    </script>
 </body>
 </html>

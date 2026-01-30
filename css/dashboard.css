@@ -1,0 +1,384 @@
+/* Dashboard Layout Styles */
+
+/* 대시보드 컨테이너 */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+/* 섹션 공통 스타일 */
+section {
+    margin-bottom: var(--space-xl);
+    background: var(--bg-primary);
+    padding: var(--space-lg);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: opacity 0.3s;
+}
+
+section h2 {
+    margin: 0 0 var(--space-lg) 0;
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+section h3 {
+    margin: var(--space-lg) 0 var(--space-md) 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* 기간 선택 */
+.period-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.date-inputs input[type="date"] {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.quick-buttons {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.quick-buttons button {
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-primary);
+}
+
+.quick-buttons button:hover {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+/* 차트 그리드 */
+.chart-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-lg);
+}
+
+.chart-container {
+    position: relative;
+}
+
+.chart-container canvas {
+    max-height: 400px;
+}
+
+/* 접기/펼치기 섹션 */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: var(--space-lg);
+}
+
+.section-header:hover {
+    opacity: 0.8;
+}
+
+.toggle-icon {
+    font-size: 1rem;
+    transition: transform 0.3s;
+    color: var(--text-secondary);
+}
+
+.analytics-section.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.analytics-section.collapsed .section-content {
+    display: none;
+}
+
+.section-content {
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 분석 하위 섹션 */
+.analysis-subsection {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.analysis-subsection:last-child {
+    border-bottom: none;
+}
+
+.analysis-subsection canvas {
+    max-height: 300px;
+    margin-bottom: var(--space-md);
+}
+
+/* 분석 테이블 */
+.analysis-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.analysis-table thead {
+    background: var(--bg-secondary);
+}
+
+.analysis-table th {
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.analysis-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.analysis-table tbody tr:hover {
+    background: var(--bg-secondary);
+}
+
+/* 오늘의 종목 카드 */
+.today-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+}
+
+.today-card {
+    background: var(--bg-secondary);
+    padding: var(--space-lg);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-blue);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.today-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* 거래 내역 테이블 */
+.table-section .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+    cursor: default;
+}
+
+.table-section .section-header:hover {
+    opacity: 1;
+}
+
+.table-controls {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.table-controls input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+    padding: var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.table-controls select {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.table-controls button {
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.table-controls button:hover {
+    background: #0052a3;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: var(--space-md);
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.transaction-table thead {
+    background: var(--bg-secondary);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.transaction-table th {
+    padding: var(--space-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.transaction-table th:hover {
+    background: var(--bg-tertiary);
+}
+
+.transaction-table th.sort-asc::after {
+    content: ' ▲';
+    color: var(--accent-blue);
+}
+
+.transaction-table th.sort-desc::after {
+    content: ' ▼';
+    color: var(--accent-blue);
+}
+
+.transaction-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.transaction-table tbody tr:hover {
+    background: var(--bg-secondary);
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.pagination button {
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.pagination button:hover {
+    background: var(--bg-tertiary);
+}
+
+.pagination button.active {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: var(--space-md);
+    }
+
+    section {
+        padding: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+
+    section h2 {
+        font-size: 1.1rem;
+    }
+
+    .chart-row {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .today-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .table-controls input[type="text"],
+    .table-controls select,
+    .table-controls button {
+        width: 100%;
+    }
+
+    .quick-buttons button {
+        flex: 1;
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,414 @@
+// Analytics Engine - 백테스팅 데이터 분석
+
+const Analytics = {
+    /**
+     * 기간 내 모든 intraday 데이터 로드 및 거래 내역 생성
+     */
+    async loadIntradayData(startDate, endDate, initialCapital = 1000000, maxPerStock = 100000, buyExpensive = true) {
+        const tradingDays = Utils.getDateRange(startDate, endDate);
+        const trades = [];
+        const equityCurve = [{ date: Utils.formatDate(startDate), capital: initialCapital }];
+
+        let capital = initialCapital;
+
+        for (const day of tradingDays) {
+            try {
+                const dateStr = Utils.formatDateToYYYYMMDD(day);
+                const response = await fetch(`data/intraday/intraday_${dateStr}.json`);
+
+                if (!response.ok) {
+                    console.log(`[Analytics] ${dateStr} 데이터 없음`);
+                    continue;
+                }
+
+                const data = await response.json();
+                const stocks = Object.values(data.stocks || {});
+                const dateFormatted = Utils.formatDate(day);
+
+                for (const stock of stocks) {
+                    const pl = stock.profit_loss_analysis;
+                    if (!pl) continue;
+
+                    const openingPrice = pl.opening_price;
+
+                    // 주식 수 및 투자금 계산
+                    let shares = 0;
+                    let investAmount = 0;
+
+                    if (openingPrice > maxPerStock) {
+                        if (buyExpensive) {
+                            shares = 1;
+                            investAmount = openingPrice;
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        shares = Math.floor(maxPerStock / openingPrice);
+                        investAmount = shares * openingPrice;
+                    }
+
+                    if (investAmount > capital) {
+                        continue;
+                    }
+
+                    // 매도가 결정
+                    let sellPrice = 0;
+                    let result = 'none';
+
+                    if (pl.first_hit === 'profit') {
+                        sellPrice = pl.profit_target_price;
+                        result = 'profit';
+                    } else if (pl.first_hit === 'loss') {
+                        sellPrice = pl.loss_target_price;
+                        result = 'loss';
+                    } else {
+                        sellPrice = pl.closing_price;
+                        result = 'none';
+                    }
+
+                    // 손익 계산
+                    const sellAmount = shares * sellPrice;
+                    const profit = sellAmount - investAmount;
+                    const returnPercent = (profit / investAmount) * 100;
+
+                    // 자본 업데이트
+                    capital = capital - investAmount + sellAmount;
+
+                    trades.push({
+                        date: dateFormatted,
+                        stock_code: stock.code,
+                        stock_name: stock.name,
+                        selection_score: stock.selection_score || 0,
+                        selection_reason: stock.selection_reason || '-',
+                        buy_price: openingPrice,
+                        sell_price: sellPrice,
+                        shares: shares,
+                        invest_amount: investAmount,
+                        sell_amount: sellAmount,
+                        profit: profit,
+                        return_percent: returnPercent,
+                        result: result,
+                        first_hit_time: pl.first_hit_time,
+                        capital_after: capital
+                    });
+                }
+
+                equityCurve.push({ date: dateFormatted, capital: capital });
+
+            } catch (e) {
+                console.warn(`[Analytics] ${Utils.formatDateToYYYYMMDD(day)} 처리 실패:`, e);
+            }
+        }
+
+        return { trades, equityCurve, finalCapital: capital };
+    },
+
+    /**
+     * 전체 성과 통계 계산
+     */
+    calculateOverallStats(trades, finalCapital, initialCapital) {
+        const totalTrades = trades.length;
+        const profitTrades = trades.filter(t => t.result === 'profit');
+        const lossTrades = trades.filter(t => t.result === 'loss');
+        const noneTrades = trades.filter(t => t.result === 'none');
+
+        const winRate = totalTrades > 0 ? (profitTrades.length / totalTrades * 100) : 0;
+        const totalReturn = ((finalCapital - initialCapital) / initialCapital * 100);
+
+        const avgWin = profitTrades.length > 0
+            ? profitTrades.reduce((sum, t) => sum + t.return_percent, 0) / profitTrades.length
+            : 0;
+
+        const avgLoss = lossTrades.length > 0
+            ? lossTrades.reduce((sum, t) => sum + t.return_percent, 0) / lossTrades.length
+            : 0;
+
+        // 연승/연패 계산
+        let currentStreak = 0;
+        let maxWinStreak = 0;
+        let maxLossStreak = 0;
+        let streakType = null;
+
+        trades.forEach(trade => {
+            if (trade.result === 'profit') {
+                if (streakType === 'win') {
+                    currentStreak++;
+                } else {
+                    currentStreak = 1;
+                    streakType = 'win';
+                }
+                maxWinStreak = Math.max(maxWinStreak, currentStreak);
+            } else if (trade.result === 'loss') {
+                if (streakType === 'loss') {
+                    currentStreak++;
+                } else {
+                    currentStreak = 1;
+                    streakType = 'loss';
+                }
+                maxLossStreak = Math.max(maxLossStreak, currentStreak);
+            } else {
+                currentStreak = 0;
+                streakType = null;
+            }
+        });
+
+        return {
+            finalCapital,
+            totalReturn,
+            totalTrades,
+            winRate,
+            profitCount: profitTrades.length,
+            lossCount: lossTrades.length,
+            noneCount: noneTrades.length,
+            avgWin,
+            avgLoss,
+            maxWinStreak,
+            maxLossStreak
+        };
+    },
+
+    /**
+     * 점수대별 성과 분석
+     */
+    analyzeByScoreRange(trades) {
+        const ranges = [
+            { label: '0-50점', min: 0, max: 50 },
+            { label: '51-80점', min: 51, max: 80 },
+            { label: '81-100점', min: 81, max: 100 },
+            { label: '101점+', min: 101, max: 999 }
+        ];
+
+        return ranges.map(range => {
+            const filtered = trades.filter(t =>
+                t.selection_score >= range.min && t.selection_score <= range.max
+            );
+
+            const profitCount = filtered.filter(t => t.result === 'profit').length;
+            const winRate = filtered.length > 0 ? (profitCount / filtered.length * 100) : 0;
+            const avgReturn = filtered.length > 0
+                ? filtered.reduce((sum, t) => sum + t.return_percent, 0) / filtered.length
+                : 0;
+
+            return {
+                range: range.label,
+                count: filtered.length,
+                winRate,
+                avgReturn
+            };
+        }).filter(r => r.count > 0);
+    },
+
+    /**
+     * 일자별 성과 분석
+     */
+    analyzeByDate(trades) {
+        const byDate = {};
+
+        trades.forEach(trade => {
+            if (!byDate[trade.date]) {
+                byDate[trade.date] = {
+                    date: trade.date,
+                    trades: [],
+                    profitCount: 0,
+                    lossCount: 0,
+                    noneCount: 0,
+                    totalReturn: 0
+                };
+            }
+
+            byDate[trade.date].trades.push(trade);
+            if (trade.result === 'profit') byDate[trade.date].profitCount++;
+            if (trade.result === 'loss') byDate[trade.date].lossCount++;
+            if (trade.result === 'none') byDate[trade.date].noneCount++;
+            byDate[trade.date].totalReturn += trade.return_percent;
+        });
+
+        return Object.values(byDate).sort((a, b) => b.date.localeCompare(a.date));
+    },
+
+    /**
+     * 요일별 패턴 분석
+     */
+    analyzeByDayOfWeek(trades) {
+        const days = ['월', '화', '수', '목', '금'];
+        const byDay = {};
+
+        days.forEach(day => {
+            byDay[day] = {
+                day,
+                trades: [],
+                profitCount: 0,
+                lossCount: 0,
+                noneCount: 0
+            };
+        });
+
+        trades.forEach(trade => {
+            const day = Utils.getDayOfWeek(trade.date);
+            if (byDay[day]) {
+                byDay[day].trades.push(trade);
+                if (trade.result === 'profit') byDay[day].profitCount++;
+                if (trade.result === 'loss') byDay[day].lossCount++;
+                if (trade.result === 'none') byDay[day].noneCount++;
+            }
+        });
+
+        return days.map(day => {
+            const data = byDay[day];
+            const count = data.trades.length;
+            const winRate = count > 0 ? (data.profitCount / count * 100) : 0;
+            const avgReturn = count > 0
+                ? data.trades.reduce((sum, t) => sum + t.return_percent, 0) / count
+                : 0;
+
+            return {
+                day,
+                count,
+                profitCount: data.profitCount,
+                lossCount: data.lossCount,
+                noneCount: data.noneCount,
+                winRate,
+                avgReturn
+            };
+        }).filter(d => d.count > 0);
+    },
+
+    /**
+     * 선정사유별 성과 분석
+     */
+    analyzeByReason(trades) {
+        const byReason = {};
+
+        trades.forEach(trade => {
+            const reason = trade.selection_reason || '기타';
+            if (!byReason[reason]) {
+                byReason[reason] = {
+                    reason,
+                    trades: [],
+                    profitCount: 0,
+                    lossCount: 0
+                };
+            }
+
+            byReason[reason].trades.push(trade);
+            if (trade.result === 'profit') byReason[reason].profitCount++;
+            if (trade.result === 'loss') byReason[reason].lossCount++;
+        });
+
+        return Object.values(byReason).map(data => {
+            const count = data.trades.length;
+            const winRate = count > 0 ? (data.profitCount / count * 100) : 0;
+            const avgReturn = count > 0
+                ? data.trades.reduce((sum, t) => sum + t.return_percent, 0) / count
+                : 0;
+
+            return {
+                reason: data.reason,
+                count,
+                winRate,
+                avgReturn
+            };
+        }).sort((a, b) => b.count - a.count);
+    },
+
+    /**
+     * 시간대별 익절/손절 패턴 분석
+     */
+    analyzeByTimeOfDay(trades) {
+        const timeSlots = [
+            { label: '09:00-09:30', start: '09:00', end: '09:30' },
+            { label: '09:30-10:00', start: '09:30', end: '10:00' },
+            { label: '10:00-10:30', start: '10:00', end: '10:30' },
+            { label: '10:30-11:00', start: '10:30', end: '11:00' },
+            { label: '11:00-11:30', start: '11:00', end: '11:30' },
+            { label: '11:30-12:00', start: '11:30', end: '12:00' },
+            { label: '12:00-12:30', start: '12:00', end: '12:30' },
+            { label: '12:30-13:00', start: '12:30', end: '13:00' },
+            { label: '13:00-13:30', start: '13:00', end: '13:30' },
+            { label: '13:30-14:00', start: '13:30', end: '14:00' },
+            { label: '14:00-14:30', start: '14:00', end: '14:30' },
+            { label: '14:30-15:00', start: '14:30', end: '15:00' },
+            { label: '15:00-15:30', start: '15:00', end: '15:30' }
+        ];
+
+        return timeSlots.map(slot => {
+            const profitHits = trades.filter(t =>
+                t.result === 'profit' &&
+                t.first_hit_time &&
+                t.first_hit_time >= slot.start &&
+                t.first_hit_time < slot.end
+            ).length;
+
+            const lossHits = trades.filter(t =>
+                t.result === 'loss' &&
+                t.first_hit_time &&
+                t.first_hit_time >= slot.start &&
+                t.first_hit_time < slot.end
+            ).length;
+
+            return {
+                timeSlot: slot.label,
+                profitHits,
+                lossHits
+            };
+        });
+    },
+
+    /**
+     * 수익률 분포 분석
+     */
+    analyzeReturnDistribution(trades) {
+        const buckets = [
+            { label: '-10% 이하', min: -Infinity, max: -10 },
+            { label: '-10% ~ -5%', min: -10, max: -5 },
+            { label: '-5% ~ -3%', min: -5, max: -3 },
+            { label: '-3% ~ -1%', min: -3, max: -1 },
+            { label: '-1% ~ 0%', min: -1, max: 0 },
+            { label: '0% ~ 1%', min: 0, max: 1 },
+            { label: '1% ~ 3%', min: 1, max: 3 },
+            { label: '3% ~ 5%', min: 3, max: 5 },
+            { label: '5% ~ 10%', min: 5, max: 10 },
+            { label: '10% 이상', min: 10, max: Infinity }
+        ];
+
+        return buckets.map(bucket => {
+            const count = trades.filter(t =>
+                t.return_percent >= bucket.min && t.return_percent < bucket.max
+            ).length;
+
+            return {
+                bucket: bucket.label,
+                count
+            };
+        });
+    },
+
+    /**
+     * 오늘의 종목 조회 (최신 날짜의 상위 3개)
+     */
+    async getTodayStocks() {
+        try {
+            const response = await fetch('data/history.json');
+            if (!response.ok) return [];
+
+            const historyData = await response.json();
+            if (!historyData.dates || historyData.dates.length === 0) return [];
+
+            const latestDate = historyData.dates[0];
+            const stocks = historyData.data_by_date[latestDate] || [];
+
+            return stocks.slice(0, 3).map((stock, index) => ({
+                rank: index + 1,
+                code: stock.stock_code || stock.code,
+                name: stock.stock_name || stock.name,
+                score: stock.total_score || 0,
+                reason: stock.selection_reason || '-',
+                date: latestDate
+            }));
+
+        } catch (error) {
+            console.error('[Analytics] 오늘의 종목 조회 실패:', error);
+            return [];
+        }
+    }
+};
