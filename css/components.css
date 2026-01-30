@@ -1,0 +1,118 @@
+/* 필터 컨트롤 */
+.filters {
+    background: var(--bg-primary);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.filters select {
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-family: var(--font-mono);
+}
+
+/* 점수 배지 */
+.score-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.score-high .score-badge { background: var(--score-high); color: white; }
+.score-mid .score-badge { background: var(--score-mid); color: white; }
+.score-low .score-badge { background: var(--score-low); color: white; }
+.score-zero .score-badge { background: var(--score-zero); color: var(--text-secondary); }
+
+/* 상태 아이콘 */
+.status-icon {
+    font-size: 0.9rem;
+    cursor: help;
+}
+
+.status-icon.success { color: var(--accent-green); }
+.status-icon.warning { color: #f59e0b; }
+.status-icon.error { color: var(--accent-red); }
+
+/* 등락률 */
+.price-change {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.price-change.positive { color: var(--accent-red); }
+.price-change.negative { color: var(--accent-blue); }
+
+/* 순위 배지 */
+.rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    background: var(--bg-tertiary);
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.rank.top3 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #000;
+}
+
+/* 종목명 */
+.stock-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.stock-code {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+}
+
+/* 툴팁 */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 180px;
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    text-align: center;
+    border-radius: 4px;
+    padding: var(--space-xs);
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -90px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 0.75rem;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* 대장주 왕관 */
+.leading-badge {
+    font-size: 1rem;
+}

@@ -1,0 +1,105 @@
+/* 기본 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 14px;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    line-height: 1.5;
+    transition: background 0.2s, color 0.2s;
+}
+
+/* 컨테이너 - 최대폭 제거, 여백 최소화 */
+.container {
+    width: 100%;
+    padding: var(--space-md);
+}
+
+/* 헤더 - 컴팩트 */
+.header {
+    background: var(--bg-primary);
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.update-time {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+}
+
+/* 테이블 기본 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-primary);
+    font-size: 0.85rem;
+}
+
+th {
+    background: var(--bg-tertiary);
+    padding: var(--space-sm) var(--space-xs);
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    user-select: none;
+    cursor: pointer;
+}
+
+th:hover {
+    background: var(--bg-secondary);
+}
+
+td {
+    padding: var(--space-xs);
+    text-align: center;
+    border: 1px solid var(--border-color);
+    font-family: var(--font-mono);
+}
+
+tr:hover {
+    background: var(--bg-secondary);
+}
+
+/* 로딩 및 에러 */
+.loading, .error {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--text-secondary);
+}
+
+.error {
+    color: var(--accent-red);
+}

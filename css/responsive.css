@@ -1,0 +1,142 @@
+/* 모바일 대응 (768px 이하) */
+@media (max-width: 768px) {
+    html {
+        font-size: 13px;
+    }
+
+    .container {
+        padding: var(--space-xs);
+    }
+
+    .header {
+        flex-direction: column;
+        height: auto;
+        padding: var(--space-sm);
+        gap: var(--space-sm);
+    }
+
+    .header-left, .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* PC 테이블 숨김 */
+    .table-desktop {
+        display: none;
+    }
+
+    /* 모바일 카드 뷰 */
+    .table-mobile {
+        display: block;
+    }
+
+    .stock-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: var(--space-md);
+        margin-bottom: var(--space-sm);
+        position: relative;
+    }
+
+    .stock-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--space-sm);
+    }
+
+    .stock-card-title {
+        flex: 1;
+    }
+
+    .stock-card-score {
+        font-size: 1.5rem;
+        font-weight: 700;
+        font-family: var(--font-mono);
+        color: var(--accent-blue);
+    }
+
+    .stock-card-detail {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-xs);
+        margin-top: var(--space-sm);
+        padding-top: var(--space-sm);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .stock-card-item {
+        text-align: center;
+    }
+
+    .stock-card-label {
+        font-size: 0.7rem;
+        color: var(--text-tertiary);
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .stock-card-value {
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: var(--font-mono);
+    }
+
+    /* 펼침/접기 버튼 */
+    .expand-btn {
+        width: 100%;
+        padding: var(--space-xs);
+        background: var(--bg-tertiary);
+        border: none;
+        border-radius: 4px;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        cursor: pointer;
+        margin-top: var(--space-sm);
+    }
+
+    .stock-card-expanded {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .stock-card-expanded.active {
+        max-height: 500px;
+    }
+
+    .score-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-xs);
+        padding: var(--space-sm) 0;
+    }
+}
+
+/* 데스크톱 */
+@media (min-width: 769px) {
+    .table-mobile {
+        display: none;
+    }
+
+    .table-desktop {
+        display: table;
+    }
+
+    /* 작은 컬럼 숨김 (선택적) */
+    .hide-on-desktop {
+        display: none;
+    }
+}
+
+/* 태블릿 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    html {
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: var(--space-xs) 2px;
+    }
+}
