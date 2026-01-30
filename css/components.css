@@ -220,21 +220,25 @@
 
 .stat-card {
     background: var(--bg-primary);
-    padding: var(--space-lg);
+    padding: var(--space-md);
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
     margin-bottom: var(--space-xs);
+    white-space: nowrap;
 }
 
 .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--text-primary);
+    word-break: break-all;
 }
 
 /* 차트 */
