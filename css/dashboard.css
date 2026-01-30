@@ -429,9 +429,16 @@ section h3 {
         width: 100%;
     }
 
+    .quick-buttons {
+        gap: var(--space-xs);
+    }
+
     .quick-buttons button {
         flex: 1;
-        min-width: 80px;
+        min-width: 0;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.75rem;
+        white-space: nowrap;
     }
 }
 
