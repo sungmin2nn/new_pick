@@ -313,27 +313,24 @@ const Dashboard = {
      * 요일별 분석
      */
     renderDayOfWeekAnalysis(data) {
-        // 차트
-        Charts.renderDayOfWeekChart('dayOfWeekChart', data);
-
-        // 테이블
+        // 테이블만 렌더링 (차트 제거)
         const table = document.getElementById('dayOfWeekTable');
         if (!table) return;
 
         const html = `
             <thead>
                 <tr>
-                    <th>요일</th>
-                    <th>거래 수</th>
-                    <th>승률</th>
-                    <th>평균 수익률</th>
+                    <th style="width: 10%;">요일</th>
+                    <th style="width: 40%;">거래수 (익절/손절/미달)</th>
+                    <th style="width: 25%;">승률</th>
+                    <th style="width: 25%;">평균수익률</th>
                 </tr>
             </thead>
             <tbody>
                 ${data.map(row => `
                     <tr>
-                        <td>${row.day}요일</td>
-                        <td>${row.count}건</td>
+                        <td>${row.day}</td>
+                        <td>${row.count} (${row.profitCount}/${row.lossCount}/${row.noneCount})</td>
                         <td>${Utils.formatPercent(row.winRate)}</td>
                         <td>${Utils.formatPercentWithColor(row.avgReturn)}</td>
                     </tr>
