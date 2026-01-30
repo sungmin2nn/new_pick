@@ -65,21 +65,23 @@
             </div>
         </section>
 
-        <!-- 섹션 3: 차트 -->
-        <section class="charts-section">
-            <div class="chart-row">
-                <div class="chart-container">
-                    <h3>📈 자본 증가 곡선</h3>
-                    <canvas id="equityChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h3>🍩 결과 분포</h3>
-                    <canvas id="resultChart"></canvas>
-                </div>
+        <!-- 섹션 3: 자본 증가 곡선 -->
+        <section class="equity-section">
+            <h2>📈 자본 증가 곡선</h2>
+            <div class="chart-container-large">
+                <canvas id="equityChart"></canvas>
             </div>
         </section>
 
-        <!-- 섹션 4: 상세 분석 (접기/펼치기) -->
+        <!-- 섹션 4: 결과 분포 -->
+        <section class="result-section">
+            <h2>🍩 결과 분포</h2>
+            <div class="chart-container-small">
+                <canvas id="resultChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 섹션 5: 상세 분석 (접기/펼치기) -->
         <section class="analytics-section">
             <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
                 <h2>📊 상세 분석</h2>
@@ -127,7 +129,7 @@
             </div>
         </section>
 
-        <!-- 섹션 5: 오늘의 종목 -->
+        <!-- 섹션 6: 오늘의 종목 -->
         <section class="today-section">
             <h2>🌟 오늘의 종목 (상위 5개)</h2>
             <div class="today-cards" id="todayCards">
@@ -135,7 +137,7 @@
             </div>
         </section>
 
-        <!-- 섹션 6: 거래 내역 테이블 -->
+        <!-- 섹션 7: 거래 내역 테이블 -->
         <section class="table-section">
             <div class="section-header">
                 <h2>📋 전체 거래 내역</h2>
@@ -181,7 +183,7 @@
             <div class="pagination" id="tablePagination"></div>
         </section>
 
-        <!-- 섹션 7: 시스템 정보 -->
+        <!-- 섹션 8: 시스템 정보 -->
         <section class="system-info-section collapsed">
             <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
                 <h2>💡 시스템 정보</h2>

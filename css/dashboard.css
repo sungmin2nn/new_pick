@@ -77,19 +77,28 @@ section h3 {
     border-color: var(--accent-blue);
 }
 
-/* 차트 그리드 */
-.chart-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: var(--space-lg);
-}
-
-.chart-container {
+/* 차트 컨테이너 */
+.chart-container-large {
     position: relative;
+    height: 400px;
+    width: 100%;
 }
 
-.chart-container canvas {
-    max-height: 400px;
+.chart-container-large canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.chart-container-small {
+    position: relative;
+    height: 300px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.chart-container-small canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* 접기/펼치기 섹션 */
@@ -393,8 +402,12 @@ section h3 {
         font-size: 1.1rem;
     }
 
-    .chart-row {
-        grid-template-columns: 1fr;
+    .chart-container-large {
+        height: 300px;
+    }
+
+    .chart-container-small {
+        height: 250px;
     }
 
     .stats-grid {

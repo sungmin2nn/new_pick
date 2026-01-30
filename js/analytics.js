@@ -274,25 +274,67 @@ const Analytics = {
     },
 
     /**
+     * 선정사유 정규화 (유사한 사유 그룹핑)
+     */
+    normalizeReason(reason) {
+        if (!reason) return '기타';
+
+        // 소문자 변환 후 처리
+        const normalized = reason.toLowerCase();
+
+        // 공시 관련
+        if (normalized.includes('공시')) {
+            return '공시 관련';
+        }
+
+        // AI/반도체 테마 (여러 표현 통합)
+        if (normalized.includes('ai') || normalized.includes('반도체')) {
+            return 'AI·반도체 테마';
+        }
+
+        // 방산 테마
+        if (normalized.includes('방산')) {
+            return '방산 테마';
+        }
+
+        // 뉴스 관련
+        if (normalized.includes('뉴스')) {
+            // 긍정 뉴스
+            if (normalized.includes('긍정')) {
+                return '뉴스 (긍정)';
+            }
+            // 중립 뉴스
+            if (normalized.includes('중립')) {
+                return '뉴스 (중립)';
+            }
+            return '뉴스 관련';
+        }
+
+        // 기타
+        return '기타';
+    },
+
+    /**
      * 선정사유별 성과 분석
      */
     analyzeByReason(trades) {
         const byReason = {};
 
         trades.forEach(trade => {
-            const reason = trade.selection_reason || '기타';
-            if (!byReason[reason]) {
-                byReason[reason] = {
-                    reason,
+            const normalizedReason = this.normalizeReason(trade.selection_reason);
+
+            if (!byReason[normalizedReason]) {
+                byReason[normalizedReason] = {
+                    reason: normalizedReason,
                     trades: [],
                     profitCount: 0,
                     lossCount: 0
                 };
             }
 
-            byReason[reason].trades.push(trade);
-            if (trade.result === 'profit') byReason[reason].profitCount++;
-            if (trade.result === 'loss') byReason[reason].lossCount++;
+            byReason[normalizedReason].trades.push(trade);
+            if (trade.result === 'profit') byReason[normalizedReason].profitCount++;
+            if (trade.result === 'loss') byReason[normalizedReason].lossCount++;
         });
 
         return Object.values(byReason).map(data => {
