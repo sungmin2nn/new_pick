@@ -699,10 +699,17 @@
                         <th class="sortable" data-sort="rank" style="width: 50px;">순위</th>
                         <th class="sortable" data-sort="name" style="min-width: 120px;">종목명</th>
                         <th class="sortable" data-sort="score" style="width: 80px;">총점</th>
-                        <th class="sortable" data-sort="disclosure" style="width: 50px;">공시</th>
-                        <th class="sortable" data-sort="news" style="width: 50px;">뉴스</th>
-                        <th class="sortable" data-sort="theme" style="width: 50px;">테마</th>
+                        <th class="sortable" data-sort="disclosure" style="width: 45px;">공시</th>
+                        <th class="sortable" data-sort="news" style="width: 45px;">뉴스</th>
+                        <th class="sortable" data-sort="theme" style="width: 45px;">테마</th>
                         <th class="sortable" data-sort="investor" style="width: 50px;">투자자</th>
+                        <th class="sortable" data-sort="trading_value" style="width: 50px;">거래대금</th>
+                        <th class="sortable" data-sort="market_cap" style="width: 50px;">시총</th>
+                        <th class="sortable" data-sort="price_momentum" style="width: 50px;">가격</th>
+                        <th class="sortable" data-sort="volume_surge" style="width: 50px;">거래량</th>
+                        <th class="sortable" data-sort="turnover_rate" style="width: 50px;">회전율</th>
+                        <th class="sortable" data-sort="material_overlap" style="width: 50px;">중복도</th>
+                        <th class="sortable" data-sort="news_timing" style="width: 50px;">시간대</th>
                         <th style="min-width: 180px;">선정 사유</th>
                         <th class="sortable" data-sort="price" style="width: 90px;">현재가</th>
                         <th class="sortable" data-sort="change" style="width: 80px;">등락률</th>
@@ -1427,6 +1434,34 @@
                         aVal = a.score_detail?.investor || 0;
                         bVal = b.score_detail?.investor || 0;
                         break;
+                    case 'trading_value':
+                        aVal = a.score_detail?.trading_value || 0;
+                        bVal = b.score_detail?.trading_value || 0;
+                        break;
+                    case 'market_cap':
+                        aVal = a.score_detail?.market_cap || 0;
+                        bVal = b.score_detail?.market_cap || 0;
+                        break;
+                    case 'price_momentum':
+                        aVal = a.score_detail?.price_momentum || 0;
+                        bVal = b.score_detail?.price_momentum || 0;
+                        break;
+                    case 'volume_surge':
+                        aVal = a.score_detail?.volume_surge || 0;
+                        bVal = b.score_detail?.volume_surge || 0;
+                        break;
+                    case 'turnover_rate':
+                        aVal = a.score_detail?.turnover_rate || 0;
+                        bVal = b.score_detail?.turnover_rate || 0;
+                        break;
+                    case 'material_overlap':
+                        aVal = a.score_detail?.material_overlap || 0;
+                        bVal = b.score_detail?.material_overlap || 0;
+                        break;
+                    case 'news_timing':
+                        aVal = a.score_detail?.news_timing || 0;
+                        bVal = b.score_detail?.news_timing || 0;
+                        break;
                     case 'price':
                         aVal = a.current_price || 0;
                         bVal = b.current_price || 0;
@@ -1518,6 +1553,27 @@
                             <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.investor || stock.investor_score || 0)}</span>
                             ${investorIcon}
                         </div>
+                    </td>
+                    <td>
+                        <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.trading_value || stock.trading_value_score || 0)}</span>
+                    </td>
+                    <td>
+                        <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.market_cap || stock.market_cap_score || 0)}</span>
+                    </td>
+                    <td>
+                        <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.price_momentum || stock.price_momentum_score || 0)}</span>
+                    </td>
+                    <td>
+                        <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.volume_surge || stock.volume_surge_score || 0)}</span>
+                    </td>
+                    <td>
+                        <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.turnover_rate || stock.turnover_rate_score || 0)}</span>
+                    </td>
+                    <td>
+                        <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.material_overlap || stock.material_overlap_score || 0)}</span>
+                    </td>
+                    <td>
+                        <span class="score-badge" style="font-size: 0.75rem; padding: 2px 6px;">${Math.round(stock.score_detail?.news_timing || stock.news_timing_score || 0)}</span>
                     </td>
                     <td style="font-size: 0.75rem; color: #4a5568; text-align: left; padding-left: 10px; line-height: 1.4;">${stock.selection_reason || '-'}</td>
                     <td style="font-size: 0.85rem; font-weight: 600;">${(stock.current_price || 0).toLocaleString()}</td>
