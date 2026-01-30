@@ -44,7 +44,15 @@ const Render = {
                 };
             },
             theme_keywords: () => {
-                const themes = stock.matched_themes || [];
+                let themes = stock.matched_themes || [];
+                // JSON 문자열인 경우 파싱
+                if (typeof themes === 'string') {
+                    try {
+                        themes = JSON.parse(themes);
+                    } catch (e) {
+                        themes = [];
+                    }
+                }
                 return {
                     value,
                     status: themes.length > 0 ? 'success' : 'no_match',
