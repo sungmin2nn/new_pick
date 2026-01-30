@@ -109,6 +109,10 @@ const TableUtils = {
                     aVal = a.profit;
                     bVal = b.profit;
                     break;
+                case 'shares':
+                    aVal = a.shares;
+                    bVal = b.shares;
+                    break;
                 default:
                     aVal = a.date;
                     bVal = b.date;
@@ -167,6 +171,7 @@ const TableUtils = {
                     <td><span class="score-badge">${trade.selection_score}</span></td>
                     <td style="text-align: left; font-size: 0.85rem;">${trade.selection_reason}</td>
                     <td>${Utils.formatNumber(trade.buy_price)}</td>
+                    <td style="font-family: var(--font-mono);">${Utils.formatNumber(trade.shares)}주</td>
                     <td>${Utils.formatNumber(trade.sell_price)}</td>
                     <td>
                         <span class="price-change ${returnClass}">
@@ -255,8 +260,9 @@ const TableUtils = {
             name: 1,
             code: 2,
             score: 3,
-            return: 7,
-            profit: 8
+            shares: 6,
+            return: 8,
+            profit: 9
         };
 
         const columnIndex = columnMap[this.sortConfig.column];

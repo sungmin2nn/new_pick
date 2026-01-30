@@ -456,6 +456,7 @@ const Dashboard = {
             '총점': trade.selection_score,
             '선정사유': trade.selection_reason,
             '매수가': trade.buy_price,
+            '수량': trade.shares,
             '매도가': trade.sell_price,
             '수익률': trade.return_percent.toFixed(2) + '%',
             '손익금액': trade.profit,
