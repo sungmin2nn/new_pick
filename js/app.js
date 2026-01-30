@@ -3,6 +3,9 @@ const App = {
     async init() {
         console.log('[App] 초기화 시작');
 
+        // 탭 초기화
+        Tabs.init();
+
         // 히스토리 로드
         await API.loadHistory();
 

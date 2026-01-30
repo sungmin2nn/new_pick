@@ -16,6 +16,7 @@
     <header class="header">
         <div class="header-left">
             <h1>🔮 장전 종목 선정</h1>
+            <div class="subtitle">매일 아침 08:30 자동 선정 | <a href="system_guide.html">📚 시스템 가이드</a> | <a href="data/backtest_report.html">📊 백테스팅 리포트</a></div>
             <span class="update-time" id="updateTime">-</span>
         </div>
         <div class="header-right">
@@ -25,7 +26,15 @@
         </div>
     </header>
 
-    <!-- 메인 컨텐츠 -->
+    <!-- 탭 네비게이션 -->
+    <div class="tabs">
+        <button class="tab-button active" id="stocksTabBtn">📊 종목 선정</button>
+        <button class="tab-button" id="backtestTabBtn">📈 백테스팅</button>
+        <button class="tab-button" id="systemTabBtn">⚙️ 시스템 정보</button>
+    </div>
+
+    <!-- 종목 선정 탭 -->
+    <div id="stocksTab" class="tab-content active">
     <div class="container">
         <!-- 로딩 -->
         <div id="loading" class="loading">데이터 로딩 중...</div>
@@ -64,11 +73,123 @@
         <!-- 모바일 카드 -->
         <div id="mobileCards" class="table-mobile" style="display: none;"></div>
     </div>
+    </div>
+
+    <!-- 백테스팅 탭 -->
+    <div id="backtestTab" class="tab-content">
+        <div class="container">
+            <!-- 기간 및 투자금 설정 -->
+            <div class="backtest-controls">
+                <div class="control-group">
+                    <label>📅 기간 설정</label>
+                    <div class="date-inputs">
+                        <input type="date" id="periodStartDate">
+                        <span>~</span>
+                        <input type="date" id="periodEndDate">
+                    </div>
+                </div>
+                <div class="quick-period-btns">
+                    <button onclick="BacktestApp.setQuickPeriod('year')">올해</button>
+                    <button onclick="BacktestApp.setQuickPeriod('month')">이번달</button>
+                    <button onclick="BacktestApp.setQuickPeriod('week')">이번주</button>
+                    <button onclick="BacktestApp.setQuickPeriod('30days')">30일</button>
+                    <button onclick="BacktestApp.setQuickPeriod('7days')">7일</button>
+                </div>
+                <div class="control-group">
+                    <label>💰 초기 투자금</label>
+                    <input type="number" id="initialInvestment" value="1000000" min="100000" step="100000">
+                    <span>원</span>
+                </div>
+                <div class="control-group">
+                    <label>💵 종목당 제한 금액</label>
+                    <input type="number" id="maxPerStock" value="100000" min="10000" step="10000">
+                    <span>원</span>
+                </div>
+                <div class="control-group">
+                    <label>🔧 고가 종목 처리</label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="buyExpensiveStocks" checked>
+                        <span>1주 가격이 제한금액 초과 시 1주만 매수</span>
+                    </label>
+                </div>
+                <div class="run-btn-container">
+                    <button class="run-backtest-btn" onclick="BacktestApp.runBacktest()">🚀 백테스팅 실행</button>
+                </div>
+            </div>
+
+            <!-- 백테스트 결과 -->
+            <div id="backtestResults" style="display: none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">최종 자산</div>
+                        <div class="stat-value" id="btFinalCapital">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">누적 수익률</div>
+                        <div class="stat-value" id="btTotalReturn">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">총 거래 수</div>
+                        <div class="stat-value" id="btTotalTrades">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">승률</div>
+                        <div class="stat-value" id="btWinRate">-</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>📈 자본 증가 곡선</h3>
+                    <canvas id="equityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 시스템 정보 탭 -->
+    <div id="systemTab" class="tab-content">
+        <div class="container">
+            <div class="system-info-grid">
+                <div class="info-card">
+                    <h3>🎯 핵심 기능</h3>
+                    <ul>
+                        <li>공시 수집 및 분석</li>
+                        <li>뉴스 모니터링</li>
+                        <li>테마 키워드 매칭</li>
+                        <li>투자자 동향 분석</li>
+                        <li>시장 데이터 분석</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>⚙️ 점수 체계</h3>
+                    <ul>
+                        <li>총점: 145점</li>
+                        <li>공시: 최대 20점</li>
+                        <li>뉴스: 최대 15점</li>
+                        <li>테마: 최대 15점</li>
+                        <li>투자자: 최대 15점</li>
+                        <li>대장주 보너스: +5점</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>🕐 실행 시간</h3>
+                    <ul>
+                        <li>매일 08:30 - 장전 종목 선정</li>
+                        <li>실시간 데이터 업데이트</li>
+                        <li>자동 백테스팅</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- JavaScript -->
-    <script src="js/config.js?v=2"></script>
-    <script src="js/api.js?v=2"></script>
-    <script src="js/render.js?v=2"></script>
-    <script src="js/app.js?v=2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/config.js?v=3"></script>
+    <script src="js/api.js?v=3"></script>
+    <script src="js/render.js?v=3"></script>
+    <script src="js/backtest.js?v=3"></script>
+    <script src="js/tabs.js?v=3"></script>
+    <script src="js/app.js?v=3"></script>
 </body>
 </html>

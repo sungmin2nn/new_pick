@@ -31,19 +31,34 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 48px;
+    min-height: 48px;
 }
 
 .header-left {
     display: flex;
-    align-items: center;
-    gap: var(--space-lg);
+    flex-direction: column;
+    gap: var(--space-xs);
 }
 
 .header h1 {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.header .subtitle {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.header .subtitle a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.header .subtitle a:hover {
+    text-decoration: underline;
 }
 
 .header-right {
