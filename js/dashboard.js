@@ -20,9 +20,9 @@ const Dashboard = {
     async init() {
         console.log('[Dashboard] 초기화 시작');
 
-        // 기본 기간 설정 (최근 30일)
+        // 기본 기간 설정 (최근 7일)
         this.state.endDate = new Date();
-        this.state.startDate = Utils.daysAgo(30);
+        this.state.startDate = Utils.daysAgo(7);
 
         // 날짜 입력 필드에 설정
         document.getElementById('startDate').value = Utils.formatDate(this.state.startDate);
