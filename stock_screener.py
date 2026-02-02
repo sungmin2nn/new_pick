@@ -8,7 +8,7 @@ import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import config
-from utils import get_kst_now, format_kst_time
+from utils import get_kst_now, format_kst_time, get_date_info, is_market_day
 from market_data import MarketDataCollector
 from news_collector import NewsCollector
 from disclosure_collector import DisclosureCollector
@@ -549,9 +549,14 @@ class StockScreener:
         # JSON 파일로 저장
         output_path = os.path.join(config.OUTPUT_DIR, config.JSON_FILE)
 
+        # 날짜/요일 정보 포함
+        date_info = get_date_info()
         result = {
             'generated_at': format_kst_time(format_str='%Y-%m-%dT%H:%M:%S'),
             'date': format_kst_time(format_str='%Y-%m-%d'),
+            'weekday': date_info['weekday_kr'],
+            'weekday_short': date_info['weekday_short'],
+            'is_market_day': is_market_day(),
             'count': len(stocks),
             'candidates': stocks
         }
@@ -683,7 +688,22 @@ class StockScreener:
     def run(self):
         """메인 실행 함수"""
         print("🚀 장전 종목 선정 시스템 시작")
-        print(f"⏰ 실행 시간 (KST): {format_kst_time()}")
+
+        # 날짜/요일 정보 명확히 표시
+        date_info = get_date_info()
+        print(f"⏰ 실행 시간 (KST): {date_info['full_str']}")
+        print(f"📅 날짜: {date_info['date_str_kr']} {date_info['weekday_kr']}")
+
+        # 주말 경고
+        if not is_market_day():
+            print(f"\n⚠️  주의: 오늘은 {date_info['weekday_kr']}입니다. 주식 시장 휴장일입니다.")
+            print("   주말/공휴일에는 유의미한 데이터가 수집되지 않을 수 있습니다.")
+
+        # 장 시작 전 안내
+        current_hour = date_info['datetime'].hour
+        current_minute = date_info['datetime'].minute
+        if current_hour < 9 or (current_hour == 9 and current_minute == 0):
+            print(f"\n📌 장 시작 전입니다 (현재 {current_hour:02d}:{current_minute:02d}). 전일 거래대금 기준으로 필터링합니다.")
 
         try:
             # 1. 시장 데이터 수집
