@@ -27,17 +27,107 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run stock screener
+    - name: Check if market day
+      id: market_check
+      run: |
+        python -c "
+        from utils import is_market_day
+        import sys
+        if is_market_day():
+            print('오늘은 개장일입니다.')
+            print('is_market_day=true', file=open('$GITHUB_OUTPUT', 'a'))
+        else:
+            print('오늘은 휴장일입니다. 스캔을 스킵합니다.')
+            print('is_market_day=false', file=open('$GITHUB_OUTPUT', 'a'))
+        "
+
+    - name: Run stock screener (1차 시도)
+      id: scan1
+      if: steps.market_check.outputs.is_market_day == 'true'
+      continue-on-error: true
       env:
         DART_API_KEY: ${{ secrets.DART_API_KEY }}
       run: |
         python stock_screener.py
 
+    - name: Verify results (1차)
+      id: verify1
+      if: steps.scan1.outcome == 'success'
+      continue-on-error: true
+      run: |
+        python -c "
+        import json
+        with open('data/morning_candidates.json') as f:
+            data = json.load(f)
+        count = data.get('count', 0)
+        print(f'선정 종목: {count}개')
+        if count == 0:
+            exit(1)
+        "
+
+    - name: Wait before retry (1차 실패 시)
+      if: steps.scan1.outcome == 'failure' || steps.verify1.outcome == 'failure'
+      run: |
+        echo "⚠️ 1차 시도 실패. 60초 후 재시도..."
+        sleep 60
+
+    - name: Run stock screener (2차 시도)
+      id: scan2
+      if: steps.scan1.outcome == 'failure' || steps.verify1.outcome == 'failure'
+      continue-on-error: true
+      env:
+        DART_API_KEY: ${{ secrets.DART_API_KEY }}
+      run: |
+        python stock_screener.py
+
+    - name: Verify results (2차)
+      id: verify2
+      if: steps.scan2.outcome == 'success'
+      continue-on-error: true
+      run: |
+        python -c "
+        import json
+        with open('data/morning_candidates.json') as f:
+            data = json.load(f)
+        count = data.get('count', 0)
+        print(f'선정 종목: {count}개')
+        if count == 0:
+            exit(1)
+        "
+
+    - name: Wait before retry (2차 실패 시)
+      if: steps.scan2.outcome == 'failure' || steps.verify2.outcome == 'failure'
+      run: |
+        echo "⚠️ 2차 시도 실패. 60초 후 재시도..."
+        sleep 60
+
+    - name: Run stock screener (3차 시도 - 최종)
+      id: scan3
+      if: steps.scan2.outcome == 'failure' || steps.verify2.outcome == 'failure'
+      env:
+        DART_API_KEY: ${{ secrets.DART_API_KEY }}
+      run: |
+        python stock_screener.py
+
+    - name: Verify results (최종)
+      if: steps.market_check.outputs.is_market_day == 'true'
+      run: |
+        python -c "
+        import json
+        with open('data/morning_candidates.json') as f:
+            data = json.load(f)
+        count = data.get('count', 0)
+        print(f'✅ 최종 선정 종목: {count}개')
+        # 0개여도 정상 종료 (휴장일 등)
+        "
+
     - name: Export history
+      if: steps.market_check.outputs.is_market_day == 'true'
       run: |
         python export_history.py
 
     - name: Commit and push results
+      if: steps.market_check.outputs.is_market_day == 'true'
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"

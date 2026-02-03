@@ -24,11 +24,56 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Check morning candidates
+      id: check_candidates
+      run: |
+        python -c "
+        import json
+        import os
+        from datetime import datetime
+        import pytz
+
+        kst = pytz.timezone('Asia/Seoul')
+        today = datetime.now(kst).strftime('%Y-%m-%d')
+
+        filepath = 'data/morning_candidates.json'
+        if not os.path.exists(filepath):
+            print('❌ morning_candidates.json 파일 없음')
+            print('has_candidates=false')
+            exit(0)
+
+        with open(filepath) as f:
+            data = json.load(f)
+
+        file_date = data.get('date', '')
+        count = data.get('count', 0)
+
+        print(f'파일 날짜: {file_date}, 오늘: {today}')
+        print(f'선정 종목: {count}개')
+
+        if file_date != today:
+            print('⚠️ 오늘 날짜의 데이터가 아닙니다.')
+            print('has_candidates=false')
+        elif count == 0:
+            print('⚠️ 선정된 종목이 없습니다.')
+            print('has_candidates=false')
+        else:
+            print('✅ 오늘 선정 종목 확인됨')
+            print('has_candidates=true')
+        " | tee /dev/stderr | grep 'has_candidates=' >> $GITHUB_OUTPUT
+
     - name: Collect intraday data
+      if: steps.check_candidates.outputs.has_candidates == 'true'
       run: |
         python intraday_collector.py
 
+    - name: Skip message
+      if: steps.check_candidates.outputs.has_candidates != 'true'
+      run: |
+        echo "📭 오늘 선정된 종목이 없어 장중 데이터 수집을 스킵합니다."
+
     - name: Commit and push results
+      if: steps.check_candidates.outputs.has_candidates == 'true'
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
