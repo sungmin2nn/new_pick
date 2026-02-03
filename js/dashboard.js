@@ -70,6 +70,14 @@ const Dashboard = {
                 TableUtils.applyFilters({ reason: e.target.value });
             });
         }
+
+        // 매수여부 필터
+        const entryFilter = document.getElementById('entryFilter');
+        if (entryFilter) {
+            entryFilter.addEventListener('change', (e) => {
+                TableUtils.applyFilters({ entry: e.target.value });
+            });
+        }
     },
 
     /**
@@ -379,34 +387,95 @@ const Dashboard = {
     },
 
     /**
-     * 오늘의 종목 렌더링
+     * 오늘 종목 탭 전환
+     */
+    switchTodayTab(tabType) {
+        // 탭 버튼 활성화
+        document.querySelectorAll('.today-tabs .tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.closest('.tab-btn').classList.add('active');
+
+        // 탭 콘텐츠 전환
+        document.querySelectorAll('.today-tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(tabType + 'Tab').classList.add('active');
+    },
+
+    /**
+     * 오늘의 종목 렌더링 (Entry Check 포함)
      */
     async renderTodayStocks() {
-        const container = document.getElementById('todayCards');
-        if (!container) return;
+        const buyContainer = document.getElementById('buyCards');
+        const skipContainer = document.getElementById('skipCards');
+        if (!buyContainer || !skipContainer) return;
 
-        const stocks = await Analytics.getTodayStocks();
+        const stocks = await Analytics.getTodayStocksWithEntryCheck();
 
-        if (stocks.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">아직 데이터가 없습니다.</p>';
-            return;
+        // 매수/스킵 분류
+        const buyStocks = stocks.filter(s => s.shouldBuy);
+        const skipStocks = stocks.filter(s => !s.shouldBuy);
+
+        // 카운트 업데이트
+        document.getElementById('buyCount').textContent = buyStocks.length;
+        document.getElementById('skipCount').textContent = skipStocks.length;
+
+        // 매수 종목 렌더링
+        if (buyStocks.length === 0) {
+            buyContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">매수 종목이 없습니다.</p>';
+        } else {
+            buyContainer.innerHTML = buyStocks.map((stock, index) => `
+                <div class="today-card buy-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span class="rank ${index < 3 ? 'top3' : ''}">${index + 1}</span>
+                        <span class="score-badge">${stock.score}점</span>
+                    </div>
+                    <div class="stock-name">${stock.name}</div>
+                    <div class="stock-code">${stock.code}</div>
+                    <div class="entry-info buy">
+                        <span class="entry-badge buy">📈 매수</span>
+                        ${stock.entryPrice ? `<span class="entry-price">진입가: ${Utils.formatCurrency(stock.entryPrice)}</span>` : ''}
+                    </div>
+                    ${stock.actualResult ? `
+                        <div class="result-info ${stock.actualResult.first_hit === 'profit' ? 'profit' : stock.actualResult.first_hit === 'loss' ? 'loss' : 'none'}">
+                            결과: ${stock.actualResult.first_hit === 'profit' ? '익절 (+5%)' : stock.actualResult.first_hit === 'loss' ? '손절 (-3%)' : '미달 (' + stock.actualResult.closing_percent.toFixed(2) + '%)'}
+                        </div>
+                    ` : ''}
+                    <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                        ${stock.reason}
+                    </div>
+                </div>
+            `).join('');
         }
 
-        const html = stocks.map(stock => `
-            <div class="today-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                    <span class="rank ${stock.rank <= 3 ? 'top3' : ''}">${stock.rank}</span>
-                    <span class="score-badge">${stock.score}점</span>
+        // 스킵 종목 렌더링
+        if (skipStocks.length === 0) {
+            skipContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">스킵 종목이 없습니다.</p>';
+        } else {
+            skipContainer.innerHTML = skipStocks.map((stock, index) => `
+                <div class="today-card skip-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span class="rank">${index + 1}</span>
+                        <span class="score-badge">${stock.score}점</span>
+                    </div>
+                    <div class="stock-name">${stock.name}</div>
+                    <div class="stock-code">${stock.code}</div>
+                    <div class="entry-info skip">
+                        <span class="entry-badge skip">⏭️ 스킵</span>
+                        <span class="skip-reason">${stock.skipReason || '조건 미충족'}</span>
+                    </div>
+                    ${stock.virtualResult ? `
+                        <div class="virtual-result ${stock.virtualResult.first_hit === 'profit' ? 'profit' : stock.virtualResult.first_hit === 'loss' ? 'loss' : 'none'}">
+                            (만약 매수했다면: ${stock.virtualResult.first_hit === 'profit' ? '익절' : stock.virtualResult.first_hit === 'loss' ? '손절' : stock.virtualResult.closing_percent.toFixed(2) + '%'})
+                        </div>
+                    ` : ''}
+                    <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
+                        ${stock.reason}
+                    </div>
                 </div>
-                <div class="stock-name">${stock.name}</div>
-                <div class="stock-code">${stock.code}</div>
-                <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);">
-                    ${stock.reason}
-                </div>
-            </div>
-        `).join('');
-
-        container.innerHTML = html;
+            `).join('');
+        }
     },
 
     /**

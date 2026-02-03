@@ -29,6 +29,11 @@ const Analytics = {
                     const pl = stock.profit_loss_analysis;
                     if (!pl) continue;
 
+                    // Entry Check 정보
+                    const entryCheck = pl.entry_check || {};
+                    const shouldBuy = pl.should_buy !== false;
+                    const skipReason = pl.skip_reason || entryCheck.skip_reason || null;
+
                     const openingPrice = pl.opening_price;
 
                     // 주식 수 및 투자금 계산
@@ -80,6 +85,8 @@ const Analytics = {
                         stock_name: stock.name,
                         selection_score: stock.selection_score || 0,
                         selection_reason: stock.selection_reason || '-',
+                        should_buy: shouldBuy,
+                        skip_reason: skipReason,
                         buy_price: openingPrice,
                         sell_price: sellPrice,
                         shares: shares,
@@ -89,7 +96,9 @@ const Analytics = {
                         return_percent: returnPercent,
                         result: result,
                         first_hit_time: pl.first_hit_time,
-                        capital_after: capital
+                        capital_after: capital,
+                        actual_result: pl.actual_result,
+                        virtual_result: pl.virtual_result
                     });
                 }
 
@@ -473,6 +482,62 @@ const Analytics = {
 
         } catch (error) {
             console.error('[Analytics] 오늘의 종목 조회 실패:', error);
+            return [];
+        }
+    },
+
+    /**
+     * 오늘의 종목 조회 (Entry Check 정보 포함)
+     */
+    async getTodayStocksWithEntryCheck() {
+        try {
+            // 최신 intraday 파일 찾기
+            const today = new Date();
+            let intradayData = null;
+
+            // 최근 7일 내 데이터 탐색
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const dateStr = Utils.formatDateToYYYYMMDD(d);
+
+                try {
+                    const response = await fetch(`data/intraday/intraday_${dateStr}.json`);
+                    if (response.ok) {
+                        intradayData = await response.json();
+                        break;
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+
+            if (!intradayData || !intradayData.stocks) {
+                return [];
+            }
+
+            const stocks = Object.values(intradayData.stocks);
+
+            return stocks.map(stock => {
+                const pl = stock.profit_loss_analysis || {};
+                const entryCheck = pl.entry_check || {};
+
+                return {
+                    code: stock.code,
+                    name: stock.name,
+                    score: stock.selection_score || 0,
+                    reason: stock.selection_reason || '-',
+                    shouldBuy: pl.should_buy !== false,
+                    skipReason: pl.skip_reason || entryCheck.skip_reason,
+                    entryPrice: entryCheck.entry_price || pl.opening_price,
+                    entryTime: entryCheck.entry_time,
+                    actualResult: pl.actual_result,
+                    virtualResult: pl.virtual_result
+                };
+            });
+
+        } catch (error) {
+            console.error('[Analytics] Entry Check 데이터 조회 실패:', error);
             return [];
         }
     }

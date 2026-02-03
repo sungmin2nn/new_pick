@@ -185,10 +185,63 @@ section h3 {
     background: var(--bg-secondary);
 }
 
+/* 오늘의 종목 탭 */
+.today-tabs {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: var(--space-sm);
+}
+
+.tab-btn {
+    padding: var(--space-sm) var(--space-lg);
+    background: transparent;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.tab-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.tab-btn.active {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.tab-count {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+}
+
+.tab-btn.active .tab-count {
+    background: rgba(255,255,255,0.3);
+}
+
+.today-tab-content {
+    display: none;
+}
+
+.today-tab-content.active {
+    display: block;
+}
+
 /* 오늘의 종목 카드 */
 .today-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--space-md);
 }
 
@@ -200,9 +253,85 @@ section h3 {
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.today-card.buy-card {
+    border-left-color: #48bb78;
+}
+
+.today-card.skip-card {
+    border-left-color: #ed8936;
+    opacity: 0.85;
+}
+
 .today-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Entry Check 정보 */
+.entry-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.entry-badge {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.entry-badge.buy {
+    background: #48bb78;
+    color: white;
+}
+
+.entry-badge.skip {
+    background: #ed8936;
+    color: white;
+}
+
+.entry-price {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.skip-reason {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* 결과 정보 */
+.result-info, .virtual-result {
+    margin-top: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.result-info.profit {
+    background: rgba(245, 101, 101, 0.1);
+    color: #f56565;
+}
+
+.result-info.loss {
+    background: rgba(66, 153, 225, 0.1);
+    color: #4299e1;
+}
+
+.result-info.none {
+    background: rgba(160, 174, 192, 0.1);
+    color: var(--text-secondary);
+}
+
+.virtual-result {
+    background: rgba(237, 137, 54, 0.1);
+    color: #ed8936;
+    font-style: italic;
 }
 
 /* 거래 내역 테이블 */
@@ -392,12 +521,12 @@ section h3 {
 /* 모바일 반응형 */
 @media (max-width: 768px) {
     .dashboard-container {
-        padding: var(--space-md);
+        padding: var(--space-sm);
     }
 
     section {
         padding: var(--space-md);
-        margin-bottom: var(--space-lg);
+        margin-bottom: var(--space-md);
     }
 
     section h2 {
@@ -405,26 +534,49 @@ section h3 {
     }
 
     .chart-container-large {
-        height: 300px;
+        height: 250px;
     }
 
     .chart-container-small {
-        height: 250px;
+        height: 200px;
+    }
+
+    /* 탭 모바일 */
+    .today-tabs {
+        overflow-x: auto;
+        padding-bottom: var(--space-xs);
+    }
+
+    .tab-btn {
+        padding: var(--space-xs) var(--space-md);
+        font-size: 0.85rem;
+        white-space: nowrap;
     }
 
     .today-cards {
         grid-template-columns: 1fr;
     }
 
+    .today-card {
+        padding: var(--space-md);
+    }
+
+    .entry-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .table-controls {
         flex-direction: column;
         align-items: stretch;
+        gap: var(--space-xs);
     }
 
     .table-controls input[type="text"],
     .table-controls select,
     .table-controls button {
         width: 100%;
+        padding: var(--space-sm);
     }
 
     .quick-buttons {
@@ -437,5 +589,49 @@ section h3 {
         padding: var(--space-xs) var(--space-sm);
         font-size: 0.75rem;
         white-space: nowrap;
+    }
+
+    /* 테이블 모바일 최적화 */
+    .transaction-table {
+        font-size: 0.8rem;
+    }
+
+    .transaction-table th,
+    .transaction-table td {
+        padding: var(--space-xs) var(--space-sm);
+    }
+
+    /* 스탯 카드 그리드 */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 초소형 모바일 (375px 이하) */
+@media (max-width: 375px) {
+    .dashboard-container {
+        padding: var(--space-xs);
+    }
+
+    section {
+        padding: var(--space-sm);
+    }
+
+    section h2 {
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tab-btn {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.8rem;
+    }
+
+    .tab-count {
+        font-size: 0.7rem;
+        padding: 1px 6px;
     }
 }

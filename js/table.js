@@ -4,7 +4,7 @@ const TableUtils = {
     currentData: [],
     filteredData: [],
     sortConfig: { column: 'date', direction: 'desc' },
-    filters: { result: 'all', reason: 'all' },
+    filters: { result: 'all', reason: 'all', entry: 'all' },
     searchQuery: '',
     currentPage: 1,
     perPage: 50,
@@ -69,6 +69,15 @@ const TableUtils = {
             filtered = filtered.filter(t => t.selection_reason === this.filters.reason);
         }
 
+        // 매수여부 필터
+        if (this.filters.entry !== 'all') {
+            if (this.filters.entry === 'buy') {
+                filtered = filtered.filter(t => t.should_buy !== false);
+            } else if (this.filters.entry === 'skip') {
+                filtered = filtered.filter(t => t.should_buy === false);
+            }
+        }
+
         // 검색
         if (this.searchQuery) {
             filtered = filtered.filter(t =>
@@ -112,6 +121,10 @@ const TableUtils = {
                 case 'shares':
                     aVal = a.shares;
                     bVal = b.shares;
+                    break;
+                case 'shouldBuy':
+                    aVal = a.should_buy ? 1 : 0;
+                    bVal = b.should_buy ? 1 : 0;
                     break;
                 default:
                     aVal = a.date;
@@ -158,6 +171,7 @@ const TableUtils = {
         // 테이블 행 생성
         tbody.innerHTML = pageData.map(trade => {
             const resultBadge = this.getResultBadge(trade.result);
+            const entryBadge = this.getEntryBadge(trade.should_buy, trade.skip_reason);
             const returnClass = trade.return_percent >= 0 ? 'positive' : 'negative';
             const returnSign = trade.return_percent >= 0 ? '+' : '';
 
@@ -170,6 +184,7 @@ const TableUtils = {
                     <td style="font-family: var(--font-mono);">${trade.stock_code}</td>
                     <td><span class="score-badge">${trade.selection_score}</span></td>
                     <td style="text-align: left; font-size: 0.85rem;">${trade.selection_reason}</td>
+                    <td>${entryBadge}</td>
                     <td>${Utils.formatNumber(trade.buy_price)}</td>
                     <td style="font-family: var(--font-mono);">${Utils.formatNumber(trade.shares)}주</td>
                     <td>${Utils.formatNumber(trade.sell_price)}</td>
@@ -205,6 +220,18 @@ const TableUtils = {
             none: '<span style="background: #a0aec0; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">미달</span>'
         };
         return badges[result] || badges.none;
+    },
+
+    /**
+     * 매수여부 뱃지 생성
+     */
+    getEntryBadge(shouldBuy, skipReason) {
+        if (shouldBuy !== false) {
+            return '<span style="background: #48bb78; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;">매수</span>';
+        } else {
+            const reason = skipReason || '조건미충족';
+            return `<span style="background: #ed8936; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.75rem; font-weight: 600;" title="${reason}">스킵</span>`;
+        }
     },
 
     /**
@@ -260,9 +287,10 @@ const TableUtils = {
             name: 1,
             code: 2,
             score: 3,
-            shares: 6,
-            return: 8,
-            profit: 9
+            shouldBuy: 5,
+            shares: 7,
+            return: 9,
+            profit: 10
         };
 
         const columnIndex = columnMap[this.sortConfig.column];

@@ -6,10 +6,10 @@
     <title>뉴스 트레이딩 대시보드</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/variables.css?v=8">
-    <link rel="stylesheet" href="css/base.css?v=8">
-    <link rel="stylesheet" href="css/components.css?v=8">
-    <link rel="stylesheet" href="css/dashboard.css?v=8">
+    <link rel="stylesheet" href="css/variables.css?v=9">
+    <link rel="stylesheet" href="css/base.css?v=9">
+    <link rel="stylesheet" href="css/components.css?v=9">
+    <link rel="stylesheet" href="css/dashboard.css?v=9">
 </head>
 <body>
     <!-- 헤더 -->
@@ -122,11 +122,32 @@
             </div>
         </section>
 
-        <!-- 섹션 6: 오늘의 종목 -->
+        <!-- 섹션 6: 오늘의 종목 (Entry Check 포함) -->
         <section class="today-section">
-            <h2>🌟 오늘의 종목 (상위 5개)</h2>
-            <div class="today-cards" id="todayCards">
-                <p style="text-align: center; color: var(--text-secondary);">로딩 중...</p>
+            <h2>🌟 오늘의 종목</h2>
+
+            <!-- 탭 버튼 -->
+            <div class="today-tabs">
+                <button class="tab-btn active" onclick="Dashboard.switchTodayTab('buy')">
+                    📈 매수 종목 <span id="buyCount" class="tab-count">0</span>
+                </button>
+                <button class="tab-btn" onclick="Dashboard.switchTodayTab('skip')">
+                    ⏭️ 스킵 종목 <span id="skipCount" class="tab-count">0</span>
+                </button>
+            </div>
+
+            <!-- 매수 종목 탭 -->
+            <div class="today-tab-content active" id="buyTab">
+                <div class="today-cards" id="buyCards">
+                    <p style="text-align: center; color: var(--text-secondary);">로딩 중...</p>
+                </div>
+            </div>
+
+            <!-- 스킵 종목 탭 -->
+            <div class="today-tab-content" id="skipTab">
+                <div class="today-cards" id="skipCards">
+                    <p style="text-align: center; color: var(--text-secondary);">로딩 중...</p>
+                </div>
             </div>
         </section>
 
@@ -141,6 +162,11 @@
                         <option value="profit">익절만</option>
                         <option value="loss">손절만</option>
                         <option value="none">미달만</option>
+                    </select>
+                    <select id="entryFilter">
+                        <option value="all">전체 (매수/스킵)</option>
+                        <option value="buy">매수만</option>
+                        <option value="skip">스킵만</option>
                     </select>
                     <select id="reasonFilter">
                         <option value="all">모든 사유</option>
@@ -157,6 +183,7 @@
                             <th onclick="TableUtils.sortBy('code')">종목코드</th>
                             <th onclick="TableUtils.sortBy('score')">총점</th>
                             <th>선정사유</th>
+                            <th onclick="TableUtils.sortBy('shouldBuy')">매수여부</th>
                             <th>매수가</th>
                             <th onclick="TableUtils.sortBy('shares')">수량</th>
                             <th>매도가</th>
@@ -167,7 +194,7 @@
                     </thead>
                     <tbody id="transactionTableBody">
                         <tr>
-                            <td colspan="11" style="text-align: center; padding: var(--space-xl); color: var(--text-secondary);">
+                            <td colspan="12" style="text-align: center; padding: var(--space-xl); color: var(--text-secondary);">
                                 데이터를 불러오는 중...
                             </td>
                         </tr>
@@ -192,12 +219,12 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="js/config.js?v=8"></script>
-    <script src="js/utils.js?v=8"></script>
-    <script src="js/analytics.js?v=8"></script>
-    <script src="js/charts.js?v=8"></script>
-    <script src="js/table.js?v=8"></script>
-    <script src="js/dashboard.js?v=8"></script>
+    <script src="js/config.js?v=9"></script>
+    <script src="js/utils.js?v=9"></script>
+    <script src="js/analytics.js?v=9"></script>
+    <script src="js/charts.js?v=9"></script>
+    <script src="js/table.js?v=9"></script>
+    <script src="js/dashboard.js?v=9"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             Dashboard.init();
