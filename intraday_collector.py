@@ -137,23 +137,120 @@ class IntradayCollector:
             traceback.print_exc()
             return []
 
-    def analyze_profit_loss(self, stock_code, date_str, profit_target=3.0, loss_target=-2.0):
+    def check_entry_conditions(self, minute_data, avg_volume_20d=0):
         """
-        시초가 매매 익절/손절 분석
+        매수 진입 조건 체크 (09:05 기준)
+
+        Args:
+            minute_data: 분봉 데이터
+            avg_volume_20d: 20일 평균 거래량
+
+        Returns:
+            매수 조건 체크 결과
+        """
+        import config
+
+        check_minutes = getattr(config, 'VOLUME_CHECK_MINUTES', 5)
+        volume_threshold = getattr(config, 'VOLUME_CHECK_THRESHOLD', 0.5)
+        max_gap = getattr(config, 'MAX_GAP_UP', 5.0)
+        min_gap = getattr(config, 'MIN_GAP_DOWN', -5.0)
+
+        result = {
+            'volume_5min': 0,
+            'volume_5min_ratio': 0,
+            'volume_sufficient': False,
+            'gap_percent': 0,
+            'gap_ok': True,
+            'should_buy': False,
+            'skip_reason': None,
+            'entry_price': 0,
+            'entry_time': None
+        }
+
+        if not minute_data or len(minute_data) == 0:
+            result['skip_reason'] = '분봉 데이터 없음'
+            return result
+
+        # 09:00~09:05 거래량 합산
+        volume_5min = 0
+        entry_price = 0
+        entry_time = None
+
+        for candle in minute_data:
+            time_str = candle['time']  # "09:01:00" 형식
+            try:
+                hour_min = time_str[:5]  # "09:01"
+                hour = int(hour_min[:2])
+                minute = int(hour_min[3:5])
+
+                if hour == 9 and minute < check_minutes:
+                    volume_5min += candle['volume']
+
+                # 매수 시점 가격 (09:05 또는 그 직후)
+                if hour == 9 and minute == check_minutes:
+                    entry_price = candle['open']
+                    entry_time = time_str
+            except:
+                continue
+
+        # 매수 시점이 없으면 09:00 시가 사용
+        if entry_price == 0 and minute_data:
+            entry_price = minute_data[0]['open']
+            entry_time = minute_data[0]['time']
+
+        result['volume_5min'] = volume_5min
+        result['entry_price'] = entry_price
+        result['entry_time'] = entry_time
+
+        # 거래량 충분 여부 체크
+        if avg_volume_20d > 0:
+            # 5분간 예상 거래량 = 일 평균 / 390분 * 5분
+            expected_5min_volume = (avg_volume_20d / 390) * check_minutes
+            result['volume_5min_ratio'] = volume_5min / expected_5min_volume if expected_5min_volume > 0 else 0
+            result['volume_sufficient'] = result['volume_5min_ratio'] >= volume_threshold
+        else:
+            # 평균 거래량 정보 없으면 통과
+            result['volume_sufficient'] = True
+            result['volume_5min_ratio'] = 1.0
+
+        # 갭 체크 (시초가 기준)
+        if minute_data:
+            opening_price = minute_data[0]['open']
+            # 전일 종가는 분봉에서 알 수 없으므로, 외부에서 전달받거나 스킵
+            # 여기서는 갭 체크를 스킵하고 stock_screener에서 이미 체크했다고 가정
+            result['gap_ok'] = True
+
+        # 최종 매수 여부 결정
+        if not result['volume_sufficient']:
+            result['skip_reason'] = f"거래량 부족 (비율: {result['volume_5min_ratio']:.2f})"
+        elif not result['gap_ok']:
+            result['skip_reason'] = f"갭 필터 미통과"
+        else:
+            result['should_buy'] = True
+
+        return result
+
+    def analyze_profit_loss(self, stock_code, date_str, profit_target=3.0, loss_target=-2.0, avg_volume_20d=0):
+        """
+        시초가 매매 익절/손절 분석 (매수 조건 체크 포함)
 
         Args:
             stock_code: 종목코드
             date_str: 날짜
-            profit_target: 익절 목표 (%, 예: 3.0 = +3%)
-            loss_target: 손절 목표 (%, 예: -2.0 = -2%)
+            profit_target: 익절 목표 (%, 예: 5.0 = +5%)
+            loss_target: 손절 목표 (%, 예: -3.0 = -3%)
+            avg_volume_20d: 20일 평균 거래량
 
         Returns:
-            익절/손절 분석 결과
+            매수 조건 + 익절/손절 분석 결과
         """
         minute_data = self.get_minute_data(stock_code, date_str, freq='1')
 
         if not minute_data or len(minute_data) == 0:
             return None
+
+        # 1. 매수 조건 체크
+        entry_check = self.check_entry_conditions(minute_data, avg_volume_20d)
 
         # 시초가 = 09:00 시가
         opening_price = minute_data[0]['open']
@@ -161,17 +258,22 @@ class IntradayCollector:
         if opening_price == 0:
             return None
 
-        # 익절/손절 목표가 계산
-        profit_price = opening_price * (1 + profit_target / 100)
-        loss_price = opening_price * (1 + loss_target / 100)
+        # 매수 기준가 = 09:05 가격 (또는 시초가)
+        entry_price = entry_check['entry_price'] if entry_check['entry_price'] > 0 else opening_price
 
-        result = {
-            'opening_price': opening_price,
+        # 익절/손절 목표가 계산 (매수 기준가 기준)
+        profit_price = entry_price * (1 + profit_target / 100)
+        loss_price = entry_price * (1 + loss_target / 100)
+
+        # 2. 가상 결과 (매수했다면의 결과) - 항상 계산
+        virtual_result = {
+            'entry_price': entry_price,
+            'entry_time': entry_check['entry_time'],
             'profit_target_percent': profit_target,
             'loss_target_percent': loss_target,
             'profit_target_price': int(profit_price),
             'loss_target_price': int(loss_price),
-            'first_hit': None,  # 'profit' or 'loss' or 'none'
+            'first_hit': None,
             'first_hit_time': None,
             'first_hit_price': None,
             'profit_hit_time': None,
@@ -179,55 +281,83 @@ class IntradayCollector:
             'max_profit_percent': 0,
             'max_loss_percent': 0,
             'closing_price': minute_data[-1]['close'],
-            'closing_percent': ((minute_data[-1]['close'] - opening_price) / opening_price * 100) if opening_price > 0 else 0
+            'closing_percent': ((minute_data[-1]['close'] - entry_price) / entry_price * 100) if entry_price > 0 else 0
         }
 
         profit_hit = False
         loss_hit = False
 
-        # 1분봉 순회하며 익절/손절 도달 시점 확인
+        # 매수 시점 이후 분봉만 분석
+        entry_time_str = entry_check['entry_time'] or '09:00:00'
+
         for candle in minute_data:
+            # 매수 시점 이전은 스킵
+            if candle['time'] < entry_time_str:
+                continue
+
             high = candle['high']
             low = candle['low']
             time = candle['time']
 
             # 수익률 계산
-            high_percent = ((high - opening_price) / opening_price * 100) if opening_price > 0 else 0
-            low_percent = ((low - opening_price) / opening_price * 100) if opening_price > 0 else 0
+            high_percent = ((high - entry_price) / entry_price * 100) if entry_price > 0 else 0
+            low_percent = ((low - entry_price) / entry_price * 100) if entry_price > 0 else 0
 
             # 최대 수익/손실 업데이트
-            if high_percent > result['max_profit_percent']:
-                result['max_profit_percent'] = high_percent
-            if low_percent < result['max_loss_percent']:
-                result['max_loss_percent'] = low_percent
+            if high_percent > virtual_result['max_profit_percent']:
+                virtual_result['max_profit_percent'] = high_percent
+            if low_percent < virtual_result['max_loss_percent']:
+                virtual_result['max_loss_percent'] = low_percent
 
-            # 익절 도달 확인 (고가가 익절가 도달)
+            # 익절 도달 확인
             if not profit_hit and high >= profit_price:
                 profit_hit = True
-                result['profit_hit_time'] = time
+                virtual_result['profit_hit_time'] = time
 
-                if result['first_hit'] is None:
-                    result['first_hit'] = 'profit'
-                    result['first_hit_time'] = time
-                    result['first_hit_price'] = int(profit_price)
+                if virtual_result['first_hit'] is None:
+                    virtual_result['first_hit'] = 'profit'
+                    virtual_result['first_hit_time'] = time
+                    virtual_result['first_hit_price'] = int(profit_price)
 
-            # 손절 도달 확인 (저가가 손절가 도달)
+            # 손절 도달 확인
             if not loss_hit and low <= loss_price:
                 loss_hit = True
-                result['loss_hit_time'] = time
+                virtual_result['loss_hit_time'] = time
 
-                if result['first_hit'] is None:
-                    result['first_hit'] = 'loss'
-                    result['first_hit_time'] = time
-                    result['first_hit_price'] = int(loss_price)
+                if virtual_result['first_hit'] is None:
+                    virtual_result['first_hit'] = 'loss'
+                    virtual_result['first_hit_time'] = time
+                    virtual_result['first_hit_price'] = int(loss_price)
 
-            # 둘 다 도달했으면 더 이상 확인 불필요
             if profit_hit and loss_hit:
                 break
 
-        # 익절/손절 둘 다 도달 안 함
-        if result['first_hit'] is None:
-            result['first_hit'] = 'none'
+        if virtual_result['first_hit'] is None:
+            virtual_result['first_hit'] = 'none'
+
+        # 3. 최종 결과 구조
+        result = {
+            'opening_price': opening_price,
+            'entry_check': entry_check,
+            'should_buy': entry_check['should_buy'],
+            'skip_reason': entry_check['skip_reason'],
+
+            # 실제 결과 (매수 조건 통과 시)
+            'actual_result': virtual_result if entry_check['should_buy'] else None,
+
+            # 가상 결과 (매수 조건 미통과 시, 만약 샀다면)
+            'virtual_result': virtual_result if not entry_check['should_buy'] else None,
+
+            # 하위 호환성 (기존 필드 유지)
+            'profit_target_percent': profit_target,
+            'loss_target_percent': loss_target,
+            'first_hit': virtual_result['first_hit'],
+            'first_hit_time': virtual_result['first_hit_time'],
+            'closing_price': virtual_result['closing_price'],
+            'closing_percent': virtual_result['closing_percent'],
+            'max_profit_percent': virtual_result['max_profit_percent'],
+            'max_loss_percent': virtual_result['max_loss_percent']
+        }
 
         return result
 
@@ -252,11 +382,12 @@ class IntradayCollector:
         for candidate in candidates:
             stock_code = candidate.get('code', '')
             stock_name = candidate.get('name', '')
+            avg_volume_20d = candidate.get('avg_volume_20d', 0)
 
             print(f"\n🔍 {stock_name} ({stock_code})")
 
-            # 익절/손절 분석
-            pl_analysis = self.analyze_profit_loss(stock_code, date_str, profit_target, loss_target)
+            # 익절/손절 분석 (매수 조건 체크 포함)
+            pl_analysis = self.analyze_profit_loss(stock_code, date_str, profit_target, loss_target, avg_volume_20d)
 
             intraday_data[stock_code] = {
                 'code': stock_code,
@@ -307,15 +438,18 @@ if __name__ == '__main__':
 
         print(f"✓ {len(candidates)}개 선정 종목 로드 완료")
 
-        # 당일 데이터 수집 (익절 +3%, 손절 -2%)
-        intraday_data = collector.collect_intraday_data(candidates, profit_target=3.0, loss_target=-2.0)
+        # 당일 데이터 수집 (익절 +5%, 손절 -3%) - 퀀트 최적화
+        import config
+        profit = getattr(config, 'PROFIT_TARGET', 5.0)
+        loss = getattr(config, 'LOSS_TARGET', -3.0)
+        intraday_data = collector.collect_intraday_data(candidates, profit_target=profit, loss_target=loss)
 
         # 저장
         collector.save_intraday_data(intraday_data)
 
         # 익절/손절 분석 결과 출력
         print("\n" + "="*70)
-        print("📊 시초가 매매 백테스팅 결과 (익절 +3% / 손절 -2%)")
+        print(f"📊 시초가 매매 백테스팅 결과 (익절 +{profit}% / 손절 {loss}%)")
         print("="*70)
 
         profit_count = 0

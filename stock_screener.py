@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import config
 from utils import get_kst_now, format_kst_time, get_date_info, is_market_day
-from market_data import MarketDataCollector
+from market_data import MarketDataCollector, is_before_market_open
 from news_collector import NewsCollector
 from disclosure_collector import DisclosureCollector
 from investor_collector import InvestorCollector
@@ -41,19 +41,29 @@ class StockScreener:
     def apply_filters(self, stocks):
         """최소 필터링 조건 적용 (극소형만 제외)"""
         print("\n🔍 최소 필터 적용 중...")
-        filtered = []
 
+        before_market = is_before_market_open()
+        if before_market:
+            print("  ⏰ 장 시작 전: market_data에서 전일 거래대금 적용됨")
+
+        filtered = []
         for stock in stocks:
             # 극소형 제외 (거래대금 100억 미만)
-            if stock.get('trading_value', 0) < config.MIN_TRADING_VALUE:
-                continue
+            # 캐시 적용 후에도 거래대금이 없으면 시가총액으로 대체
+            trading_value = stock.get('trading_value', 0)
+            if trading_value < config.MIN_TRADING_VALUE:
+                # 장 시작 전이고 캐시가 없으면 시가총액 기준으로만 필터
+                if before_market and stock.get('market_cap', 0) >= config.MIN_MARKET_CAP * 10:
+                    pass  # 시가총액이 충분히 크면 통과
+                else:
+                    continue
 
             # 극소형 제외 (시가총액 100억 미만)
             if stock.get('market_cap', 0) < config.MIN_MARKET_CAP:
                 continue
 
-            # 폭락주 제외 (등락률 -30% 미만)
-            if stock.get('price_change_percent', 0) < config.MIN_PRICE_CHANGE:
+            # 폭락주 제외 (등락률 -30% 미만) - 장 시작 전에는 스킵
+            if not before_market and stock.get('price_change_percent', 0) < config.MIN_PRICE_CHANGE:
                 continue
 
             # 페니스탁 제외 (100원 미만)
@@ -65,9 +75,19 @@ class StockScreener:
             if current_price > config.MAX_PRICE:
                 continue
 
+            # 갭 필터 (추격 매수 방지) - 장중에만 적용
+            if not before_market:
+                price_change = stock.get('price_change_percent', 0)
+                max_gap = getattr(config, 'MAX_GAP_UP', 5.0)
+                min_gap = getattr(config, 'MIN_GAP_DOWN', -5.0)
+                if price_change > max_gap:
+                    continue  # 5% 이상 갭상승 제외
+                if price_change < min_gap:
+                    continue  # -5% 이상 갭하락 제외
+
             filtered.append(stock)
 
-        print(f"  ✓ 필터링 완료: {len(filtered)}개 종목 (기존 대비 완화)")
+        print(f"  ✓ 필터링 완료: {len(filtered)}개 종목")
         return filtered
 
     def fetch_news(self):

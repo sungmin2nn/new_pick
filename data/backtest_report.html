@@ -113,14 +113,53 @@
             background: linear-gradient(90deg, #667eea, #764ba2);
             transition: width 0.3s;
         }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .equity-table {
+            margin-top: 20px;
+        }
+        .equity-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .profit { color: #e74c3c; font-weight: 600; }
+        .loss { color: #3498db; font-weight: 600; }
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .summary-box h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        .summary-value {
+            font-weight: bold;
+            font-size: 18px;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>📊 백테스팅 리포트</h1>
             <div class="meta">
-                생성일시: 2026-01-30 18:23:17 |
+                생성일시: 2026-02-02 22:19:30 |
                 분석 기간: 3일 |
                 총 종목: 11개
             </div>
@@ -165,6 +204,190 @@
                 <div class="value">-2.67%</div>
             </div>
         </div>
+
+        <div class="section">
+            <h2>💰 자본 증가 곡선</h2>
+
+            <div class="summary-box">
+                <h3>투자 성과 요약</h3>
+                <div class="summary-row">
+                    <span>초기 자본금</span>
+                    <span class="summary-value">10,000,000원</span>
+                </div>
+                <div class="summary-row">
+                    <span>최종 자본금</span>
+                    <span class="summary-value">10,141,898원</span>
+                </div>
+                <div class="summary-row">
+                    <span>총 손익</span>
+                    <span class="summary-value" style="color: #90EE90">
+                        +141,898원
+                    </span>
+                </div>
+                <div class="summary-row">
+                    <span>총 수익률</span>
+                    <span class="summary-value" style="color: #90EE90">
+                        +1.42%
+                    </span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="equityChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="dailyReturnChart"></canvas>
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px;">📋 일별 상세 내역</h3>
+            <table class="equity-table">
+                <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>종목 수</th>
+                        <th>전일 자본</th>
+                        <th>당일 자본</th>
+                        <th>일 손익</th>
+                        <th>일 수익률</th>
+                        <th>누적 수익률</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr>
+                        <td><strong>20260128</strong></td>
+                        <td>3개</td>
+                        <td>10,000,000원</td>
+                        <td>10,035,710원</td>
+                        <td class="profit">+35,710원</td>
+                        <td class="profit">+0.36%</td>
+                        <td class="profit">+0.36%</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>20260129</strong></td>
+                        <td>3개</td>
+                        <td>10,035,710원</td>
+                        <td>10,042,502원</td>
+                        <td class="profit">+6,792원</td>
+                        <td class="profit">+0.07%</td>
+                        <td class="profit">+0.43%</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>20260130</strong></td>
+                        <td>5개</td>
+                        <td>10,042,502원</td>
+                        <td>10,141,898원</td>
+                        <td class="profit">+99,396원</td>
+                        <td class="profit">+0.99%</td>
+                        <td class="profit">+1.42%</td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+            // 자본 증가 곡선 차트
+            const equityCtx = document.getElementById('equityChart').getContext('2d');
+            new Chart(equityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['20260128', '20260129', '20260130'],
+                    datasets: [{
+                        label: '자본금 (원)',
+                        data: [10035710.0, 10042502.0, 10141898.0],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '자본 증가 곡선 (초기 자본: 10,000,000원)',
+                            font: { size: 16 }
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '자본금: ' + context.raw.toLocaleString() + '원';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString() + '원';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 일별 수익률 차트
+            const dailyCtx = document.getElementById('dailyReturnChart').getContext('2d');
+            const dailyReturns = [0.36, 0.07, 0.99];
+            const barColors = dailyReturns.map(v => v >= 0 ? 'rgba(231, 76, 60, 0.8)' : 'rgba(52, 152, 219, 0.8)');
+
+            new Chart(dailyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['20260128', '20260129', '20260130'],
+                    datasets: [{
+                        label: '일 수익률 (%)',
+                        data: dailyReturns,
+                        backgroundColor: barColors,
+                        borderColor: barColors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '일별 수익률',
+                            font: { size: 16 }
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '수익률: ' + (context.raw >= 0 ? '+' : '') + context.raw + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    return (value >= 0 ? '+' : '') + value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
 
         <div class="section">
             <h2>점수대별 성과 분석</h2>

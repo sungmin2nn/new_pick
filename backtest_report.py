@@ -138,11 +138,78 @@ class BacktestReporter:
 
         return results
 
+    def calculate_equity_curve(self, data, initial_capital=10000000):
+        """
+        자본 증가 곡선 계산
+        각 종목에 균등 투자했다고 가정 (일별 총 자본을 5등분)
+
+        Args:
+            data: 전체 백테스트 데이터
+            initial_capital: 초기 자본금 (기본 1000만원)
+
+        Returns:
+            list: 일별 자본 변동 내역
+        """
+        by_date = defaultdict(list)
+        for d in data:
+            by_date[d['date']].append(d)
+
+        equity_curve = []
+        current_capital = initial_capital
+
+        for date in sorted(by_date.keys()):
+            stocks = by_date[date]
+            num_stocks = len(stocks)
+
+            if num_stocks == 0:
+                continue
+
+            # 각 종목에 균등 투자
+            invest_per_stock = current_capital / num_stocks
+
+            daily_profit_loss = 0
+            daily_details = []
+
+            for stock in stocks:
+                # 종목별 수익/손실 계산
+                return_pct = stock['closing_percent'] / 100
+                stock_profit = invest_per_stock * return_pct
+                daily_profit_loss += stock_profit
+
+                daily_details.append({
+                    'name': stock['name'],
+                    'invest_amount': invest_per_stock,
+                    'return_pct': stock['closing_percent'],
+                    'profit_loss': stock_profit,
+                    'first_hit': stock['first_hit']
+                })
+
+            # 일별 수익률 계산
+            daily_return_pct = (daily_profit_loss / current_capital) * 100
+
+            # 자본 업데이트
+            previous_capital = current_capital
+            current_capital += daily_profit_loss
+
+            equity_curve.append({
+                'date': date,
+                'capital': current_capital,
+                'previous_capital': previous_capital,
+                'daily_profit_loss': daily_profit_loss,
+                'daily_return_pct': daily_return_pct,
+                'cumulative_return_pct': ((current_capital - initial_capital) / initial_capital) * 100,
+                'num_stocks': num_stocks,
+                'details': daily_details
+            })
+
+        return equity_curve, initial_capital
+
     def generate_html_report(self, all_data):
         """HTML 리포트 생성"""
         overall_stats = self.calculate_statistics(all_data)
         score_analysis = self.analyze_by_score_range(all_data)
         date_analysis = self.analyze_by_date(all_data)
+        equity_curve, initial_capital = self.calculate_equity_curve(all_data)
 
         html = f"""<!DOCTYPE html>
 <html lang="ko">
@@ -259,7 +326,46 @@ class BacktestReporter:
             background: linear-gradient(90deg, #667eea, #764ba2);
             transition: width 0.3s;
         }}
+        .chart-container {{
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }}
+        .equity-table {{
+            margin-top: 20px;
+        }}
+        .equity-table th {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }}
+        .profit {{ color: #e74c3c; font-weight: 600; }}
+        .loss {{ color: #3498db; font-weight: 600; }}
+        .summary-box {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }}
+        .summary-box h3 {{
+            margin-bottom: 15px;
+            font-size: 18px;
+        }}
+        .summary-row {{
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }}
+        .summary-row:last-child {{
+            border-bottom: none;
+        }}
+        .summary-value {{
+            font-weight: bold;
+            font-size: 18px;
+        }}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -315,6 +421,194 @@ class BacktestReporter:
                 <div class="value">{overall_stats['max_loss']:.2f}%</div>
             </div>
         </div>
+"""
+
+        # 자본 증가 곡선 섹션
+        if equity_curve:
+            final_capital = equity_curve[-1]['capital'] if equity_curve else initial_capital
+            total_profit_loss = final_capital - initial_capital
+            total_return_pct = ((final_capital - initial_capital) / initial_capital) * 100
+
+            # 그래프용 데이터 생성
+            dates_js = [eq['date'] for eq in equity_curve]
+            capitals_js = [round(eq['capital'], 0) for eq in equity_curve]
+            daily_returns_js = [round(eq['daily_return_pct'], 2) for eq in equity_curve]
+
+            html += f"""
+        <div class="section">
+            <h2>💰 자본 증가 곡선</h2>
+
+            <div class="summary-box">
+                <h3>투자 성과 요약</h3>
+                <div class="summary-row">
+                    <span>초기 자본금</span>
+                    <span class="summary-value">{initial_capital:,.0f}원</span>
+                </div>
+                <div class="summary-row">
+                    <span>최종 자본금</span>
+                    <span class="summary-value">{final_capital:,.0f}원</span>
+                </div>
+                <div class="summary-row">
+                    <span>총 손익</span>
+                    <span class="summary-value" style="color: {'#90EE90' if total_profit_loss >= 0 else '#FFB6C1'}">
+                        {'+' if total_profit_loss >= 0 else ''}{total_profit_loss:,.0f}원
+                    </span>
+                </div>
+                <div class="summary-row">
+                    <span>총 수익률</span>
+                    <span class="summary-value" style="color: {'#90EE90' if total_return_pct >= 0 else '#FFB6C1'}">
+                        {'+' if total_return_pct >= 0 else ''}{total_return_pct:.2f}%
+                    </span>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="equityChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="dailyReturnChart"></canvas>
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 15px;">📋 일별 상세 내역</h3>
+            <table class="equity-table">
+                <thead>
+                    <tr>
+                        <th>날짜</th>
+                        <th>종목 수</th>
+                        <th>전일 자본</th>
+                        <th>당일 자본</th>
+                        <th>일 손익</th>
+                        <th>일 수익률</th>
+                        <th>누적 수익률</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+            for eq in equity_curve:
+                date_formatted = eq['date']
+                if len(date_formatted) == 8:
+                    date_formatted = f"{{date_formatted[:4]}}-{{date_formatted[4:6]}}-{{date_formatted[6:]}}"
+
+                profit_class = 'profit' if eq['daily_profit_loss'] >= 0 else 'loss'
+                cumulative_class = 'profit' if eq['cumulative_return_pct'] >= 0 else 'loss'
+
+                html += f"""
+                    <tr>
+                        <td><strong>{eq['date']}</strong></td>
+                        <td>{eq['num_stocks']}개</td>
+                        <td>{eq['previous_capital']:,.0f}원</td>
+                        <td>{eq['capital']:,.0f}원</td>
+                        <td class="{profit_class}">{'+' if eq['daily_profit_loss'] >= 0 else ''}{eq['daily_profit_loss']:,.0f}원</td>
+                        <td class="{profit_class}">{'+' if eq['daily_return_pct'] >= 0 else ''}{eq['daily_return_pct']:.2f}%</td>
+                        <td class="{cumulative_class}">{'+' if eq['cumulative_return_pct'] >= 0 else ''}{eq['cumulative_return_pct']:.2f}%</td>
+                    </tr>
+"""
+
+            html += f"""
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+            // 자본 증가 곡선 차트
+            const equityCtx = document.getElementById('equityChart').getContext('2d');
+            new Chart(equityCtx, {{
+                type: 'line',
+                data: {{
+                    labels: {dates_js},
+                    datasets: [{{
+                        label: '자본금 (원)',
+                        data: {capitals_js},
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }}]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        title: {{
+                            display: true,
+                            text: '자본 증가 곡선 (초기 자본: {initial_capital:,}원)',
+                            font: {{ size: 16 }}
+                        }},
+                        legend: {{ display: false }},
+                        tooltip: {{
+                            callbacks: {{
+                                label: function(context) {{
+                                    return '자본금: ' + context.raw.toLocaleString() + '원';
+                                }}
+                            }}
+                        }}
+                    }},
+                    scales: {{
+                        y: {{
+                            beginAtZero: false,
+                            ticks: {{
+                                callback: function(value) {{
+                                    return value.toLocaleString() + '원';
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }});
+
+            // 일별 수익률 차트
+            const dailyCtx = document.getElementById('dailyReturnChart').getContext('2d');
+            const dailyReturns = {daily_returns_js};
+            const barColors = dailyReturns.map(v => v >= 0 ? 'rgba(231, 76, 60, 0.8)' : 'rgba(52, 152, 219, 0.8)');
+
+            new Chart(dailyCtx, {{
+                type: 'bar',
+                data: {{
+                    labels: {dates_js},
+                    datasets: [{{
+                        label: '일 수익률 (%)',
+                        data: dailyReturns,
+                        backgroundColor: barColors,
+                        borderColor: barColors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 1
+                    }}]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {{
+                        title: {{
+                            display: true,
+                            text: '일별 수익률',
+                            font: {{ size: 16 }}
+                        }},
+                        legend: {{ display: false }},
+                        tooltip: {{
+                            callbacks: {{
+                                label: function(context) {{
+                                    return '수익률: ' + (context.raw >= 0 ? '+' : '') + context.raw + '%';
+                                }}
+                            }}
+                        }}
+                    }},
+                    scales: {{
+                        y: {{
+                            ticks: {{
+                                callback: function(value) {{
+                                    return (value >= 0 ? '+' : '') + value + '%';
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+            }});
+        </script>
 """
 
         # 점수대별 분석
