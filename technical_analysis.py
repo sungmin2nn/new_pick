@@ -92,30 +92,30 @@ class TechnicalAnalyzer:
                 'ma20': int(ma20) if ma20 else None,
                 'ma60': int(ma60) if ma60 else None,
 
-                # 위치 판단
-                'above_ma5': current_price > ma5 if ma5 else None,
-                'above_ma20': current_price > ma20 if ma20 else None,
-                'above_ma60': current_price > ma60 if ma60 else None,
-                'ma5_above_ma20': ma5 > ma20 if (ma5 and ma20) else None,
+                # 위치 판단 (bool()로 numpy.bool_ -> Python bool 변환)
+                'above_ma5': bool(current_price > ma5) if ma5 else None,
+                'above_ma20': bool(current_price > ma20) if ma20 else None,
+                'above_ma60': bool(current_price > ma60) if ma60 else None,
+                'ma5_above_ma20': bool(ma5 > ma20) if (ma5 and ma20) else None,
 
                 # 전일 고가 대비
-                'near_prev_high': current_price >= prev_high * 0.98,
-                'above_prev_high': current_price > prev_high,
+                'near_prev_high': bool(current_price >= prev_high * 0.98),
+                'above_prev_high': bool(current_price > prev_high),
 
                 # 20일 고가 대비
                 'high_20d': int(high_20d),
-                'near_high_20d': current_price >= high_20d * 0.97,
-                'above_high_20d': current_price > high_20d,
+                'near_high_20d': bool(current_price >= high_20d * 0.97),
+                'above_high_20d': bool(current_price > high_20d),
 
                 # 52주 고가/저가
                 'high_52w': int(high_52w),
                 'low_52w': int(low_52w),
-                'pct_from_52w_high': round(((current_price - high_52w) / high_52w) * 100, 2),
-                'near_52w_high': current_price >= high_52w * 0.95,
+                'pct_from_52w_high': round(float((current_price - high_52w) / high_52w * 100), 2),
+                'near_52w_high': bool(current_price >= high_52w * 0.95),
 
                 # 거래량
                 'avg_volume_20d': avg_volume_20d,
-                'volume_ratio': round(volume_ratio, 2),
+                'volume_ratio': round(float(volume_ratio), 2),
             }
 
             return result
