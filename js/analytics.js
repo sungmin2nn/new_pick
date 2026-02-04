@@ -56,18 +56,19 @@ const Analytics = {
                         continue;
                     }
 
-                    // 매도가 결정
+                    // 매도가 결정 (actual_result 내부에서도 탐색)
+                    const ar = pl.actual_result || {};
                     let sellPrice = 0;
                     let result = 'none';
 
                     if (pl.first_hit === 'profit') {
-                        sellPrice = pl.profit_target_price;
+                        sellPrice = pl.profit_target_price || ar.profit_target_price || pl.closing_price;
                         result = 'profit';
                     } else if (pl.first_hit === 'loss') {
-                        sellPrice = pl.loss_target_price;
+                        sellPrice = pl.loss_target_price || ar.loss_target_price || pl.closing_price;
                         result = 'loss';
                     } else {
-                        sellPrice = pl.closing_price;
+                        sellPrice = pl.closing_price || ar.closing_price || openingPrice;
                         result = 'none';
                     }
 
