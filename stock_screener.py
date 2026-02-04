@@ -13,6 +13,8 @@ from market_data import MarketDataCollector, is_before_market_open
 from news_collector import NewsCollector
 from disclosure_collector import DisclosureCollector
 from investor_collector import InvestorCollector
+from market_sentiment import MarketSentiment
+from technical_analysis import TechnicalAnalyzer
 from database import Database
 
 # .env 파일에서 환경변수 로드
@@ -24,9 +26,13 @@ class StockScreener:
         self.news_data = []
         self.disclosure_data = []
         self.investor_data = {}
+        self.market_sentiment_data = None
+        self.technical_data = {}
         self.market_collector = MarketDataCollector()
         self.news_collector = NewsCollector()
         self.investor_collector = InvestorCollector()
+        self.sentiment_analyzer = MarketSentiment()
+        self.technical_analyzer = TechnicalAnalyzer()
 
         # DART API 키 (환경변수에서 읽기)
         dart_api_key = os.environ.get('DART_API_KEY', '')
@@ -527,6 +533,87 @@ class StockScreener:
 
         return leading_stocks
 
+    def classify_cap_tier(self, stock):
+        """종목의 시가총액 구간 분류"""
+        market_cap = stock.get('market_cap', 0)
+        cap_tiers = getattr(config, 'CAP_TIERS', {
+            'large': 10_000_000_000_000,
+            'mid': 1_000_000_000_000,
+            'small': 0,
+        })
+
+        if market_cap >= cap_tiers['large']:
+            return 'large'
+        elif market_cap >= cap_tiers['mid']:
+            return 'mid'
+        else:
+            return 'small'
+
+    def apply_cap_tier_supplement(self, top_stocks, all_scored_stocks):
+        """
+        시가총액 구간별 최소 수량 보장 (대형주 편중 방지)
+
+        로직:
+        1. 점수순 상위 5개를 기본 선정
+        2. 구간별 최소 수량(대형 1, 중형 2, 소형 2) 미달 시 추가
+        3. 최종 5개 이상 가능
+        """
+        cap_min = getattr(config, 'CAP_TIER_MIN', {
+            'large': 1, 'mid': 2, 'small': 2,
+        })
+
+        # 현재 선정된 종목의 구간별 개수 파악
+        tier_counts = {'large': 0, 'mid': 0, 'small': 0}
+        selected_codes = set()
+
+        for stock in top_stocks:
+            tier = self.classify_cap_tier(stock)
+            stock['cap_tier'] = tier
+            tier_counts[tier] += 1
+            selected_codes.add(stock['code'])
+
+        # 미달 구간 확인 및 추가
+        added_stocks = []
+        for tier_name in ['mid', 'small', 'large']:
+            needed = cap_min.get(tier_name, 0) - tier_counts.get(tier_name, 0)
+
+            if needed > 0:
+                # 해당 구간에서 점수 높은 순서로 추가
+                tier_candidates = [
+                    s for s in all_scored_stocks
+                    if self.classify_cap_tier(s) == tier_name and s['code'] not in selected_codes
+                ]
+                # 점수순 정렬
+                tier_candidates.sort(key=lambda x: x['total_score'], reverse=True)
+
+                for stock in tier_candidates[:needed]:
+                    stock['cap_tier'] = tier_name
+                    stock['added_by_cap_tier'] = True
+                    added_stocks.append(stock)
+                    selected_codes.add(stock['code'])
+                    tier_counts[tier_name] += 1
+
+                if tier_candidates[:needed]:
+                    tier_label = {'large': '대형주', 'mid': '중형주', 'small': '소형주'}.get(tier_name, tier_name)
+                    names = ', '.join([s['name'] for s in tier_candidates[:needed]])
+                    print(f"  📌 {tier_label} 부족 → {len(tier_candidates[:needed])}개 추가: {names}")
+
+        # 기존 + 추가 합치기
+        final_stocks = list(top_stocks) + added_stocks
+
+        # 구간별 현황 출력
+        tier_label_map = {'large': '대형주(10조↑)', 'mid': '중형주(1조~10조)', 'small': '소형주(1조↓)'}
+        print(f"\n  📊 시가총액 구간별 현황:")
+        for tier_name, label in tier_label_map.items():
+            count = tier_counts[tier_name]
+            min_req = cap_min.get(tier_name, 0)
+            status = '✅' if count >= min_req else '⚠️'
+            print(f"    {status} {label}: {count}개 (최소 {min_req}개)")
+
+        print(f"  ✓ 최종 선정: {len(final_stocks)}개 (기본 {len(top_stocks)} + 추가 {len(added_stocks)})")
+
+        return final_stocks
+
     def rank_stocks(self, stocks):
         """종목 점수 계산 및 순위 매기기"""
         print("\n📈 점수 계산 및 순위 매기기...")
@@ -553,7 +640,13 @@ class StockScreener:
         # 점수순 정렬
         scored_stocks.sort(key=lambda x: x['total_score'], reverse=True)
 
-        return scored_stocks[:config.TOP_N]
+        # 상위 N개 기본 선정
+        top_n = scored_stocks[:config.TOP_N]
+
+        # 시가총액 구간별 보충 (대형주 편중 방지)
+        final_stocks = self.apply_cap_tier_supplement(top_n, scored_stocks)
+
+        return final_stocks
 
     def save_results(self, stocks):
         """결과 저장 (JSON + DB)"""
@@ -566,6 +659,16 @@ class StockScreener:
         for stock in stocks:
             stock['score_metadata'] = self.generate_score_metadata(stock)
 
+            # 기술적 지표 추가 (표시용, 점수 미반영)
+            code = stock.get('code', '')
+            if code in self.technical_data:
+                tech = self.technical_data[code]
+                stock['technical_indicators'] = tech
+                stock['technical_summary'] = self.technical_analyzer.get_technical_summary(tech)
+            else:
+                stock['technical_indicators'] = None
+                stock['technical_summary'] = '-'
+
         # JSON 파일로 저장
         output_path = os.path.join(config.OUTPUT_DIR, config.JSON_FILE)
 
@@ -577,6 +680,7 @@ class StockScreener:
             'weekday': date_info['weekday_kr'],
             'weekday_short': date_info['weekday_short'],
             'is_market_day': is_market_day(),
+            'market_sentiment': self.market_sentiment_data,
             'count': len(stocks),
             'candidates': stocks
         }
@@ -663,23 +767,38 @@ class StockScreener:
         print(f"🎯 장전 종목 선정 완료 - {format_kst_time(format_str='%Y-%m-%d %H:%M')}")
         print("="*60)
 
-        for i, stock in enumerate(stocks[:10], 1):
-            # 대장주 표시
-            leading_badge = " 👑대장주" if stock.get('is_leading', False) else ""
-            print(f"\n{i}. {stock.get('name', 'N/A')} ({stock.get('code', 'N/A')}) - {stock.get('market', 'N/A')}{leading_badge}")
+        for i, stock in enumerate(stocks, 1):
+            # 대장주/추가 표시
+            badges = []
+            if stock.get('is_leading', False):
+                badges.append("👑대장주")
+            if stock.get('added_by_cap_tier', False):
+                badges.append("📌구간추가")
+
+            cap_tier = stock.get('cap_tier', '')
+            tier_label = {'large': '[대형]', 'mid': '[중형]', 'small': '[소형]'}.get(cap_tier, '')
+
+            badge_str = f" {' '.join(badges)}" if badges else ""
+
+            print(f"\n{i}. {stock.get('name', 'N/A')} ({stock.get('code', 'N/A')}) - {stock.get('market', 'N/A')} {tier_label}{badge_str}")
             print(f"   현재가: {stock.get('current_price', 0):,}원 ({stock.get('price_change_percent', 0):+.2f}%)")
-            print(f"   거래대금: {stock.get('trading_value', 0)/100000000:.0f}억원")
+            print(f"   시총: {stock.get('market_cap', 0)/1000000000000:.1f}조원 | 거래대금: {stock.get('trading_value', 0)/100000000:.0f}억원")
             print(f"   총점: {stock.get('total_score', 0):.0f}점/145점")
             score_detail = stock.get('score_detail', {})
             print(f"   - 공시: {score_detail.get('disclosure', 0):.0f}점 | 뉴스: {score_detail.get('news', 0):.0f}점 | 테마: {score_detail.get('theme_keywords', 0):.0f}점 | 투자자: {score_detail.get('investor', 0):.0f}점")
             print(f"   - 거래대금: {score_detail.get('trading_value', 0):.0f}점 | 시총: {score_detail.get('market_cap', 0):.0f}점 | 모멘텀: {score_detail.get('price_momentum', 0):.0f}점")
             print(f"   - 거래량: {score_detail.get('volume_surge', 0):.0f}점 | 회전율: {score_detail.get('turnover_rate', 0):.0f}점 | 재료중복: {score_detail.get('material_overlap', 0):.0f}점 | 뉴스시간: {score_detail.get('news_timing', 0):.0f}점")
 
+            # 기술적 지표 (표시만)
+            tech_summary = stock.get('technical_summary', '-')
+            if tech_summary and tech_summary != '-':
+                print(f"   📐 기술적: {tech_summary}")
+
             # 공시 정보
             disclosure_count = stock.get('disclosure_count', 0)
             if disclosure_count > 0:
                 print(f"   - 공시: {disclosure_count}건")
-                for disc in stock.get('disclosures', [])[:3]:  # 최대 3건만 표시
+                for disc in stock.get('disclosures', [])[:3]:
                     amount = disc.get('amount', 0)
                     amount_str = f" ({amount}억원)" if amount > 0 else ""
                     print(f"     · [{disc.get('category', 'N/A')}] {disc.get('report_nm', 'N/A')}{amount_str}")
@@ -702,9 +821,6 @@ class StockScreener:
             if foreign_buy > 0 or institution_buy > 0:
                 print(f"   - 외국인: {foreign_buy:,}주 | 기관: {institution_buy:,}주")
 
-        if len(stocks) > 10:
-            print(f"\n... 외 {len(stocks) - 10}개 종목")
-
     def run(self):
         """메인 실행 함수"""
         print("🚀 장전 종목 선정 시스템 시작")
@@ -726,6 +842,13 @@ class StockScreener:
             print(f"\n📌 장 시작 전입니다 (현재 {current_hour:02d}:{current_minute:02d}). 전일 거래대금 기준으로 필터링합니다.")
 
         try:
+            # 0. 시장 분위기 판단 (표시만, 액션 없음)
+            try:
+                self.market_sentiment_data = self.sentiment_analyzer.determine_market_mode()
+            except Exception as e:
+                print(f"  ⚠️  시장 분위기 판단 실패 (계속 진행): {e}")
+                self.market_sentiment_data = None
+
             # 1. 시장 데이터 수집
             stocks = self.fetch_market_data()
 
@@ -741,13 +864,20 @@ class StockScreener:
             # 5. 필터링 적용
             filtered_stocks = self.apply_filters(stocks)
 
-            # 6. 점수 계산 및 순위
+            # 6. 점수 계산 및 순위 (시가총액 구간별 보충 포함)
             ranked_stocks = self.rank_stocks(filtered_stocks)
 
-            # 7. 결과 저장
+            # 7. 기술적 지표 분석 (표시용, 점수 미반영)
+            try:
+                self.technical_data = self.technical_analyzer.analyze_stocks(ranked_stocks)
+            except Exception as e:
+                print(f"  ⚠️  기술적 분석 실패 (계속 진행): {e}")
+                self.technical_data = {}
+
+            # 8. 결과 저장
             self.save_results(ranked_stocks)
 
-            # 8. 결과 출력
+            # 9. 결과 출력
             self.print_summary(ranked_stocks)
 
             print("\n✅ 작업 완료!")

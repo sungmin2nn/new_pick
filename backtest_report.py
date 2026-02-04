@@ -33,7 +33,7 @@ class BacktestReporter:
                     for code, stock_data in stocks.items():
                         pl = stock_data.get('profit_loss_analysis')
                         if pl:
-                            all_data.append({
+                            entry = {
                                 'date': date,
                                 'code': code,
                                 'name': stock_data.get('name', ''),
@@ -48,7 +48,24 @@ class BacktestReporter:
                                 'max_loss_percent': pl.get('max_loss_percent', 0),
                                 'profit_target_percent': pl.get('profit_target_percent', 3.0),
                                 'loss_target_percent': pl.get('loss_target_percent', -2.0),
-                            })
+                            }
+
+                            # 멀티 시나리오 데이터 (있으면)
+                            ms = stock_data.get('multi_scenario')
+                            if ms and ms.get('scenarios'):
+                                entry['multi_scenario'] = ms['scenarios']
+
+                            # 단타 전략 데이터 (있으면)
+                            scalp = stock_data.get('scalp_strategy')
+                            if scalp:
+                                entry['scalp_strategy'] = scalp
+
+                            # 스윙 전략 데이터 (있으면)
+                            swing = stock_data.get('swing_strategy')
+                            if swing:
+                                entry['swing_strategy'] = swing
+
+                            all_data.append(entry)
             except Exception as e:
                 print(f"⚠️  파일 로드 실패 ({filepath}): {e}")
 
@@ -203,6 +220,95 @@ class BacktestReporter:
             })
 
         return equity_curve, initial_capital
+
+    def calculate_multi_scenario_stats(self, data):
+        """멀티 시나리오 통계 계산"""
+        scenario_stats = {}
+
+        for d in data:
+            ms = d.get('multi_scenario')
+            if not ms:
+                continue
+
+            for name, sc in ms.items():
+                if name not in scenario_stats:
+                    scenario_stats[name] = {
+                        'label': sc.get('label', name),
+                        'profit': 0, 'loss': 0, 'none': 0, 'total': 0,
+                        'rr': sc.get('rr', '-'),
+                    }
+                scenario_stats[name]['total'] += 1
+                result = sc.get('result', 'none')
+                if result == 'profit':
+                    scenario_stats[name]['profit'] += 1
+                elif result == 'loss':
+                    scenario_stats[name]['loss'] += 1
+                else:
+                    scenario_stats[name]['none'] += 1
+
+        return scenario_stats
+
+    def calculate_scalp_stats(self, data):
+        """단타 전략 통계 계산"""
+        total = 0
+        entered = 0
+        profit = 0
+        loss = 0
+        timeout = 0
+
+        for d in data:
+            scalp = d.get('scalp_strategy')
+            if not scalp:
+                continue
+
+            total += 1
+            if scalp.get('should_enter', False):
+                entered += 1
+
+            exit_result = scalp.get('exit_result')
+            if exit_result == 'profit':
+                profit += 1
+            elif exit_result == 'loss':
+                loss += 1
+            elif exit_result == 'timeout':
+                timeout += 1
+
+        if total == 0:
+            return None
+
+        return {
+            'total': total,
+            'entered': entered,
+            'profit': profit,
+            'loss': loss,
+            'timeout': timeout,
+        }
+
+    def calculate_swing_stats(self, data):
+        """스윙 전략 통계 계산"""
+        total = 0
+        signals = defaultdict(int)
+
+        for d in data:
+            swing = d.get('swing_strategy')
+            if not swing:
+                continue
+
+            total += 1
+            signal = swing.get('signal', 'unknown')
+            signals[signal] += 1
+
+        if total == 0:
+            return None
+
+        return {
+            'total': total,
+            'strong_buy': signals.get('strong_buy', 0),
+            'hold': signals.get('hold', 0),
+            'watch': signals.get('watch', 0),
+            'warning': signals.get('warning', 0),
+            'sell': signals.get('sell', 0),
+        }
 
     def generate_html_report(self, all_data):
         """HTML 리포트 생성"""
@@ -609,6 +715,104 @@ class BacktestReporter:
                 }}
             }});
         </script>
+"""
+
+        # 멀티 시나리오 비교 분석
+        scenario_stats = self.calculate_multi_scenario_stats(all_data)
+        if scenario_stats:
+            html += """
+        <div class="section">
+            <h2>🎯 4가지 시나리오 비교 분석</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>시나리오</th>
+                        <th>종목 수</th>
+                        <th>승률</th>
+                        <th>익절</th>
+                        <th>손절</th>
+                        <th>미도달</th>
+                        <th>R:R</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+            for name in sorted(scenario_stats.keys()):
+                st = scenario_stats[name]
+                win_rate = (st['profit'] / st['total'] * 100) if st['total'] > 0 else 0
+                html += f"""
+                    <tr>
+                        <td><strong>{st['label']}</strong></td>
+                        <td>{st['total']}개</td>
+                        <td class="{'positive' if win_rate > 50 else ''}">{win_rate:.1f}%</td>
+                        <td>{st['profit']}</td>
+                        <td>{st['loss']}</td>
+                        <td>{st['none']}</td>
+                        <td>{st.get('rr', '-')}</td>
+                    </tr>
+"""
+            html += """
+                </tbody>
+            </table>
+        </div>
+"""
+
+        # 단타/스윙 전략 비교
+        scalp_stats = self.calculate_scalp_stats(all_data)
+        swing_stats = self.calculate_swing_stats(all_data)
+        if scalp_stats or swing_stats:
+            html += """
+        <div class="section">
+            <h2>⚡ 전략별 성과 비교</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>전략</th>
+                        <th>분석 종목</th>
+                        <th>진입 신호</th>
+                        <th>익절</th>
+                        <th>손절</th>
+                        <th>타임아웃</th>
+                        <th>승률</th>
+                    </tr>
+                </thead>
+                <tbody>
+"""
+            if scalp_stats:
+                scalp_total = scalp_stats.get('total', 0)
+                scalp_entered = scalp_stats.get('entered', 0)
+                scalp_profit = scalp_stats.get('profit', 0)
+                scalp_loss = scalp_stats.get('loss', 0)
+                scalp_timeout = scalp_stats.get('timeout', 0)
+                scalp_winrate = (scalp_profit / scalp_entered * 100) if scalp_entered > 0 else 0
+                html += f"""
+                    <tr>
+                        <td><strong>단타 (09:00~09:10)</strong></td>
+                        <td>{scalp_total}개</td>
+                        <td>{scalp_entered}개</td>
+                        <td>{scalp_profit}</td>
+                        <td>{scalp_loss}</td>
+                        <td>{scalp_timeout}</td>
+                        <td class="{'positive' if scalp_winrate > 50 else ''}">{scalp_winrate:.1f}%</td>
+                    </tr>
+"""
+            if swing_stats:
+                swing_total = swing_stats.get('total', 0)
+                html += f"""
+                    <tr>
+                        <td><strong>스윙 (종가 기준)</strong></td>
+                        <td>{swing_total}개</td>
+                        <td>-</td>
+                        <td>{swing_stats.get('strong_buy', 0)}</td>
+                        <td>{swing_stats.get('sell', 0)}</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+"""
+            html += """
+                </tbody>
+            </table>
+        </div>
 """
 
         # 점수대별 분석
