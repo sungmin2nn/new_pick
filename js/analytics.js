@@ -74,7 +74,7 @@ const Analytics = {
                     // 손익 계산
                     const sellAmount = shares * sellPrice;
                     const profit = sellAmount - investAmount;
-                    const returnPercent = (profit / investAmount) * 100;
+                    const returnPercent = investAmount > 0 ? (profit / investAmount) * 100 : 0;
 
                     // 자본 업데이트
                     capital = capital - investAmount + sellAmount;
@@ -127,7 +127,7 @@ const Analytics = {
         const noneNeutralTrades = noneTrades.filter(t => t.return_percent === 0);
 
         const winRate = totalTrades > 0 ? (profitTrades.length / totalTrades * 100) : 0;
-        const totalReturn = ((finalCapital - initialCapital) / initialCapital * 100);
+        const totalReturn = initialCapital > 0 ? ((finalCapital - initialCapital) / initialCapital * 100) : 0;
 
         const avgWin = profitTrades.length > 0
             ? profitTrades.reduce((sum, t) => sum + t.return_percent, 0) / profitTrades.length

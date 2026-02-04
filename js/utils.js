@@ -52,7 +52,7 @@ const Utils = {
      * Format number with thousand separators
      */
     formatNumber(num) {
-        if (num === null || num === undefined) return '-';
+        if (num === null || num === undefined || isNaN(num) || !isFinite(num)) return '-';
         return num.toLocaleString('ko-KR');
     },
 
@@ -60,7 +60,7 @@ const Utils = {
      * Format currency (KRW)
      */
     formatCurrency(amount) {
-        if (amount === null || amount === undefined) return '-';
+        if (amount === null || amount === undefined || isNaN(amount) || !isFinite(amount)) return '-';
         return amount.toLocaleString('ko-KR') + '원';
     },
 
@@ -68,7 +68,7 @@ const Utils = {
      * Format percentage
      */
     formatPercent(value, decimals = 2) {
-        if (value === null || value === undefined) return '-';
+        if (value === null || value === undefined || isNaN(value) || !isFinite(value)) return '-';
         return value.toFixed(decimals) + '%';
     },
 
@@ -76,7 +76,7 @@ const Utils = {
      * Format percentage with color class
      */
     formatPercentWithColor(value, decimals = 2) {
-        if (value === null || value === undefined) return '-';
+        if (value === null || value === undefined || isNaN(value) || !isFinite(value)) return '-';
         const sign = value >= 0 ? '+' : '';
         const colorClass = value >= 0 ? 'positive' : 'negative';
         return `<span class="price-change ${colorClass}">${sign}${value.toFixed(decimals)}%</span>`;
