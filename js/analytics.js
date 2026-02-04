@@ -62,15 +62,18 @@ const Analytics = {
                     let result = 'none';
 
                     if (pl.first_hit === 'profit') {
-                        sellPrice = pl.profit_target_price || ar.profit_target_price || pl.closing_price;
+                        sellPrice = pl.profit_target_price || ar.profit_target_price || pl.closing_price || ar.closing_price || openingPrice;
                         result = 'profit';
                     } else if (pl.first_hit === 'loss') {
-                        sellPrice = pl.loss_target_price || ar.loss_target_price || pl.closing_price;
+                        sellPrice = pl.loss_target_price || ar.loss_target_price || pl.closing_price || ar.closing_price || openingPrice;
                         result = 'loss';
                     } else {
                         sellPrice = pl.closing_price || ar.closing_price || openingPrice;
                         result = 'none';
                     }
+
+                    // sellPrice가 없으면 거래 스킵
+                    if (!sellPrice) continue;
 
                     // 손익 계산
                     const sellAmount = shares * sellPrice;
