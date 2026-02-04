@@ -518,11 +518,18 @@ const Analytics = {
 
             const stocks = Object.values(intradayData.stocks);
 
+            // 날짜 포맷: "20260204" → "2026-02-04"
+            const rawDate = intradayData.date || '';
+            const formattedDate = rawDate.length === 8
+                ? `${rawDate.slice(0,4)}-${rawDate.slice(4,6)}-${rawDate.slice(6,8)}`
+                : rawDate;
+
             return stocks.map(stock => {
                 const pl = stock.profit_loss_analysis || {};
                 const entryCheck = pl.entry_check || {};
 
                 return {
+                    date: formattedDate,
                     code: stock.code,
                     name: stock.name,
                     score: stock.selection_score || 0,

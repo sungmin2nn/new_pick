@@ -433,6 +433,7 @@ const Dashboard = {
                     </div>
                     <div class="stock-name">${stock.name}</div>
                     <div class="stock-code">${stock.code}</div>
+                    ${stock.date ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">📅 ${stock.date} (${Utils.getDayOfWeek(stock.date)})</div>` : ''}
                     <div class="entry-info buy">
                         <span class="entry-badge buy">📈 매수</span>
                         ${stock.entryPrice ? `<span class="entry-price">진입가: ${Utils.formatCurrency(stock.entryPrice)}</span>` : ''}
@@ -461,6 +462,7 @@ const Dashboard = {
                     </div>
                     <div class="stock-name">${stock.name}</div>
                     <div class="stock-code">${stock.code}</div>
+                    ${stock.date ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">📅 ${stock.date} (${Utils.getDayOfWeek(stock.date)})</div>` : ''}
                     <div class="entry-info skip">
                         <span class="entry-badge skip">⏭️ 스킵</span>
                         <span class="skip-reason">${stock.skipReason || '조건 미충족'}</span>
