@@ -18,41 +18,26 @@ class MarketSentiment:
         self.session = requests.Session()
 
     def get_vix(self):
-        """VIX 지수 수집 (네이버 해외지수)"""
+        """VIX 지수 수집 (Yahoo Finance API - 네이버에서 VIX 종목 삭제됨)"""
         try:
-            url = 'https://finance.naver.com/world/sise.naver?symbol=VIX@VIX'
+            url = 'https://query1.finance.yahoo.com/v8/finance/chart/%5EVIX?range=2d&interval=1d'
             response = self.session.get(url, headers=self.headers, timeout=10)
-            soup = BeautifulSoup(response.text, 'html.parser')
+            data = response.json()
 
-            # 현재 VIX 값
-            now_value = soup.select_one('#content .rate_info .no_today .blind')
-            if now_value:
-                vix = float(now_value.text.strip().replace(',', ''))
-            else:
-                # 대체 선택자
-                now_value = soup.select_one('.no_today span.blind')
-                vix = float(now_value.text.strip().replace(',', '')) if now_value else None
+            result = data.get('chart', {}).get('result', [{}])[0]
+            meta = result.get('meta', {})
 
-            # 전일 대비 변동
-            change_el = soup.select_one('.no_exday .blind')
+            vix = meta.get('regularMarketPrice')
+            prev_close = meta.get('chartPreviousClose') or meta.get('previousClose')
+
             change = 0
-            if change_el:
-                try:
-                    change = float(change_el.text.strip().replace(',', ''))
-                except (ValueError, AttributeError):
-                    change = 0
-
-            # 상승/하락 판단
-            change_direction = 'up'
-            icon_el = soup.select_one('.no_exday img')
-            if icon_el:
-                alt_text = icon_el.get('alt', '')
-                if '하락' in alt_text:
-                    change_direction = 'down'
-                    change = -abs(change)
+            change_direction = 'unknown'
+            if vix is not None and prev_close is not None:
+                change = round(vix - prev_close, 2)
+                change_direction = 'up' if change >= 0 else 'down'
 
             return {
-                'value': vix,
+                'value': round(vix, 2) if vix else None,
                 'change': change,
                 'direction': change_direction,
                 'status': self._vix_status(vix) if vix else 'unknown'
@@ -199,8 +184,21 @@ class MarketSentiment:
         else:
             return '급락'
 
+    def _parse_naver_world_value(self, soup, selector):
+        """네이버 해외지수 숫자 파싱 (span 분리 구조 대응)"""
+        el = soup.select_one(selector)
+        if not el:
+            return None
+        em = el.find('em')
+        if em:
+            raw = em.get_text().replace(' ', '').replace('\n', '').replace('\t', '')
+            clean = re.sub(r'[^0-9.,]', '', raw)
+            if clean:
+                return float(clean.replace(',', ''))
+        return None
+
     def get_us_market(self):
-        """미국 증시 수집 (네이버 해외지수)"""
+        """미국 증시 수집 (네이버 해외지수 - span 분리 구조 대응)"""
         result = {}
         indices = {
             'S&P500': 'SPI@SPX',
@@ -214,29 +212,42 @@ class MarketSentiment:
                 response = self.session.get(url, headers=self.headers, timeout=10)
                 soup = BeautifulSoup(response.text, 'html.parser')
 
-                now_value = soup.select_one('.no_today .blind')
-                value = float(now_value.text.strip().replace(',', '')) if now_value else None
+                # 현재가 파싱 (.no_today > em > span들의 텍스트 합침)
+                value = self._parse_naver_world_value(soup, '.no_today')
 
-                change_el = soup.select_one('.no_exday .blind')
+                # 변동값/퍼센트 파싱 (.no_exday > em들)
                 change = 0
-                if change_el:
-                    try:
-                        change = float(change_el.text.strip().replace(',', ''))
-                    except (ValueError, AttributeError):
-                        change = 0
+                change_pct = 0
+                direction = 'unknown'
 
-                # 상승/하락
-                icon_el = soup.select_one('.no_exday img')
-                if icon_el and '하락' in icon_el.get('alt', ''):
-                    change = -abs(change)
+                no_exday = soup.select_one('.no_exday')
+                if no_exday:
+                    ems = no_exday.find_all('em')
+                    if len(ems) >= 1:
+                        raw = ems[0].get_text().replace(' ', '').replace('\n', '').replace('\t', '')
+                        clean = re.sub(r'[^0-9.,]', '', raw)
+                        if clean:
+                            change = float(clean.replace(',', ''))
+                        cls = ems[0].get('class', [])
+                        if 'no_down' in cls:
+                            direction = 'down'
+                            change = -abs(change)
+                        elif 'no_up' in cls:
+                            direction = 'up'
 
-                change_pct = (change / (value - change) * 100) if value and (value - change) != 0 else 0
+                    if len(ems) >= 2:
+                        raw = ems[1].get_text().replace(' ', '').replace('\n', '').replace('\t', '')
+                        pct_match = re.search(r'([0-9.]+)%', raw)
+                        if pct_match:
+                            change_pct = float(pct_match.group(1))
+                            if direction == 'down':
+                                change_pct = -change_pct
 
                 result[name] = {
                     'value': value,
-                    'change': change,
+                    'change': round(change, 2),
                     'change_pct': round(change_pct, 2),
-                    'direction': 'up' if change >= 0 else 'down',
+                    'direction': direction,
                 }
 
             except Exception as e:
@@ -297,9 +308,10 @@ class MarketSentiment:
 
         # 미국 증시 기반 점수
         for name, data in us_market.items():
-            if data['change_pct'] >= 1.0:
+            pct = data.get('change_pct') or 0
+            if pct >= 1.0:
                 score += 1
-            elif data['change_pct'] <= -1.0:
+            elif pct <= -1.0:
                 score -= 1
 
         # 모드 결정
