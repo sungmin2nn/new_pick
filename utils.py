@@ -101,7 +101,7 @@ def get_date_info(dt=None):
 
 def is_market_day(dt=None):
     """
-    주식 시장 개장일인지 확인 (주말 제외, 공휴일은 미포함)
+    주식 시장 개장일인지 확인 (주말 + 공휴일 제외)
 
     Args:
         dt: datetime 객체 (None이면 현재 시간)
@@ -109,8 +109,70 @@ def is_market_day(dt=None):
     Returns:
         bool: 개장일이면 True
     """
+    if dt is None:
+        dt = get_kst_now()
+    elif dt.tzinfo is None:
+        dt = dt.replace(tzinfo=KST)
+    elif dt.tzinfo != KST:
+        dt = dt.astimezone(KST)
+
     weekday_info = get_kst_weekday(dt)
-    return not weekday_info['is_weekend']
+    if weekday_info['is_weekend']:
+        return False
+
+    date_str = dt.strftime('%m-%d')
+    year = dt.year
+    holidays = _get_holidays(year)
+
+    return date_str not in holidays
+
+
+def _get_holidays(year):
+    """
+    해당 연도의 한국 공휴일 목록 반환 (MM-DD 형식 set)
+    음력 명절(설/추석)은 매년 달라지므로 연도별로 관리
+    """
+    # 매년 고정 공휴일
+    fixed = {
+        '01-01',  # 신정
+        '03-01',  # 삼일절
+        '05-05',  # 어린이날
+        '06-06',  # 현충일
+        '08-15',  # 광복절
+        '10-03',  # 개천절
+        '10-09',  # 한글날
+        '12-25',  # 크리스마스
+    }
+
+    # 연도별 음력 명절 + 대체공휴일 (매년 업데이트 필요)
+    variable = {
+        2025: {
+            '01-28', '01-29', '01-30',  # 설날 연휴
+            '05-05',  # 부처님오신날 (어린이날과 겹침)
+            '05-06',  # 대체공휴일
+            '09-05', '09-06', '09-07', '09-08',  # 추석 연휴 + 대체공휴일
+        },
+        2026: {
+            '02-16', '02-17', '02-18',  # 설날 연휴
+            '03-02',  # 삼일절 대체공휴일
+            '05-24',  # 부처님오신날
+            '05-25',  # 부처님오신날 대체공휴일
+            '08-17',  # 광복절 대체공휴일
+            '09-24', '09-25', '09-26',  # 추석 연휴
+            '10-05',  # 개천절 대체공휴일
+        },
+        2027: {
+            '02-05', '02-06', '02-07',  # 설날 연휴 (추정)
+            '05-13',  # 부처님오신날 (추정)
+            '09-14', '09-15', '09-16',  # 추석 연휴 (추정)
+        },
+    }
+
+    holidays = set(fixed)
+    if year in variable:
+        holidays.update(variable[year])
+
+    return holidays
 
 
 def print_current_time_info():
