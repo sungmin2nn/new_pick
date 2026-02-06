@@ -52,6 +52,17 @@ class StockScreener:
         if before_market:
             print("  ⏰ 장 시작 전: market_data에서 전일 거래대금 적용됨")
 
+        # 필터링 통계 (0개 후보 진단용)
+        filter_stats = {
+            'total': len(stocks),
+            'trading_value_fail': 0,
+            'market_cap_fail': 0,
+            'price_change_fail': 0,
+            'price_too_low': 0,
+            'price_too_high': 0,
+            'gap_filter_fail': 0,
+        }
+
         filtered = []
         for stock in stocks:
             # 극소형 제외 (거래대금 100억 미만)
@@ -62,23 +73,28 @@ class StockScreener:
                 if before_market and stock.get('market_cap', 0) >= config.MIN_MARKET_CAP * 10:
                     pass  # 시가총액이 충분히 크면 통과
                 else:
+                    filter_stats['trading_value_fail'] += 1
                     continue
 
             # 극소형 제외 (시가총액 100억 미만)
             if stock.get('market_cap', 0) < config.MIN_MARKET_CAP:
+                filter_stats['market_cap_fail'] += 1
                 continue
 
             # 폭락주 제외 (등락률 -30% 미만) - 장 시작 전에는 스킵
             if not before_market and stock.get('price_change_percent', 0) < config.MIN_PRICE_CHANGE:
+                filter_stats['price_change_fail'] += 1
                 continue
 
             # 페니스탁 제외 (100원 미만)
             current_price = stock.get('current_price', 0)
             if current_price < config.MIN_PRICE:
+                filter_stats['price_too_low'] += 1
                 continue
 
             # 극단적 고가 제외 (100만원 초과)
             if current_price > config.MAX_PRICE:
+                filter_stats['price_too_high'] += 1
                 continue
 
             # 갭 필터 (추격 매수 방지) - 장중에만 적용
@@ -87,13 +103,37 @@ class StockScreener:
                 max_gap = getattr(config, 'MAX_GAP_UP', 5.0)
                 min_gap = getattr(config, 'MIN_GAP_DOWN', -5.0)
                 if price_change > max_gap:
+                    filter_stats['gap_filter_fail'] += 1
                     continue  # 5% 이상 갭상승 제외
                 if price_change < min_gap:
+                    filter_stats['gap_filter_fail'] += 1
                     continue  # -5% 이상 갭하락 제외
 
             filtered.append(stock)
 
         print(f"  ✓ 필터링 완료: {len(filtered)}개 종목")
+
+        # 0개 후보일 경우 상세 진단 출력
+        if len(filtered) == 0:
+            print("\n⚠️  경고: 필터링 결과 0개 종목!")
+            print("  📊 필터별 제외 현황:")
+            print(f"    - 입력 종목 수: {filter_stats['total']}개")
+            print(f"    - 거래대금 100억 미만: {filter_stats['trading_value_fail']}개 제외")
+            print(f"    - 시가총액 100억 미만: {filter_stats['market_cap_fail']}개 제외")
+            print(f"    - 등락률 -30% 미만: {filter_stats['price_change_fail']}개 제외")
+            print(f"    - 가격 100원 미만: {filter_stats['price_too_low']}개 제외")
+            print(f"    - 가격 100만원 초과: {filter_stats['price_too_high']}개 제외")
+            print(f"    - 갭 필터 (±5%): {filter_stats['gap_filter_fail']}개 제외")
+
+            # 데이터 품질 체크
+            if filter_stats['total'] > 0:
+                sample = stocks[:5]
+                print("\n  🔍 데이터 샘플 (상위 5개):")
+                for s in sample:
+                    mc = s.get('market_cap', 0) / 100000000
+                    tv = s.get('trading_value', 0) / 100000000
+                    print(f"    {s.get('name', 'N/A')}: 시가총액={mc:.0f}억, 거래대금={tv:.0f}억")
+
         return filtered
 
     def fetch_news(self):
@@ -863,6 +903,17 @@ class StockScreener:
 
             # 5. 필터링 적용
             filtered_stocks = self.apply_filters(stocks)
+
+            # 0개 후보 처리
+            if not filtered_stocks:
+                print("\n❌ 필터링 후 후보 종목이 0개입니다.")
+                print("   가능한 원인:")
+                print("   1. 네이버 금융 데이터 파싱 오류 (테이블 구조 변경)")
+                print("   2. 장 시작 전 거래대금 데이터 부재")
+                print("   3. 공휴일/주말로 인한 데이터 미갱신")
+                print("\n   빈 결과 파일을 저장합니다...")
+                self.save_results([])
+                return False
 
             # 6. 점수 계산 및 순위 (시가총액 구간별 보충 포함)
             ranked_stocks = self.rank_stocks(filtered_stocks)
