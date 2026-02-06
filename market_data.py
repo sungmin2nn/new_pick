@@ -73,13 +73,15 @@ class MarketDataCollector:
                         stock_code = stock_code.group(1)
 
                         try:
-                            # 데이터 파싱
+                            # 데이터 파싱 (2026년 기준 네이버 금융 테이블 구조)
+                            # th[2]=현재가, th[3]=전일비, th[4]=등락률, th[6]=시가총액, th[9]=거래량
                             current_price = self._parse_number(cols[2].text)
                             price_change = self._parse_number(cols[3].text)
                             price_change_percent = self._parse_number(cols[4].text)
-                            volume = self._parse_number(cols[6].text)
-                            trading_value = self._parse_number(cols[7].text) * 1_000_000  # 백만원 -> 원
-                            market_cap = self._parse_number(cols[9].text) * 100_000_000  # 억원 -> 원
+                            market_cap = self._parse_number(cols[6].text) * 100_000_000  # 억원 -> 원
+                            volume = self._parse_number(cols[9].text)
+                            # 거래대금은 테이블에 없음 - 나중에 전일 데이터 또는 추정치 사용
+                            trading_value = 0  # enrich_stock_data에서 채움
 
                             stock_data = {
                                 'code': stock_code,
@@ -117,49 +119,54 @@ class MarketDataCollector:
             print("  ⏰ 장 시작 전입니다. 전일 거래대금을 기준으로 필터링합니다.")
 
         enriched = []
-        for i, stock in enumerate(stocks[:50], 1):  # 상위 50개만 (속도 제한)
+        # 상위 100개 종목에 대해 전일 거래대금 조회 (시가총액 상위)
+        fetch_count = min(100, len(stocks))
+        fetched_trading_values = 0
+
+        for i, stock in enumerate(stocks[:fetch_count], 1):
             try:
                 code = stock['code']
 
-                # 장 시작 전이고 당일 거래대금이 낮으면 전일 데이터 사용
-                if before_market and stock.get('trading_value', 0) < 1_000_000_000:  # 10억 미만
+                # 거래대금이 없거나 장 시작 전이면 전일 데이터 사용
+                if stock.get('trading_value', 0) < 1_000_000_000:  # 10억 미만
                     prev_data = self.get_previous_day_data(code)
                     if prev_data and prev_data['prev_trading_value'] > 0:
                         stock['trading_value'] = prev_data['prev_trading_value']
                         stock['volume'] = prev_data['prev_volume']
                         stock['using_prev_day_data'] = True
+                        fetched_trading_values += 1
                         if i <= 5:  # 처음 5개만 로그
                             print(f"    📊 {stock['name']}: 전일 거래대금 {prev_data['prev_trading_value']/100000000:.0f}억원 사용")
 
                 # 20일 평균 거래량 추정
-                avg_volume_20d = stock['volume'] * 0.7
+                avg_volume_20d = stock['volume'] * 0.7 if stock.get('volume', 0) > 0 else 0
                 stock['avg_volume_20d'] = avg_volume_20d
                 enriched.append(stock)
 
-                if i % 10 == 0:
-                    print(f"  - {i}/50 완료")
+                if i % 20 == 0:
+                    print(f"  - {i}/{fetch_count} 완료 (전일 거래대금 {fetched_trading_values}개 적용)")
 
-                time.sleep(0.3)
+                time.sleep(0.2)
 
             except Exception as e:
                 # 실패해도 기본 데이터는 유지
-                stock['avg_volume_20d'] = stock['volume'] * 0.7
+                stock['avg_volume_20d'] = stock.get('volume', 0) * 0.7
                 enriched.append(stock)
 
-        # 나머지 종목도 장 시작 전이면 전일 데이터 사용
-        for stock in stocks[50:]:
-            if before_market and stock.get('trading_value', 0) < 1_000_000_000:
-                # 나머지 종목은 시가총액 기반 추정 (API 호출 줄이기)
-                # 평균적으로 일 거래대금은 시가총액의 0.5~2% 수준
-                estimated_trading = stock.get('market_cap', 0) * 0.01
-                if estimated_trading > stock.get('trading_value', 0):
-                    stock['trading_value'] = estimated_trading
-                    stock['using_prev_day_data'] = True
+        print(f"  ✓ 상위 {fetch_count}개 종목 전일 거래대금 조회 완료 ({fetched_trading_values}개 적용)")
 
-            stock['avg_volume_20d'] = stock['volume'] * 0.7
+        # 나머지 종목은 시가총액 기반 추정 (API 호출 줄이기)
+        for stock in stocks[fetch_count:]:
+            # 평균적으로 일 거래대금은 시가총액의 0.5~2% 수준
+            estimated_trading = stock.get('market_cap', 0) * 0.01
+            if estimated_trading > stock.get('trading_value', 0):
+                stock['trading_value'] = estimated_trading
+                stock['using_prev_day_data'] = True
+
+            stock['avg_volume_20d'] = stock.get('volume', 0) * 0.7
             enriched.append(stock)
 
-        print(f"  ✓ 상세 정보 추가 완료")
+        print(f"  ✓ 상세 정보 추가 완료 (총 {len(enriched)}개)")
         return enriched
 
     def _parse_number(self, text):
