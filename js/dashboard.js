@@ -160,6 +160,13 @@ const Dashboard = {
 
             console.log(`[Dashboard] ${this.state.trades.length}개 거래 로드됨`);
 
+            // 거래 데이터가 없으면 안내 메시지 표시
+            if (this.state.trades.length === 0) {
+                this.showNoDataMessage();
+            } else {
+                this.hideNoDataMessage();
+            }
+
             // 2. 통계 분석
             const stats = Analytics.calculateOverallStats(
                 this.state.trades,
@@ -566,5 +573,55 @@ const Dashboard = {
     showError(message) {
         alert(message);
         this.hideLoading();
+    },
+
+    /**
+     * 데이터 없음 메시지 표시
+     */
+    showNoDataMessage() {
+        // 이미 메시지가 있으면 스킵
+        if (document.getElementById('noDataMessage')) return;
+
+        const message = document.createElement('div');
+        message.id = 'noDataMessage';
+        message.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+                border: 1px solid #ffc107;
+                border-radius: 8px;
+                padding: 1.5rem;
+                margin: 1rem 0;
+                text-align: center;
+                color: #856404;
+            ">
+                <h3 style="margin: 0 0 0.5rem 0;">📭 선택한 기간에 거래 데이터가 없습니다</h3>
+                <p style="margin: 0; font-size: 0.9rem;">
+                    • 장중 데이터(intraday)는 매일 <b>16:30 KST</b> 이후에 수집됩니다<br>
+                    • "전체" 버튼을 클릭하면 과거 데이터를 확인할 수 있습니다<br>
+                    • 오늘 선정된 종목은 위의 "오늘의 종목" 섹션에서 확인하세요
+                </p>
+            </div>
+        `;
+
+        // 오늘의 종목 섹션 아래에 삽입
+        const todaySection = document.querySelector('.today-section');
+        if (todaySection) {
+            todaySection.insertAdjacentElement('afterend', message);
+        } else {
+            const mainContent = document.querySelector('main');
+            if (mainContent) {
+                mainContent.insertBefore(message, mainContent.firstChild);
+            }
+        }
+    },
+
+    /**
+     * 데이터 없음 메시지 숨기기
+     */
+    hideNoDataMessage() {
+        const message = document.getElementById('noDataMessage');
+        if (message) {
+            message.remove();
+        }
     }
 };
