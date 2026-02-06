@@ -495,9 +495,23 @@ const Analytics = {
      */
     async getTodayStocksWithEntryCheck() {
         try {
-            // 최신 intraday 파일 찾기
+            // 1. 먼저 morning_candidates.json에서 오늘 날짜 확인
+            let morningData = null;
+            let morningDate = null;
+            try {
+                const morningResponse = await fetch('data/morning_candidates.json');
+                if (morningResponse.ok) {
+                    morningData = await morningResponse.json();
+                    morningDate = morningData.date; // "2026-02-06" 형식
+                }
+            } catch (e) {
+                console.log('[Analytics] morning_candidates.json 로드 실패');
+            }
+
+            // 2. 오늘 날짜의 intraday 파일 탐색
             const today = new Date();
             let intradayData = null;
+            let intradayDateStr = null;
 
             // 최근 7일 내 데이터 탐색
             for (let i = 0; i < 7; i++) {
@@ -509,6 +523,7 @@ const Analytics = {
                     const response = await fetch(`data/intraday/intraday_${dateStr}.json`);
                     if (response.ok) {
                         intradayData = await response.json();
+                        intradayDateStr = dateStr;
                         break;
                     }
                 } catch (e) {
@@ -516,6 +531,32 @@ const Analytics = {
                 }
             }
 
+            // 3. morning_candidates가 intraday보다 최신이면 morning_candidates 사용
+            if (morningData && morningDate) {
+                const morningDateClean = morningDate.replace(/-/g, ''); // "20260206"
+
+                // intraday가 없거나, morning이 더 최신이면 morning 사용
+                if (!intradayData || (intradayDateStr && morningDateClean > intradayDateStr)) {
+                    console.log('[Analytics] morning_candidates.json 사용 (더 최신):', morningDate);
+
+                    const candidates = morningData.candidates || [];
+                    return candidates.map(stock => ({
+                        date: morningDate,
+                        code: stock.code,
+                        name: stock.name,
+                        score: stock.total_score || 0,
+                        reason: stock.selection_reason || '-',
+                        shouldBuy: true, // 장전 선정 종목은 기본 매수
+                        skipReason: null,
+                        entryPrice: stock.current_price,
+                        entryTime: null,
+                        actualResult: null, // 아직 결과 없음
+                        virtualResult: null
+                    }));
+                }
+            }
+
+            // 4. intraday 데이터 사용 (기존 로직)
             if (!intradayData || !intradayData.stocks) {
                 return [];
             }
