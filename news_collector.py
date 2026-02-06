@@ -15,17 +15,40 @@ class NewsCollector:
         }
         self.session = requests.Session()
 
-        # 긍정/부정 키워드 사전
-        self.positive_keywords = [
-            '급등', '상승', '호재', '신고가', '강세', '증가', '성장', '확대',
-            '수주', '계약', '흑자', '개선', '돌파', '상승세', '랠리', '최고',
-            '긍정', '호조', '상향', '목표가', '매수', '투자의견'
+        # 긍정/부정 키워드 사전 (오탐 방지를 위해 구체화)
+        # 강한 긍정 (가중치 2)
+        self.strong_positive_keywords = [
+            '급등', '폭등', '신고가', '52주 신고가', '역대 최고', '사상 최고',
+            '대규모 수주', '대형 계약', '실적 호조', '어닝 서프라이즈',
+            '목표가 상향', '투자의견 상향', '매수 추천', '강력 매수',
+            '흑자 전환', '실적 개선', 'FDA 승인', '허가 획득'
         ]
 
+        # 일반 긍정 (가중치 1)
+        self.positive_keywords = [
+            '상승세', '강세', '호재', '수주', '계약 체결', '공급 계약',
+            '증가세', '성장세', '확대', '개선', '돌파', '랠리',
+            '호조', '상향 조정', '긍정적', '매출 증가', '이익 증가'
+        ]
+
+        # 강한 부정 (가중치 2)
+        self.strong_negative_keywords = [
+            '급락', '폭락', '신저가', '52주 신저가', '역대 최저', '사상 최저',
+            '대규모 손실', '적자 전환', '실적 쇼크', '어닝 쇼크',
+            '목표가 하향', '투자의견 하향', '매도 추천', '파산', '상장폐지',
+            '회계 부정', '횡령', '배임', '분식회계'
+        ]
+
+        # 일반 부정 (가중치 1)
         self.negative_keywords = [
-            '급락', '하락', '악재', '신저가', '약세', '감소', '축소', '적자',
-            '부진', '우려', '경고', '하락세', '최저', '부정', '하향', '매도',
-            '손실', '적자', '파산', '구조조정'
+            '하락세', '약세', '악재', '감소', '축소', '적자',
+            '부진', '우려', '경고', '하향 조정', '부정적',
+            '손실', '구조조정', '감원', '매출 감소', '이익 감소'
+        ]
+
+        # 오탐 방지: 부정문 앞에 붙는 키워드 (무시)
+        self.negation_patterns = [
+            '없이', '아닌', '못한', '않고', '않은', '제외', '불구'
         ]
 
     def _parse_news_time(self, time_str):
@@ -58,14 +81,59 @@ class NewsCollector:
         return yesterday_18 <= news_time <= today_0830
 
     def _analyze_sentiment(self, text):
-        """뉴스 감성 분석 (긍정/부정/중립)"""
-        positive_count = sum(1 for keyword in self.positive_keywords if keyword in text)
-        negative_count = sum(1 for keyword in self.negative_keywords if keyword in text)
+        """
+        뉴스 감성 분석 (긍정/부정/중립)
+        - 강한 키워드는 가중치 2, 일반 키워드는 가중치 1
+        - 부정문 패턴 앞에 있는 키워드는 무시
+        """
+        positive_score = 0
+        negative_score = 0
+        matched_positive = []
+        matched_negative = []
 
-        if positive_count > negative_count:
-            return 'positive', positive_count - negative_count
-        elif negative_count > positive_count:
-            return 'negative', negative_count - positive_count
+        # 강한 긍정 키워드 (가중치 2)
+        for keyword in self.strong_positive_keywords:
+            if keyword in text:
+                # 부정문 패턴 체크
+                idx = text.find(keyword)
+                context = text[max(0, idx-5):idx]
+                if not any(neg in context for neg in self.negation_patterns):
+                    positive_score += 2
+                    matched_positive.append(keyword)
+
+        # 일반 긍정 키워드 (가중치 1)
+        for keyword in self.positive_keywords:
+            if keyword in text:
+                idx = text.find(keyword)
+                context = text[max(0, idx-5):idx]
+                if not any(neg in context for neg in self.negation_patterns):
+                    positive_score += 1
+                    matched_positive.append(keyword)
+
+        # 강한 부정 키워드 (가중치 2)
+        for keyword in self.strong_negative_keywords:
+            if keyword in text:
+                idx = text.find(keyword)
+                context = text[max(0, idx-5):idx]
+                if not any(neg in context for neg in self.negation_patterns):
+                    negative_score += 2
+                    matched_negative.append(keyword)
+
+        # 일반 부정 키워드 (가중치 1)
+        for keyword in self.negative_keywords:
+            if keyword in text:
+                idx = text.find(keyword)
+                context = text[max(0, idx-5):idx]
+                if not any(neg in context for neg in self.negation_patterns):
+                    negative_score += 1
+                    matched_negative.append(keyword)
+
+        # 점수 차이로 판단 (최소 2점 차이 필요)
+        diff = positive_score - negative_score
+        if diff >= 2:
+            return 'positive', diff
+        elif diff <= -2:
+            return 'negative', abs(diff)
         else:
             return 'neutral', 0
 
