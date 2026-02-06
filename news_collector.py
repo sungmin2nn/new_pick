@@ -69,16 +69,54 @@ class NewsCollector:
             return None
 
     def _is_relevant_time(self, pub_time_str):
-        """전일 18:00 ~ 당일 08:30 사이 뉴스인지 확인"""
+        """
+        장전 종목 선정에 유효한 뉴스 시간인지 확인
+        - 전일 15:00 ~ 당일 09:00 (장후~장전 전체)
+        - 장중 뉴스(09:00~15:00)는 전일 것만 포함
+        """
         news_time = self._parse_news_time(pub_time_str)
         if not news_time:
             return True  # 시간 파싱 실패 시 포함
 
         now = datetime.now()
-        yesterday_18 = (now - timedelta(days=1)).replace(hour=18, minute=0, second=0, microsecond=0)
-        today_0830 = now.replace(hour=8, minute=30, second=0, microsecond=0)
 
-        return yesterday_18 <= news_time <= today_0830
+        # 현재 시간이 09:00 이전 (장전)
+        if now.hour < 9:
+            # 전일 15:00 ~ 당일 현재 시간
+            yesterday_15 = (now - timedelta(days=1)).replace(hour=15, minute=0, second=0, microsecond=0)
+            return yesterday_15 <= news_time <= now
+        else:
+            # 장중/장후: 전일 15:00 ~ 당일 09:00
+            yesterday_15 = (now - timedelta(days=1)).replace(hour=15, minute=0, second=0, microsecond=0)
+            today_0900 = now.replace(hour=9, minute=0, second=0, microsecond=0)
+            return yesterday_15 <= news_time <= today_0900
+
+    def _get_news_timing_category(self, pub_time_str):
+        """
+        뉴스 시간대 분류 (점수화용)
+        - morning: 당일 06:00~08:30 (장전 최고)
+        - evening: 전일 18:00~24:00 (장후)
+        - afternoon: 전일 15:00~18:00 (장중 후반)
+        - other: 기타
+        """
+        news_time = self._parse_news_time(pub_time_str)
+        if not news_time:
+            return 'other'
+
+        now = datetime.now()
+        hour = news_time.hour
+
+        # 당일 뉴스인지 확인
+        is_today = news_time.date() == now.date()
+
+        if is_today and 6 <= hour < 9:
+            return 'morning'  # 장전 (당일 06:00~09:00)
+        elif not is_today and 18 <= hour <= 23:
+            return 'evening'  # 장후 (전일 18:00~24:00)
+        elif not is_today and 15 <= hour < 18:
+            return 'afternoon'  # 장중 후반 (전일 15:00~18:00)
+        else:
+            return 'other'
 
     def _analyze_sentiment(self, text):
         """
@@ -182,13 +220,16 @@ class NewsCollector:
                             time_tag = summary_dd.find('span', {'class': 'wdate'})
                             pub_time = time_tag.text.strip() if time_tag else ''
 
-                        # 시간 필터링 (전일 18:00 ~ 당일 08:30)
+                        # 시간 필터링 (전일 15:00 ~ 당일 09:00)
                         if not self._is_relevant_time(pub_time):
                             continue
 
                         # 감성 분석
                         full_text = title + ' ' + summary
                         sentiment, score = self._analyze_sentiment(full_text)
+
+                        # 시간대 분류 (점수화용)
+                        timing_category = self._get_news_timing_category(pub_time)
 
                         all_news.append({
                             'title': title,
@@ -197,7 +238,8 @@ class NewsCollector:
                             'pub_time': pub_time,
                             'source': 'naver_stock',
                             'sentiment': sentiment,
-                            'sentiment_score': score
+                            'sentiment_score': score,
+                            'timing_category': timing_category
                         })
 
                     except Exception as e:
@@ -248,13 +290,16 @@ class NewsCollector:
                             time_tag = summary_dd.find('span', {'class': 'wdate'})
                             pub_time = time_tag.text.strip() if time_tag else ''
 
-                        # 시간 필터링
+                        # 시간 필터링 (전일 15:00 ~ 당일 09:00)
                         if not self._is_relevant_time(pub_time):
                             continue
 
                         # 감성 분석
                         full_text = title + ' ' + summary
                         sentiment, score = self._analyze_sentiment(full_text)
+
+                        # 시간대 분류 (점수화용)
+                        timing_category = self._get_news_timing_category(pub_time)
 
                         all_news.append({
                             'title': title,
@@ -263,7 +308,8 @@ class NewsCollector:
                             'pub_time': pub_time,
                             'source': 'naver_featured',
                             'sentiment': sentiment,
-                            'sentiment_score': score
+                            'sentiment_score': score,
+                            'timing_category': timing_category
                         })
 
                     except Exception as e:
