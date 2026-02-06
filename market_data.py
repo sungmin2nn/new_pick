@@ -122,6 +122,8 @@ class MarketDataCollector:
         # 상위 100개 종목에 대해 전일 거래대금 조회 (시가총액 상위)
         fetch_count = min(100, len(stocks))
         fetched_trading_values = 0
+        # 상위 30개 종목에 대해서만 실제 20일 평균 거래량 계산 (속도 제한)
+        avg_volume_fetch_count = min(30, fetch_count)
 
         for i, stock in enumerate(stocks[:fetch_count], 1):
             try:
@@ -138,22 +140,36 @@ class MarketDataCollector:
                         if i <= 5:  # 처음 5개만 로그
                             print(f"    📊 {stock['name']}: 전일 거래대금 {prev_data['prev_trading_value']/100000000:.0f}억원 사용")
 
-                # 20일 평균 거래량 추정
-                avg_volume_20d = stock['volume'] * 0.7 if stock.get('volume', 0) > 0 else 0
-                stock['avg_volume_20d'] = avg_volume_20d
+                # 20일 평균 거래량 계산 (상위 30개만 실제 계산)
+                if i <= avg_volume_fetch_count:
+                    avg_volume_20d = self.get_avg_volume_20d(code)
+                    if avg_volume_20d > 0:
+                        stock['avg_volume_20d'] = avg_volume_20d
+                        stock['avg_volume_20d_actual'] = True
+                    else:
+                        # 실패 시 추정치 사용
+                        stock['avg_volume_20d'] = stock.get('volume', 0) * 0.7
+                        stock['avg_volume_20d_actual'] = False
+                else:
+                    # 나머지는 추정치 사용
+                    stock['avg_volume_20d'] = stock.get('volume', 0) * 0.7
+                    stock['avg_volume_20d_actual'] = False
+
                 enriched.append(stock)
 
                 if i % 20 == 0:
                     print(f"  - {i}/{fetch_count} 완료 (전일 거래대금 {fetched_trading_values}개 적용)")
 
-                time.sleep(0.2)
+                time.sleep(0.15)
 
             except Exception as e:
                 # 실패해도 기본 데이터는 유지
                 stock['avg_volume_20d'] = stock.get('volume', 0) * 0.7
+                stock['avg_volume_20d_actual'] = False
                 enriched.append(stock)
 
         print(f"  ✓ 상위 {fetch_count}개 종목 전일 거래대금 조회 완료 ({fetched_trading_values}개 적용)")
+        print(f"  ✓ 상위 {avg_volume_fetch_count}개 종목 20일 평균거래량 실제 계산 완료")
 
         # 나머지 종목은 시가총액 기반 추정 (API 호출 줄이기)
         for stock in stocks[fetch_count:]:
@@ -164,6 +180,7 @@ class MarketDataCollector:
                 stock['using_prev_day_data'] = True
 
             stock['avg_volume_20d'] = stock.get('volume', 0) * 0.7
+            stock['avg_volume_20d_actual'] = False
             enriched.append(stock)
 
         print(f"  ✓ 상세 정보 추가 완료 (총 {len(enriched)}개)")
@@ -218,6 +235,43 @@ class MarketDataCollector:
             return None
         except Exception as e:
             return None
+
+    def get_avg_volume_20d(self, stock_code):
+        """종목의 20일 평균 거래량 계산 (일별 시세 페이지에서)"""
+        try:
+            volumes = []
+            # 20일 데이터를 얻으려면 2~3페이지 필요 (페이지당 약 10일)
+            for page in range(1, 4):
+                url = f'https://finance.naver.com/item/sise_day.naver?code={stock_code}&page={page}'
+                response = self.session.get(url, headers=self.headers, timeout=10)
+                soup = BeautifulSoup(response.text, 'html.parser')
+
+                table = soup.find('table', {'class': 'type2'})
+                if not table:
+                    break
+
+                rows = table.find_all('tr')
+                for row in rows:
+                    cols = row.find_all('td')
+                    if len(cols) >= 7:
+                        date_text = cols[0].text.strip()
+                        if date_text and '.' in date_text:
+                            volume = self._parse_number(cols[6].text)
+                            if volume > 0:
+                                volumes.append(volume)
+                                if len(volumes) >= 20:
+                                    break
+
+                if len(volumes) >= 20:
+                    break
+                time.sleep(0.1)  # 요청 간격
+
+            if volumes:
+                return sum(volumes) / len(volumes)
+            return 0
+
+        except Exception as e:
+            return 0
 
     def get_market_data(self):
         """전체 시장 데이터 수집 (메인 함수)"""
