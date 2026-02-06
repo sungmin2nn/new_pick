@@ -7,14 +7,12 @@ VIX 지수, 원달러 환율, 코스피200 선물 데이터를 수집하여
 import requests
 from bs4 import BeautifulSoup
 import re
-from utils import format_kst_time
+from utils import format_kst_time, get_headers
 
 
 class MarketSentiment:
     def __init__(self):
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-        }
+        self.headers = get_headers()  # 랜덤 User-Agent 사용
         self.session = requests.Session()
 
     def get_vix(self):

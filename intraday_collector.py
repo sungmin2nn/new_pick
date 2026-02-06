@@ -10,13 +10,13 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
-from utils import get_kst_now, format_kst_time
+from utils import get_kst_now, format_kst_time, get_random_user_agent
 
 class IntradayCollector:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': get_random_user_agent(),  # 랜덤 User-Agent 사용
             'Referer': 'https://finance.naver.com/'
         })
 

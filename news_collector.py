@@ -7,12 +7,11 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import time
 import re
+from utils import get_headers
 
 class NewsCollector:
     def __init__(self):
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-        }
+        self.headers = get_headers()  # 랜덤 User-Agent 사용
         self.session = requests.Session()
 
         # 긍정/부정 키워드 사전 (오탐 방지를 위해 구체화)

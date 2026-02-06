@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import time
 import re
 from datetime import datetime, timedelta, timezone
+from utils import get_headers, get_random_user_agent
 
 # 한국 시간대 (UTC+9)
 KST = timezone(timedelta(hours=9))
@@ -21,9 +22,7 @@ def is_before_market_open():
 
 class MarketDataCollector:
     def __init__(self):
-        self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-        }
+        self.headers = get_headers()  # 랜덤 User-Agent 사용
         self.session = requests.Session()
 
     def get_kospi_kosdaq_list(self):
