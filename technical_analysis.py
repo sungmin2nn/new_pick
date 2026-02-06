@@ -40,8 +40,8 @@ class TechnicalAnalyzer:
                 today = get_kst_now()
                 date_str = today.strftime('%Y%m%d')
 
-            # 120일 전부터 데이터 조회 (60일선 + 여유)
-            from_date = (datetime.strptime(date_str, '%Y%m%d') - timedelta(days=180)).strftime('%Y%m%d')
+            # 52주(365일) + 여유분 데이터 조회 (52주 고/저가 계산용)
+            from_date = (datetime.strptime(date_str, '%Y%m%d') - timedelta(days=400)).strftime('%Y%m%d')
 
             df = self.pykrx_stock.get_market_ohlcv_by_date(from_date, date_str, stock_code)
 
