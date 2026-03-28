@@ -1,8 +1,7 @@
 """
 가상 매매 시뮬레이터
-- 시가 매수 시뮬레이션
-- 익절/손절 체크
-- 일일 결과 기록
+- 당일: 분봉 기반 정확한 체결 시간 (intraday_collector 활용)
+- 과거: 일봉 기반 시뮬레이션 (백테스트용)
 """
 
 import sys
@@ -17,6 +16,14 @@ from pykrx import stock
 import pandas as pd
 
 from .selector import StockCandidate
+
+# 기존 intraday_collector 활용
+try:
+    from intraday_collector import IntradayCollector
+    INTRADAY_AVAILABLE = True
+except ImportError:
+    INTRADAY_AVAILABLE = False
+    print("[Simulator] Warning: intraday_collector not available, using daily data only")
 
 
 @dataclass
@@ -34,6 +41,8 @@ class TradeResult:
     exit_time: str = ""
     high_price: int = 0
     low_price: int = 0
+    max_profit_pct: float = 0  # 장중 최대 수익률
+    max_loss_pct: float = 0    # 장중 최대 손실률
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -44,7 +53,7 @@ class TradingSimulator:
     페이퍼 트레이딩 시뮬레이터
 
     매매 규칙:
-    - 진입: 당일 시가 매수
+    - 진입: 당일 시가 매수 (09:00~09:05)
     - 익절: +3% 도달 시 즉시 청산
     - 손절: -1.5% 도달 시 즉시 청산
     - 시간 청산: 14:30 이후 종가 청산
@@ -62,15 +71,23 @@ class TradingSimulator:
         self.results: List[TradeResult] = []
         self.trade_date: str = ""
 
+        # 분봉 수집기 초기화
+        if INTRADAY_AVAILABLE:
+            self.intraday = IntradayCollector()
+        else:
+            self.intraday = None
+
     def simulate_day(self,
                      candidates: List[StockCandidate],
-                     date: str = None) -> List[TradeResult]:
+                     date: str = None,
+                     use_intraday: bool = True) -> List[TradeResult]:
         """
         하루 매매 시뮬레이션
 
         Args:
             candidates: 선정된 종목 리스트
             date: 매매일 (YYYYMMDD)
+            use_intraday: 분봉 데이터 사용 여부 (당일만 가능)
 
         Returns:
             매매 결과 리스트
@@ -82,6 +99,18 @@ class TradingSimulator:
             print("[Simulator] 매매 대상 종목 없음")
             return []
 
+        # 당일 여부 확인
+        today = datetime.now().strftime("%Y%m%d")
+        is_today = (self.trade_date == today)
+
+        # 분봉 사용 가능 여부
+        can_use_intraday = (
+            use_intraday and
+            INTRADAY_AVAILABLE and
+            self.intraday and
+            is_today
+        )
+
         # 종목당 투자금액 계산
         num_stocks = min(len(candidates), self.MAX_STOCKS)
         amount_per_stock = self.capital // num_stocks
@@ -91,10 +120,15 @@ class TradingSimulator:
         print(f"  자본금: {self.capital:,}원")
         print(f"  종목수: {num_stocks}개")
         print(f"  종목당: {amount_per_stock:,}원")
+        print(f"  데이터: {'분봉 (정확한 시간)' if can_use_intraday else '일봉 (추정 시간)'}")
         print(f"{'='*50}")
 
         for candidate in candidates[:self.MAX_STOCKS]:
-            result = self._simulate_trade(candidate, amount_per_stock)
+            if can_use_intraday:
+                result = self._simulate_trade_intraday(candidate, amount_per_stock)
+            else:
+                result = self._simulate_trade_daily(candidate, amount_per_stock)
+
             if result:
                 self.results.append(result)
 
@@ -103,11 +137,109 @@ class TradingSimulator:
 
         return self.results
 
-    def _simulate_trade(self,
-                        candidate: StockCandidate,
-                        investment: int) -> Optional[TradeResult]:
+    def _simulate_trade_intraday(self,
+                                  candidate: StockCandidate,
+                                  investment: int) -> Optional[TradeResult]:
         """
-        개별 종목 매매 시뮬레이션
+        분봉 기반 매매 시뮬레이션 (정확한 체결 시간)
+
+        Args:
+            candidate: 종목 후보
+            investment: 투자 금액
+
+        Returns:
+            매매 결과
+        """
+        code = candidate.code
+        name = candidate.name
+
+        try:
+            # intraday_collector의 analyze_profit_loss 활용
+            analysis = self.intraday.analyze_profit_loss(
+                code,
+                self.trade_date,
+                profit_target=self.PROFIT_TARGET,
+                loss_target=self.LOSS_TARGET,
+                avg_volume_20d=0
+            )
+
+            if not analysis:
+                print(f"  [{name}] 분봉 데이터 없음 - 스킵")
+                return None
+
+            # 매수 조건 확인
+            entry_check = analysis.get('entry_check', {})
+            entry_price = entry_check.get('entry_price', 0) or analysis.get('opening_price', 0)
+            entry_time = entry_check.get('entry_time', '09:00:00')
+
+            if entry_price == 0:
+                print(f"  [{name}] 진입가 0원 - 스킵")
+                return None
+
+            # 매수 수량 계산
+            quantity = investment // entry_price
+            if quantity == 0:
+                print(f"  [{name}] 매수 불가 (금액 부족)")
+                return None
+
+            # 결과 추출
+            virtual_result = analysis.get('actual_result') or analysis.get('virtual_result', {})
+            first_hit = virtual_result.get('first_hit', 'none')
+            first_hit_time = virtual_result.get('first_hit_time', '')
+            first_hit_price = virtual_result.get('first_hit_price', 0)
+            closing_price = virtual_result.get('closing_price', entry_price)
+
+            # 청산 유형 및 가격 결정
+            if first_hit == 'profit':
+                exit_price = first_hit_price or int(entry_price * (1 + self.PROFIT_TARGET / 100))
+                exit_type = 'profit'
+                exit_time = first_hit_time or '10:00:00'
+            elif first_hit == 'loss':
+                exit_price = first_hit_price or int(entry_price * (1 + self.LOSS_TARGET / 100))
+                exit_type = 'loss'
+                exit_time = first_hit_time or '09:30:00'
+            else:
+                exit_price = closing_price
+                exit_type = 'close'
+                exit_time = '15:20:00'
+
+            # 수익률 계산
+            return_pct = (exit_price - entry_price) / entry_price * 100
+            return_amount = int((exit_price - entry_price) * quantity)
+
+            result = TradeResult(
+                code=code,
+                name=name,
+                entry_price=entry_price,
+                exit_price=exit_price,
+                quantity=quantity,
+                return_pct=round(return_pct, 2),
+                return_amount=return_amount,
+                exit_type=exit_type,
+                entry_time=entry_time[:5] if entry_time else "09:00",
+                exit_time=exit_time[:5] if exit_time else "",
+                high_price=0,
+                low_price=0,
+                max_profit_pct=round(virtual_result.get('max_profit_percent', 0), 2),
+                max_loss_pct=round(virtual_result.get('max_loss_percent', 0), 2)
+            )
+
+            # 개별 결과 출력
+            emoji = "+" if return_pct > 0 else "-" if return_pct < 0 else "="
+            print(f"  [{name}] {entry_price:,}원 → {exit_price:,}원 ({return_pct:+.2f}%) [{exit_type}@{exit_time[:5]}] {emoji}")
+
+            return result
+
+        except Exception as e:
+            print(f"  [{name}] 분봉 시뮬레이션 오류: {e}")
+            # 일봉 fallback
+            return self._simulate_trade_daily(candidate, investment)
+
+    def _simulate_trade_daily(self,
+                               candidate: StockCandidate,
+                               investment: int) -> Optional[TradeResult]:
+        """
+        일봉 기반 매매 시뮬레이션 (백테스트용, 추정 시간)
 
         Args:
             candidate: 종목 후보
@@ -148,7 +280,7 @@ class TradingSimulator:
             loss_price = open_price * (1 + self.LOSS_TARGET / 100)
 
             # 청산 시뮬레이션
-            exit_price, exit_type, exit_time = self._determine_exit(
+            exit_price, exit_type, exit_time = self._determine_exit_daily(
                 open_price, high_price, low_price, close_price,
                 profit_price, loss_price
             )
@@ -156,6 +288,10 @@ class TradingSimulator:
             # 수익률 계산
             return_pct = (exit_price - open_price) / open_price * 100
             return_amount = int((exit_price - open_price) * quantity)
+
+            # 장중 최대 수익/손실
+            max_profit_pct = (high_price - open_price) / open_price * 100 if open_price > 0 else 0
+            max_loss_pct = (low_price - open_price) / open_price * 100 if open_price > 0 else 0
 
             result = TradeResult(
                 code=code,
@@ -169,12 +305,14 @@ class TradingSimulator:
                 entry_time="09:00",
                 exit_time=exit_time,
                 high_price=high_price,
-                low_price=low_price
+                low_price=low_price,
+                max_profit_pct=round(max_profit_pct, 2),
+                max_loss_pct=round(max_loss_pct, 2)
             )
 
             # 개별 결과 출력
             emoji = "+" if return_pct > 0 else "-" if return_pct < 0 else "="
-            print(f"  [{name}] {open_price:,}원 → {exit_price:,}원 ({return_pct:+.2f}%) [{exit_type}] {emoji}")
+            print(f"  [{name}] {open_price:,}원 → {exit_price:,}원 ({return_pct:+.2f}%) [{exit_type}@{exit_time}] {emoji}")
 
             return result
 
@@ -182,15 +320,15 @@ class TradingSimulator:
             print(f"  [{name}] 오류: {e}")
             return None
 
-    def _determine_exit(self,
-                        open_p: int,
-                        high_p: int,
-                        low_p: int,
-                        close_p: int,
-                        profit_p: float,
-                        loss_p: float) -> tuple:
+    def _determine_exit_daily(self,
+                               open_p: int,
+                               high_p: int,
+                               low_p: int,
+                               close_p: int,
+                               profit_p: float,
+                               loss_p: float) -> tuple:
         """
-        청산 유형 결정
+        일봉 기반 청산 유형 결정 (추정 시간)
 
         로직:
         1. 고가가 익절가 이상 → 익절 (+3%)
@@ -282,7 +420,7 @@ class TradingSimulator:
                         end_date: str,
                         selector) -> List[dict]:
         """
-        기간 백테스트
+        기간 백테스트 (일봉 기반)
 
         Args:
             start_date: 시작일 (YYYYMMDD)
@@ -294,6 +432,7 @@ class TradingSimulator:
         """
         print(f"\n{'='*60}")
         print(f"[Simulator] 기간 백테스트: {start_date} ~ {end_date}")
+        print(f"  (과거 데이터는 일봉 기반 추정 시간 사용)")
         print(f"{'='*60}")
 
         # 거래일 목록 조회
@@ -312,8 +451,8 @@ class TradingSimulator:
                 # 종목 선정
                 candidates = selector.select_stocks(date)
 
-                # 매매 시뮬레이션
-                self.simulate_day(candidates, date)
+                # 매매 시뮬레이션 (백테스트는 일봉 사용)
+                self.simulate_day(candidates, date, use_intraday=False)
 
                 # 결과 저장
                 summary = self.get_daily_summary()
