@@ -232,6 +232,91 @@
             padding: 40px;
             color: #8892b0;
         }
+
+        /* Strategy Select */
+        .control-bar select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+            background: #16213e;
+            color: #e4e4e4;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        /* Strategy Comparison Grid */
+        .strategy-comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .strategy-card {
+            background: rgba(22, 33, 62, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #2a2a4a;
+            transition: all 0.3s;
+        }
+        .strategy-card:hover {
+            border-color: #00d9ff;
+            transform: translateY(-3px);
+        }
+        .strategy-card.best {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+        .strategy-card .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        .strategy-card .strategy-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #00d9ff;
+        }
+        .strategy-card .strategy-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .strategy-card .badge-best {
+            background: #00ff88;
+            color: #1a1a2e;
+        }
+        .strategy-card .strategy-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .strategy-card .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .strategy-card .stat-item .value {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .strategy-card .stat-item .label {
+            font-size: 0.8em;
+            color: #8892b0;
+        }
+        .strategy-card .candidates-list {
+            font-size: 0.9em;
+        }
+        .strategy-card .candidate-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
@@ -240,20 +325,31 @@
         <header class="header">
             <div>
                 <h1>📊 페이퍼 트레이딩 대시보드</h1>
-                <div class="subtitle">대형주 역추세 전략 | 실시간 모니터링</div>
+                <div class="subtitle">다중 전략 비교 | 실시간 모니터링</div>
             </div>
             <nav class="nav-links">
-                <a href="index.html">메인 대시보드</a>
                 <a href="system_guide.html">시스템 가이드</a>
             </nav>
         </header>
 
         <!-- Control Bar -->
         <div class="control-bar">
+            <select id="strategySelect" onchange="onStrategyChange()">
+                <option value="all">📊 전체 전략 비교</option>
+                <option value="largecap_contrarian">대형주 역추세</option>
+                <option value="momentum">모멘텀 추세</option>
+                <option value="theme_policy">테마/정책</option>
+            </select>
             <input type="date" id="selectDate" />
             <button class="btn-secondary" onclick="loadHistoryData()">히스토리 조회</button>
             <button class="btn-primary" onclick="loadTodayData()">오늘 데이터</button>
             <button class="btn-refresh" onclick="triggerManualCheck()">🔄 수동 체크</button>
+        </div>
+
+        <!-- Strategy Comparison (전체 선택시 표시) -->
+        <div class="section" id="strategyComparison" style="display: none;">
+            <h2>⚔️ 전략 비교</h2>
+            <div id="comparisonGrid" class="strategy-comparison-grid"></div>
         </div>
 
         <!-- Stats -->
@@ -316,6 +412,7 @@
 
     <script>
         let performanceChart = null;
+        let currentStrategy = 'all';
 
         // 오늘 날짜 설정
         document.addEventListener('DOMContentLoaded', () => {
@@ -324,8 +421,30 @@
             loadTodayData();
         });
 
+        // 전략 변경
+        function onStrategyChange() {
+            currentStrategy = document.getElementById('strategySelect').value;
+            const comparisonSection = document.getElementById('strategyComparison');
+
+            if (currentStrategy === 'all') {
+                comparisonSection.style.display = 'block';
+            } else {
+                comparisonSection.style.display = 'none';
+            }
+
+            loadTodayData();
+        }
+
         // 오늘 데이터 로드
         async function loadTodayData() {
+            const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+
+            if (currentStrategy === 'all') {
+                await loadMultiStrategyData(today);
+            } else {
+                await loadSingleStrategyData(today, currentStrategy);
+            }
+
             await loadPaperTradingData();
             await loadLiveStatus();
         }
@@ -338,8 +457,146 @@
                 return;
             }
             const dateStr = dateInput.replace(/-/g, '');
+
+            if (currentStrategy === 'all') {
+                await loadMultiStrategyData(dateStr);
+            } else {
+                await loadSingleStrategyData(dateStr, currentStrategy);
+            }
+
             await loadPaperTradingData(dateStr);
             await loadLiveStatus(dateStr);
+        }
+
+        // 다중 전략 데이터 로드
+        async function loadMultiStrategyData(dateStr) {
+            try {
+                const response = await fetch(`data/paper_trading/candidates_${dateStr}_all.json?t=${Date.now()}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displayStrategyComparison(data);
+                } else {
+                    document.getElementById('comparisonGrid').innerHTML = '<div class="no-data">해당 날짜의 데이터가 없습니다</div>';
+                }
+            } catch (error) {
+                console.log('Multi-strategy load error:', error);
+            }
+        }
+
+        // 단일 전략 데이터 로드
+        async function loadSingleStrategyData(dateStr, strategyId) {
+            try {
+                const response = await fetch(`data/paper_trading/candidates_${dateStr}_${strategyId}.json?t=${Date.now()}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    displaySingleStrategy(data);
+                }
+            } catch (error) {
+                console.log('Single strategy load error:', error);
+            }
+        }
+
+        // 전략 비교 표시
+        function displayStrategyComparison(data) {
+            const grid = document.getElementById('comparisonGrid');
+            const strategies = data.strategies || {};
+
+            if (Object.keys(strategies).length === 0) {
+                grid.innerHTML = '<div class="no-data">전략 데이터가 없습니다</div>';
+                return;
+            }
+
+            // 수익률 기준 최고 전략 찾기
+            let bestStrategy = null;
+            let bestReturn = -Infinity;
+            for (const [id, result] of Object.entries(strategies)) {
+                const ret = result.simulation?.total_return || 0;
+                if (ret > bestReturn) {
+                    bestReturn = ret;
+                    bestStrategy = id;
+                }
+            }
+
+            let html = '';
+            for (const [id, result] of Object.entries(strategies)) {
+                const isBest = id === bestStrategy && bestReturn > 0;
+                const sim = result.simulation || {};
+                const candidates = result.candidates || [];
+
+                html += `
+                    <div class="strategy-card ${isBest ? 'best' : ''}">
+                        <div class="strategy-header">
+                            <span class="strategy-name">${result.strategy_name || id}</span>
+                            ${isBest ? '<span class="strategy-badge badge-best">🏆 최고</span>' : ''}
+                        </div>
+                        <div class="strategy-stats">
+                            <div class="stat-item">
+                                <div class="value">${candidates.length}</div>
+                                <div class="label">종목 수</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="value ${sim.total_return > 0 ? 'positive' : sim.total_return < 0 ? 'negative' : ''}">${sim.total_return ? sim.total_return.toFixed(2) + '%' : '-'}</div>
+                                <div class="label">수익률</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="value">${sim.win_rate ? sim.win_rate.toFixed(0) + '%' : '-'}</div>
+                                <div class="label">승률</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="value">${sim.total_trades || '-'}</div>
+                                <div class="label">거래 수</div>
+                            </div>
+                        </div>
+                        <div class="candidates-list">
+                            <strong>선정 종목:</strong>
+                            ${candidates.slice(0, 5).map(c => `
+                                <div class="candidate-item">
+                                    <span>${c.name}</span>
+                                    <span class="${c.change_pct > 0 ? 'positive' : 'negative'}">${c.change_pct > 0 ? '+' : ''}${c.change_pct.toFixed(2)}%</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = html;
+            document.getElementById('strategyComparison').style.display = 'block';
+        }
+
+        // 단일 전략 표시
+        function displaySingleStrategy(data) {
+            // 기존 실시간 상태 UI에 표시
+            const container = document.getElementById('liveStatus');
+            const candidates = data.candidates || [];
+
+            if (candidates.length === 0) {
+                container.innerHTML = '<div class="no-data">선정된 종목이 없습니다</div>';
+                return;
+            }
+
+            let html = '<div class="live-status-grid">';
+            candidates.forEach(c => {
+                const statusClass = c.change_pct > 0 ? 'profit' : c.change_pct < 0 ? 'loss' : 'waiting';
+                html += `
+                    <div class="stock-status-card ${statusClass}">
+                        <div class="stock-name">
+                            <span>${c.name}</span>
+                            <span class="stock-code">${c.code}</span>
+                        </div>
+                        <div class="stock-info">
+                            <span class="info-label">가격</span>
+                            <span class="info-value">${c.price?.toLocaleString() || '-'}원</span>
+                            <span class="info-label">등락률</span>
+                            <span class="info-value ${c.change_pct > 0 ? 'positive' : 'negative'}">${c.change_pct > 0 ? '+' : ''}${c.change_pct.toFixed(2)}%</span>
+                            <span class="info-label">점수</span>
+                            <span class="info-value">${c.score?.toFixed(1) || '-'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
         }
 
         // 수동 체크 트리거
@@ -356,11 +613,13 @@
                 const response = await fetch('data/paper_trading/results.json?t=' + Date.now());
                 if (response.ok) {
                     const results = await response.json();
+                    console.log('Results loaded:', Object.keys(results).length, 'days');
                     displayStats(results);
                     displayRecentTrades(results, dateStr);
                     displayDailyResults(results);
                     displayPerformanceChart(results);
                 } else {
+                    console.log('Results file not found, status:', response.status);
                     displayNoData();
                 }
             } catch (error) {

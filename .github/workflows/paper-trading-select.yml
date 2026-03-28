@@ -1,4 +1,4 @@
-name: Paper Trading - Morning Select
+name: Paper Trading - Morning Select (Multi-Strategy)
 
 on:
   schedule:
@@ -38,49 +38,23 @@ jobs:
             with open('env', 'a') as f:
                 f.write('IS_MARKET_DAY=false\n')
         "
-        cat env >> $GITHUB_OUTPUT 2>/dev/null || echo "is_market_day=true" >> $GITHUB_OUTPUT
+        cat env >> $GITHUB_OUTPUT 2>/dev/null || echo "IS_MARKET_DAY=true" >> $GITHUB_OUTPUT
 
-    - name: Select stocks for today
+    - name: Run multi-strategy selection
       id: select
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
         python -c "
-        import json
+        from paper_trading.multi_strategy_runner import run_all_strategies
         from datetime import datetime
-        from paper_trading.selector import StockSelector
 
-        selector = StockSelector()
         today = datetime.now().strftime('%Y%m%d')
+        print(f'=== 다중 전략 종목 선정 ({today}) ===')
 
-        print(f'종목 선정 시작: {today}')
+        # 모든 전략 실행 (전략당 5개 종목)
+        results = run_all_strategies(date=today, top_n=5)
 
-        # 종목 선정 (전일 데이터 기반)
-        candidates = selector.select_stocks(date=today)
-
-        if candidates:
-            print(f'선정 종목: {len(candidates)}개')
-
-            # 결과 저장
-            result = {
-                'date': today,
-                'selected_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'count': len(candidates),
-                'candidates': [c.to_dict() for c in candidates]
-            }
-
-            import os
-            os.makedirs('data/paper_trading', exist_ok=True)
-
-            with open(f'data/paper_trading/candidates_{today}.json', 'w', encoding='utf-8') as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
-
-            print('저장 완료')
-
-            # 종목 리스트 출력
-            for c in candidates:
-                print(f'  - {c.name} ({c.code}): {c.change_pct:+.2f}%, 점수 {c.score:.1f}')
-        else:
-            print('선정된 종목 없음')
+        print(f'\n총 {len(results)}개 전략 실행 완료')
         "
 
     - name: Commit and push results
@@ -92,26 +66,38 @@ jobs:
         git add data/paper_trading/candidates_*.json 2>/dev/null || true
 
         git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "🎯 장전 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
+          (git commit -m "🎯 다중전략 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
 
     - name: Summary
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
-        echo "## 🎯 장전 종목 선정 완료" >> $GITHUB_STEP_SUMMARY
+        echo "## 🎯 다중 전략 종목 선정 완료" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         TODAY=$(date +'%Y%m%d')
-        if [ -f "data/paper_trading/candidates_${TODAY}.json" ]; then
-          python -c "
+        python -c "
         import json
+        import glob
         from datetime import datetime
+
         today = datetime.now().strftime('%Y%m%d')
+
+        # 통합 파일 로드
         try:
-            with open(f'data/paper_trading/candidates_{today}.json') as f:
+            with open(f'data/paper_trading/candidates_{today}_all.json') as f:
                 data = json.load(f)
-            print(f'- 선정 종목: {data.get(\"count\", 0)}개')
-            for c in data.get('candidates', [])[:5]:
-                print(f'  - {c[\"name\"]}: {c[\"change_pct\"]:+.2f}%')
+
+            strategies = data.get('strategies', {})
+            print(f'### 전략별 선정 결과\n')
+
+            for sid, result in strategies.items():
+                name = result.get('strategy_name', sid)
+                count = result.get('count', 0)
+                print(f'#### {name} ({count}개)')
+
+                for c in result.get('candidates', [])[:3]:
+                    print(f'- {c[\"name\"]}: {c[\"change_pct\"]:+.2f}%, 점수 {c[\"score\"]}')
+                print('')
+
         except Exception as e:
             print(f'Error: {e}')
-          " >> $GITHUB_STEP_SUMMARY
-        fi
+        " >> $GITHUB_STEP_SUMMARY
