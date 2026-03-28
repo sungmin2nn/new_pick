@@ -1,8 +1,8 @@
-name: Daily Paper Trading
+name: Paper Trading - Final Result
 
 on:
   schedule:
-    # 매일 16:10 KST (07:10 UTC) - 장 종료 후 10분
+    # 매일 16:10 KST (07:10 UTC) - 장 종료 후 최종 결과
     - cron: '10 7 * * 1-5'
   workflow_dispatch: # 수동 실행 가능
     inputs:
@@ -12,12 +12,18 @@ on:
         default: ''
 
 jobs:
-  paper-trade:
+  final-result:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Pull latest changes
+      run: |
+        git pull origin master || true
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -36,17 +42,18 @@ jobs:
         from utils import is_market_day
         if is_market_day():
             print('오늘은 개장일입니다.')
-            with open('$GITHUB_OUTPUT', 'a') as f:
-                f.write('is_market_day=true\n')
+            with open('env', 'a') as f:
+                f.write('IS_MARKET_DAY=true\n')
         else:
             print('오늘은 휴장일입니다.')
-            with open('$GITHUB_OUTPUT', 'a') as f:
-                f.write('is_market_day=false\n')
+            with open('env', 'a') as f:
+                f.write('IS_MARKET_DAY=false\n')
         "
+        cat env >> $GITHUB_OUTPUT 2>/dev/null || echo "IS_MARKET_DAY=true" >> $GITHUB_OUTPUT
 
-    - name: Run paper trading
-      id: paper_trade
-      if: steps.market_check.outputs.is_market_day == 'true'
+    - name: Run final simulation
+      id: simulate
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       env:
         DART_API_KEY: ${{ secrets.DART_API_KEY }}
       run: |
@@ -56,8 +63,48 @@ jobs:
           python -m paper_trading.scheduler run --force
         fi
 
-    - name: Generate dashboard
-      if: steps.market_check.outputs.is_market_day == 'true'
+    - name: Select tomorrow stocks
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      run: |
+        python -c "
+        import json
+        from datetime import datetime, timedelta
+        from paper_trading.selector import StockSelector
+        import os
+
+        selector = StockSelector()
+
+        # 내일 날짜 계산 (주말 건너뛰기)
+        today = datetime.now()
+        tomorrow = today + timedelta(days=1)
+        while tomorrow.weekday() >= 5:  # 토,일
+            tomorrow += timedelta(days=1)
+
+        tomorrow_str = tomorrow.strftime('%Y%m%d')
+        print(f'내일({tomorrow_str}) 종목 선정')
+
+        # 오늘 데이터 기반으로 내일 종목 선정
+        candidates = selector.select_stocks()
+
+        if candidates:
+            result = {
+                'date': tomorrow_str,
+                'selected_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'count': len(candidates),
+                'candidates': [c.to_dict() for c in candidates]
+            }
+
+            os.makedirs('data/paper_trading', exist_ok=True)
+            with open(f'data/paper_trading/candidates_{tomorrow_str}.json', 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+
+            print(f'내일 선정 종목: {len(candidates)}개')
+            for c in candidates:
+                print(f'  - {c.name}: {c.change_pct:+.2f}%')
+        "
+
+    - name: Generate reports
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
         python -c "
         from auto_reporter import AutoReporter
@@ -65,44 +112,53 @@ jobs:
         reporter.generate_daily_report()
         reporter.update_knowledge_base()
         reporter.generate_html_dashboard()
-        print('Dashboard generated successfully')
+        reporter.aggregate_paper_trading_results()
+        print('Reports generated successfully')
         "
 
     - name: Commit and push results
-      if: steps.market_check.outputs.is_market_day == 'true'
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
 
-        # Add paper trading results
+        # Add all paper trading files
         git add data/paper_trading/ 2>/dev/null || true
         git add logs/ 2>/dev/null || true
         git add data/dashboard_report.html 2>/dev/null || true
         git add data/project_report.html 2>/dev/null || true
         git add data/knowledge_base.json 2>/dev/null || true
 
-        # Commit if there are changes
         git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "📊 페이퍼 트레이딩 결과 - $(date +'%Y-%m-%d')" && git push) || true
+          (git commit -m "📊 페이퍼 트레이딩 최종 결과 - $(date +'%Y-%m-%d')" && git push) || true
 
     - name: Summary
-      if: steps.market_check.outputs.is_market_day == 'true'
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
-        echo "## 📊 페이퍼 트레이딩 완료" >> $GITHUB_STEP_SUMMARY
+        echo "## 📊 페이퍼 트레이딩 최종 결과" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        if [ -f "data/paper_trading/result_$(date +'%Y%m%d').json" ]; then
+        TODAY=$(date +'%Y%m%d')
+        if [ -f "data/paper_trading/result_${TODAY}.json" ]; then
           python -c "
         import json
         from datetime import datetime
-        date = datetime.now().strftime('%Y%m%d')
+        today = datetime.now().strftime('%Y%m%d')
         try:
-            with open(f'data/paper_trading/result_{date}.json') as f:
+            with open(f'data/paper_trading/result_{today}.json') as f:
                 data = json.load(f)
             sim = data.get('simulation', {})
+            print(f'### 오늘 결과')
             print(f'- 거래 수: {sim.get(\"total_trades\", 0)}건')
             print(f'- 승률: {sim.get(\"win_rate\", 0)}%')
             print(f'- 총 수익률: {sim.get(\"total_return\", 0):+.2f}%')
-        except:
-            print('결과 파일 읽기 실패')
+            print(f'- 익절: {sim.get(\"profit_exits\", 0)}건')
+            print(f'- 손절: {sim.get(\"loss_exits\", 0)}건')
+            print('')
+            print('### 매매 상세')
+            for r in sim.get('results', []):
+                icon = '✅' if r['exit_type'] == 'profit' else '❌' if r['exit_type'] == 'loss' else '⚪'
+                print(f'{icon} {r[\"name\"]}: {r[\"return_pct\"]:+.2f}% ({r[\"exit_type\"]}@{r.get(\"exit_time\", \"\")})')
+        except Exception as e:
+            print(f'Error: {e}')
           " >> $GITHUB_STEP_SUMMARY
         fi

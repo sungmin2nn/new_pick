@@ -1,0 +1,92 @@
+name: Paper Trading - Intraday Check
+
+on:
+  schedule:
+    # 장중 3회 체크: 10:00, 12:00, 14:00 KST
+    - cron: '0 1 * * 1-5'   # 10:00 KST (01:00 UTC)
+    - cron: '0 3 * * 1-5'   # 12:00 KST (03:00 UTC)
+    - cron: '0 5 * * 1-5'   # 14:00 KST (05:00 UTC)
+  workflow_dispatch: # 수동 실행 (버튼)
+
+jobs:
+  check-status:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Check if market hours
+      id: time_check
+      run: |
+        python -c "
+        from datetime import datetime
+        import pytz
+
+        kst = pytz.timezone('Asia/Seoul')
+        now = datetime.now(kst)
+        hour = now.hour
+
+        # 장중 시간 체크 (09:00 ~ 15:30)
+        if 9 <= hour < 16:
+            print('장중 시간입니다.')
+            with open('env', 'a') as f:
+                f.write('IS_MARKET_HOURS=true\n')
+        else:
+            print('장 마감 후입니다.')
+            with open('env', 'a') as f:
+                f.write('IS_MARKET_HOURS=false\n')
+        "
+        cat env >> $GITHUB_OUTPUT 2>/dev/null || echo "IS_MARKET_HOURS=true" >> $GITHUB_OUTPUT
+
+    - name: Run status check
+      id: check
+      run: |
+        python -m paper_trading.checker
+
+    - name: Commit and push status
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+
+        git add data/paper_trading/status_*.json 2>/dev/null || true
+
+        git diff --quiet && git diff --staged --quiet || \
+          (git commit -m "⏱️ 장중 상태 체크 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
+
+    - name: Summary
+      run: |
+        echo "## ⏱️ 장중 상태 체크" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        TODAY=$(date +'%Y%m%d')
+        if [ -f "data/paper_trading/status_${TODAY}.json" ]; then
+          python -c "
+        import json
+        from datetime import datetime
+        today = datetime.now().strftime('%Y%m%d')
+        try:
+            with open(f'data/paper_trading/status_{today}.json') as f:
+                data = json.load(f)
+            print(f'- 체크 시간: {data.get(\"checked_at\", \"N/A\")}')
+            print(f'- 총 종목: {data.get(\"total_stocks\", 0)}개')
+            print(f'- 익절 도달: {data.get(\"profit_hit\", 0)}개')
+            print(f'- 손절 도달: {data.get(\"loss_hit\", 0)}개')
+            print(f'- 대기 중: {data.get(\"waiting\", 0)}개')
+            print('')
+            for s in data.get('stocks', []):
+                icon = '✅' if s['status'] == 'profit_hit' else '❌' if s['status'] == 'loss_hit' else '⏳'
+                print(f'{icon} {s[\"name\"]}: {s.get(\"message\", \"\")}')
+        except Exception as e:
+            print(f'Error: {e}')
+          " >> $GITHUB_STEP_SUMMARY
+        fi

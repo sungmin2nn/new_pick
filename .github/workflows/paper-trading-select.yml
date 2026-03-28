@@ -1,0 +1,117 @@
+name: Paper Trading - Morning Select
+
+on:
+  schedule:
+    # 매일 08:00 KST (23:00 UTC 전날) - 장 시작 전 종목 선정
+    - cron: '0 23 * * 0-4'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  select-stocks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Check if market day
+      id: market_check
+      run: |
+        python -c "
+        from utils import is_market_day
+        if is_market_day():
+            print('오늘은 개장일입니다.')
+            with open('env', 'a') as f:
+                f.write('IS_MARKET_DAY=true\n')
+        else:
+            print('오늘은 휴장일입니다.')
+            with open('env', 'a') as f:
+                f.write('IS_MARKET_DAY=false\n')
+        "
+        cat env >> $GITHUB_OUTPUT 2>/dev/null || echo "is_market_day=true" >> $GITHUB_OUTPUT
+
+    - name: Select stocks for today
+      id: select
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      run: |
+        python -c "
+        import json
+        from datetime import datetime
+        from paper_trading.selector import StockSelector
+
+        selector = StockSelector()
+        today = datetime.now().strftime('%Y%m%d')
+
+        print(f'종목 선정 시작: {today}')
+
+        # 종목 선정 (전일 데이터 기반)
+        candidates = selector.select_stocks(date=today)
+
+        if candidates:
+            print(f'선정 종목: {len(candidates)}개')
+
+            # 결과 저장
+            result = {
+                'date': today,
+                'selected_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'count': len(candidates),
+                'candidates': [c.to_dict() for c in candidates]
+            }
+
+            import os
+            os.makedirs('data/paper_trading', exist_ok=True)
+
+            with open(f'data/paper_trading/candidates_{today}.json', 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+
+            print('저장 완료')
+
+            # 종목 리스트 출력
+            for c in candidates:
+                print(f'  - {c.name} ({c.code}): {c.change_pct:+.2f}%, 점수 {c.score:.1f}')
+        else:
+            print('선정된 종목 없음')
+        "
+
+    - name: Commit and push results
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+
+        git add data/paper_trading/candidates_*.json 2>/dev/null || true
+
+        git diff --quiet && git diff --staged --quiet || \
+          (git commit -m "🎯 장전 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
+
+    - name: Summary
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      run: |
+        echo "## 🎯 장전 종목 선정 완료" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        TODAY=$(date +'%Y%m%d')
+        if [ -f "data/paper_trading/candidates_${TODAY}.json" ]; then
+          python -c "
+        import json
+        from datetime import datetime
+        today = datetime.now().strftime('%Y%m%d')
+        try:
+            with open(f'data/paper_trading/candidates_{today}.json') as f:
+                data = json.load(f)
+            print(f'- 선정 종목: {data.get(\"count\", 0)}개')
+            for c in data.get('candidates', [])[:5]:
+                print(f'  - {c[\"name\"]}: {c[\"change_pct\"]:+.2f}%')
+        except Exception as e:
+            print(f'Error: {e}')
+          " >> $GITHUB_STEP_SUMMARY
+        fi
