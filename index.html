@@ -9,14 +9,15 @@
     <link rel="stylesheet" href="css/variables.css?v=9">
     <link rel="stylesheet" href="css/base.css?v=9">
     <link rel="stylesheet" href="css/components.css?v=9">
-    <link rel="stylesheet" href="css/dashboard.css?v=9">
+    <link rel="stylesheet" href="css/dashboard.css?v=10">
+    <link rel="stylesheet" href="css/responsive.css?v=10">
 </head>
 <body>
     <!-- 헤더 -->
     <header class="header">
         <div class="header-left">
             <h1>🔮 뉴스 트레이딩 대시보드</h1>
-            <div class="subtitle">매일 아침 08:30 자동 선정 | <a href="system_guide.html">📚 시스템 가이드</a></div>
+            <div class="subtitle">매일 아침 08:30 자동 선정 | <a href="paper_trading.html">📊 페이퍼 트레이딩</a> | <a href="system_guide.html">📚 시스템 가이드</a></div>
         </div>
     </header>
 
@@ -180,7 +181,6 @@
                         <tr>
                             <th onclick="TableUtils.sortBy('date')">날짜</th>
                             <th onclick="TableUtils.sortBy('name')">종목명</th>
-                            <th onclick="TableUtils.sortBy('code')">종목코드</th>
                             <th onclick="TableUtils.sortBy('score')">총점</th>
                             <th>선정사유</th>
                             <th onclick="TableUtils.sortBy('shouldBuy')">매수여부</th>
@@ -194,7 +194,7 @@
                     </thead>
                     <tbody id="transactionTableBody">
                         <tr>
-                            <td colspan="12" style="text-align: center; padding: var(--space-xl); color: var(--text-secondary);">
+                            <td colspan="11" style="text-align: center; padding: var(--space-xl); color: var(--text-secondary);">
                                 데이터를 불러오는 중...
                             </td>
                         </tr>
