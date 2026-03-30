@@ -610,22 +610,83 @@
         // 메인 데이터 로드
         async function loadPaperTradingData(dateStr = null) {
             try {
+                // 1. 먼저 results.json 시도
                 const response = await fetch('data/paper_trading/results.json?t=' + Date.now());
                 if (response.ok) {
                     const results = await response.json();
-                    console.log('Results loaded:', Object.keys(results).length, 'days');
-                    displayStats(results);
-                    displayRecentTrades(results, dateStr);
-                    displayDailyResults(results);
-                    displayPerformanceChart(results);
-                } else {
-                    console.log('Results file not found, status:', response.status);
-                    displayNoData();
+                    if (results.daily_results && results.daily_results.length > 0) {
+                        console.log('Results loaded:', results.daily_results.length, 'days');
+                        displayStats(results);
+                        displayRecentTrades(results, dateStr);
+                        displayDailyResults(results);
+                        displayPerformanceChart(results);
+                        return;
+                    }
                 }
+
+                // 2. results.json이 비어있으면 백테스트 결과 로드
+                console.log('Loading backtest results...');
+                const backtestResponse = await fetch('data/paper_trading/strategy_backtest_results.json?t=' + Date.now());
+                if (backtestResponse.ok) {
+                    const backtest = await backtestResponse.json();
+                    const converted = convertBacktestToResults(backtest);
+                    console.log('Backtest loaded:', converted.daily_results.length, 'days');
+                    displayStats(converted);
+                    displayRecentTrades(converted, dateStr);
+                    displayDailyResults(converted);
+                    displayPerformanceChart(converted);
+                    return;
+                }
+
+                console.log('No data found');
+                displayNoData();
             } catch (error) {
                 console.log('Data load error:', error);
                 displayNoData();
             }
+        }
+
+        // 백테스트 결과를 results.json 형식으로 변환
+        function convertBacktestToResults(backtest) {
+            const daily_results = [];
+            const strategy = backtest.strategies?.largecap_contrarian;
+
+            if (!strategy || !strategy.daily) {
+                return { daily_results: [] };
+            }
+
+            strategy.daily.forEach(day => {
+                if (day.trades === 0) return; // 거래 없는 날 스킵
+
+                const results = (day.stocks || []).map(s => ({
+                    code: s.code,
+                    name: s.name,
+                    entry_price: s.entry_price || 0,
+                    exit_price: s.exit_price || 0,
+                    entry_time: s.entry_time || '09:05',
+                    exit_time: s.exit_time || '-',
+                    return_pct: s.return_pct || 0,
+                    exit_type: s.exit_type || s.result
+                }));
+
+                const wins = results.filter(r => r.exit_type === 'profit').length;
+                const losses = results.filter(r => r.exit_type === 'loss').length;
+
+                daily_results.push({
+                    date: day.date.replace(/-/g, ''),
+                    total_trades: day.trades,
+                    wins: wins,
+                    total_return: day.return || 0,
+                    profit_exits: wins,
+                    loss_exits: losses,
+                    results: results
+                });
+            });
+
+            // 날짜 역순 정렬
+            daily_results.sort((a, b) => a.date.localeCompare(b.date));
+
+            return { daily_results };
         }
 
         // 실시간 상태 로드
