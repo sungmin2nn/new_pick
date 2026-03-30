@@ -233,15 +233,32 @@
             color: #8892b0;
         }
 
-        /* Strategy Select */
-        .control-bar select {
-            padding: 10px 15px;
+        /* Strategy Buttons */
+        .strategy-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .strategy-btn {
+            padding: 10px 20px;
             border-radius: 8px;
-            border: 1px solid #2a2a4a;
+            border: 2px solid #2a2a4a;
             background: #16213e;
             color: #e4e4e4;
-            font-size: 1em;
+            font-size: 0.95em;
             cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .strategy-btn:hover {
+            border-color: #00d9ff;
+            background: rgba(0, 217, 255, 0.1);
+        }
+        .strategy-btn.active {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            font-weight: 600;
         }
 
         /* Strategy Comparison Grid */
@@ -333,14 +350,16 @@
             </nav>
         </header>
 
+        <!-- Strategy Buttons -->
+        <div class="strategy-buttons">
+            <button class="strategy-btn active" data-strategy="all" onclick="selectStrategy('all', this)">📊 전체 비교</button>
+            <button class="strategy-btn" data-strategy="largecap_contrarian" onclick="selectStrategy('largecap_contrarian', this)">🏢 대형주 역추세</button>
+            <button class="strategy-btn" data-strategy="momentum" onclick="selectStrategy('momentum', this)">📈 모멘텀</button>
+            <button class="strategy-btn" data-strategy="theme_policy" onclick="selectStrategy('theme_policy', this)">🎯 테마/정책</button>
+        </div>
+
         <!-- Control Bar -->
         <div class="control-bar">
-            <select id="strategySelect" onchange="onStrategyChange()">
-                <option value="all">📊 전체 전략 비교</option>
-                <option value="largecap_contrarian">대형주 역추세</option>
-                <option value="momentum">모멘텀 추세</option>
-                <option value="theme_policy">테마/정책</option>
-            </select>
             <input type="date" id="selectDate" />
             <button class="btn-secondary" onclick="loadHistoryData()">히스토리 조회</button>
             <button class="btn-primary" onclick="loadTodayData()">오늘 데이터</button>
@@ -422,9 +441,13 @@
             loadTodayData();
         });
 
-        // 전략 변경
-        function onStrategyChange() {
-            currentStrategy = document.getElementById('strategySelect').value;
+        // 전략 선택 (버튼)
+        function selectStrategy(strategy, btn) {
+            // 버튼 활성화 상태 변경
+            document.querySelectorAll('.strategy-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            currentStrategy = strategy;
             const comparisonSection = document.getElementById('strategyComparison');
 
             if (currentStrategy === 'all') {
