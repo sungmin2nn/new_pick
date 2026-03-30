@@ -1,0 +1,173 @@
+name: BNF Stock Selection
+
+on:
+  schedule:
+    # 매일 16:30 KST (07:30 UTC) - 장 마감 후
+    - cron: '30 7 * * 1-5'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  select:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run BNF selector
+      run: |
+        python -c "
+        import json
+        import os
+        from datetime import datetime
+        import pytz
+
+        # KST 시간
+        kst = pytz.timezone('Asia/Seoul')
+        today = datetime.now(kst)
+        date_str = today.strftime('%Y%m%d')
+
+        print(f'BNF 낙폭과대 종목 선정 - {date_str}')
+        print('='*60)
+
+        # 주요 대형주 리스트 (KOSPI 200 일부)
+        major_stocks = [
+            '005930', '000660', '373220', '207940', '005380',
+            '006400', '035420', '000270', '035720', '051910',
+            '068270', '105560', '055550', '012330', '003670',
+            '096770', '028260', '066570', '003550', '034730',
+            '086790', '247540', '011200', '009150', '018260',
+            '033780', '010130', '032830', '003490', '017670',
+            '000810', '015760', '024110', '036570', '009540',
+            '316140', '010950', '000100', '004020', '001570',
+        ]
+
+        try:
+            from pykrx import stock
+            import warnings
+            warnings.filterwarnings('ignore')
+
+            candidates = []
+
+            for code in major_stocks:
+                try:
+                    # 30일 데이터 조회
+                    from datetime import timedelta
+                    start_date = (today - timedelta(days=40)).strftime('%Y%m%d')
+                    df = stock.get_market_ohlcv(start_date, date_str, code)
+
+                    if df.empty or len(df) < 10:
+                        continue
+
+                    name = stock.get_market_ticker_name(code)
+                    current_price = int(df.iloc[-1]['종가'])
+
+                    # 5일 낙폭
+                    price_5d_ago = df.iloc[-6]['종가'] if len(df) > 5 else df.iloc[0]['종가']
+                    drop_5d = (price_5d_ago - current_price) / price_5d_ago * 100
+
+                    # 10일 낙폭
+                    price_10d_ago = df.iloc[-11]['종가'] if len(df) > 10 else df.iloc[0]['종가']
+                    drop_10d = (price_10d_ago - current_price) / price_10d_ago * 100
+
+                    # 고점 대비 낙폭
+                    high_20d = int(df['고가'].max())
+                    drop_from_high = (high_20d - current_price) / high_20d * 100
+
+                    # BNF 기준: 5일 -15% OR 10일 -20% OR 고점 -25%
+                    reasons = []
+                    if drop_5d >= 15:
+                        reasons.append(f'5일 {drop_5d:.1f}%')
+                    if drop_10d >= 20:
+                        reasons.append(f'10일 {drop_10d:.1f}%')
+                    if drop_from_high >= 25:
+                        reasons.append(f'고점 {drop_from_high:.1f}%')
+
+                    if reasons:
+                        candidates.append({
+                            'code': code,
+                            'name': name,
+                            'price': current_price,
+                            'high_20d': high_20d,
+                            'drop_5d': round(drop_5d, 2),
+                            'drop_10d': round(drop_10d, 2),
+                            'drop_from_high': round(drop_from_high, 2),
+                            'max_drop': round(max(drop_5d, drop_10d, drop_from_high), 2),
+                            'reasons': ' | '.join(reasons)
+                        })
+                        print(f'✓ {name}({code}): {\" | \".join(reasons)}')
+
+                except Exception as e:
+                    continue
+
+            # 낙폭 큰 순 정렬
+            candidates.sort(key=lambda x: x['max_drop'], reverse=True)
+
+            # 순위 부여
+            for i, c in enumerate(candidates, 1):
+                c['rank'] = i
+
+            # 결과 저장
+            result = {
+                'date': today.strftime('%Y-%m-%d'),
+                'generated_at': today.strftime('%Y-%m-%d %H:%M:%S'),
+                'strategy': 'BNF_낙폭과대',
+                'criteria': {
+                    'drop_5d_threshold': 15.0,
+                    'drop_10d_threshold': 20.0,
+                    'drop_high_threshold': 25.0,
+                },
+                'count': len(candidates),
+                'candidates': candidates
+            }
+
+            os.makedirs('data/bnf', exist_ok=True)
+
+            # 오늘 날짜 파일
+            with open(f'data/bnf/candidates_{date_str}.json', 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False)
+
+            # 최신 파일 (대시보드용)
+            with open('data/bnf/candidates.json', 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False)
+
+            print('='*60)
+            print(f'선정 완료: {len(candidates)}개 종목')
+
+            if candidates:
+                print('\\n[TOP 5 낙폭과대 종목]')
+                for c in candidates[:5]:
+                    print(f'{c[\"rank\"]}. {c[\"name\"]}({c[\"code\"]}) - {c[\"max_drop\"]:.1f}%')
+
+        except ImportError:
+            print('pykrx 모듈을 찾을 수 없습니다.')
+            # 빈 결과 저장
+            result = {
+                'date': today.strftime('%Y-%m-%d'),
+                'generated_at': today.strftime('%Y-%m-%d %H:%M:%S'),
+                'strategy': 'BNF_낙폭과대',
+                'count': 0,
+                'candidates': [],
+                'error': 'pykrx not available'
+            }
+            os.makedirs('data/bnf', exist_ok=True)
+            with open('data/bnf/candidates.json', 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False)
+        "
+
+    - name: Commit and push results
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add data/bnf/
+        git diff --quiet && git diff --staged --quiet || (git commit -m "🔥 BNF 낙폭과대 종목 선정 - $(date +'%Y-%m-%d')" && git push) || true
