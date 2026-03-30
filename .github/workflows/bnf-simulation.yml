@@ -78,10 +78,39 @@ jobs:
         candidates = candidates_data.get('candidates', [])
         print(f'후보 종목: {len(candidates)}개')
 
+        if len(candidates) == 0:
+            print('후보 종목이 없습니다.')
+            positions_data['updated_at'] = f'{today} {time_str}'
+            with open(positions_file, 'w', encoding='utf-8') as f:
+                json.dump(positions_data, f, indent=2, ensure_ascii=False)
+            exit(0)
+
         try:
             from pykrx import stock
             import warnings
             warnings.filterwarnings('ignore')
+
+            # 가장 최근 거래일 찾기 (pykrx는 미래 날짜 지원 안함)
+            # 2025년 3월 기준으로 조회
+            test_code = candidates[0]['code']
+            market_date = None
+
+            # 최근 실제 거래일 찾기
+            for days_back in range(1, 400):
+                test_date = (datetime(2025, 3, 28) - timedelta(days=days_back)).strftime('%Y%m%d')
+                try:
+                    df = stock.get_market_ohlcv(test_date, test_date, test_code)
+                    if not df.empty and len(df) > 0:
+                        market_date = test_date
+                        break
+                except:
+                    continue
+
+            if not market_date:
+                # 더 과거로 시도
+                market_date = '20250328'
+
+            print(f'시장 기준일: {market_date}')
 
             positions = positions_data.get('positions', [])
             if isinstance(positions, dict):
@@ -95,14 +124,12 @@ jobs:
             open_positions = [p for p in positions if p.get('state') != 'CLOSED']
 
             # 기존 포지션 가격 업데이트
+            start_date = (datetime.strptime(market_date, '%Y%m%d') - timedelta(days=10)).strftime('%Y%m%d')
+
             for p in open_positions:
                 code = p['code']
                 try:
-                    df = stock.get_market_ohlcv_by_date(
-                        (datetime.now() - timedelta(days=5)).strftime('%Y%m%d'),
-                        datetime.now().strftime('%Y%m%d'),
-                        code
-                    )
+                    df = stock.get_market_ohlcv(start_date, market_date, code)
                     if not df.empty:
                         current_price = int(df.iloc[-1]['종가'])
                         p['current_price'] = current_price
@@ -128,49 +155,48 @@ jobs:
                             print(f'익절: {p[\"name\"]} ({gain_pct:.1f}%)')
 
                 except Exception as e:
-                    print(f'가격 조회 실패: {code}')
+                    print(f'가격 조회 실패: {code} - {e}')
 
-            # 신규 진입
-            for candidate in candidates[:max_positions - len([p for p in positions if p.get('state') != 'CLOSED'])]:
+            # 신규 진입 (candidates.json의 가격 사용)
+            current_open = len([p for p in positions if p.get('state') != 'CLOSED'])
+            slots_available = max_positions - current_open
+
+            print(f'진입 가능 슬롯: {slots_available}개')
+
+            for candidate in candidates[:slots_available]:
                 code = candidate['code']
                 name = candidate['name']
 
                 if any(p['code'] == code and p['state'] != 'CLOSED' for p in positions):
+                    print(f'이미 보유 중: {name}')
                     continue
 
-                try:
-                    df = stock.get_market_ohlcv_by_date(
-                        (datetime.now() - timedelta(days=5)).strftime('%Y%m%d'),
-                        datetime.now().strftime('%Y%m%d'),
-                        code
-                    )
-                    if df.empty:
-                        continue
+                # candidates.json에서 가격 사용
+                current_price = candidate.get('price', 0)
+                if current_price <= 0:
+                    print(f'가격 정보 없음: {name}')
+                    continue
 
-                    current_price = int(df.iloc[-1]['종가'])
-                    quantity = int(position_size / current_price)
+                quantity = int(position_size / current_price)
 
-                    if quantity > 0:
-                        new_position = {
-                            'code': code,
-                            'name': name,
-                            'state': 'FULL',
-                            'avg_price': current_price,
-                            'current_price': current_price,
-                            'total_quantity': quantity,
-                            'entry_date': today,
-                            'entry_price': current_price,
-                            'unrealized_pnl': 0,
-                            'unrealized_pnl_pct': 0,
-                            'selection_reason': candidate.get('reasons', ''),
-                            'entries': [{'price': current_price, 'quantity': quantity, 'date': today, 'time': time_str}],
-                            'exits': []
-                        }
-                        positions.append(new_position)
-                        print(f'진입: {name} @ {current_price:,}원 x {quantity}주')
-
-                except Exception as e:
-                    print(f'진입 실패: {code}')
+                if quantity > 0:
+                    new_position = {
+                        'code': code,
+                        'name': name,
+                        'state': 'FULL',
+                        'avg_price': current_price,
+                        'current_price': current_price,
+                        'total_quantity': quantity,
+                        'entry_date': today,
+                        'entry_price': current_price,
+                        'unrealized_pnl': 0,
+                        'unrealized_pnl_pct': 0,
+                        'selection_reason': candidate.get('reasons', ''),
+                        'entries': [{'price': current_price, 'quantity': quantity, 'date': today, 'time': time_str}],
+                        'exits': []
+                    }
+                    positions.append(new_position)
+                    print(f'진입: {name}({code}) @ {current_price:,}원 x {quantity}주')
 
             # 청산 포지션 이력 이동
             trades = history_data.get('trades', [])
@@ -243,8 +269,10 @@ jobs:
             print(f'오픈 포지션: {len(open_positions)}개')
             print(f'총 거래: {total_trades}건, 승률: {win_rate:.1f}%')
 
-        except ImportError:
-            print('pykrx 모듈을 찾을 수 없습니다.')
+        except Exception as e:
+            print(f'오류 발생: {e}')
+            import traceback
+            traceback.print_exc()
             positions_data['updated_at'] = f'{today} {time_str}'
             with open(positions_file, 'w', encoding='utf-8') as f:
                 json.dump(positions_data, f, indent=2, ensure_ascii=False)
