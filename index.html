@@ -634,22 +634,97 @@
         // 메인 데이터 로드
         async function loadPaperTradingData(dateStr = null) {
             try {
+                // 1. 실제 페이퍼 트레이딩 결과 로드 시도
                 const response = await fetch('data/paper_trading/results.json?t=' + Date.now());
                 if (response.ok) {
                     const results = await response.json();
-                    console.log('Results loaded:', Object.keys(results).length, 'days');
-                    displayStats(results);
-                    displayRecentTrades(results, dateStr);
-                    displayDailyResults(results);
-                    displayPerformanceChart(results);
-                } else {
-                    console.log('Results file not found, status:', response.status);
-                    displayNoData();
+                    if (results.daily_results && results.daily_results.length > 0) {
+                        console.log('Paper trading results loaded:', results.daily_results.length, 'days');
+                        displayStats(results);
+                        displayRecentTrades(results, dateStr);
+                        displayDailyResults(results);
+                        displayPerformanceChart(results);
+                        return;
+                    }
                 }
+
+                // 2. 백테스트 결과로 폴백
+                const backtestResponse = await fetch('data/paper_trading/strategy_backtest_results.json?t=' + Date.now());
+                if (backtestResponse.ok) {
+                    const backtest = await backtestResponse.json();
+                    console.log('Backtest results loaded:', backtest.total_days, 'days');
+                    const transformed = transformBacktestData(backtest);
+                    displayStats(transformed);
+                    displayRecentTrades(transformed, dateStr);
+                    displayDailyResults(transformed);
+                    displayPerformanceChart(transformed);
+                    return;
+                }
+
+                displayNoData();
             } catch (error) {
                 console.log('Data load error:', error);
                 displayNoData();
             }
+        }
+
+        // 백테스트 데이터를 페이퍼 트레이딩 형식으로 변환
+        function transformBacktestData(backtest) {
+            const strategies = backtest.strategies || {};
+            const dailyMap = {};
+
+            // 모든 전략의 일별 데이터를 합산
+            for (const [strategyId, strategy] of Object.entries(strategies)) {
+                const daily = strategy.daily || [];
+                daily.forEach(d => {
+                    if (!dailyMap[d.date]) {
+                        dailyMap[d.date] = {
+                            date: d.date,
+                            total_trades: 0,
+                            wins: 0,
+                            losses: 0,
+                            close_exits: 0,
+                            total_return: 0,
+                            profit_exits: 0,
+                            loss_exits: 0,
+                            results: []
+                        };
+                    }
+                    const day = dailyMap[d.date];
+                    day.total_trades += d.trades || 0;
+                    day.wins += d.wins || 0;
+                    day.losses += d.losses || 0;
+                    day.total_return += d.return || 0;
+                    day.profit_exits += d.wins || 0;
+                    day.loss_exits += d.losses || 0;
+
+                    // 종목별 결과 추가
+                    (d.stocks || []).forEach(s => {
+                        day.results.push({
+                            code: s.code,
+                            name: s.name,
+                            return_pct: s.return_pct,
+                            exit_type: s.exit_type,
+                            strategy: strategyId
+                        });
+                    });
+                });
+            }
+
+            // 날짜순 정렬 및 누적 수익률 계산
+            const dailyResults = Object.values(dailyMap).sort((a, b) => a.date.localeCompare(b.date));
+            let cumulative = 0;
+            dailyResults.forEach(d => {
+                d.win_rate = d.total_trades > 0 ? Math.round(d.wins / d.total_trades * 100) : 0;
+                cumulative += d.total_return;
+                d.cumulative_return = cumulative;
+            });
+
+            return {
+                daily_results: dailyResults,
+                source: 'backtest',
+                period: backtest.period
+            };
         }
 
         // 실시간 상태 로드
@@ -994,7 +1069,7 @@
 
     <!-- Footer with Last Modified Date -->
     <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-03-30 23:15
+        📅 마지막 수정: 2026-03-30 23:25
     </footer>
 </body>
 </html>
