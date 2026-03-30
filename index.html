@@ -272,13 +272,15 @@
             /* Table scroll wrapper */
             .table-wrapper {
                 overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                margin: 0 -15px;
-                padding: 0 15px;
+                overflow-y: hidden;
+                margin: 0;
+                padding: 0;
+                max-width: 100%;
             }
             table {
-                min-width: 600px;
+                min-width: 500px;
                 font-size: 0.85em;
+                width: 100%;
             }
             th, td {
                 padding: 10px 8px;
@@ -337,8 +339,14 @@
             }
             .stock-status-card .stock-name { font-size: 0.95em; }
             .stock-status-card .stock-info { font-size: 0.8em; gap: 6px; }
-            .table-wrapper { margin: 0 -10px; padding: 0 10px; }
-            table { min-width: 500px; font-size: 0.75em; }
+            .table-wrapper {
+                margin: 0;
+                padding: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                max-width: 100%;
+            }
+            table { min-width: 450px; font-size: 0.75em; width: 100%; }
             th, td { padding: 8px 6px; }
             .chart-container { height: 200px; }
             .no-data { padding: 25px; font-size: 0.85em; }
@@ -766,16 +774,14 @@
                     }
                 }
 
-                // 2. 백테스트 결과로 폴백
-                const backtestResponse = await fetch('data/paper_trading/strategy_backtest_results.json?t=' + Date.now());
-                if (backtestResponse.ok) {
-                    const backtest = await backtestResponse.json();
-                    console.log('Backtest results loaded:', backtest.total_days, 'days');
-                    const transformed = transformBacktestData(backtest);
-                    displayStats(transformed);
-                    displayRecentTrades(transformed, dateStr);
-                    displayDailyResults(transformed);
-                    displayPerformanceChart(transformed);
+                // 2. intraday 데이터 직접 로드
+                const intradayData = await loadIntradayFiles();
+                if (intradayData && intradayData.daily_results.length > 0) {
+                    console.log('Intraday results loaded:', intradayData.daily_results.length, 'days');
+                    displayStats(intradayData);
+                    displayRecentTrades(intradayData, dateStr);
+                    displayDailyResults(intradayData);
+                    displayPerformanceChart(intradayData);
                     return;
                 }
 
@@ -842,6 +848,106 @@
                 daily_results: dailyResults,
                 source: 'backtest',
                 period: backtest.period
+            };
+        }
+
+        // intraday 파일들 직접 로드
+        async function loadIntradayFiles() {
+            const dailyResults = [];
+
+            // 최근 30일 날짜 목록 생성
+            const dates = [];
+            const today = new Date();
+            for (let i = 0; i < 45; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const dayOfWeek = d.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // 주말 제외
+                    dates.push(d.toISOString().split('T')[0].replace(/-/g, ''));
+                }
+            }
+
+            // 각 날짜의 intraday 파일 로드
+            for (const dateStr of dates) {
+                try {
+                    const response = await fetch(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        const dayResult = transformIntradayData(data, dateStr);
+                        if (dayResult) {
+                            dailyResults.push(dayResult);
+                        }
+                    }
+                } catch (e) {
+                    // 파일 없으면 스킵
+                }
+            }
+
+            // 날짜순 정렬 및 누적 수익률 계산
+            dailyResults.sort((a, b) => a.date.localeCompare(b.date));
+            let cumulative = 0;
+            dailyResults.forEach(d => {
+                cumulative += d.total_return;
+                d.cumulative_return = cumulative;
+            });
+
+            return { daily_results: dailyResults, source: 'intraday' };
+        }
+
+        // intraday 데이터 변환
+        function transformIntradayData(data, dateStr) {
+            const stocks = data.stocks || {};
+            const stockList = Object.values(stocks);
+
+            if (stockList.length === 0) return null;
+
+            let wins = 0, losses = 0, closes = 0;
+            let totalReturn = 0;
+            const results = [];
+
+            stockList.forEach(s => {
+                const pl = s.profit_loss_analysis || {};
+                const firstHit = pl.first_hit;
+                let exitType = 'close';
+                let returnPct = pl.closing_percent || 0;
+
+                if (firstHit === 'profit') {
+                    exitType = 'profit';
+                    returnPct = pl.profit_target_percent || 3;
+                    wins++;
+                } else if (firstHit === 'loss') {
+                    exitType = 'loss';
+                    returnPct = pl.loss_target_percent || -1.5;
+                    losses++;
+                } else {
+                    closes++;
+                }
+
+                totalReturn += returnPct;
+                results.push({
+                    code: s.code,
+                    name: s.name,
+                    return_pct: parseFloat(returnPct.toFixed(2)),
+                    exit_type: exitType,
+                    entry_price: pl.actual_result?.entry_price,
+                    exit_price: pl.actual_result?.closing_price,
+                    entry_time: pl.actual_result?.entry_time,
+                    exit_time: pl.first_hit_time || '15:30:00'
+                });
+            });
+
+            const totalTrades = stockList.length;
+            return {
+                date: dateStr,
+                total_trades: totalTrades,
+                wins: wins,
+                losses: losses,
+                close_exits: closes,
+                total_return: parseFloat((totalReturn / totalTrades).toFixed(2)),
+                profit_exits: wins,
+                loss_exits: losses,
+                win_rate: totalTrades > 0 ? Math.round(wins / totalTrades * 100) : 0,
+                results: results
             };
         }
 
@@ -1191,7 +1297,7 @@
 
     <!-- Footer with Last Modified Date -->
     <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-03-30 23:42
+        📅 마지막 수정: 2026-03-30 23:55
     </footer>
 </body>
 </html>
