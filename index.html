@@ -36,6 +36,46 @@
         }
         .header .nav-links a:hover { text-decoration: underline; }
 
+        /* Dashboard Navigation */
+        .dashboard-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .dashboard-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .dashboard-nav-btn:not(.active) {
+            background: rgba(42, 42, 74, 0.5);
+            color: #8892b0;
+            border-color: #2a2a4a;
+        }
+        .dashboard-nav-btn:not(.active):hover {
+            background: rgba(42, 42, 74, 0.8);
+            color: #e4e4e4;
+            transform: translateY(-2px);
+        }
+        .dashboard-nav-btn.active {
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+        }
+        .dashboard-nav-btn.bnf:not(.active):hover {
+            border-color: #ff6b35;
+            color: #ff6b35;
+        }
+        .dashboard-nav-btn.bnf.active {
+            background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+        }
+        .nav-icon { font-size: 1.2em; }
+
         /* Control Bar */
         .control-bar {
             display: flex;
@@ -499,6 +539,18 @@
 <body>
     <div class="container">
         <!-- Header -->
+        <!-- Dashboard Navigation -->
+        <div class="dashboard-nav">
+            <a href="index.html" class="dashboard-nav-btn active">
+                <span class="nav-icon">📈</span>
+                <span>Paper Trading</span>
+            </a>
+            <a href="bnf_dashboard.html" class="dashboard-nav-btn bnf">
+                <span class="nav-icon">📉</span>
+                <span>BNF 낙폭과대</span>
+            </a>
+        </div>
+
         <header class="header">
             <div>
                 <h1>📊 페이퍼 트레이딩 대시보드</h1>

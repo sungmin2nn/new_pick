@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BNF 매매 시뮬레이터</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+            color: #e4e4e4;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 2px solid #2a2a4a;
+            background: transparent;
+            color: #8892b0;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-btn:hover {
+            border-color: #00d9ff;
+            color: #00d9ff;
+        }
+        .nav-btn.active {
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.15);
+            color: #ff6b35;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #2a2a4a;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 {
+            color: #ff6b35;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header .subtitle { color: #8892b0; margin-top: 5px; font-size: 0.9em; }
+        .bnf-badge {
+            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.5em;
+            font-weight: bold;
+        }
+
+        /* Strategy Info */
+        .strategy-info {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .strategy-info h3 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .strategy-rules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .rule-card {
+            background: rgba(15, 15, 35, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .rule-card .label {
+            color: #8892b0;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+        .rule-card .value {
+            color: #e4e4e4;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #2a2a4a;
+        }
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 5px;
+        }
+        .stat-value.positive { color: #00ff88; }
+        .stat-value.negative { color: #ff6b6b; }
+        .stat-label { color: #8892b0; font-size: 0.8em; }
+
+        /* Section */
+        .section {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #2a2a4a;
+        }
+        .section h2 {
+            color: #ff8c42;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Candidates Table */
+        .candidates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .candidate-card {
+            background: rgba(15, 15, 35, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #ff6b35;
+        }
+        .candidate-card.selected {
+            border-left-color: #00ff88;
+            background: rgba(0, 255, 136, 0.05);
+        }
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .candidate-name {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        .candidate-code {
+            color: #8892b0;
+            font-size: 0.85em;
+        }
+        .drop-badge {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .candidate-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            font-size: 0.9em;
+        }
+        .candidate-stats .label { color: #8892b0; }
+        .candidate-stats .value { text-align: right; }
+
+        /* Position Card */
+        .position-card {
+            background: rgba(15, 15, 35, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #00d9ff;
+            margin-bottom: 15px;
+        }
+        .position-card.profit { border-left-color: #00ff88; }
+        .position-card.loss { border-left-color: #ff6b6b; }
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .position-state {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .position-state.partial { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        .position-state.full { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
+        .position-state.exiting { background: rgba(255, 107, 53, 0.2); color: #ff6b35; }
+
+        /* Entry/Exit Timeline */
+        .timeline {
+            margin-top: 15px;
+            padding-left: 20px;
+            border-left: 2px solid #2a2a4a;
+        }
+        .timeline-item {
+            position: relative;
+            padding: 10px 0 10px 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 14px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #2a2a4a;
+        }
+        .timeline-item.entry::before { background: #00d9ff; }
+        .timeline-item.exit::before { background: #ff6b35; }
+        .timeline-item.profit::before { background: #00ff88; }
+        .timeline-item.loss::before { background: #ff6b6b; }
+        .timeline-time {
+            color: #8892b0;
+            font-size: 0.8em;
+        }
+        .timeline-detail {
+            color: #e4e4e4;
+            font-size: 0.9em;
+            margin-top: 2px;
+        }
+
+        /* Chart */
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        th { background: #0f3460; color: #ff8c42; font-weight: 600; }
+        tr:hover { background: rgba(255, 107, 53, 0.05); }
+        .positive { color: #00ff88; }
+        .negative { color: #ff6b6b; }
+
+        /* No Data */
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #8892b0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header h1 { font-size: 1.4em; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .strategy-rules { grid-template-columns: 1fr; }
+            .nav-buttons { flex-wrap: wrap; }
+        }
+        @media (max-width: 420px) {
+            body { padding: 8px; }
+            .header h1 { font-size: 1.2em; }
+            .section { padding: 15px; }
+            .stat-value { font-size: 1.4em; }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            border-top: 1px solid #2a2a4a;
+            color: #8892b0;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">📊 페이퍼 트레이딩</a>
+            <a href="bnf_dashboard.html" class="nav-btn active">🔥 BNF 매매</a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>
+                    🔥 BNF 매매 시뮬레이터
+                    <span class="bnf-badge">역추세</span>
+                </h1>
+                <div class="subtitle">낙폭과대 종목 반등 매매 | 분할 진입/청산 | 트레일링 스탑</div>
+            </div>
+        </div>
+
+        <!-- Strategy Info -->
+        <div class="strategy-info">
+            <h3>📋 BNF 매매 규칙</h3>
+            <div class="strategy-rules">
+                <div class="rule-card">
+                    <div class="label">종목 선정</div>
+                    <div class="value">5일 -15% 또는 고점대비 -25%</div>
+                </div>
+                <div class="rule-card">
+                    <div class="label">분할 매수</div>
+                    <div class="value">30% → 40% → 30%</div>
+                </div>
+                <div class="rule-card">
+                    <div class="label">분할 매도</div>
+                    <div class="value">+5% / +10% / 트레일링</div>
+                </div>
+                <div class="rule-card">
+                    <div class="label">손절</div>
+                    <div class="value">-3% (트레일링 적용)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalTrades">-</div>
+                <div class="stat-label">총 거래</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="winRate">-</div>
+                <div class="stat-label">승률</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalReturn">-</div>
+                <div class="stat-label">총 수익률</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgReturn">-</div>
+                <div class="stat-label">평균 수익</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="openPositions">-</div>
+                <div class="stat-label">보유 포지션</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="unrealizedPnl">-</div>
+                <div class="stat-label">평가손익</div>
+            </div>
+        </div>
+
+        <!-- Candidates -->
+        <div class="section">
+            <h2>📉 낙폭과대 후보 종목</h2>
+            <div id="candidatesGrid" class="candidates-grid">
+                <div class="no-data">데이터 로딩 중...</div>
+            </div>
+        </div>
+
+        <!-- Open Positions -->
+        <div class="section">
+            <h2>💼 보유 포지션</h2>
+            <div id="positionsContainer">
+                <div class="no-data">보유 중인 포지션이 없습니다</div>
+            </div>
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="section">
+            <h2>📈 누적 수익률</h2>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Trade History -->
+        <div class="section">
+            <h2>📋 매매 이력</h2>
+            <div class="table-wrapper">
+                <table id="tradeHistory">
+                    <thead>
+                        <tr>
+                            <th>날짜</th>
+                            <th>종목</th>
+                            <th>진입가</th>
+                            <th>청산가</th>
+                            <th>보유일</th>
+                            <th>수익률</th>
+                            <th>손익</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="7" class="no-data">매매 이력이 없습니다</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        📅 마지막 수정: 2026-03-31 00:30
+    </footer>
+
+    <script>
+        let performanceChart = null;
+
+        // 페이지 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBNFData();
+        });
+
+        // BNF 데이터 로드
+        async function loadBNFData() {
+            try {
+                // 후보 종목 로드
+                await loadCandidates();
+                // 포지션 로드
+                await loadPositions();
+                // 거래 이력 로드
+                await loadTradeHistory();
+            } catch (error) {
+                console.error('BNF data load error:', error);
+            }
+        }
+
+        // 후보 종목 로드
+        async function loadCandidates() {
+            const grid = document.getElementById('candidatesGrid');
+
+            try {
+                const response = await fetch('data/bnf/candidates.json?t=' + Date.now());
+                if (!response.ok) {
+                    grid.innerHTML = '<div class="no-data">후보 종목 데이터가 없습니다. 시뮬레이션을 실행해주세요.</div>';
+                    return;
+                }
+
+                const data = await response.json();
+                const candidates = data.candidates || [];
+
+                if (candidates.length === 0) {
+                    grid.innerHTML = '<div class="no-data">조건을 충족하는 종목이 없습니다</div>';
+                    return;
+                }
+
+                grid.innerHTML = candidates.map(c => `
+                    <div class="candidate-card">
+                        <div class="candidate-header">
+                            <div>
+                                <div class="candidate-name">${c.name}</div>
+                                <div class="candidate-code">${c.code}</div>
+                            </div>
+                            <div class="drop-badge">${c.drop_pct?.toFixed(1) || 0}%</div>
+                        </div>
+                        <div class="candidate-stats">
+                            <span class="label">현재가</span>
+                            <span class="value">${c.current_price?.toLocaleString() || '-'}원</span>
+                            <span class="label">5일 낙폭</span>
+                            <span class="value negative">${c.drop_5d?.toFixed(1) || '-'}%</span>
+                            <span class="label">고점대비</span>
+                            <span class="value negative">${c.drop_from_high?.toFixed(1) || '-'}%</span>
+                            <span class="label">시총</span>
+                            <span class="value">${(c.market_cap / 1e12)?.toFixed(1) || '-'}조</span>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                grid.innerHTML = '<div class="no-data">후보 종목 로드 실패</div>';
+            }
+        }
+
+        // 포지션 로드
+        async function loadPositions() {
+            const container = document.getElementById('positionsContainer');
+
+            try {
+                const response = await fetch('data/bnf/positions.json?t=' + Date.now());
+                if (!response.ok) {
+                    container.innerHTML = '<div class="no-data">포지션 데이터가 없습니다</div>';
+                    updateStats({});
+                    return;
+                }
+
+                const data = await response.json();
+                const positions = data.positions || [];
+                const openPositions = positions.filter(p => p.state !== 'CLOSED');
+
+                // 통계 업데이트
+                updateStats(data);
+
+                if (openPositions.length === 0) {
+                    container.innerHTML = '<div class="no-data">보유 중인 포지션이 없습니다</div>';
+                    return;
+                }
+
+                container.innerHTML = openPositions.map(p => {
+                    const pnlClass = p.unrealized_pnl >= 0 ? 'profit' : 'loss';
+                    const stateClass = p.state.toLowerCase();
+
+                    return `
+                        <div class="position-card ${pnlClass}">
+                            <div class="position-header">
+                                <div>
+                                    <div class="candidate-name">${p.name}</div>
+                                    <div class="candidate-code">${p.code}</div>
+                                </div>
+                                <span class="position-state ${stateClass}">${getStateLabel(p.state)}</span>
+                            </div>
+                            <div class="candidate-stats">
+                                <span class="label">평균단가</span>
+                                <span class="value">${p.avg_price?.toLocaleString() || '-'}원</span>
+                                <span class="label">현재가</span>
+                                <span class="value">${p.current_price?.toLocaleString() || '-'}원</span>
+                                <span class="label">보유수량</span>
+                                <span class="value">${p.total_quantity || 0}주</span>
+                                <span class="label">평가손익</span>
+                                <span class="value ${pnlClass}">${p.unrealized_pnl >= 0 ? '+' : ''}${p.unrealized_pnl?.toLocaleString() || 0}원</span>
+                            </div>
+                            ${renderTimeline(p)}
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                container.innerHTML = '<div class="no-data">포지션 로드 실패</div>';
+            }
+        }
+
+        // 진입/청산 타임라인 렌더링
+        function renderTimeline(position) {
+            const entries = position.entries || [];
+            const exits = position.exits || [];
+
+            if (entries.length === 0 && exits.length === 0) return '';
+
+            let html = '<div class="timeline">';
+
+            entries.forEach((e, i) => {
+                html += `
+                    <div class="timeline-item entry">
+                        <div class="timeline-time">${e.date} ${e.time}</div>
+                        <div class="timeline-detail">매수 ${i+1}차: ${e.price?.toLocaleString()}원 × ${e.quantity}주</div>
+                    </div>
+                `;
+            });
+
+            exits.forEach((e, i) => {
+                const exitClass = e.pnl >= 0 ? 'profit' : 'loss';
+                html += `
+                    <div class="timeline-item exit ${exitClass}">
+                        <div class="timeline-time">${e.date} ${e.time}</div>
+                        <div class="timeline-detail">매도 ${i+1}차: ${e.price?.toLocaleString()}원 × ${e.quantity}주 (${e.pnl >= 0 ? '+' : ''}${e.pnl_pct?.toFixed(1)}%)</div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        // 상태 라벨
+        function getStateLabel(state) {
+            const labels = {
+                'PENDING': '대기',
+                'PARTIAL': '분할진입중',
+                'FULL': '보유',
+                'EXITING': '분할청산중',
+                'CLOSED': '청산완료'
+            };
+            return labels[state] || state;
+        }
+
+        // 통계 업데이트
+        function updateStats(data) {
+            const stats = data.stats || {};
+
+            document.getElementById('totalTrades').textContent = (stats.total_trades || 0) + '건';
+            document.getElementById('winRate').textContent = (stats.win_rate || 0).toFixed(1) + '%';
+
+            const totalReturn = stats.total_return || 0;
+            const totalReturnEl = document.getElementById('totalReturn');
+            totalReturnEl.textContent = (totalReturn >= 0 ? '+' : '') + totalReturn.toFixed(2) + '%';
+            totalReturnEl.className = 'stat-value ' + (totalReturn >= 0 ? 'positive' : 'negative');
+
+            document.getElementById('avgReturn').textContent = (stats.avg_return || 0).toFixed(2) + '%';
+            document.getElementById('openPositions').textContent = (stats.open_positions || 0) + '개';
+
+            const unrealizedPnl = stats.unrealized_pnl || 0;
+            const unrealizedEl = document.getElementById('unrealizedPnl');
+            unrealizedEl.textContent = (unrealizedPnl >= 0 ? '+' : '') + unrealizedPnl.toLocaleString() + '원';
+            unrealizedEl.className = 'stat-value ' + (unrealizedPnl >= 0 ? 'positive' : 'negative');
+        }
+
+        // 거래 이력 로드
+        async function loadTradeHistory() {
+            try {
+                const response = await fetch('data/bnf/trade_history.json?t=' + Date.now());
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const trades = data.trades || [];
+
+                if (trades.length === 0) return;
+
+                const tbody = document.querySelector('#tradeHistory tbody');
+                tbody.innerHTML = trades.slice(-20).reverse().map(t => {
+                    const pnlClass = t.return_pct >= 0 ? 'positive' : 'negative';
+                    return `
+                        <tr>
+                            <td>${t.exit_date}</td>
+                            <td>${t.name} (${t.code})</td>
+                            <td>${t.avg_entry_price?.toLocaleString()}원</td>
+                            <td>${t.avg_exit_price?.toLocaleString()}원</td>
+                            <td>${t.holding_days || 1}일</td>
+                            <td class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct?.toFixed(2)}%</td>
+                            <td class="${pnlClass}">${t.pnl >= 0 ? '+' : ''}${t.pnl?.toLocaleString()}원</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // 차트 업데이트
+                updatePerformanceChart(trades);
+
+            } catch (error) {
+                console.error('Trade history load error:', error);
+            }
+        }
+
+        // 성과 차트 업데이트
+        function updatePerformanceChart(trades) {
+            if (!trades || trades.length === 0) return;
+
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+
+            // 날짜별 누적 수익률 계산
+            const dailyReturns = {};
+            trades.forEach(t => {
+                const date = t.exit_date;
+                if (!dailyReturns[date]) dailyReturns[date] = 0;
+                dailyReturns[date] += t.return_pct || 0;
+            });
+
+            const dates = Object.keys(dailyReturns).sort();
+            let cumulative = 0;
+            const cumulativeReturns = dates.map(d => {
+                cumulative += dailyReturns[d];
+                return cumulative;
+            });
+
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: '누적 수익률 (%)',
+                        data: cumulativeReturns,
+                        borderColor: '#ff6b35',
+                        backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#8892b0' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#8892b0', maxRotation: 45 }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#e4e4e4' } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
