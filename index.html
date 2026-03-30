@@ -198,25 +198,59 @@
         .badge-loss { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
         .badge-close { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
+        /* Chart Toggle Button */
+        .chart-toggle-btn {
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 1px solid #2a2a4a;
+            background: transparent;
             color: #8892b0;
+            font-size: 0.75em;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #00d9ff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-            vertical-align: middle;
+        .chart-toggle-btn.active {
+            background: #00d9ff;
+            color: #1a1a2e;
+            border-color: #00d9ff;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .chart-toggle-btn:hover:not(.active) {
+            border-color: #00d9ff;
+            color: #00d9ff;
+        }
+
+        /* Status Message */
+        .status-message {
+            text-align: center;
+            padding: 30px 20px;
+            color: #8892b0;
+            font-size: 1em;
+        }
+        .status-message.waiting { color: #ffaa00; }
+        .status-message.no-data { color: #8892b0; }
+        .status-message.error { color: #ff6b6b; }
+
+        /* Mini Stat for Strategy Summary */
+        .stat-mini {
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-mini .value {
+            display: block;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+        .stat-mini .value.positive { color: #00ff88; }
+        .stat-mini .value.negative { color: #ff6b6b; }
+        .stat-mini .label {
+            display: block;
+            font-size: 0.75em;
+            color: #8892b0;
+            margin-top: 4px;
+        }
 
         /* Responsive - Tablet */
         @media (max-width: 768px) {
@@ -532,12 +566,20 @@
                 ⏱️ 실시간 상태
                 <span class="update-time" id="statusUpdateTime">-</span>
             </h2>
-            <div id="liveStatus" class="loading">데이터 로딩 중</div>
+            <div id="targetDate" style="color: #00d9ff; font-size: 0.9em; margin-bottom: 10px;"></div>
+            <div id="liveStatus">상태 확인 중...</div>
         </div>
 
         <!-- Performance Chart -->
         <div class="section">
-            <h2>📈 성과 차트</h2>
+            <h2>
+                📈 성과 차트
+                <div style="display: flex; gap: 8px;">
+                    <button class="chart-toggle-btn active" onclick="toggleChartMode('percent')">%</button>
+                    <button class="chart-toggle-btn" onclick="toggleChartMode('amount')">금액</button>
+                </div>
+            </h2>
+            <div id="initialCapitalInfo" style="color: #8892b0; font-size: 0.85em; margin-bottom: 10px;">초기 자본금: 1,000,000원</div>
             <div class="chart-container">
                 <canvas id="performanceChart"></canvas>
             </div>
@@ -559,6 +601,10 @@
     <script>
         let performanceChart = null;
         let currentStrategy = 'all';
+        let chartMode = 'percent'; // 'percent' or 'amount'
+        let cachedData = null;
+        const INITIAL_CAPITAL = 1000000; // 초기 자본금 100만원
+        const POSITION_SIZE = 200000; // 종목당 투자금액 20만원
 
         // 오늘 날짜 설정
         document.addEventListener('DOMContentLoaded', () => {
@@ -566,6 +612,17 @@
             document.getElementById('selectDate').value = today;
             loadTodayData();
         });
+
+        // 차트 모드 전환
+        function toggleChartMode(mode) {
+            chartMode = mode;
+            document.querySelectorAll('.chart-toggle-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.trim() === (mode === 'percent' ? '%' : '금액'));
+            });
+            if (cachedData) {
+                displayPerformanceChart(cachedData);
+            }
+        }
 
         // 전략 선택 (버튼)
         function selectStrategy(strategy, btn) {
@@ -620,16 +677,41 @@
 
         // 다중 전략 데이터 로드
         async function loadMultiStrategyData(dateStr) {
+            const grid = document.getElementById('comparisonGrid');
             try {
+                // 먼저 candidates_all 파일 시도
                 const response = await fetch(`data/paper_trading/candidates_${dateStr}_all.json?t=${Date.now()}`);
                 if (response.ok) {
                     const data = await response.json();
                     displayStrategyComparison(data);
-                } else {
-                    document.getElementById('comparisonGrid').innerHTML = '<div class="no-data">해당 날짜의 데이터가 없습니다</div>';
+                    return;
                 }
+
+                // 없으면 intraday 데이터로 전략 비교 생성
+                const intradayResponse = await fetch(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
+                if (intradayResponse.ok) {
+                    const data = await intradayResponse.json();
+                    const stocks = Object.values(data.stocks || {});
+                    if (stocks.length > 0) {
+                        grid.innerHTML = `
+                            <div class="strategy-summary">
+                                <p style="color: #8892b0; margin-bottom: 15px;">📅 ${formatDate(dateStr)} 인트라데이 분석 결과</p>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+                                    <div class="stat-mini"><span class="value">${stocks.length}</span><span class="label">분석 종목</span></div>
+                                    <div class="stat-mini"><span class="value positive">${stocks.filter(s => s.profit_loss_analysis?.first_hit === 'profit').length}</span><span class="label">익절</span></div>
+                                    <div class="stat-mini"><span class="value negative">${stocks.filter(s => s.profit_loss_analysis?.first_hit === 'loss').length}</span><span class="label">손절</span></div>
+                                    <div class="stat-mini"><span class="value">${stocks.filter(s => !s.profit_loss_analysis?.first_hit || s.profit_loss_analysis?.first_hit === 'none').length}</span><span class="label">미도달</span></div>
+                                </div>
+                            </div>
+                        `;
+                        return;
+                    }
+                }
+
+                grid.innerHTML = '<div class="status-message no-data">해당 날짜의 전략 비교 데이터가 없습니다</div>';
             } catch (error) {
                 console.log('Multi-strategy load error:', error);
+                grid.innerHTML = '<div class="status-message error">데이터 로드 실패</div>';
             }
         }
 
@@ -955,9 +1037,18 @@
         async function loadLiveStatus(dateStr = null) {
             const container = document.getElementById('liveStatus');
             const updateTime = document.getElementById('statusUpdateTime');
+            const targetDateEl = document.getElementById('targetDate');
 
             try {
                 const today = dateStr || new Date().toISOString().split('T')[0].replace(/-/g, '');
+                const formattedDate = formatDate(today);
+                targetDateEl.textContent = `📅 대상 날짜: ${formattedDate}`;
+
+                // 현재 시간 체크
+                const now = new Date();
+                const hour = now.getHours();
+                const isWeekend = now.getDay() === 0 || now.getDay() === 6;
+                const isMarketOpen = hour >= 9 && hour < 16;
 
                 // 상태 파일 로드 시도
                 const statusResponse = await fetch(`data/paper_trading/status_${today}.json?t=${Date.now()}`);
@@ -979,12 +1070,25 @@
                     return;
                 }
 
-                container.innerHTML = '<div class="no-data">오늘 선정된 종목이 없습니다.</div>';
+                // 상태 메시지 표시
+                let statusMsg = '';
+                if (isWeekend) {
+                    statusMsg = '<div class="status-message no-data">📅 주말 - 장 휴무</div>';
+                } else if (hour < 8) {
+                    statusMsg = '<div class="status-message waiting">⏳ 장 시작 전 - 08:10 종목 선정 예정</div>';
+                } else if (hour < 9) {
+                    statusMsg = '<div class="status-message waiting">⏳ 대기 중 - 09:00 장 시작 예정</div>';
+                } else if (isMarketOpen) {
+                    statusMsg = '<div class="status-message waiting">📊 장중 - 충족 종목 없음</div>';
+                } else {
+                    statusMsg = '<div class="status-message no-data">📋 장 마감 - 오늘 충족 종목 없음</div>';
+                }
+                container.innerHTML = statusMsg;
                 updateTime.textContent = '-';
 
             } catch (error) {
                 console.log('Live status load error:', error);
-                container.innerHTML = '<div class="no-data">상태 데이터를 불러올 수 없습니다.</div>';
+                container.innerHTML = '<div class="status-message error">⚠️ 상태 데이터를 불러올 수 없습니다</div>';
             }
         }
 
@@ -1091,6 +1195,7 @@
 
         // 성과 차트
         function displayPerformanceChart(data) {
+            cachedData = data; // 캐시 저장
             const days = data.daily_results || [];
 
             if (days.length === 0) return;
@@ -1103,6 +1208,18 @@
             });
             const dailyReturns = days.map(d => d.total_return || 0);
 
+            // 금액 모드용 데이터
+            let balance = INITIAL_CAPITAL;
+            const cumulativeAmounts = days.map(d => {
+                const dailyPnL = (d.total_trades || 0) * POSITION_SIZE * (d.total_return || 0) / 100;
+                balance += dailyPnL;
+                return balance;
+            });
+            const dailyAmounts = days.map(d => {
+                return (d.total_trades || 0) * POSITION_SIZE * (d.total_return || 0) / 100;
+            });
+
+            const isPercent = chartMode === 'percent';
             const ctx = document.getElementById('performanceChart').getContext('2d');
 
             if (performanceChart) {
@@ -1115,8 +1232,8 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: '누적 수익률 (%)',
-                            data: cumulativeReturns,
+                            label: isPercent ? '누적 수익률 (%)' : '총 자산 (원)',
+                            data: isPercent ? cumulativeReturns : cumulativeAmounts,
                             borderColor: '#00d9ff',
                             backgroundColor: 'rgba(0, 217, 255, 0.1)',
                             fill: true,
@@ -1124,8 +1241,8 @@
                             yAxisID: 'y'
                         },
                         {
-                            label: '일일 수익률 (%)',
-                            data: dailyReturns,
+                            label: isPercent ? '일일 수익률 (%)' : '일일 손익 (원)',
+                            data: isPercent ? dailyReturns : dailyAmounts,
                             borderColor: '#00ff88',
                             backgroundColor: 'rgba(0, 255, 136, 0.5)',
                             type: 'bar',
@@ -1189,33 +1306,36 @@
             }
 
             const html = `
-                <div class="table-wrapper">
+                <div class="table-wrapper" style="margin: 0 -5px; padding: 0 5px;">
                 <table>
                     <thead>
                         <tr>
                             <th>날짜</th>
                             <th>종목</th>
+                            <th>주수</th>
                             <th>진입가</th>
                             <th>청산가</th>
-                            <th>진입시간</th>
-                            <th>청산시간</th>
                             <th>수익률</th>
-                            <th>청산유형</th>
+                            <th>손익금액</th>
+                            <th>청산</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${allTrades.slice(-15).reverse().map(t => `
+                        ${allTrades.slice(-15).reverse().map(t => {
+                            const shares = t.entry_price ? Math.floor(POSITION_SIZE / t.entry_price) : 0;
+                            const pnlAmount = shares * (t.exit_price || t.entry_price) * (t.return_pct || 0) / 100;
+                            return `
                             <tr>
                                 <td>${formatDate(t.date)}</td>
-                                <td>${t.name} (${t.code})</td>
-                                <td>${t.entry_price?.toLocaleString()}원</td>
-                                <td>${t.exit_price?.toLocaleString()}원</td>
-                                <td>${t.entry_time || '-'}</td>
-                                <td>${t.exit_time || '-'}</td>
+                                <td>${t.name}</td>
+                                <td>${shares}주</td>
+                                <td>${t.entry_price?.toLocaleString() || '-'}</td>
+                                <td>${t.exit_price?.toLocaleString() || '-'}</td>
                                 <td class="${t.return_pct >= 0 ? 'positive' : 'negative'}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct}%</td>
+                                <td class="${pnlAmount >= 0 ? 'positive' : 'negative'}">${pnlAmount >= 0 ? '+' : ''}${Math.round(pnlAmount).toLocaleString()}원</td>
                                 <td><span class="badge badge-${t.exit_type}">${getExitTypeLabel(t.exit_type)}</span></td>
                             </tr>
-                        `).join('')}
+                        `}).join('')}
                     </tbody>
                 </table>
                 </div>
@@ -1233,32 +1353,38 @@
                 return;
             }
 
+            // 누적 손익 계산
+            let cumulativePnL = 0;
+            const daysWithPnL = days.map(d => {
+                const dailyPnL = (d.total_trades || 0) * POSITION_SIZE * (d.total_return || 0) / 100;
+                cumulativePnL += dailyPnL;
+                return { ...d, dailyPnL, cumulativePnL };
+            });
+
             const html = `
-                <div class="table-wrapper">
-                <table>
+                <div class="table-wrapper" style="margin: 0; padding: 0;">
+                <table style="min-width: 580px;">
                     <thead>
                         <tr>
                             <th>날짜</th>
-                            <th>거래수</th>
+                            <th>거래</th>
                             <th>승률</th>
                             <th>수익률</th>
-                            <th>누적</th>
-                            <th>익절</th>
-                            <th>손절</th>
-                            <th>종가</th>
+                            <th>손익</th>
+                            <th>누적손익</th>
+                            <th>익/손/종</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${days.slice(-20).reverse().map(d => `
+                        ${daysWithPnL.slice(-20).reverse().map(d => `
                             <tr>
                                 <td>${formatDate(d.date)}</td>
                                 <td>${d.total_trades}건</td>
                                 <td>${d.win_rate}%</td>
-                                <td class="${d.total_return >= 0 ? 'positive' : 'negative'}">${d.total_return >= 0 ? '+' : ''}${d.total_return?.toFixed(2)}%</td>
-                                <td class="${d.cumulative_return >= 0 ? 'positive' : 'negative'}">${d.cumulative_return >= 0 ? '+' : ''}${d.cumulative_return?.toFixed(2) || '-'}%</td>
-                                <td>${d.profit_exits || 0}</td>
-                                <td>${d.loss_exits || 0}</td>
-                                <td>${d.close_exits || 0}</td>
+                                <td class="${d.total_return >= 0 ? 'positive' : 'negative'}">${d.total_return >= 0 ? '+' : ''}${d.total_return?.toFixed(1)}%</td>
+                                <td class="${d.dailyPnL >= 0 ? 'positive' : 'negative'}">${d.dailyPnL >= 0 ? '+' : ''}${Math.round(d.dailyPnL).toLocaleString()}</td>
+                                <td class="${d.cumulativePnL >= 0 ? 'positive' : 'negative'}">${d.cumulativePnL >= 0 ? '+' : ''}${Math.round(d.cumulativePnL).toLocaleString()}</td>
+                                <td>${d.profit_exits || 0}/${d.loss_exits || 0}/${d.close_exits || 0}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -1297,7 +1423,7 @@
 
     <!-- Footer with Last Modified Date -->
     <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-03-30 23:55
+        📅 마지막 수정: 2026-03-31 00:10
     </footer>
 </body>
 </html>
