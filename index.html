@@ -218,7 +218,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Responsive */
+        /* Responsive - Tablet */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 0 5px; }
@@ -227,7 +227,7 @@
             .header .nav-links { margin-top: 15px; }
             .header .nav-links a { margin: 0 10px; font-size: 0.9em; }
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 10px;
             }
             .stat-card { padding: 15px 10px; }
@@ -287,15 +287,61 @@
             .chart-container { height: 250px; }
         }
 
-        @media (max-width: 480px) {
+        /* Responsive - Mobile (S23 등) */
+        @media (max-width: 420px) {
+            body { padding: 8px; }
+            .container { padding: 0; }
+            .header { margin-bottom: 15px; padding-bottom: 12px; }
+            .header h1 { font-size: 1.15em; }
+            .header .subtitle { font-size: 0.75em; }
+            .header .nav-links a { margin: 0 8px; font-size: 0.8em; }
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+                margin-bottom: 15px;
             }
-            .stat-card { padding: 12px 8px; }
-            .stat-value { font-size: 1.3em; }
-            .header h1 { font-size: 1.2em; }
-            .strategy-btn { padding: 6px 10px; font-size: 0.8em; }
+            .stat-card {
+                padding: 10px 6px;
+                border-radius: 10px;
+            }
+            .stat-value { font-size: 1.1em; }
+            .stat-label { font-size: 0.65em; }
+            .control-bar {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+            .control-bar input[type="date"] {
+                padding: 6px 8px;
+                font-size: 0.8em;
+                max-width: 130px;
+            }
+            .control-bar button {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+            .section {
+                padding: 12px 10px;
+                margin-bottom: 12px;
+                border-radius: 8px;
+            }
+            .section h2 { font-size: 1em; margin-bottom: 12px; }
+            .strategy-buttons { gap: 6px; padding-bottom: 8px; }
+            .strategy-btn {
+                padding: 6px 10px;
+                font-size: 0.75em;
+                border-radius: 6px;
+            }
+            .stock-status-card {
+                padding: 12px;
+                border-radius: 8px;
+            }
+            .stock-status-card .stock-name { font-size: 0.95em; }
+            .stock-status-card .stock-info { font-size: 0.8em; gap: 6px; }
+            .table-wrapper { margin: 0 -10px; padding: 0 10px; }
+            table { min-width: 500px; font-size: 0.75em; }
+            th, td { padding: 8px 6px; }
+            .chart-container { height: 200px; }
+            .no-data { padding: 25px; font-size: 0.85em; }
         }
 
         /* No Data */
@@ -1145,7 +1191,7 @@
 
     <!-- Footer with Last Modified Date -->
     <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-03-30 23:35
+        📅 마지막 수정: 2026-03-30 23:42
     </footer>
 </body>
 </html>
