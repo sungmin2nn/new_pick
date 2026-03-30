@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>프로젝트 대시보드</title>
+    <title>뉴스봇 대시보드</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -17,24 +17,24 @@
         h2 { color: #00ff88; margin: 20px 0 15px; }
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
             margin: 20px 0;
         }
         .stat-card {
             background: #16213e;
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
         }
         .stat-value {
-            font-size: 2em;
+            font-size: 1.8em;
             font-weight: bold;
             color: #00d9ff;
         }
         .stat-value.positive { color: #00ff88; }
         .stat-value.negative { color: #ff6b6b; }
-        .stat-label { color: #8892b0; margin-top: 10px; }
+        .stat-label { color: #8892b0; margin-top: 8px; font-size: 0.9em; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -53,29 +53,49 @@
             margin: 20px 0;
         }
         .timestamp { color: #8892b0; font-size: 0.9em; }
+        .profit { color: #ff6b6b; }
+        .loss { color: #4dabf7; }
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin: 2px;
+        }
+        .tag-profit { background: #2d1f1f; color: #ff6b6b; }
+        .tag-loss { background: #1f2d3d; color: #4dabf7; }
+        .tag-none { background: #2d2d2d; color: #888; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>프로젝트 대시보드</h1>
-        <p class="timestamp">최종 업데이트: 2026-03-30 08:46:24</p>
+        <h1>뉴스봇 대시보드</h1>
+        <p class="timestamp">최종 업데이트: 2026-03-30 22:01:29</p>
 
         <div class="stat-grid">
             <div class="stat-card">
-                <div class="stat-value">0</div>
-                <div class="stat-label">최근 거래일</div>
+                <div class="stat-value">30</div>
+                <div class="stat-label">분석일</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">0</div>
-                <div class="stat-label">총 거래 수</div>
+                <div class="stat-value">219</div>
+                <div class="stat-label">총 종목</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">0.0%</div>
-                <div class="stat-label">승률</div>
+                <div class="stat-value">17.4%</div>
+                <div class="stat-label">익절 승률</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value negative">+0.00%</div>
-                <div class="stat-label">총 수익률</div>
+                <div class="stat-value positive">+0.27%</div>
+                <div class="stat-label">평균 수익</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value profit">38</div>
+                <div class="stat-label">익절</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value loss">63</div>
+                <div class="stat-label">손절</div>
             </div>
         </div>
 
@@ -119,12 +139,44 @@
         </div>
 
         <div class="section">
-            <h2>최근 매매 기록</h2>
+            <h2>일별 인트라데이 결과</h2>
             <table>
-                <tr><th>날짜</th><th>거래수</th><th>승률</th><th>수익률</th></tr>
+                <tr><th>날짜</th><th>종목</th><th>익절</th><th>손절</th><th>미도달</th><th>승률</th><th>평균</th></tr>
+<tr><td>2026-03-30</td><td>8</td><td class='profit'>2</td><td class='loss'>2</td><td>4</td><td>25%</td><td class='positive'>+0.96%</td></tr>
+<tr><td>2026-03-27</td><td>6</td><td class='profit'>1</td><td class='loss'>0</td><td>5</td><td>17%</td><td class='positive'>+2.94%</td></tr>
+<tr><td>2026-03-26</td><td>8</td><td class='profit'>1</td><td class='loss'>3</td><td>4</td><td>12%</td><td class='negative'>-1.61%</td></tr>
+<tr><td>2026-03-25</td><td>8</td><td class='profit'>1</td><td class='loss'>3</td><td>4</td><td>12%</td><td class='negative'>-0.65%</td></tr>
+<tr><td>2026-03-24</td><td>7</td><td class='profit'>0</td><td class='loss'>5</td><td>2</td><td>0%</td><td class='positive'>+1.00%</td></tr>
+<tr><td>2026-03-23</td><td>6</td><td class='profit'>1</td><td class='loss'>3</td><td>2</td><td>17%</td><td class='negative'>-1.89%</td></tr>
+<tr><td>2026-03-20</td><td>8</td><td class='profit'>1</td><td class='loss'>1</td><td>6</td><td>12%</td><td class='positive'>+2.32%</td></tr>
+<tr><td>2026-03-19</td><td>7</td><td class='profit'>1</td><td class='loss'>0</td><td>6</td><td>14%</td><td class='positive'>+2.97%</td></tr>
+<tr><td>2026-03-18</td><td>7</td><td class='profit'>2</td><td class='loss'>1</td><td>4</td><td>29%</td><td class='positive'>+3.04%</td></tr>
+<tr><td>2026-03-17</td><td>5</td><td class='profit'>1</td><td class='loss'>0</td><td>4</td><td>20%</td><td class='negative'>-1.17%</td></tr>
+<tr><td>2026-03-16</td><td>7</td><td class='profit'>1</td><td class='loss'>2</td><td>4</td><td>14%</td><td class='positive'>+1.14%</td></tr>
+<tr><td>2026-03-13</td><td>8</td><td class='profit'>2</td><td class='loss'>0</td><td>6</td><td>25%</td><td class='positive'>+2.26%</td></tr>
+<tr><td>2026-03-12</td><td>7</td><td class='profit'>0</td><td class='loss'>1</td><td>6</td><td>0%</td><td class='positive'>+0.11%</td></tr>
+<tr><td>2026-03-11</td><td>7</td><td class='profit'>1</td><td class='loss'>2</td><td>4</td><td>14%</td><td class='negative'>-0.66%</td></tr>
+<tr><td>2026-03-10</td><td>8</td><td class='profit'>0</td><td class='loss'>3</td><td>5</td><td>0%</td><td class='negative'>-0.42%</td></tr>
 
             </table>
         </div>
+
+        <div class="section">
+            <h2>최근 상세 (2026-03-30)</h2>
+            <table>
+                <tr><th>종목</th><th>점수</th><th>결과</th><th>종가</th><th>최고</th><th>최저</th></tr>
+<tr><td>ISC</td><td>56</td><td><span class="tag tag-loss">손절</span></td><td class='positive'>+1.43%</td><td class='profit'>+4.71%</td><td class='loss'>-4.51%</td></tr>
+<tr><td>제일기획</td><td>55</td><td><span class="tag tag-none">미도달</span></td><td class='negative'>-0.56%</td><td class='profit'>+0.10%</td><td class='loss'>-1.08%</td></tr>
+<tr><td>휴젤</td><td>44</td><td><span class="tag tag-loss">손절</span></td><td class='negative'>-4.28%</td><td class='profit'>+1.17%</td><td class='loss'>-4.47%</td></tr>
+<tr><td>테스</td><td>42</td><td><span class="tag tag-none">미도달</span></td><td class='negative'>-0.18%</td><td class='profit'>+1.06%</td><td class='loss'>-2.29%</td></tr>
+<tr><td>동국제약</td><td>42</td><td><span class="tag tag-profit">익절</span></td><td class='positive'>+3.60%</td><td class='profit'>+5.39%</td><td class='loss'>-1.80%</td></tr>
+<tr><td>전진건설로봇</td><td>41</td><td><span class="tag tag-profit">익절</span></td><td class='positive'>+4.49%</td><td class='profit'>+5.47%</td><td class='loss'>+0.00%</td></tr>
+<tr><td>LS증권</td><td>37</td><td><span class="tag tag-none">미도달</span></td><td class='positive'>+1.79%</td><td class='profit'>+2.39%</td><td class='loss'>-0.60%</td></tr>
+<tr><td>셀트리온</td><td>38</td><td><span class="tag tag-none">미도달</span></td><td class='positive'>+1.36%</td><td class='profit'>+2.11%</td><td class='loss'>-0.40%</td></tr>
+
+            </table>
+        </div>
+
     </div>
 </body>
 </html>

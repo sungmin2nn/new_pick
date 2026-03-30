@@ -20,6 +20,23 @@ class AutoReporter:
         self.context_loader = ContextLoader()
         self.reports_dir = DATA_DIR / "reports"
         self.reports_dir.mkdir(exist_ok=True)
+        self.intraday_dir = DATA_DIR / "intraday"
+
+    def load_intraday_results(self, limit: int = 30) -> List[Dict]:
+        """인트라데이 결과 로드"""
+        results = []
+        if not self.intraday_dir.exists():
+            return results
+
+        files = sorted(self.intraday_dir.glob("intraday_*.json"), reverse=True)[:limit]
+        for filepath in files:
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    results.append(data)
+            except Exception as e:
+                print(f"[WARN] 인트라데이 파일 로드 실패: {filepath} - {e}")
+        return results
 
     def generate_daily_report(self, date: str = None) -> str:
         """일간 리포트 생성"""
@@ -314,23 +331,78 @@ class AutoReporter:
         print(f"[REPORT] 지식 베이스 업데이트: {kb_file}")
 
     def generate_html_dashboard(self) -> str:
-        """HTML 대시보드 리포트 생성"""
+        """HTML 대시보드 리포트 생성 (인트라데이 결과 포함)"""
         ctx = self.context_loader.load_context()
-        trades = self.logger.get_trades()[:30]
 
-        # 통계 계산
-        total_trades = sum(t.get("summary", {}).get("total_trades", 0) for t in trades)
-        total_wins = sum(t.get("summary", {}).get("wins", 0) for t in trades)
-        win_rate = (total_wins / total_trades * 100) if total_trades > 0 else 0
-        total_returns = [t.get("summary", {}).get("total_return", 0) for t in trades]
-        total_return = sum(total_returns)
+        # 인트라데이 결과 로드
+        intraday_results = self.load_intraday_results(limit=30)
+
+        # 인트라데이 통계 계산
+        total_stocks = 0
+        total_profit = 0
+        total_loss = 0
+        total_none = 0
+        all_closing_pcts = []
+
+        daily_stats = []
+        for day_data in intraday_results:
+            date = day_data.get('date', '')
+            if len(date) == 8:
+                date = f"{date[:4]}-{date[4:6]}-{date[6:]}"
+
+            stocks = day_data.get('stocks', {})
+            day_profit = 0
+            day_loss = 0
+            day_none = 0
+            day_closing_pcts = []
+
+            for code, info in stocks.items():
+                pl = info.get('profit_loss_analysis') or {}
+                if not pl:
+                    continue
+                entry = pl.get('entry_check') or {}
+                should_buy = entry.get('should_buy', True) if entry else True
+
+                if should_buy:
+                    actual = pl.get('actual_result') or pl
+                    first_hit = actual.get('first_hit', 'none')
+                    closing_pct = actual.get('closing_percent', 0) or 0
+
+                    if first_hit == 'profit':
+                        day_profit += 1
+                        total_profit += 1
+                    elif first_hit == 'loss':
+                        day_loss += 1
+                        total_loss += 1
+                    else:
+                        day_none += 1
+                        total_none += 1
+
+                    day_closing_pcts.append(closing_pct)
+                    all_closing_pcts.append(closing_pct)
+                    total_stocks += 1
+
+            if day_closing_pcts:
+                daily_stats.append({
+                    'date': date,
+                    'count': len(day_closing_pcts),
+                    'profit': day_profit,
+                    'loss': day_loss,
+                    'none': day_none,
+                    'win_rate': (day_profit / len(day_closing_pcts) * 100) if day_closing_pcts else 0,
+                    'avg_return': sum(day_closing_pcts) / len(day_closing_pcts) if day_closing_pcts else 0
+                })
+
+        # 전체 통계
+        win_rate = (total_profit / total_stocks * 100) if total_stocks > 0 else 0
+        avg_return = sum(all_closing_pcts) / len(all_closing_pcts) if all_closing_pcts else 0
 
         html = f"""<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>프로젝트 대시보드</title>
+    <title>뉴스봇 대시보드</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
@@ -344,24 +416,24 @@ class AutoReporter:
         h2 {{ color: #00ff88; margin: 20px 0 15px; }}
         .stat-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
             margin: 20px 0;
         }}
         .stat-card {{
             background: #16213e;
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
         }}
         .stat-value {{
-            font-size: 2em;
+            font-size: 1.8em;
             font-weight: bold;
             color: #00d9ff;
         }}
         .stat-value.positive {{ color: #00ff88; }}
         .stat-value.negative {{ color: #ff6b6b; }}
-        .stat-label {{ color: #8892b0; margin-top: 10px; }}
+        .stat-label {{ color: #8892b0; margin-top: 8px; font-size: 0.9em; }}
         table {{
             width: 100%;
             border-collapse: collapse;
@@ -380,29 +452,49 @@ class AutoReporter:
             margin: 20px 0;
         }}
         .timestamp {{ color: #8892b0; font-size: 0.9em; }}
+        .profit {{ color: #ff6b6b; }}
+        .loss {{ color: #4dabf7; }}
+        .tag {{
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin: 2px;
+        }}
+        .tag-profit {{ background: #2d1f1f; color: #ff6b6b; }}
+        .tag-loss {{ background: #1f2d3d; color: #4dabf7; }}
+        .tag-none {{ background: #2d2d2d; color: #888; }}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>프로젝트 대시보드</h1>
+        <h1>뉴스봇 대시보드</h1>
         <p class="timestamp">최종 업데이트: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
 
         <div class="stat-grid">
             <div class="stat-card">
-                <div class="stat-value">{len(trades)}</div>
-                <div class="stat-label">최근 거래일</div>
+                <div class="stat-value">{len(daily_stats)}</div>
+                <div class="stat-label">분석일</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">{total_trades}</div>
-                <div class="stat-label">총 거래 수</div>
+                <div class="stat-value">{total_stocks}</div>
+                <div class="stat-label">총 종목</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value">{win_rate:.1f}%</div>
-                <div class="stat-label">승률</div>
+                <div class="stat-label">익절 승률</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value {'positive' if total_return > 0 else 'negative'}">{total_return:+.2f}%</div>
-                <div class="stat-label">총 수익률</div>
+                <div class="stat-value {'positive' if avg_return > 0 else 'negative'}">{avg_return:+.2f}%</div>
+                <div class="stat-label">평균 수익</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value profit">{total_profit}</div>
+                <div class="stat-label">익절</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value loss">{total_loss}</div>
+                <div class="stat-label">손절</div>
             </div>
         </div>
 
@@ -443,21 +535,72 @@ class AutoReporter:
         </div>
 
         <div class="section">
-            <h2>최근 매매 기록</h2>
+            <h2>일별 인트라데이 결과</h2>
             <table>
-                <tr><th>날짜</th><th>거래수</th><th>승률</th><th>수익률</th></tr>
+                <tr><th>날짜</th><th>종목</th><th>익절</th><th>손절</th><th>미도달</th><th>승률</th><th>평균</th></tr>
 """
-        for t in trades[:10]:
-            s = t.get("summary", {})
-            ret = s.get("total_return", 0)
-            ret_class = "positive" if ret > 0 else "negative" if ret < 0 else ""
-            html += f"<tr><td>{t.get('date')}</td><td>{s.get('total_trades', 0)}</td>"
-            html += f"<td>{s.get('win_rate', 0):.1f}%</td>"
-            html += f"<td class='{ret_class}'>{ret:+.2f}%</td></tr>\n"
+        for d in daily_stats[:15]:
+            ret_class = "positive" if d['avg_return'] > 0 else "negative" if d['avg_return'] < 0 else ""
+            html += f"<tr><td>{d['date']}</td><td>{d['count']}</td>"
+            html += f"<td class='profit'>{d['profit']}</td>"
+            html += f"<td class='loss'>{d['loss']}</td>"
+            html += f"<td>{d['none']}</td>"
+            html += f"<td>{d['win_rate']:.0f}%</td>"
+            html += f"<td class='{ret_class}'>{d['avg_return']:+.2f}%</td></tr>\n"
 
         html += """
             </table>
         </div>
+"""
+        # 오늘 상세 결과 (가장 최근 날짜)
+        if intraday_results:
+            latest = intraday_results[0]
+            latest_date = latest.get('date', '')
+            if len(latest_date) == 8:
+                latest_date = f"{latest_date[:4]}-{latest_date[4:6]}-{latest_date[6:]}"
+
+            html += f"""
+        <div class="section">
+            <h2>최근 상세 ({latest_date})</h2>
+            <table>
+                <tr><th>종목</th><th>점수</th><th>결과</th><th>종가</th><th>최고</th><th>최저</th></tr>
+"""
+            for code, info in latest.get('stocks', {}).items():
+                pl = info.get('profit_loss_analysis') or {}
+                if not pl:
+                    continue
+                entry = pl.get('entry_check') or {}
+                should_buy = entry.get('should_buy', True) if entry else True
+
+                if should_buy:
+                    actual = pl.get('actual_result') or pl
+                    first_hit = actual.get('first_hit', 'none')
+                    closing_pct = actual.get('closing_percent', 0)
+                    max_profit = actual.get('max_profit_percent', 0)
+                    max_loss = actual.get('max_loss_percent', 0)
+
+                    if first_hit == 'profit':
+                        result_tag = '<span class="tag tag-profit">익절</span>'
+                    elif first_hit == 'loss':
+                        result_tag = '<span class="tag tag-loss">손절</span>'
+                    else:
+                        result_tag = '<span class="tag tag-none">미도달</span>'
+
+                    closing_class = "positive" if closing_pct > 0 else "negative" if closing_pct < 0 else ""
+
+                    html += f"<tr><td>{info.get('name', code)}</td>"
+                    html += f"<td>{info.get('selection_score', 0):.0f}</td>"
+                    html += f"<td>{result_tag}</td>"
+                    html += f"<td class='{closing_class}'>{closing_pct:+.2f}%</td>"
+                    html += f"<td class='profit'>{max_profit:+.2f}%</td>"
+                    html += f"<td class='loss'>{max_loss:+.2f}%</td></tr>\n"
+
+            html += """
+            </table>
+        </div>
+"""
+
+        html += """
     </div>
 </body>
 </html>
