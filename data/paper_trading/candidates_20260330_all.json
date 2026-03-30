@@ -1,0 +1,170 @@
+{
+  "date": "20260330",
+  "generated_at": "2026-03-30 23:41:16",
+  "strategies": {
+    "largecap_contrarian": {
+      "strategy_id": "largecap_contrarian",
+      "strategy_name": "대형주 역추세",
+      "date": "20260330",
+      "selected_at": "2026-03-30 23:41:04",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "min_price": 5000,
+        "max_change": -1.5,
+        "min_trading_value": 50,
+        "weights": {
+          "market_cap": 30,
+          "change_pct": 25,
+          "trading_value": 20,
+          "price_level": 15,
+          "volatility": 10
+        }
+      },
+      "simulation": null
+    },
+    "momentum": {
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀 추세",
+      "date": "20260330",
+      "selected_at": "2026-03-30 23:41:04",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "min_price": 3000,
+        "min_change": 3.0,
+        "max_change": 15.0,
+        "min_trading_value": 30,
+        "weights": {
+          "change_pct": 35,
+          "trading_value": 30,
+          "volume_surge": 20,
+          "price_level": 15
+        }
+      },
+      "simulation": null
+    },
+    "theme_policy": {
+      "strategy_id": "theme_policy",
+      "strategy_name": "테마/정책",
+      "date": "20260330",
+      "selected_at": "2026-03-30 23:41:16",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "373220",
+          "name": "LG에너지솔루션",
+          "price": 410000,
+          "change_pct": 3.929024081115336,
+          "score": 29.8,
+          "score_detail": {
+            "theme_relevance": 20.0,
+            "change_pct": 9.82256020278834,
+            "trading_value": 0.0,
+            "news_count": 0.0,
+            "themes": [
+              "2차전지"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 747897,
+          "trading_value": 0
+        },
+        {
+          "code": "003670",
+          "name": "포스코퓨처엠",
+          "price": 214500,
+          "change_pct": 2.631578947368421,
+          "score": 26.6,
+          "score_detail": {
+            "theme_relevance": 20.0,
+            "change_pct": 6.578947368421052,
+            "trading_value": 0.0,
+            "news_count": 0.0,
+            "themes": [
+              "2차전지"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 576917,
+          "trading_value": 0
+        },
+        {
+          "code": "247540",
+          "name": "에코프로비엠",
+          "price": 203500,
+          "change_pct": 0.49382716049382713,
+          "score": 21.2,
+          "score_detail": {
+            "theme_relevance": 20.0,
+            "change_pct": 1.2345679012345678,
+            "trading_value": 0.0,
+            "news_count": 0.0,
+            "themes": [
+              "2차전지"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 404454,
+          "trading_value": 0
+        },
+        {
+          "code": "066970",
+          "name": "엘앤에프",
+          "price": 155900,
+          "change_pct": 0.38634900193174504,
+          "score": 21.0,
+          "score_detail": {
+            "theme_relevance": 20.0,
+            "change_pct": 0.9658725048293626,
+            "trading_value": 0.0,
+            "news_count": 0.0,
+            "themes": [
+              "2차전지"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 1523586,
+          "trading_value": 0
+        },
+        {
+          "code": "000660",
+          "name": "SK하이닉스",
+          "price": 873000,
+          "change_pct": -5.314533622559653,
+          "score": 20.0,
+          "score_detail": {
+            "theme_relevance": 20.0,
+            "change_pct": 0,
+            "trading_value": 0.0,
+            "news_count": 0.0,
+            "themes": [
+              "AI반도체"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 4498502,
+          "trading_value": 0
+        }
+      ],
+      "params": {
+        "active_themes": [
+          "AI반도체",
+          "2차전지"
+        ],
+        "weights": {
+          "theme_relevance": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "news_count": 15
+        }
+      },
+      "simulation": null
+    }
+  }
+}
