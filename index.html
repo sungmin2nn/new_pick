@@ -1122,6 +1122,19 @@
                     return;
                 }
 
+                // morning_candidates.json 로드 시도
+                const morningResponse = await fetch(`data/morning_candidates.json?t=${Date.now()}`);
+                if (morningResponse.ok) {
+                    const morningData = await morningResponse.json();
+                    // 오늘 날짜와 일치하는지 확인
+                    const morningDate = (morningData.date || '').replace(/-/g, '');
+                    if (morningDate === today || morningDate === today.slice(0,4) + '-' + today.slice(4,6) + '-' + today.slice(6,8)) {
+                        displayMorningCandidates(morningData);
+                        updateTime.textContent = `선정 시간: ${morningData.generated_at || '-'}`;
+                        return;
+                    }
+                }
+
                 // 상태 메시지 표시
                 let statusMsg = '';
                 if (isWeekend) {
@@ -1214,6 +1227,44 @@
                                 <span class="info-value">${c.score?.toFixed(1) || '-'}점</span>
                                 <span class="info-label">거래대금</span>
                                 <span class="info-value">${(c.trading_value / 100000000)?.toFixed(0) || '-'}억</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // morning_candidates.json 표시
+        function displayMorningCandidates(data) {
+            const container = document.getElementById('liveStatus');
+            const candidates = data.candidates || [];
+            const sentiment = data.market_sentiment || {};
+
+            if (candidates.length === 0) {
+                container.innerHTML = '<div class="no-data">선정된 종목이 없습니다.</div>';
+                return;
+            }
+
+            const html = `
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,217,255,0.1); border-radius: 8px;">
+                    <span style="color: #00d9ff; font-weight: 600;">📊 ${data.date} (${data.weekday_short}) 선정 종목</span>
+                    <span style="color: #8892b0; margin-left: 10px;">시장: ${sentiment.mode || '-'}</span>
+                </div>
+                <div class="live-status-grid">
+                    ${candidates.map(c => `
+                        <div class="stock-status-card waiting">
+                            <div class="stock-name">
+                                <span>${c.name} <span class="stock-code">(${c.code})</span></span>
+                                <span class="status-badge" style="background: ${c.strategy === 'largecap_contrarian' ? '#ff6b6b' : c.strategy === 'momentum' ? '#00ff88' : '#ffaa00'}; color: #1a1a2e; font-size: 0.7em;">
+                                    ${c.strategy === 'largecap_contrarian' ? '역추세' : c.strategy === 'momentum' ? '모멘텀' : '테마'}
+                                </span>
+                            </div>
+                            <div class="stock-info">
+                                <span class="info-label">전일 종가</span>
+                                <span class="info-value">${c.price?.toLocaleString() || '-'}원</span>
+                                <span class="info-label">점수</span>
+                                <span class="info-value">${c.score?.toFixed(1) || '-'}점</span>
                             </div>
                         </div>
                     `).join('')}
