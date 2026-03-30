@@ -220,10 +220,82 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 0 5px; }
             .header { flex-direction: column; text-align: center; }
+            .header h1 { font-size: 1.4em; }
             .header .nav-links { margin-top: 15px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .control-bar { justify-content: center; }
+            .header .nav-links a { margin: 0 10px; font-size: 0.9em; }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .stat-card { padding: 15px 10px; }
+            .stat-value { font-size: 1.5em; }
+            .stat-label { font-size: 0.75em; }
+            .control-bar {
+                justify-content: center;
+                gap: 8px;
+            }
+            .control-bar input[type="date"],
+            .control-bar button {
+                padding: 8px 12px;
+                font-size: 0.85em;
+            }
+            .section {
+                padding: 15px;
+                margin-bottom: 15px;
+                border-radius: 10px;
+            }
+            .section h2 {
+                font-size: 1.1em;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            .strategy-buttons {
+                width: 100%;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .strategy-btn {
+                flex-shrink: 0;
+                padding: 8px 14px;
+                font-size: 0.85em;
+            }
+            .live-status-grid {
+                grid-template-columns: 1fr;
+            }
+            .stock-status-card { padding: 15px; }
+            /* Table scroll wrapper */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -15px;
+                padding: 0 15px;
+            }
+            table {
+                min-width: 600px;
+                font-size: 0.85em;
+            }
+            th, td {
+                padding: 10px 8px;
+                white-space: nowrap;
+            }
+            .chart-container { height: 250px; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .stat-card { padding: 12px 8px; }
+            .stat-value { font-size: 1.3em; }
+            .header h1 { font-size: 1.2em; }
+            .strategy-btn { padding: 6px 10px; font-size: 0.8em; }
         }
 
         /* No Data */
@@ -965,6 +1037,7 @@
             }
 
             const html = `
+                <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
@@ -993,6 +1066,7 @@
                         `).join('')}
                     </tbody>
                 </table>
+                </div>
             `;
             container.innerHTML = html;
         }
@@ -1008,6 +1082,7 @@
             }
 
             const html = `
+                <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
@@ -1036,6 +1111,7 @@
                         `).join('')}
                     </tbody>
                 </table>
+                </div>
             `;
             container.innerHTML = html;
         }
@@ -1069,7 +1145,7 @@
 
     <!-- Footer with Last Modified Date -->
     <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-03-30 23:25
+        📅 마지막 수정: 2026-03-30 23:35
     </footer>
 </body>
 </html>
