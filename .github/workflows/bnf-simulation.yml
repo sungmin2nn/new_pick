@@ -90,27 +90,12 @@ jobs:
             import warnings
             warnings.filterwarnings('ignore')
 
-            # 가장 최근 거래일 찾기 (pykrx는 미래 날짜 지원 안함)
-            # 2025년 3월 기준으로 조회
+            # 현재 날짜 기준으로 시장 데이터 조회
             test_code = candidates[0]['code']
-            market_date = None
+            today_str = now.strftime('%Y%m%d')
+            start_str = (now - timedelta(days=10)).strftime('%Y%m%d')
 
-            # 최근 실제 거래일 찾기
-            for days_back in range(1, 400):
-                test_date = (datetime(2025, 3, 28) - timedelta(days=days_back)).strftime('%Y%m%d')
-                try:
-                    df = stock.get_market_ohlcv(test_date, test_date, test_code)
-                    if not df.empty and len(df) > 0:
-                        market_date = test_date
-                        break
-                except:
-                    continue
-
-            if not market_date:
-                # 더 과거로 시도
-                market_date = '20250328'
-
-            print(f'시장 기준일: {market_date}')
+            print(f'시장 기준일: {today_str}')
 
             positions = positions_data.get('positions', [])
             if isinstance(positions, dict):
@@ -124,12 +109,10 @@ jobs:
             open_positions = [p for p in positions if p.get('state') != 'CLOSED']
 
             # 기존 포지션 가격 업데이트
-            start_date = (datetime.strptime(market_date, '%Y%m%d') - timedelta(days=10)).strftime('%Y%m%d')
-
             for p in open_positions:
                 code = p['code']
                 try:
-                    df = stock.get_market_ohlcv(start_date, market_date, code)
+                    df = stock.get_market_ohlcv(start_str, today_str, code)
                     if not df.empty:
                         current_price = int(df.iloc[-1]['종가'])
                         p['current_price'] = current_price
