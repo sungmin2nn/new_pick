@@ -276,14 +276,29 @@
         }
         table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
         th, td {
-            padding: 8px 10px;
+            padding: 6px 8px;
             text-align: left;
             border-bottom: 1px solid #2a2a4a;
+            white-space: nowrap;
         }
-        th { background: #0f3460; color: #ff8c42; font-weight: 600; font-size: 0.85em; }
+        th { background: #0f3460; color: #ff8c42; font-weight: 600; font-size: 0.8em; }
         tr:hover { background: rgba(255, 107, 53, 0.05); }
         .positive { color: #00ff88; }
         .negative { color: #ff6b6b; }
+
+        /* Candidates Table */
+        #candidatesTable th:nth-child(1) { width: 30px; }
+        #candidatesTable th:nth-child(2) { width: 120px; }
+        #candidatesTable th:nth-child(3),
+        #candidatesTable th:nth-child(4) { width: 90px; text-align: right; }
+        #candidatesTable th:nth-child(5),
+        #candidatesTable th:nth-child(6),
+        #candidatesTable th:nth-child(7) { width: 60px; text-align: right; }
+        #candidatesTable td:nth-child(3),
+        #candidatesTable td:nth-child(4),
+        #candidatesTable td:nth-child(5),
+        #candidatesTable td:nth-child(6),
+        #candidatesTable td:nth-child(7) { text-align: right; }
 
         /* No Data */
         .no-data {
