@@ -392,8 +392,23 @@
         <!-- Candidates -->
         <div class="section">
             <h2>📉 낙폭과대 후보 종목</h2>
-            <div id="candidatesGrid" class="candidates-grid">
-                <div class="no-data">데이터 로딩 중...</div>
+            <div class="table-wrapper">
+                <table id="candidatesTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>종목</th>
+                            <th>현재가</th>
+                            <th>20일고점</th>
+                            <th>고점대비</th>
+                            <th>5일</th>
+                            <th>10일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidatesBody">
+                        <tr><td colspan="7" class="no-data">데이터 로딩 중...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -477,12 +492,12 @@
 
         // 후보 종목 로드
         async function loadCandidates() {
-            const grid = document.getElementById('candidatesGrid');
+            const tbody = document.getElementById('candidatesBody');
 
             try {
                 const response = await fetch('data/bnf/candidates.json?t=' + Date.now());
                 if (!response.ok) {
-                    grid.innerHTML = '<div class="no-data">후보 종목 데이터가 없습니다. 시뮬레이션을 실행해주세요.</div>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">후보 종목 데이터가 없습니다</td></tr>';
                     return;
                 }
 
@@ -490,39 +505,29 @@
                 const candidates = data.candidates || [];
 
                 if (candidates.length === 0) {
-                    grid.innerHTML = '<div class="no-data">조건을 충족하는 종목이 없습니다</div>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">조건을 충족하는 종목이 없습니다</td></tr>';
                     return;
                 }
 
-                grid.innerHTML = candidates.map(c => {
+                tbody.innerHTML = candidates.map((c, i) => {
                     const drop5d = c.drop_5d || 0;
                     const drop10d = c.drop_10d || 0;
-                    const drop5dClass = drop5d > 0 ? 'negative' : 'positive';
-                    const drop10dClass = drop10d > 0 ? 'negative' : 'positive';
+                    const dropHigh = c.drop_from_high || 0;
                     return `
-                    <div class="candidate-card">
-                        <div class="candidate-header">
-                            <div>
-                                <div class="candidate-name">${c.name}</div>
-                                <div class="candidate-code">${c.code}</div>
-                            </div>
-                            <div class="drop-badge">-${c.drop_from_high?.toFixed(1) || 0}%</div>
-                        </div>
-                        <div class="candidate-stats">
-                            <span class="label">현재가</span>
-                            <span class="value">${(c.price || c.current_price)?.toLocaleString() || '-'}원</span>
-                            <span class="label">20일고점</span>
-                            <span class="value">${c.high_20d?.toLocaleString() || '-'}원</span>
-                            <span class="label">5일변동</span>
-                            <span class="value ${drop5dClass}">${drop5d > 0 ? '-' : '+'}${Math.abs(drop5d).toFixed(1)}%</span>
-                            <span class="label">10일변동</span>
-                            <span class="value ${drop10dClass}">${drop10d > 0 ? '-' : '+'}${Math.abs(drop10d).toFixed(1)}%</span>
-                        </div>
-                    </div>
-                `}).join('');
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
+                            <td>${(c.price || 0).toLocaleString()}원</td>
+                            <td>${(c.high_20d || 0).toLocaleString()}원</td>
+                            <td class="negative">-${dropHigh.toFixed(1)}%</td>
+                            <td class="${drop5d > 0 ? 'negative' : 'positive'}">${drop5d > 0 ? '-' : '+'}${Math.abs(drop5d).toFixed(1)}%</td>
+                            <td class="${drop10d > 0 ? 'negative' : 'positive'}">${drop10d > 0 ? '-' : '+'}${Math.abs(drop10d).toFixed(1)}%</td>
+                        </tr>
+                    `;
+                }).join('');
 
             } catch (error) {
-                grid.innerHTML = '<div class="no-data">후보 종목 로드 실패</div>';
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">후보 종목 로드 실패</td></tr>';
             }
         }
 
