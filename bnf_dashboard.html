@@ -438,22 +438,22 @@
 
         <!-- Trade History -->
         <div class="section">
-            <h2>📋 매매 이력</h2>
+            <h2>📋 매매 내역</h2>
             <div class="table-wrapper">
                 <table id="tradeHistory">
                     <thead>
                         <tr>
                             <th>날짜</th>
+                            <th>구분</th>
                             <th>종목</th>
-                            <th>진입가</th>
-                            <th>청산가</th>
-                            <th>보유일</th>
-                            <th>수익률</th>
-                            <th>손익</th>
+                            <th>가격</th>
+                            <th>수량</th>
+                            <th>금액</th>
+                            <th>비고</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td colspan="7" class="no-data">매매 이력이 없습니다</td></tr>
+                        <tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -666,38 +666,48 @@
                 }
 
                 const data = await response.json();
-                const trades = data.trades || [];
+                const allTrades = data.all_trades || [];
+                const closedTrades = data.trades || [];
 
                 // 초기 차트는 항상 표시
-                if (trades.length === 0) {
-                    initEmptyChart();
-                    // 매매이력 테이블도 빈 상태로 표시
-                    const tbody = document.querySelector('#tradeHistory tbody');
-                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">아직 청산된 거래가 없습니다</td></tr>';
+                initEmptyChart();
+
+                const tbody = document.querySelector('#tradeHistory tbody');
+
+                if (allTrades.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>';
                     return;
                 }
 
-                const tbody = document.querySelector('#tradeHistory tbody');
-                tbody.innerHTML = trades.slice(-20).reverse().map(t => {
-                    const profit = t.profit || t.pnl || 0;
-                    const pnlClass = profit >= 0 ? 'positive' : 'negative';
-                    const entryPrice = t.entry_price || t.avg_entry_price || 0;
-                    const exitPrice = t.exit_price || t.avg_exit_price || 0;
+                tbody.innerHTML = allTrades.slice(-20).reverse().map(t => {
+                    const isBuy = t.type === 'BUY';
+                    const typeClass = isBuy ? 'positive' : 'negative';
+                    const typeLabel = isBuy ? '매수' : '매도';
+                    const reason = t.reason || '';
+
+                    let extraInfo = reason;
+                    if (!isBuy && t.return_pct !== undefined) {
+                        const pnlClass = t.return_pct >= 0 ? 'positive' : 'negative';
+                        extraInfo = `<span class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct.toFixed(1)}%</span> ${reason}`;
+                    }
+
                     return `
                         <tr>
-                            <td>${t.exit_date || '-'}</td>
-                            <td>${t.name} (${t.code})</td>
-                            <td>${entryPrice?.toLocaleString()}원</td>
-                            <td>${exitPrice?.toLocaleString()}원</td>
-                            <td>${t.holding_days || 1}일</td>
-                            <td class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct?.toFixed(2)}%</td>
-                            <td class="${pnlClass}">${profit >= 0 ? '+' : ''}${profit?.toLocaleString()}원</td>
+                            <td>${t.date || '-'}</td>
+                            <td><span class="${typeClass}" style="font-weight:600;">${typeLabel}</span></td>
+                            <td>${t.name}</td>
+                            <td>${t.price?.toLocaleString()}원</td>
+                            <td>${t.quantity}주</td>
+                            <td>${t.amount?.toLocaleString()}원</td>
+                            <td style="font-size:0.8em;">${extraInfo}</td>
                         </tr>
                     `;
                 }).join('');
 
-                // 차트 업데이트
-                updatePerformanceChart(trades);
+                // 청산 완료 거래가 있으면 차트 업데이트
+                if (closedTrades.length > 0) {
+                    updatePerformanceChart(closedTrades);
+                }
 
             } catch (error) {
                 console.error('Trade history load error:', error);
