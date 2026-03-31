@@ -54,7 +54,7 @@ jobs:
             positions_data = {
                 'updated_at': '',
                 'positions': [],
-                'stats': {'total_capital': 10000000, 'open_positions': 0, 'total_trades': 0, 'win_rate': 0, 'total_return': 0, 'avg_return': 0, 'unrealized_pnl': 0}
+                'stats': {'total_capital': 3000000, 'open_positions': 0, 'total_trades': 0, 'win_rate': 0, 'total_return': 0, 'avg_return': 0, 'unrealized_pnl': 0}
             }
 
         # 거래이력 로드
@@ -117,7 +117,7 @@ jobs:
                 positions = list(positions.values())
 
             stats = positions_data.get('stats', {})
-            total_capital = stats.get('total_capital', 10000000)
+            total_capital = stats.get('total_capital', 3000000)
             max_positions = 5
             position_size = total_capital * 0.2
 

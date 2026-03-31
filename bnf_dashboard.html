@@ -12,7 +12,8 @@
             background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
             color: #e4e4e4;
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
+            font-size: 13px;
         }
         .container { max-width: 1400px; margin: 0 auto; }
 
@@ -23,18 +24,18 @@
             margin-bottom: 20px;
         }
         .nav-btn {
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
             border: 2px solid #2a2a4a;
             background: transparent;
             color: #8892b0;
-            font-size: 0.95em;
+            font-size: 0.85em;
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .nav-btn:hover {
             border-color: #00d9ff;
@@ -51,20 +52,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 1px solid #2a2a4a;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
         }
         .header h1 {
             color: #ff6b35;
-            font-size: 1.8em;
+            font-size: 1.4em;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
-        .header .subtitle { color: #8892b0; margin-top: 5px; font-size: 0.9em; }
+        .header .subtitle { color: #8892b0; margin-top: 3px; font-size: 0.8em; }
         .bnf-badge {
             background: linear-gradient(135deg, #ff6b35, #ff8c42);
             color: white;
@@ -78,88 +79,88 @@
         .strategy-info {
             background: rgba(255, 107, 53, 0.1);
             border: 1px solid rgba(255, 107, 53, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
         }
         .strategy-info h3 {
             color: #ff6b35;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+            margin-bottom: 10px;
+            font-size: 0.95em;
         }
         .strategy-rules {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
         }
         .rule-card {
             background: rgba(15, 15, 35, 0.5);
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 6px;
+            padding: 10px;
         }
         .rule-card .label {
             color: #8892b0;
-            font-size: 0.8em;
-            margin-bottom: 5px;
+            font-size: 0.7em;
+            margin-bottom: 3px;
         }
         .rule-card .value {
             color: #e4e4e4;
-            font-size: 1em;
+            font-size: 0.85em;
             font-weight: 500;
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
         }
         .stat-card {
             background: rgba(22, 33, 62, 0.8);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 8px;
+            padding: 12px;
             text-align: center;
             border: 1px solid #2a2a4a;
         }
         .stat-value {
-            font-size: 1.8em;
+            font-size: 1.3em;
             font-weight: bold;
             color: #ff6b35;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         .stat-value.positive { color: #00ff88; }
         .stat-value.negative { color: #ff6b6b; }
-        .stat-label { color: #8892b0; font-size: 0.8em; }
+        .stat-label { color: #8892b0; font-size: 0.7em; }
 
         /* Section */
         .section {
             background: rgba(22, 33, 62, 0.8);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
             border: 1px solid #2a2a4a;
         }
         .section h2 {
             color: #ff8c42;
-            margin-bottom: 20px;
-            font-size: 1.2em;
+            margin-bottom: 12px;
+            font-size: 1em;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         /* Candidates Table */
         .candidates-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 10px;
         }
         .candidate-card {
             background: rgba(15, 15, 35, 0.6);
-            border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid #ff6b35;
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid #ff6b35;
         }
         .candidate-card.selected {
             border-left-color: #00ff88;
@@ -169,47 +170,47 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .candidate-name {
             font-weight: 600;
-            font-size: 1.1em;
+            font-size: 0.95em;
         }
         .candidate-code {
             color: #8892b0;
-            font-size: 0.85em;
+            font-size: 0.75em;
         }
         .drop-badge {
             background: rgba(255, 107, 107, 0.2);
             color: #ff6b6b;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.85em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
             font-weight: 600;
         }
         .candidate-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            font-size: 0.9em;
+            gap: 6px;
+            font-size: 0.8em;
         }
         .candidate-stats .label { color: #8892b0; }
         .candidate-stats .value { text-align: right; }
         .candidate-reason {
-            margin-top: 10px;
-            padding-top: 10px;
+            margin-top: 8px;
+            padding-top: 8px;
             border-top: 1px solid rgba(255,107,53,0.2);
-            font-size: 0.8em;
+            font-size: 0.7em;
             color: #ff8c5a;
         }
 
         /* Position Card */
         .position-card {
             background: rgba(15, 15, 35, 0.6);
-            border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid #00d9ff;
-            margin-bottom: 15px;
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid #00d9ff;
+            margin-bottom: 10px;
         }
         .position-card.profit { border-left-color: #00ff88; }
         .position-card.loss { border-left-color: #ff6b6b; }
@@ -217,12 +218,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .position-state {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
             font-weight: 600;
         }
         .position-state.partial { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
@@ -231,21 +232,21 @@
 
         /* Entry/Exit Timeline */
         .timeline {
-            margin-top: 15px;
-            padding-left: 20px;
+            margin-top: 10px;
+            padding-left: 15px;
             border-left: 2px solid #2a2a4a;
         }
         .timeline-item {
             position: relative;
-            padding: 10px 0 10px 20px;
+            padding: 6px 0 6px 15px;
         }
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -7px;
-            top: 14px;
-            width: 12px;
-            height: 12px;
+            left: -6px;
+            top: 10px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: #2a2a4a;
         }
@@ -255,17 +256,17 @@
         .timeline-item.loss::before { background: #ff6b6b; }
         .timeline-time {
             color: #8892b0;
-            font-size: 0.8em;
+            font-size: 0.7em;
         }
         .timeline-detail {
             color: #e4e4e4;
-            font-size: 0.9em;
+            font-size: 0.8em;
             margin-top: 2px;
         }
 
         /* Chart */
         .chart-container {
-            height: 300px;
+            height: 220px;
             position: relative;
         }
 
@@ -273,13 +274,13 @@
         .table-wrapper {
             overflow-x: auto;
         }
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
         th, td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: left;
             border-bottom: 1px solid #2a2a4a;
         }
-        th { background: #0f3460; color: #ff8c42; font-weight: 600; }
+        th { background: #0f3460; color: #ff8c42; font-weight: 600; font-size: 0.85em; }
         tr:hover { background: rgba(255, 107, 53, 0.05); }
         .positive { color: #00ff88; }
         .negative { color: #ff6b6b; }
@@ -287,8 +288,9 @@
         /* No Data */
         .no-data {
             text-align: center;
-            padding: 40px;
+            padding: 25px;
             color: #8892b0;
+            font-size: 0.85em;
         }
 
         /* Responsive */
