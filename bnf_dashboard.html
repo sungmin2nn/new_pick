@@ -492,28 +492,32 @@
                     return;
                 }
 
-                grid.innerHTML = candidates.map(c => `
+                grid.innerHTML = candidates.map(c => {
+                    const drop5d = c.drop_5d || 0;
+                    const drop10d = c.drop_10d || 0;
+                    const drop5dClass = drop5d > 0 ? 'negative' : 'positive';
+                    const drop10dClass = drop10d > 0 ? 'negative' : 'positive';
+                    return `
                     <div class="candidate-card">
                         <div class="candidate-header">
                             <div>
                                 <div class="candidate-name">${c.name}</div>
                                 <div class="candidate-code">${c.code}</div>
                             </div>
-                            <div class="drop-badge">-${c.max_drop?.toFixed(1) || c.drop_pct?.toFixed(1) || 0}%</div>
+                            <div class="drop-badge">-${c.drop_from_high?.toFixed(1) || 0}%</div>
                         </div>
                         <div class="candidate-stats">
                             <span class="label">현재가</span>
                             <span class="value">${(c.price || c.current_price)?.toLocaleString() || '-'}원</span>
-                            <span class="label">5일 낙폭</span>
-                            <span class="value negative">-${c.drop_5d?.toFixed(1) || '-'}%</span>
-                            <span class="label">10일 낙폭</span>
-                            <span class="value negative">-${c.drop_10d?.toFixed(1) || '-'}%</span>
-                            <span class="label">고점대비</span>
-                            <span class="value negative">-${c.drop_from_high?.toFixed(1) || '-'}%</span>
+                            <span class="label">20일고점</span>
+                            <span class="value">${c.high_20d?.toLocaleString() || '-'}원</span>
+                            <span class="label">5일변동</span>
+                            <span class="value ${drop5dClass}">${drop5d > 0 ? '-' : '+'}${Math.abs(drop5d).toFixed(1)}%</span>
+                            <span class="label">10일변동</span>
+                            <span class="value ${drop10dClass}">${drop10d > 0 ? '-' : '+'}${Math.abs(drop10d).toFixed(1)}%</span>
                         </div>
-                        <div class="candidate-reason">${c.reasons || c.selection_reason || ''}</div>
                     </div>
-                `).join('');
+                `}).join('');
 
             } catch (error) {
                 grid.innerHTML = '<div class="no-data">후보 종목 로드 실패</div>';
