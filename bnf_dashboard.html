@@ -456,6 +456,8 @@
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', () => {
+            // 기본값으로 통계 초기화
+            updateStats({ stats: { total_trades: 0, win_rate: 0, total_return: 0, avg_return: 0, open_positions: 0, unrealized_pnl: 0 }});
             loadBNFData();
         });
 
@@ -577,7 +579,10 @@
                 }).join('');
 
             } catch (error) {
+                console.error('Position load error:', error);
                 container.innerHTML = '<div class="no-data">포지션 로드 실패</div>';
+                // 에러 시에도 기본 통계 표시
+                updateStats({ stats: { total_trades: 0, win_rate: 0, total_return: 0, avg_return: 0, open_positions: 0, unrealized_pnl: 0 }});
             }
         }
 
@@ -658,8 +663,12 @@
                 const data = await response.json();
                 const trades = data.trades || [];
 
+                // 초기 차트는 항상 표시
                 if (trades.length === 0) {
                     initEmptyChart();
+                    // 매매이력 테이블도 빈 상태로 표시
+                    const tbody = document.querySelector('#tradeHistory tbody');
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">아직 청산된 거래가 없습니다</td></tr>';
                     return;
                 }
 
