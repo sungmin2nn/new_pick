@@ -197,27 +197,46 @@
         }
         .stock-status-card .info-label { color: #8892b0; }
         .stock-status-card .info-value { text-align: right; }
-        .stock-status-card .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
+        .stock-status-card .status-badge,
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
             font-weight: 600;
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
         }
+        .status-badge.positive { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .status-badge.negative { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
         .status-badge.profit { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
         .status-badge.loss { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
         .status-badge.waiting { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
 
         /* Table */
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
         th, td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: left;
             border-bottom: 1px solid #2a2a4a;
+            white-space: nowrap;
         }
-        th { background: #0f3460; color: #00d9ff; font-weight: 600; }
+        th { background: #0f3460; color: #00d9ff; font-weight: 600; font-size: 0.85em; }
         tr:hover { background: rgba(0, 217, 255, 0.05); }
         .positive { color: #00ff88; }
         .negative { color: #ff6b6b; }
+        .table-wrapper { overflow-x: auto; }
+
+        /* Live Status Table */
+        #liveStatusTable th:nth-child(1) { width: 130px; }
+        #liveStatusTable th:nth-child(2) { width: 50px; }
+        #liveStatusTable th:nth-child(3),
+        #liveStatusTable th:nth-child(4) { width: 90px; text-align: right; }
+        #liveStatusTable th:nth-child(5) { width: 70px; text-align: right; }
+        #liveStatusTable th:nth-child(6) { width: 100px; }
+        #liveStatusTable td:nth-child(3),
+        #liveStatusTable td:nth-child(4),
+        #liveStatusTable td:nth-child(5) { text-align: right; }
 
         /* Chart Container */
         .chart-container {
@@ -619,7 +638,23 @@
                 <span class="update-time" id="statusUpdateTime">-</span>
             </h2>
             <div id="targetDate" style="color: #00d9ff; font-size: 0.9em; margin-bottom: 10px;"></div>
-            <div id="liveStatus">상태 확인 중...</div>
+            <div class="table-wrapper">
+                <table id="liveStatusTable">
+                    <thead id="liveStatusHead">
+                        <tr>
+                            <th>종목</th>
+                            <th>상태</th>
+                            <th>진입가</th>
+                            <th>현재가</th>
+                            <th>수익률</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody id="liveStatusBody">
+                        <tr><td colspan="6" class="no-data">상태 확인 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Performance Chart -->
@@ -698,14 +733,16 @@
         async function loadTodayData() {
             const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
 
-            if (currentStrategy === 'all') {
-                await loadMultiStrategyData(today);
-            } else {
-                await loadSingleStrategyData(today, currentStrategy);
-            }
+            // 병렬로 모든 데이터 로드 (3배 이상 빠름)
+            const strategyPromise = currentStrategy === 'all'
+                ? loadMultiStrategyData(today)
+                : loadSingleStrategyData(today, currentStrategy);
 
-            await loadPaperTradingData();
-            await loadLiveStatus();
+            await Promise.all([
+                strategyPromise,
+                loadPaperTradingData(),
+                loadLiveStatus()
+            ]);
         }
 
         // 히스토리 조회
@@ -717,14 +754,16 @@
             }
             const dateStr = dateInput.replace(/-/g, '');
 
-            if (currentStrategy === 'all') {
-                await loadMultiStrategyData(dateStr);
-            } else {
-                await loadSingleStrategyData(dateStr, currentStrategy);
-            }
+            // 병렬로 모든 데이터 로드
+            const strategyPromise = currentStrategy === 'all'
+                ? loadMultiStrategyData(dateStr)
+                : loadSingleStrategyData(dateStr, currentStrategy);
 
-            await loadPaperTradingData(dateStr);
-            await loadLiveStatus(dateStr);
+            await Promise.all([
+                strategyPromise,
+                loadPaperTradingData(dateStr),
+                loadLiveStatus(dateStr)
+            ]);
         }
 
         // 다중 전략 데이터 로드
@@ -850,37 +889,39 @@
 
         // 단일 전략 표시
         function displaySingleStrategy(data) {
-            // 기존 실시간 상태 UI에 표시
-            const container = document.getElementById('liveStatus');
+            const thead = document.getElementById('liveStatusHead');
+            const tbody = document.getElementById('liveStatusBody');
             const candidates = data.candidates || [];
 
+            // 헤더 설정
+            thead.innerHTML = `
+                <tr>
+                    <th>종목</th>
+                    <th>가격</th>
+                    <th>등락률</th>
+                    <th>점수</th>
+                </tr>
+            `;
+
             if (candidates.length === 0) {
-                container.innerHTML = '<div class="no-data">선정된 종목이 없습니다</div>';
+                tbody.innerHTML = '<tr><td colspan="4" class="no-data">선정된 종목이 없습니다</td></tr>';
                 return;
             }
 
-            let html = '<div class="live-status-grid">';
-            candidates.forEach(c => {
-                const statusClass = c.change_pct > 0 ? 'profit' : c.change_pct < 0 ? 'loss' : 'waiting';
-                html += `
-                    <div class="stock-status-card ${statusClass}">
-                        <div class="stock-name">
-                            <span>${c.name}</span>
-                            <span class="stock-code">${c.code}</span>
-                        </div>
-                        <div class="stock-info">
-                            <span class="info-label">가격</span>
-                            <span class="info-value">${c.price?.toLocaleString() || '-'}원</span>
-                            <span class="info-label">등락률</span>
-                            <span class="info-value ${c.change_pct > 0 ? 'positive' : 'negative'}">${c.change_pct > 0 ? '+' : ''}${c.change_pct.toFixed(2)}%</span>
-                            <span class="info-label">점수</span>
-                            <span class="info-value">${c.score?.toFixed(1) || '-'}</span>
-                        </div>
-                    </div>
+            tbody.innerHTML = candidates.map(c => {
+                const price = c.current_price || c.price || 0;
+                const score = c.total_score || c.score || 0;
+                const changePct = c.change_pct || 0;
+
+                return `
+                    <tr>
+                        <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
+                        <td>${price.toLocaleString()}원</td>
+                        <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
+                        <td>${score.toFixed(1)}</td>
+                    </tr>
                 `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
+            }).join('');
         }
 
         // 수동 체크 트리거
@@ -985,37 +1026,36 @@
             };
         }
 
-        // intraday 파일들 직접 로드
+        // intraday 파일들 직접 로드 (병렬)
         async function loadIntradayFiles() {
-            const dailyResults = [];
-
-            // 최근 30일 날짜 목록 생성
+            // 최근 30일 날짜 목록 생성 (주말 제외)
             const dates = [];
             const today = new Date();
             for (let i = 0; i < 45; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
                 const dayOfWeek = d.getDay();
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) { // 주말 제외
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
                     dates.push(d.toISOString().split('T')[0].replace(/-/g, ''));
                 }
             }
 
-            // 각 날짜의 intraday 파일 로드
-            for (const dateStr of dates) {
+            // 병렬로 모든 파일 로드 (10배 이상 빠름)
+            const fetchPromises = dates.map(async dateStr => {
                 try {
                     const response = await fetch(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
                     if (response.ok) {
                         const data = await response.json();
-                        const dayResult = transformIntradayData(data, dateStr);
-                        if (dayResult) {
-                            dailyResults.push(dayResult);
-                        }
+                        return transformIntradayData(data, dateStr);
                     }
                 } catch (e) {
-                    // 파일 없으면 스킵
+                    // 파일 없으면 null
                 }
-            }
+                return null;
+            });
+
+            const results = await Promise.all(fetchPromises);
+            const dailyResults = results.filter(r => r !== null);
 
             // 날짜순 정렬 및 누적 수익률 계산
             dailyResults.sort((a, b) => a.date.localeCompare(b.date));
@@ -1087,7 +1127,7 @@
 
         // 실시간 상태 로드
         async function loadLiveStatus(dateStr = null) {
-            const container = document.getElementById('liveStatus');
+            const tbody = document.getElementById('liveStatusBody');
             const updateTime = document.getElementById('statusUpdateTime');
             const targetDateEl = document.getElementById('targetDate');
 
@@ -1138,149 +1178,155 @@
                 // 상태 메시지 표시
                 let statusMsg = '';
                 if (isWeekend) {
-                    statusMsg = '<div class="status-message no-data">📅 주말 - 장 휴무</div>';
+                    statusMsg = '📅 주말 - 장 휴무';
                 } else if (hour < 8) {
-                    statusMsg = '<div class="status-message waiting">⏳ 장 시작 전 - 08:10 종목 선정 예정</div>';
+                    statusMsg = '⏳ 장 시작 전 - 08:10 종목 선정 예정';
                 } else if (hour < 9) {
-                    statusMsg = '<div class="status-message waiting">⏳ 대기 중 - 09:00 장 시작 예정</div>';
+                    statusMsg = '⏳ 대기 중 - 09:00 장 시작 예정';
                 } else if (isMarketOpen) {
-                    statusMsg = '<div class="status-message waiting">📊 장중 - 충족 종목 없음</div>';
+                    statusMsg = '📊 장중 - 충족 종목 없음';
                 } else {
-                    statusMsg = '<div class="status-message no-data">📋 장 마감 - 오늘 충족 종목 없음</div>';
+                    statusMsg = '📋 장 마감 - 오늘 충족 종목 없음';
                 }
-                container.innerHTML = statusMsg;
+                tbody.innerHTML = `<tr><td colspan="6" class="no-data">${statusMsg}</td></tr>`;
                 updateTime.textContent = '-';
 
             } catch (error) {
                 console.log('Live status load error:', error);
-                container.innerHTML = '<div class="status-message error">⚠️ 상태 데이터를 불러올 수 없습니다</div>';
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">⚠️ 상태 데이터를 불러올 수 없습니다</td></tr>';
             }
         }
 
         // 실시간 상태 표시
         function displayLiveStatus(status) {
-            const container = document.getElementById('liveStatus');
+            const thead = document.getElementById('liveStatusHead');
+            const tbody = document.getElementById('liveStatusBody');
             const stocks = status.stocks || [];
 
+            // 헤더 설정
+            thead.innerHTML = `
+                <tr>
+                    <th>종목</th>
+                    <th>상태</th>
+                    <th>진입가</th>
+                    <th>현재가</th>
+                    <th>수익률</th>
+                    <th>비고</th>
+                </tr>
+            `;
+
             if (stocks.length === 0) {
-                container.innerHTML = '<div class="no-data">선정된 종목이 없습니다.</div>';
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">선정된 종목이 없습니다.</td></tr>';
                 return;
             }
 
-            const html = `
-                <div class="live-status-grid">
-                    ${stocks.map(s => {
-                        const statusClass = s.status === 'profit_hit' ? 'profit' :
-                                          s.status === 'loss_hit' ? 'loss' : 'waiting';
-                        const statusLabel = s.status === 'profit_hit' ? '익절 도달' :
-                                          s.status === 'loss_hit' ? '손절 도달' : '대기 중';
-                        const currentPct = s.current_pct || 0;
+            tbody.innerHTML = stocks.map(s => {
+                const statusClass = s.status === 'profit_hit' ? 'positive' :
+                                  s.status === 'loss_hit' ? 'negative' : '';
+                const statusLabel = s.status === 'profit_hit' ? '익절' :
+                                  s.status === 'loss_hit' ? '손절' : '대기';
+                const currentPct = s.current_pct || 0;
+                const note = s.hit_time || (s.max_profit_pct ? `최대 +${s.max_profit_pct}%` : '-');
 
-                        return `
-                            <div class="stock-status-card ${statusClass}">
-                                <div class="stock-name">
-                                    <span>${s.name} <span class="stock-code">(${s.code})</span></span>
-                                    <span class="status-badge ${statusClass}">${statusLabel}</span>
-                                </div>
-                                <div class="stock-info">
-                                    <span class="info-label">진입가</span>
-                                    <span class="info-value">${s.entry_price?.toLocaleString() || '-'}원</span>
-                                    <span class="info-label">현재가</span>
-                                    <span class="info-value">${s.current_price?.toLocaleString() || '-'}원</span>
-                                    <span class="info-label">현재 수익률</span>
-                                    <span class="info-value ${currentPct >= 0 ? 'positive' : 'negative'}">${currentPct >= 0 ? '+' : ''}${currentPct.toFixed(2)}%</span>
-                                    <span class="info-label">${s.hit_time ? '도달 시간' : '최대 수익'}</span>
-                                    <span class="info-value">${s.hit_time || (s.max_profit_pct ? `+${s.max_profit_pct}%` : '-')}</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            `;
-            container.innerHTML = html;
+                return `
+                    <tr>
+                        <td><strong>${s.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${s.code}</span></td>
+                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                        <td>${(s.entry_price || 0).toLocaleString()}원</td>
+                        <td>${(s.current_price || 0).toLocaleString()}원</td>
+                        <td class="${currentPct >= 0 ? 'positive' : 'negative'}">${currentPct >= 0 ? '+' : ''}${currentPct.toFixed(2)}%</td>
+                        <td>${note}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // candidates를 상태로 표시
         function displayCandidatesAsStatus(data) {
-            const container = document.getElementById('liveStatus');
+            const thead = document.getElementById('liveStatusHead');
+            const tbody = document.getElementById('liveStatusBody');
             const candidates = data.candidates || [];
 
+            // 헤더 설정 (장 시작 전 - 후보 종목)
+            thead.innerHTML = `
+                <tr>
+                    <th>종목</th>
+                    <th>상태</th>
+                    <th>전일종가</th>
+                    <th>전일등락</th>
+                    <th>점수</th>
+                    <th>거래대금</th>
+                </tr>
+            `;
+
             if (candidates.length === 0) {
-                container.innerHTML = '<div class="no-data">선정된 종목이 없습니다.</div>';
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">선정된 종목이 없습니다.</td></tr>';
                 return;
             }
 
-            const html = `
-                <div class="live-status-grid">
-                    ${candidates.map(c => `
-                        <div class="stock-status-card waiting">
-                            <div class="stock-name">
-                                <span>${c.name} <span class="stock-code">(${c.code})</span></span>
-                                <span class="status-badge waiting">장 시작 전</span>
-                            </div>
-                            <div class="stock-info">
-                                <span class="info-label">전일 종가</span>
-                                <span class="info-value">${c.price?.toLocaleString() || '-'}원</span>
-                                <span class="info-label">전일 등락</span>
-                                <span class="info-value ${c.change_pct >= 0 ? 'positive' : 'negative'}">${c.change_pct >= 0 ? '+' : ''}${c.change_pct?.toFixed(2) || 0}%</span>
-                                <span class="info-label">선정 점수</span>
-                                <span class="info-value">${c.score?.toFixed(1) || '-'}점</span>
-                                <span class="info-label">거래대금</span>
-                                <span class="info-value">${(c.trading_value / 100000000)?.toFixed(0) || '-'}억</span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-            container.innerHTML = html;
+            tbody.innerHTML = candidates.map(c => {
+                const price = c.current_price || c.price || 0;
+                const score = c.total_score || c.score || 0;
+                const tradingValue = c.trading_value ? (c.trading_value / 100000000).toFixed(0) : '-';
+
+                return `
+                    <tr>
+                        <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
+                        <td><span class="status-badge">대기</span></td>
+                        <td>${price.toLocaleString()}원</td>
+                        <td class="${(c.change_pct || 0) >= 0 ? 'positive' : 'negative'}">${(c.change_pct || 0) >= 0 ? '+' : ''}${(c.change_pct || 0).toFixed(2)}%</td>
+                        <td>${score.toFixed(1)}</td>
+                        <td>${tradingValue}억</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // morning_candidates.json 표시
         function displayMorningCandidates(data) {
-            const container = document.getElementById('liveStatus');
+            const thead = document.getElementById('liveStatusHead');
+            const tbody = document.getElementById('liveStatusBody');
             const candidates = data.candidates || [];
             const sentiment = data.market_sentiment || {};
 
+            // 헤더 설정
+            thead.innerHTML = `
+                <tr>
+                    <th>종목</th>
+                    <th>분류</th>
+                    <th>현재가</th>
+                    <th>등락률</th>
+                    <th>점수</th>
+                    <th>선정사유</th>
+                </tr>
+            `;
+
             if (candidates.length === 0) {
-                container.innerHTML = '<div class="no-data">선정된 종목이 없습니다.</div>';
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">선정된 종목이 없습니다.</td></tr>';
                 return;
             }
 
-            const html = `
-                <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,217,255,0.1); border-radius: 8px;">
-                    <span style="color: #00d9ff; font-weight: 600;">📊 ${data.date} (${data.weekday_short}) 선정 종목</span>
-                    <span style="color: #8892b0; margin-left: 10px;">시장: ${sentiment.mode || '-'}</span>
-                </div>
-                <div class="live-status-grid">
-                    ${candidates.map(c => {
-                        const price = c.current_price || c.price || 0;
-                        const score = c.total_score || c.score || 0;
-                        const changePct = c.price_change_percent || 0;
-                        const changeClass = changePct >= 0 ? 'positive' : 'negative';
-                        return `
-                        <div class="stock-status-card waiting">
-                            <div class="stock-name">
-                                <span>${c.name} <span class="stock-code">(${c.code})</span></span>
-                                <span class="status-badge" style="background: ${c.is_leading ? '#00ff88' : '#ffaa00'}; color: #1a1a2e; font-size: 0.7em;">
-                                    ${c.cap_tier === 'large' ? '대형' : c.cap_tier === 'mid' ? '중형' : '소형'}
-                                </span>
-                            </div>
-                            <div class="stock-info">
-                                <span class="info-label">현재가</span>
-                                <span class="info-value">${price?.toLocaleString() || '-'}원</span>
-                                <span class="info-label">등락률</span>
-                                <span class="info-value ${changeClass}">${changePct >= 0 ? '+' : ''}${changePct?.toFixed(2) || 0}%</span>
-                                <span class="info-label">점수</span>
-                                <span class="info-value">${score?.toFixed(0) || '-'}점</span>
-                                <span class="info-label">기술</span>
-                                <span class="info-value" style="font-size:0.75em;">${c.technical_summary || '-'}</span>
-                            </div>
-                            <div style="margin-top:8px; font-size:0.75em; color:#8892b0;">${c.selection_reason || ''}</div>
-                        </div>
-                    `}).join('')}
-                </div>
-            `;
-            container.innerHTML = html;
+            // 날짜/시장 정보 표시
+            const targetDateEl = document.getElementById('targetDate');
+            targetDateEl.innerHTML = `📊 ${data.date} (${data.weekday_short}) 선정 종목 <span style="margin-left:10px;">시장: ${sentiment.mode || '-'}</span>`;
+
+            tbody.innerHTML = candidates.map(c => {
+                const price = c.current_price || c.price || 0;
+                const score = c.total_score || c.score || 0;
+                const changePct = c.price_change_percent || 0;
+                const capLabel = c.cap_tier === 'large' ? '대형' : c.cap_tier === 'mid' ? '중형' : '소형';
+
+                return `
+                    <tr>
+                        <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
+                        <td><span class="status-badge" style="background:${c.is_leading ? '#00ff88' : '#ffaa00'};color:#1a1a2e;">${capLabel}</span></td>
+                        <td>${price.toLocaleString()}원</td>
+                        <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
+                        <td>${score.toFixed(0)}</td>
+                        <td style="font-size:0.8em;max-width:150px;white-space:normal;">${c.selection_reason || c.technical_summary || '-'}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         // 통계 표시

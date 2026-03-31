@@ -294,6 +294,22 @@
         #candidatesTable th:nth-child(5),
         #candidatesTable th:nth-child(6),
         #candidatesTable th:nth-child(7) { width: 60px; text-align: right; }
+
+        /* Positions Table */
+        #positionsTable th:nth-child(1) { width: 130px; }
+        #positionsTable th:nth-child(2) { width: 50px; }
+        #positionsTable th:nth-child(3),
+        #positionsTable th:nth-child(4),
+        #positionsTable th:nth-child(6) { width: 90px; text-align: right; }
+        #positionsTable th:nth-child(5) { width: 50px; text-align: right; }
+        #positionsTable th:nth-child(7),
+        #positionsTable th:nth-child(8) { width: 80px; text-align: right; }
+        #positionsTable td:nth-child(3),
+        #positionsTable td:nth-child(4),
+        #positionsTable td:nth-child(5),
+        #positionsTable td:nth-child(6),
+        #positionsTable td:nth-child(7),
+        #positionsTable td:nth-child(8) { text-align: right; }
         #candidatesTable td:nth-child(3),
         #candidatesTable td:nth-child(4),
         #candidatesTable td:nth-child(5),
@@ -430,8 +446,24 @@
         <!-- Open Positions -->
         <div class="section">
             <h2>💼 보유 포지션</h2>
-            <div id="positionsContainer">
-                <div class="no-data">보유 중인 포지션이 없습니다</div>
+            <div class="table-wrapper">
+                <table id="positionsTable">
+                    <thead>
+                        <tr>
+                            <th>종목</th>
+                            <th>상태</th>
+                            <th>평균단가</th>
+                            <th>현재가</th>
+                            <th>수량</th>
+                            <th>평가금액</th>
+                            <th>손익</th>
+                            <th>수익률</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionsBody">
+                        <tr><td colspan="8" class="no-data">보유 중인 포지션이 없습니다</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -548,12 +580,12 @@
 
         // 포지션 로드
         async function loadPositions() {
-            const container = document.getElementById('positionsContainer');
+            const tbody = document.getElementById('positionsBody');
 
             try {
                 const response = await fetch('data/bnf/positions.json?t=' + Date.now());
                 if (!response.ok) {
-                    container.innerHTML = '<div class="no-data">포지션 데이터가 없습니다</div>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="no-data">포지션 데이터가 없습니다</td></tr>';
                     updateStats({});
                     return;
                 }
@@ -566,41 +598,32 @@
                 updateStats(data);
 
                 if (openPositions.length === 0) {
-                    container.innerHTML = '<div class="no-data">보유 중인 포지션이 없습니다</div>';
+                    tbody.innerHTML = '<tr><td colspan="8" class="no-data">보유 중인 포지션이 없습니다</td></tr>';
                     return;
                 }
 
-                container.innerHTML = openPositions.map(p => {
-                    const pnlClass = p.unrealized_pnl >= 0 ? 'profit' : 'loss';
-                    const stateClass = p.state.toLowerCase();
+                tbody.innerHTML = openPositions.map(p => {
+                    const pnlClass = p.unrealized_pnl >= 0 ? 'positive' : 'negative';
+                    const evalAmount = (p.current_price || 0) * (p.total_quantity || 0);
+                    const pnlPct = p.unrealized_pnl_pct || 0;
 
                     return `
-                        <div class="position-card ${pnlClass}">
-                            <div class="position-header">
-                                <div>
-                                    <div class="candidate-name">${p.name}</div>
-                                    <div class="candidate-code">${p.code}</div>
-                                </div>
-                                <span class="position-state ${stateClass}">${getStateLabel(p.state)}</span>
-                            </div>
-                            <div class="candidate-stats">
-                                <span class="label">평균단가</span>
-                                <span class="value">${p.avg_price?.toLocaleString() || '-'}원</span>
-                                <span class="label">현재가</span>
-                                <span class="value">${p.current_price?.toLocaleString() || '-'}원</span>
-                                <span class="label">보유수량</span>
-                                <span class="value">${p.total_quantity || 0}주</span>
-                                <span class="label">평가손익</span>
-                                <span class="value ${pnlClass}">${p.unrealized_pnl >= 0 ? '+' : ''}${p.unrealized_pnl?.toLocaleString() || 0}원</span>
-                            </div>
-                            ${renderTimeline(p)}
-                        </div>
+                        <tr>
+                            <td><strong>${p.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${p.code}</span></td>
+                            <td><span class="position-state ${p.state?.toLowerCase()}">${getStateLabel(p.state)}</span></td>
+                            <td>${(p.avg_price || 0).toLocaleString()}원</td>
+                            <td>${(p.current_price || 0).toLocaleString()}원</td>
+                            <td>${p.total_quantity || 0}주</td>
+                            <td>${evalAmount.toLocaleString()}원</td>
+                            <td class="${pnlClass}">${p.unrealized_pnl >= 0 ? '+' : ''}${(p.unrealized_pnl || 0).toLocaleString()}원</td>
+                            <td class="${pnlClass}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</td>
+                        </tr>
                     `;
                 }).join('');
 
             } catch (error) {
                 console.error('Position load error:', error);
-                container.innerHTML = '<div class="no-data">포지션 로드 실패</div>';
+                tbody.innerHTML = '<tr><td colspan="8" class="no-data">포지션 로드 실패</td></tr>';
                 // 에러 시에도 기본 통계 표시
                 updateStats({ stats: { total_trades: 0, win_rate: 0, total_return: 0, avg_return: 0, open_positions: 0, unrealized_pnl: 0 }});
             }
