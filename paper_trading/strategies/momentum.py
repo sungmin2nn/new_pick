@@ -29,29 +29,6 @@ class MomentumStrategy(BaseStrategy):
     STRATEGY_NAME = "모멘텀 추세"
     DESCRIPTION = "전일 급등 종목 중 거래대금 상위 - 추세 추종"
 
-    # 모멘텀 후보 종목 (대형주 + 인기 중형주)
-    MOMENTUM_STOCKS = [
-        # 대형주
-        '005930', '000660', '373220', '005380', '000270',
-        '005490', '035420', '035720', '051910', '006400',
-        '003670', '105560', '055550', '086790', '012330',
-        # IT/반도체
-        '009150', '018260', '066570', '032830', '017670',
-        '030200', '036570', '263750', '377300', '042700',
-        # 2차전지/에너지
-        '096770', '247540', '006280', '086520', '012450',
-        '011790', '064350', '112610', '299660', '357780',
-        # 바이오/헬스케어
-        '068270', '326030', '207940', '145020', '091990',
-        '196170', '141080', '128940', '214370', '950130',
-        # 엔터/미디어
-        '352820', '122870', '041510', '035900', '293490',
-        # 조선/중공업
-        '009540', '267250', '042660', '010140', '329180',
-        # 기타 인기주
-        '000100', '034220', '010950', '004020', '011170',
-    ]
-
     # 필터 조건
     MIN_PRICE = 3000           # 최소 가격
     MIN_CHANGE = 3.0           # 최소 상승률
@@ -103,46 +80,47 @@ class MomentumStrategy(BaseStrategy):
         return self.candidates
 
     def _fetch_market_data(self, date: str) -> List[Dict]:
-        """시장 데이터 수집 (미리 정의된 종목 목록 사용)"""
+        """시장 데이터 수집"""
         if pykrx_stock is None:
             return []
 
         stocks = []
-        print(f"  모멘텀 후보 {len(self.MOMENTUM_STOCKS)}개 조회 중...")
 
-        for code in self.MOMENTUM_STOCKS:
-            try:
-                # 개별 종목 OHLCV 조회
-                df = pykrx_stock.get_market_ohlcv(date, date, code)
+        try:
+            for market in ['KOSPI', 'KOSDAQ']:
+                df = pykrx_stock.get_market_ohlcv_by_ticker(date, market=market)
+
                 if df.empty:
                     continue
 
-                row = df.iloc[-1]
-                close = int(row['종가'])
-                if close == 0:
-                    continue
+                for code in df.index:
+                    try:
+                        row = df.loc[code]
+                        close = int(row['종가'])
+                        if close == 0:
+                            continue
 
-                change = float(row['등락률']) if '등락률' in row.index else 0
-                volume = int(row['거래량']) if '거래량' in row.index else 0
+                        change = float(row['등락률']) if '등락률' in row else 0
+                        volume = int(row['거래량'])
+                        trading_value = int(row['거래대금']) if '거래대금' in row else 0
 
-                # 거래대금 계산
-                trading_value = volume * close
+                        name = pykrx_stock.get_market_ticker_name(code)
 
-                name = pykrx_stock.get_market_ticker_name(code)
+                        stocks.append({
+                            'code': code,
+                            'name': name,
+                            'price': close,
+                            'change_pct': change,
+                            'volume': volume,
+                            'trading_value': trading_value,
+                            'market': market
+                        })
+                    except:
+                        continue
 
-                stocks.append({
-                    'code': code,
-                    'name': name,
-                    'price': close,
-                    'change_pct': change,
-                    'volume': volume,
-                    'trading_value': trading_value,
-                    'market': 'KOSPI'
-                })
-            except:
-                continue
+        except Exception as e:
+            print(f"  데이터 수집 오류: {e}")
 
-        print(f"  조회 완료: {len(stocks)}개")
         return stocks
 
     def _filter_stocks(self, stocks: List[Dict]) -> List[Dict]:

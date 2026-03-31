@@ -30,50 +30,6 @@ class LargecapContrarianStrategy(BaseStrategy):
     STRATEGY_NAME = "대형주 역추세"
     DESCRIPTION = "시총 상위 대형주 중 전일 하락 종목에서 반등 기회 포착"
 
-    # 시총 상위 대형주 목록 (KOSPI 50 + 주요 대형주)
-    LARGE_CAP_STOCKS = [
-        '005930',  # 삼성전자
-        '000660',  # SK하이닉스
-        '373220',  # LG에너지솔루션
-        '005380',  # 현대차
-        '000270',  # 기아
-        '005490',  # POSCO홀딩스
-        '035420',  # NAVER
-        '035720',  # 카카오
-        '051910',  # LG화학
-        '006400',  # 삼성SDI
-        '003670',  # 포스코퓨처엠
-        '105560',  # KB금융
-        '055550',  # 신한지주
-        '086790',  # 하나금융지주
-        '012330',  # 현대모비스
-        '028260',  # 삼성물산
-        '066570',  # LG전자
-        '003550',  # LG
-        '096770',  # SK이노베이션
-        '034730',  # SK
-        '018260',  # 삼성에스디에스
-        '032830',  # 삼성생명
-        '015760',  # 한국전력
-        '033780',  # KT&G
-        '009150',  # 삼성전기
-        '000810',  # 삼성화재
-        '017670',  # SK텔레콤
-        '030200',  # KT
-        '036570',  # 엔씨소프트
-        '011170',  # 롯데케미칼
-        '010950',  # S-Oil
-        '004020',  # 현대제철
-        '090430',  # 아모레퍼시픽
-        '097950',  # CJ제일제당
-        '051900',  # LG생활건강
-        '010130',  # 고려아연
-        '009540',  # 한국조선해양
-        '267250',  # 현대중공업
-        '042660',  # 한화오션
-        '352820',  # 하이브
-    ]
-
     # 필터 조건
     MIN_PRICE = 5000          # 최소 가격
     MAX_CHANGE = -1.5         # 최대 등락률 (하락만)
@@ -125,49 +81,55 @@ class LargecapContrarianStrategy(BaseStrategy):
         return self.candidates
 
     def _fetch_market_data(self, date: str) -> List[Dict]:
-        """시장 데이터 수집 (미리 정의된 대형주 목록 사용)"""
+        """시장 데이터 수집"""
         if pykrx_stock is None:
             print("  pykrx 없음")
             return []
 
         stocks = []
-        print(f"  대형주 {len(self.LARGE_CAP_STOCKS)}개 조회 중...")
 
-        for code in self.LARGE_CAP_STOCKS:
-            try:
-                # 개별 종목 OHLCV 조회
-                df = pykrx_stock.get_market_ohlcv(date, date, code)
+        try:
+            # 코스피 + 코스닥
+            for market in ['KOSPI', 'KOSDAQ']:
+                df = pykrx_stock.get_market_ohlcv_by_ticker(date, market=market)
+                cap_df = pykrx_stock.get_market_cap_by_ticker(date, market=market)
+
                 if df.empty:
                     continue
 
-                row = df.iloc[-1]
-                close = int(row['종가'])
-                if close == 0:
-                    continue
+                for code in df.index:
+                    try:
+                        row = df.loc[code]
+                        cap_row = cap_df.loc[code] if code in cap_df.index else None
 
-                change = float(row['등락률']) if '등락률' in row.index else 0
-                volume = int(row['거래량']) if '거래량' in row.index else 0
+                        close = int(row['종가'])
+                        if close == 0:
+                            continue
 
-                # 거래대금 계산 (거래량 * 종가)
-                trading_value = volume * close
+                        change = float(row['등락률']) if '등락률' in row else 0
+                        volume = int(row['거래량'])
+                        trading_value = int(row['거래대금']) if '거래대금' in row else 0
 
-                # 종목명 조회
-                name = pykrx_stock.get_market_ticker_name(code)
+                        market_cap = int(cap_row['시가총액']) if cap_row is not None else 0
 
-                stocks.append({
-                    'code': code,
-                    'name': name,
-                    'price': close,
-                    'change_pct': change,
-                    'volume': volume,
-                    'trading_value': trading_value,
-                    'market_cap': 0,  # 시총은 별도 조회 필요시 추가
-                    'market': 'KOSPI'
-                })
-            except Exception as e:
-                continue
+                        name = pykrx_stock.get_market_ticker_name(code)
 
-        print(f"  조회 완료: {len(stocks)}개")
+                        stocks.append({
+                            'code': code,
+                            'name': name,
+                            'price': close,
+                            'change_pct': change,
+                            'volume': volume,
+                            'trading_value': trading_value,
+                            'market_cap': market_cap,
+                            'market': market
+                        })
+                    except:
+                        continue
+
+        except Exception as e:
+            print(f"  데이터 수집 오류: {e}")
+
         return stocks
 
     def _filter_stocks(self, stocks: List[Dict]) -> List[Dict]:
