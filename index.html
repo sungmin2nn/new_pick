@@ -559,6 +559,44 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
+        /* Strategy Legend */
+        .strategy-legend {
+            margin-top: 15px;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+        }
+        .strategy-legend .legend-title {
+            font-size: 0.85em;
+            color: #00d9ff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .strategy-legend .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        .strategy-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8em;
+        }
+        .strategy-legend .legend-label {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            min-width: 36px;
+            text-align: center;
+        }
+        .strategy-legend .legend-desc {
+            color: #8892b0;
+        }
+
         /* Strategy Comparison Grid */
         .strategy-comparison-grid {
             display: grid;
@@ -740,6 +778,28 @@
                         <tr><td colspan="12" class="loading-container"><div class="spinner"></div><div>로딩 중...</div></td></tr>
                     </tbody>
                 </table>
+            </div>
+            <!-- 전략 조건 설명 -->
+            <div class="strategy-legend">
+                <div class="legend-title">📋 전략 조건 기준</div>
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <span class="legend-label">대형</span>
+                        <span class="legend-desc">시가총액 10조원 이상</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">모멘</span>
+                        <span class="legend-desc">+3% 이상 상승 + 정배열 or 고가돌파</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">테마</span>
+                        <span class="legend-desc">당일 테마 키워드 매칭</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">역추</span>
+                        <span class="legend-desc">대형주 + -1% 이상 하락 + 거래대금 500억↑</span>
+                    </div>
+                </div>
             </div>
         </div>
 
