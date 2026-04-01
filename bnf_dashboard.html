@@ -396,7 +396,7 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-value" id="totalTrades">-</div>
-                <div class="stat-label">총 거래</div>
+                <div class="stat-label">매수/매도</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="winRate">-</div>
@@ -452,6 +452,7 @@
                         <tr>
                             <th>종목</th>
                             <th>상태</th>
+                            <th>보유</th>
                             <th>평균단가</th>
                             <th>현재가</th>
                             <th>수량</th>
@@ -461,7 +462,7 @@
                         </tr>
                     </thead>
                     <tbody id="positionsBody">
-                        <tr><td colspan="8" class="no-data">보유 중인 포지션이 없습니다</td></tr>
+                        <tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -508,7 +509,7 @@
     </div>
 
     <footer>
-        📅 마지막 수정: 2026-03-31 00:30
+        📅 마지막 수정: 2026-04-02
     </footer>
 
     <script>
@@ -598,7 +599,7 @@
                 updateStats(data);
 
                 if (openPositions.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="no-data">보유 중인 포지션이 없습니다</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>';
                     return;
                 }
 
@@ -607,15 +608,21 @@
                     const evalAmount = (p.current_price || 0) * (p.total_quantity || 0);
                     const pnlPct = p.unrealized_pnl_pct || 0;
 
+                    // 보유기간 계산
+                    const entryDate = new Date(p.entry_date);
+                    const today = new Date();
+                    const holdingDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
+
                     return `
                         <tr>
-                            <td><strong>${p.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${p.code}</span></td>
+                            <td><strong>${p.name}</strong><br><span style="color:#8892b0;font-size:0.75em;">${p.code}</span></td>
                             <td><span class="position-state ${p.state?.toLowerCase()}">${getStateLabel(p.state)}</span></td>
-                            <td>${(p.avg_price || 0).toLocaleString()}원</td>
-                            <td>${(p.current_price || 0).toLocaleString()}원</td>
+                            <td>${holdingDays}일</td>
+                            <td>${(p.avg_price || 0).toLocaleString()}</td>
+                            <td>${(p.current_price || 0).toLocaleString()}</td>
                             <td>${p.total_quantity || 0}주</td>
-                            <td>${evalAmount.toLocaleString()}원</td>
-                            <td class="${pnlClass}">${p.unrealized_pnl >= 0 ? '+' : ''}${(p.unrealized_pnl || 0).toLocaleString()}원</td>
+                            <td>${evalAmount.toLocaleString()}</td>
+                            <td class="${pnlClass}">${p.unrealized_pnl >= 0 ? '+' : ''}${(p.unrealized_pnl || 0).toLocaleString()}</td>
                             <td class="${pnlClass}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</td>
                         </tr>
                     `;
@@ -676,19 +683,31 @@
         // 통계 업데이트
         function updateStats(data) {
             const stats = data.stats || {};
+            const positions = data.positions || [];
 
-            document.getElementById('totalTrades').textContent = (stats.total_trades || 0) + '건';
+            // 매수/매도 건수 계산
+            let buyCount = 0;
+            let sellCount = 0;
+            positions.forEach(p => {
+                buyCount += (p.entries || []).length;
+                sellCount += (p.exits || []).length;
+            });
+            document.getElementById('totalTrades').textContent = buyCount + '/' + sellCount + '건';
+
             document.getElementById('winRate').textContent = (stats.win_rate || 0).toFixed(1) + '%';
 
-            const totalReturn = stats.total_return || 0;
+            // 미실현 수익률 계산
+            const totalCost = positions.reduce((sum, p) => sum + (p.avg_price * p.total_quantity), 0);
+            const unrealizedPnl = stats.unrealized_pnl || 0;
+            const unrealizedPct = totalCost > 0 ? (unrealizedPnl / totalCost * 100) : 0;
+
             const totalReturnEl = document.getElementById('totalReturn');
-            totalReturnEl.textContent = (totalReturn >= 0 ? '+' : '') + totalReturn.toFixed(2) + '%';
-            totalReturnEl.className = 'stat-value ' + (totalReturn >= 0 ? 'positive' : 'negative');
+            totalReturnEl.textContent = (unrealizedPct >= 0 ? '+' : '') + unrealizedPct.toFixed(2) + '%';
+            totalReturnEl.className = 'stat-value ' + (unrealizedPct >= 0 ? 'positive' : 'negative');
 
             document.getElementById('avgReturn').textContent = (stats.avg_return || 0).toFixed(2) + '%';
             document.getElementById('openPositions').textContent = (stats.open_positions || 0) + '개';
 
-            const unrealizedPnl = stats.unrealized_pnl || 0;
             const unrealizedEl = document.getElementById('unrealizedPnl');
             unrealizedEl.textContent = (unrealizedPnl >= 0 ? '+' : '') + unrealizedPnl.toLocaleString() + '원';
             unrealizedEl.className = 'stat-value ' + (unrealizedPnl >= 0 ? 'positive' : 'negative');
@@ -696,37 +715,85 @@
 
         // 거래 이력 로드
         async function loadTradeHistory() {
+            const tbody = document.querySelector('#tradeHistory tbody');
+
             try {
-                const response = await fetch('data/bnf/trade_history.json?t=' + Date.now());
-                if (!response.ok) {
-                    initEmptyChart();
-                    return;
+                // positions.json에서 entries/exits 가져오기
+                const posResponse = await fetch('data/bnf/positions.json?t=' + Date.now());
+                let allTrades = [];
+
+                if (posResponse.ok) {
+                    const posData = await posResponse.json();
+                    const positions = posData.positions || [];
+
+                    // 각 포지션의 entries와 exits를 수집
+                    positions.forEach(p => {
+                        // 매수 내역
+                        (p.entries || []).forEach(e => {
+                            allTrades.push({
+                                type: 'BUY',
+                                date: e.date,
+                                time: e.time,
+                                name: p.name,
+                                code: p.code,
+                                price: e.price,
+                                quantity: e.quantity,
+                                amount: e.price * e.quantity,
+                                reason: p.selection_reason || ''
+                            });
+                        });
+
+                        // 매도 내역
+                        (p.exits || []).forEach(e => {
+                            allTrades.push({
+                                type: 'SELL',
+                                date: e.date,
+                                time: e.time,
+                                name: p.name,
+                                code: p.code,
+                                price: e.price,
+                                quantity: e.quantity,
+                                amount: e.price * e.quantity,
+                                return_pct: e.pnl_pct,
+                                reason: e.reason || ''
+                            });
+                        });
+                    });
                 }
 
-                const data = await response.json();
-                const allTrades = data.all_trades || [];
-                const closedTrades = data.trades || [];
+                // trade_history.json에서 추가 데이터
+                const histResponse = await fetch('data/bnf/trade_history.json?t=' + Date.now());
+                if (histResponse.ok) {
+                    const histData = await histResponse.json();
+                    const histTrades = histData.all_trades || [];
+                    allTrades = [...allTrades, ...histTrades];
+                }
 
-                // 초기 차트는 항상 표시
+                // 날짜순 정렬
+                allTrades.sort((a, b) => {
+                    const dateA = a.date + (a.time || '');
+                    const dateB = b.date + (b.time || '');
+                    return dateB.localeCompare(dateA);
+                });
+
+                // 초기 차트 표시
                 initEmptyChart();
-
-                const tbody = document.querySelector('#tradeHistory tbody');
+                updateUnrealizedChart();
 
                 if (allTrades.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>';
                     return;
                 }
 
-                tbody.innerHTML = allTrades.slice(-20).reverse().map(t => {
+                tbody.innerHTML = allTrades.slice(0, 20).map(t => {
                     const isBuy = t.type === 'BUY';
                     const typeClass = isBuy ? 'positive' : 'negative';
                     const typeLabel = isBuy ? '매수' : '매도';
-                    const reason = t.reason || '';
 
-                    let extraInfo = reason;
+                    let extraInfo = t.reason || '';
                     if (!isBuy && t.return_pct !== undefined) {
                         const pnlClass = t.return_pct >= 0 ? 'positive' : 'negative';
-                        extraInfo = `<span class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct.toFixed(1)}%</span> ${reason}`;
+                        extraInfo = `<span class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct.toFixed(1)}%</span> ${extraInfo}`;
                     }
 
                     return `
@@ -734,21 +801,144 @@
                             <td>${t.date || '-'}</td>
                             <td><span class="${typeClass}" style="font-weight:600;">${typeLabel}</span></td>
                             <td>${t.name}</td>
-                            <td>${t.price?.toLocaleString()}원</td>
+                            <td>${(t.price || 0).toLocaleString()}</td>
                             <td>${t.quantity}주</td>
-                            <td>${t.amount?.toLocaleString()}원</td>
+                            <td>${(t.amount || 0).toLocaleString()}</td>
                             <td style="font-size:0.8em;">${extraInfo}</td>
                         </tr>
                     `;
                 }).join('');
 
-                // 청산 완료 거래가 있으면 차트 업데이트
-                if (closedTrades.length > 0) {
-                    updatePerformanceChart(closedTrades);
-                }
-
             } catch (error) {
                 console.error('Trade history load error:', error);
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">매매 내역 로드 실패</td></tr>';
+            }
+        }
+
+        // 미실현 손익 기반 차트 업데이트
+        async function updateUnrealizedChart() {
+            try {
+                const response = await fetch('data/bnf/positions.json?t=' + Date.now());
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const positions = data.positions || [];
+                const stats = data.stats || {};
+
+                if (positions.length === 0) return;
+
+                // 시작일과 현재 데이터 포인트
+                const entryDates = positions.map(p => p.entry_date).filter(d => d);
+                if (entryDates.length === 0) return;
+
+                const startDate = entryDates.sort()[0];
+                const today = new Date().toISOString().split('T')[0];
+
+                const totalCost = positions.reduce((sum, p) => sum + (p.avg_price * p.total_quantity), 0);
+                const totalValue = positions.reduce((sum, p) => sum + (p.current_price * p.total_quantity), 0);
+                const unrealizedPnl = stats.unrealized_pnl || (totalValue - totalCost);
+                const unrealizedPct = totalCost > 0 ? (unrealizedPnl / totalCost * 100) : 0;
+
+                // 누적 수익률 차트 업데이트
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                if (performanceChart) performanceChart.destroy();
+
+                performanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['시작 (' + startDate + ')', '현재 (' + today + ')'],
+                        datasets: [{
+                            label: '미실현 수익률 (%)',
+                            data: [0, unrealizedPct],
+                            borderColor: unrealizedPct >= 0 ? '#00ff88' : '#ff6b6b',
+                            backgroundColor: unrealizedPct >= 0 ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 8,
+                            pointBackgroundColor: unrealizedPct >= 0 ? '#00ff88' : '#ff6b6b'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255,255,255,0.1)' },
+                                ticks: {
+                                    color: '#8892b0',
+                                    callback: v => v.toFixed(1) + '%'
+                                },
+                                suggestedMin: Math.min(0, unrealizedPct - 5),
+                                suggestedMax: Math.max(0, unrealizedPct + 5)
+                            },
+                            x: {
+                                grid: { color: 'rgba(255,255,255,0.1)' },
+                                ticks: { color: '#8892b0', font: { size: 10 } }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#e4e4e4', font: { size: 11 } } },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => ctx.parsed.y.toFixed(2) + '%'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // 자산 추이 차트도 업데이트
+                const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
+                if (portfolioChart) portfolioChart.destroy();
+
+                const currentValue = INITIAL_CAPITAL + unrealizedPnl;
+
+                portfolioChart = new Chart(portfolioCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['시작', '현재'],
+                        datasets: [{
+                            label: '자산 (원)',
+                            data: [INITIAL_CAPITAL, currentValue],
+                            borderColor: currentValue >= INITIAL_CAPITAL ? '#00ff88' : '#ff6b6b',
+                            backgroundColor: currentValue >= INITIAL_CAPITAL ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 8,
+                            pointBackgroundColor: currentValue >= INITIAL_CAPITAL ? '#00ff88' : '#ff6b6b'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255,255,255,0.1)' },
+                                ticks: {
+                                    color: '#8892b0',
+                                    callback: v => (v / 10000).toFixed(0) + '만'
+                                },
+                                suggestedMin: Math.min(INITIAL_CAPITAL, currentValue) * 0.95,
+                                suggestedMax: Math.max(INITIAL_CAPITAL, currentValue) * 1.05
+                            },
+                            x: {
+                                grid: { color: 'rgba(255,255,255,0.1)' },
+                                ticks: { color: '#8892b0', font: { size: 10 } }
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#e4e4e4', font: { size: 11 } } },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => ctx.parsed.y.toLocaleString() + '원'
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error('Chart update error:', error);
             }
         }
 
