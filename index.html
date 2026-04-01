@@ -1478,6 +1478,7 @@
         // 최근 매매 내역
         function displayRecentTrades(data, filterDate = null) {
             const container = document.getElementById('recentTrades');
+            container.classList.remove('loading-container'); // 로딩 클래스 제거
             const days = data.daily_results || [];
 
             let allTrades = [];
@@ -1535,6 +1536,7 @@
         // 일별 결과
         function displayDailyResults(data) {
             const container = document.getElementById('dailyResults');
+            container.classList.remove('loading-container'); // 로딩 클래스 제거
             const days = data.daily_results || [];
 
             if (days.length === 0) {
