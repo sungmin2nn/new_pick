@@ -539,10 +539,12 @@
         }
         /* 통합 테이블 스타일 */
         .unified-table {
-            width: 100% !important;
-            min-width: 100%;
             font-size: 0.85em;
             table-layout: auto;
+        }
+        .section .table-wrapper .unified-table {
+            width: calc(100% + 20px);
+            margin: 0;
         }
         .unified-table th {
             padding: 8px 6px;
