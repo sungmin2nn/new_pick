@@ -141,6 +141,30 @@
         .stat-value.negative { color: #ff6b6b; }
         .stat-label { color: #8892b0; font-size: 0.85em; }
 
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(0, 217, 255, 0.2);
+            border-top: 3px solid #00d9ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #8892b0;
+        }
+        .loading-container .spinner { margin-bottom: 15px; }
+
         /* Section */
         .section {
             background: rgba(22, 33, 62, 0.8);
@@ -287,7 +311,27 @@
         }
         .status-message.waiting { color: #ffaa00; }
         .status-message.no-data { color: #8892b0; }
-        .status-message.error { color: #ff6b6b; }
+        .status-message.error {
+            color: #ff6b6b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .status-message.error .retry-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .status-message.error .retry-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
 
         /* Mini Stat for Strategy Summary */
         .stat-mini {
@@ -320,7 +364,7 @@
             .header .nav-links { margin-top: 15px; }
             .header .nav-links a { margin: 0 10px; font-size: 0.9em; }
             .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
             .stat-card { padding: 15px 10px; }
@@ -362,7 +406,6 @@
                 grid-template-columns: 1fr;
             }
             .stock-status-card { padding: 15px; }
-            /* Table scroll wrapper */
             .table-wrapper {
                 overflow-x: auto;
                 overflow-y: hidden;
@@ -391,7 +434,7 @@
             .header .subtitle { font-size: 0.75em; }
             .header .nav-links a { margin: 0 8px; font-size: 0.8em; }
             .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, 1fr);
                 gap: 6px;
                 margin-bottom: 15px;
             }
@@ -439,8 +482,18 @@
                 overflow-y: hidden;
                 max-width: 100%;
             }
-            table { min-width: 450px; font-size: 0.75em; width: 100%; }
-            th, td { padding: 8px 6px; }
+            /* Mobile table optimization - hide unnecessary columns */
+            table { min-width: 350px; font-size: 0.75em; width: 100%; }
+            th, td { padding: 8px 4px; }
+
+            /* Hide columns on mobile */
+            #liveStatusTable th:nth-child(3),
+            #liveStatusTable td:nth-child(3),
+            table thead tr th:nth-child(3),
+            table tbody tr td:nth-child(3) {
+                display: none;
+            }
+
             .chart-container { height: 200px; }
             .no-data { padding: 25px; font-size: 0.85em; }
         }
@@ -597,17 +650,11 @@
             <button class="btn-refresh" onclick="triggerManualCheck()">🔄 수동 체크</button>
         </div>
 
-        <!-- Strategy Comparison (전체 선택시 표시) -->
-        <div class="section" id="strategyComparison" style="display: none;">
-            <h2>⚔️ 전략 비교</h2>
-            <div id="comparisonGrid" class="strategy-comparison-grid"></div>
-        </div>
-
-        <!-- Stats -->
+        <!-- Stats (4개로 축소) -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card">
-                <div class="stat-value" id="tradingDays">-</div>
-                <div class="stat-label">거래일</div>
+                <div class="stat-value" id="totalReturn">-</div>
+                <div class="stat-label">누적 수익률</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="totalTrades">-</div>
@@ -618,20 +665,12 @@
                 <div class="stat-label">승률</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="totalReturn">-</div>
-                <div class="stat-label">누적 수익률</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="profitExits">-</div>
-                <div class="stat-label">익절</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="lossExits">-</div>
-                <div class="stat-label">손절</div>
+                <div class="stat-value" id="tradingDays">-</div>
+                <div class="stat-label">거래일</div>
             </div>
         </div>
 
-        <!-- Live Status -->
+        <!-- Live Status (Stats 바로 아래로 이동) -->
         <div class="section">
             <h2>
                 ⏱️ 실시간 상태
@@ -651,10 +690,16 @@
                         </tr>
                     </thead>
                     <tbody id="liveStatusBody">
-                        <tr><td colspan="6" class="no-data">상태 확인 중...</td></tr>
+                        <tr><td colspan="6" class="loading-container"><div class="spinner"></div><div>상태 확인 중...</div></td></tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Strategy Comparison (Live Status 아래로 이동) -->
+        <div class="section" id="strategyComparison" style="display: none;">
+            <h2>⚔️ 전략 비교</h2>
+            <div id="comparisonGrid" class="strategy-comparison-grid"></div>
         </div>
 
         <!-- Performance Chart -->
@@ -675,13 +720,13 @@
         <!-- Recent Trades -->
         <div class="section">
             <h2>📋 최근 매매 내역</h2>
-            <div id="recentTrades" class="loading">데이터 로딩 중</div>
+            <div id="recentTrades" class="loading-container"><div class="spinner"></div><div>데이터 로딩 중...</div></div>
         </div>
 
         <!-- Daily Results -->
         <div class="section">
             <h2>📅 일별 결과</h2>
-            <div id="dailyResults" class="loading">데이터 로딩 중</div>
+            <div id="dailyResults" class="loading-container"><div class="spinner"></div><div>데이터 로딩 중...</div></div>
         </div>
     </div>
 
@@ -692,6 +737,56 @@
         let cachedData = null;
         const INITIAL_CAPITAL = 1000000; // 초기 자본금 100만원
         const POSITION_SIZE = 200000; // 종목당 투자금액 20만원
+
+        // 데이터 캐싱
+        const dataCache = new Map();
+        const CACHE_DURATION = 60000; // 1분
+
+        // 캐싱된 fetch
+        async function fetchWithCache(url) {
+            const now = Date.now();
+            const cached = dataCache.get(url);
+
+            if (cached && (now - cached.timestamp < CACHE_DURATION)) {
+                console.log('Using cached data for:', url);
+                return cached.data;
+            }
+
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    dataCache.set(url, { data, timestamp: now });
+                    return data;
+                }
+            } catch (error) {
+                console.log('Fetch error:', url, error);
+            }
+            return null;
+        }
+
+        // 억 단위 포맷
+        function formatKoreanCurrency(amount) {
+            if (amount >= 100000000) {
+                return (amount / 100000000).toFixed(1) + '억';
+            } else if (amount >= 10000) {
+                return (amount / 10000).toFixed(0) + '만';
+            }
+            return amount.toLocaleString();
+        }
+
+        // 에러 메시지 표시
+        function showError(container, message, retryCallback = null) {
+            const retryBtn = retryCallback
+                ? `<button class="retry-btn" onclick="${retryCallback}">다시 시도</button>`
+                : '';
+            container.innerHTML = `
+                <div class="status-message error">
+                    <div>${message}</div>
+                    ${retryBtn}
+                </div>
+            `;
+        }
 
         // 오늘 날짜 설정
         document.addEventListener('DOMContentLoaded', () => {
@@ -769,20 +864,20 @@
         // 다중 전략 데이터 로드
         async function loadMultiStrategyData(dateStr) {
             const grid = document.getElementById('comparisonGrid');
+            grid.innerHTML = '<div class="loading-container"><div class="spinner"></div><div>전략 비교 데이터 로딩 중...</div></div>';
+
             try {
                 // 1. candidates_all 파일 시도
-                const response = await fetch(`data/paper_trading/candidates_${dateStr}_all.json?t=${Date.now()}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    displayStrategyComparison(data);
+                const data1 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}_all.json?t=${Date.now()}`);
+                if (data1) {
+                    displayStrategyComparison(data1);
                     return;
                 }
 
                 // 2. 기본 candidates 파일에서 전략별 분류
-                const candidatesResponse = await fetch(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
-                if (candidatesResponse.ok) {
-                    const data = await candidatesResponse.json();
-                    const candidates = data.candidates || [];
+                const data2 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
+                if (data2) {
+                    const candidates = data2.candidates || [];
                     if (candidates.length > 0) {
                         // 전략별 분류
                         const largecap = candidates.filter(c => c.cap_tier === 'large');
@@ -800,16 +895,15 @@
                 }
 
                 // 3. morning_candidates.json 폴백
-                const morningResponse = await fetch(`data/morning_candidates.json?t=${Date.now()}`);
-                if (morningResponse.ok) {
-                    const data = await morningResponse.json();
-                    const candidates = data.candidates || [];
+                const data3 = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
+                if (data3) {
+                    const candidates = data3.candidates || [];
                     if (candidates.length > 0) {
                         const largecap = candidates.filter(c => c.cap_tier === 'large');
                         const momentum = candidates.filter(c => c.theme === '모멘텀' || c.strategy === 'momentum');
                         const theme = candidates.filter(c => c.theme && c.theme !== '모멘텀');
 
-                        displayStrategyOverview(data.date || dateStr, {
+                        displayStrategyOverview(data3.date || dateStr, {
                             total: candidates,
                             largecap_contrarian: largecap,
                             momentum: momentum,
@@ -820,10 +914,9 @@
                 }
 
                 // 4. intraday 데이터로 전략 비교 생성
-                const intradayResponse = await fetch(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
-                if (intradayResponse.ok) {
-                    const data = await intradayResponse.json();
-                    const stocks = Object.values(data.stocks || {});
+                const data4 = await fetchWithCache(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
+                if (data4) {
+                    const stocks = Object.values(data4.stocks || {});
                     if (stocks.length > 0) {
                         grid.innerHTML = `
                             <div class="strategy-summary">
@@ -840,10 +933,10 @@
                     }
                 }
 
-                grid.innerHTML = '<div class="status-message no-data">해당 날짜의 전략 비교 데이터가 없습니다</div>';
+                showError(grid, '해당 날짜의 전략 비교 데이터가 없습니다', 'loadTodayData()');
             } catch (error) {
                 console.log('Multi-strategy load error:', error);
-                grid.innerHTML = '<div class="status-message error">데이터 로드 실패</div>';
+                showError(grid, '데이터 로드 중 오류가 발생했습니다', 'loadTodayData()');
             }
         }
 
@@ -922,23 +1015,23 @@
         // 단일 전략 데이터 로드
         async function loadSingleStrategyData(dateStr, strategyId) {
             const tbody = document.getElementById('liveStatusBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading-container"><div class="spinner"></div><div>전략 데이터 로딩 중...</div></td></tr>';
+
             try {
                 // 1. 전략별 파일 시도
-                const response = await fetch(`data/paper_trading/candidates_${dateStr}_${strategyId}.json?t=${Date.now()}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    displaySingleStrategy(data);
+                const data1 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}_${strategyId}.json?t=${Date.now()}`);
+                if (data1) {
+                    displaySingleStrategy(data1);
                     return;
                 }
 
                 // 2. 기본 candidates 파일에서 해당 전략 필터링
-                const fallbackResponse = await fetch(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
-                if (fallbackResponse.ok) {
-                    const data = await fallbackResponse.json();
+                const data2 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
+                if (data2) {
                     // 전략별 필터링 (전략 정보가 있으면)
                     const filtered = {
-                        ...data,
-                        candidates: (data.candidates || []).filter(c => {
+                        ...data2,
+                        candidates: (data2.candidates || []).filter(c => {
                             if (strategyId === 'largecap_contrarian') return c.cap_tier === 'large';
                             if (strategyId === 'momentum') return c.theme === '모멘텀' || c.strategy === 'momentum';
                             if (strategyId === 'theme_policy') return c.theme && c.theme !== '모멘텀';
@@ -950,12 +1043,11 @@
                 }
 
                 // 3. morning_candidates.json 폴백
-                const morningResponse = await fetch(`data/morning_candidates.json?t=${Date.now()}`);
-                if (morningResponse.ok) {
-                    const data = await morningResponse.json();
+                const data3 = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
+                if (data3) {
                     const filtered = {
-                        ...data,
-                        candidates: (data.candidates || []).filter(c => {
+                        ...data3,
+                        candidates: (data3.candidates || []).filter(c => {
                             if (strategyId === 'largecap_contrarian') return c.cap_tier === 'large';
                             if (strategyId === 'momentum') return c.theme === '모멘텀' || c.strategy === 'momentum';
                             if (strategyId === 'theme_policy') return c.theme && c.theme !== '모멘텀';
@@ -970,7 +1062,7 @@
                 tbody.innerHTML = `<tr><td colspan="4" class="no-data">${getStrategyName(strategyId)} 전략 데이터가 없습니다</td></tr>`;
             } catch (error) {
                 console.log('Single strategy load error:', error);
-                tbody.innerHTML = '<tr><td colspan="4" class="no-data">데이터 로드 실패</td></tr>';
+                showError(tbody.parentElement, '데이터 로드 중 오류가 발생했습니다', 'loadTodayData()');
             }
         }
 
@@ -1102,7 +1194,7 @@
 
         // 수동 체크 트리거
         function triggerManualCheck() {
-            const confirmed = confirm('GitHub Actions에서 수동 체크를 실행할까요?\\n(GitHub 로그인 필요)');
+            const confirmed = confirm('GitHub Actions에서 수동 체크를 실행할까요?\n(GitHub 로그인 필요)');
             if (confirmed) {
                 window.open('https://github.com/sungmin2nn/new_pick/actions/workflows/paper-trading-check.yml', '_blank');
             }
@@ -1112,17 +1204,14 @@
         async function loadPaperTradingData(dateStr = null) {
             try {
                 // 1. 실제 페이퍼 트레이딩 결과 로드 시도
-                const response = await fetch('data/paper_trading/results.json?t=' + Date.now());
-                if (response.ok) {
-                    const results = await response.json();
-                    if (results.daily_results && results.daily_results.length > 0) {
-                        console.log('Paper trading results loaded:', results.daily_results.length, 'days');
-                        displayStats(results);
-                        displayRecentTrades(results, dateStr);
-                        displayDailyResults(results);
-                        displayPerformanceChart(results);
-                        return;
-                    }
+                const results = await fetchWithCache('data/paper_trading/results.json?t=' + Date.now());
+                if (results && results.daily_results && results.daily_results.length > 0) {
+                    console.log('Paper trading results loaded:', results.daily_results.length, 'days');
+                    displayStats(results);
+                    displayRecentTrades(results, dateStr);
+                    displayDailyResults(results);
+                    displayPerformanceChart(results);
+                    return;
                 }
 
                 // 2. intraday 데이터 직접 로드
@@ -1219,9 +1308,8 @@
             // 병렬로 모든 파일 로드 (10배 이상 빠름)
             const fetchPromises = dates.map(async dateStr => {
                 try {
-                    const response = await fetch(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
-                    if (response.ok) {
-                        const data = await response.json();
+                    const data = await fetchWithCache(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
+                    if (data) {
                         return transformIntradayData(data, dateStr);
                     }
                 } catch (e) {
@@ -1307,6 +1395,8 @@
             const updateTime = document.getElementById('statusUpdateTime');
             const targetDateEl = document.getElementById('targetDate');
 
+            tbody.innerHTML = '<tr><td colspan="6" class="loading-container"><div class="spinner"></div><div>실시간 상태 확인 중...</div></td></tr>';
+
             try {
                 const today = dateStr || new Date().toISOString().split('T')[0].replace(/-/g, '');
                 const formattedDate = formatDate(today);
@@ -1319,29 +1409,26 @@
                 const isMarketOpen = hour >= 9 && hour < 16;
 
                 // 상태 파일 로드 시도
-                const statusResponse = await fetch(`data/paper_trading/status_${today}.json?t=${Date.now()}`);
+                const status = await fetchWithCache(`data/paper_trading/status_${today}.json?t=${Date.now()}`);
 
-                if (statusResponse.ok) {
-                    const status = await statusResponse.json();
+                if (status) {
                     displayLiveStatus(status);
                     updateTime.textContent = `최근 업데이트: ${status.checked_at || '-'}`;
                     return;
                 }
 
                 // 상태 파일 없으면 candidates 파일 로드
-                const candidatesResponse = await fetch(`data/paper_trading/candidates_${today}.json?t=${Date.now()}`);
+                const candidates = await fetchWithCache(`data/paper_trading/candidates_${today}.json?t=${Date.now()}`);
 
-                if (candidatesResponse.ok) {
-                    const candidates = await candidatesResponse.json();
+                if (candidates) {
                     displayCandidatesAsStatus(candidates);
                     updateTime.textContent = `선정 시간: ${candidates.selected_at || '-'}`;
                     return;
                 }
 
                 // morning_candidates.json 로드 시도
-                const morningResponse = await fetch(`data/morning_candidates.json?t=${Date.now()}`);
-                if (morningResponse.ok) {
-                    const morningData = await morningResponse.json();
+                const morningData = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
+                if (morningData) {
                     // 오늘 날짜와 일치하는지 확인
                     const morningDate = (morningData.date || '').replace(/-/g, '');
                     if (morningDate === today || morningDate === today.slice(0,4) + '-' + today.slice(4,6) + '-' + today.slice(6,8)) {
@@ -1369,7 +1456,7 @@
 
             } catch (error) {
                 console.log('Live status load error:', error);
-                tbody.innerHTML = '<tr><td colspan="6" class="no-data">⚠️ 상태 데이터를 불러올 수 없습니다</td></tr>';
+                showError(tbody.parentElement, '상태 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.', 'loadLiveStatus()');
             }
         }
 
@@ -1443,7 +1530,7 @@
             tbody.innerHTML = candidates.map(c => {
                 const price = c.current_price || c.price || 0;
                 const score = c.total_score || c.score || 0;
-                const tradingValue = c.trading_value ? (c.trading_value / 100000000).toFixed(0) : '-';
+                const tradingValue = c.trading_value ? formatKoreanCurrency(c.trading_value) : '-';
 
                 return `
                     <tr>
@@ -1452,7 +1539,7 @@
                         <td>${price.toLocaleString()}원</td>
                         <td class="${(c.change_pct || 0) >= 0 ? 'positive' : 'negative'}">${(c.change_pct || 0) >= 0 ? '+' : ''}${(c.change_pct || 0).toFixed(2)}%</td>
                         <td>${score.toFixed(1)}</td>
-                        <td>${tradingValue}억</td>
+                        <td>${tradingValue}</td>
                     </tr>
                 `;
             }).join('');
@@ -1511,8 +1598,6 @@
             const totalTrades = days.reduce((sum, d) => sum + (d.total_trades || 0), 0);
             const totalWins = days.reduce((sum, d) => sum + (d.wins || 0), 0);
             const totalReturn = days.reduce((sum, d) => sum + (d.total_return || 0), 0);
-            const profitExits = days.reduce((sum, d) => sum + (d.profit_exits || 0), 0);
-            const lossExits = days.reduce((sum, d) => sum + (d.loss_exits || 0), 0);
 
             document.getElementById('tradingDays').textContent = days.length + '일';
             document.getElementById('totalTrades').textContent = totalTrades + '건';
@@ -1523,9 +1608,6 @@
             const returnEl = document.getElementById('totalReturn');
             returnEl.textContent = (totalReturn >= 0 ? '+' : '') + totalReturn.toFixed(2) + '%';
             returnEl.className = 'stat-value ' + (totalReturn >= 0 ? 'positive' : 'negative');
-
-            document.getElementById('profitExits').textContent = profitExits + '건';
-            document.getElementById('lossExits').textContent = lossExits + '건';
         }
 
         // 성과 차트
@@ -1735,9 +1817,6 @@
             document.getElementById('totalTrades').textContent = '0건';
             document.getElementById('winRate').textContent = '0%';
             document.getElementById('totalReturn').textContent = '+0.00%';
-            document.getElementById('profitExits').textContent = '0건';
-            document.getElementById('lossExits').textContent = '0건';
-            document.getElementById('liveStatus').innerHTML = '<div class="no-data">데이터가 없습니다. 장 종료 후 자동으로 업데이트됩니다.</div>';
             document.getElementById('recentTrades').innerHTML = '<div class="no-data">아직 거래 내역이 없습니다.</div>';
             document.getElementById('dailyResults').innerHTML = '<div class="no-data">아직 일별 결과가 없습니다.</div>';
         }
