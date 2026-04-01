@@ -23,13 +23,19 @@ import json
 # 상위 디렉토리 import 설정
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+# 네이버 금융 우선, pykrx 폴백
 try:
-    from pykrx import stock
+    from naver_market import stock
     import pandas as pd
     PYKRX_AVAILABLE = True
 except ImportError:
-    PYKRX_AVAILABLE = False
-    print("[BNFSelector] Warning: pykrx not available")
+    try:
+        from pykrx import stock
+        import pandas as pd
+        PYKRX_AVAILABLE = True
+    except ImportError:
+        PYKRX_AVAILABLE = False
+        print("[BNFSelector] Warning: naver_market/pykrx not available")
 
 # 경고 무시
 import warnings

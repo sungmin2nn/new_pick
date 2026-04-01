@@ -16,10 +16,15 @@ from .base import BaseStrategy, Candidate
 from .registry import StrategyRegistry
 from utils import format_kst_time, get_headers
 
+# 네이버 금융 우선, pykrx 폴백
 try:
-    from pykrx import stock as pykrx_stock
+    from naver_market import stock as naver_stock
+    pykrx_stock = naver_stock
 except ImportError:
-    pykrx_stock = None
+    try:
+        from pykrx import stock as pykrx_stock
+    except ImportError:
+        pykrx_stock = None
 
 
 @StrategyRegistry.register

@@ -12,7 +12,12 @@ from dataclasses import dataclass, field, asdict
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pykrx import stock
+# 네이버 금융 우선, pykrx 폴백
+try:
+    from naver_market import stock
+except ImportError:
+    from pykrx import stock
+
 import pandas as pd
 
 from .selector import StockCandidate

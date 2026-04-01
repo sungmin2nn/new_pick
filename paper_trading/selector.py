@@ -11,10 +11,15 @@ from dataclasses import dataclass, field, asdict
 # 상위 디렉토리 import 설정
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pykrx import stock
+# 네이버 금융 우선, pykrx 폴백
+try:
+    from naver_market import stock
+except ImportError:
+    from pykrx import stock
+
 import pandas as pd
 
-# pykrx 경고 무시
+# 경고 무시
 import warnings
 warnings.filterwarnings('ignore')
 

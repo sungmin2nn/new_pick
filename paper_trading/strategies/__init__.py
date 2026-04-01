@@ -10,6 +10,7 @@ from .registry import StrategyRegistry
 from .largecap_contrarian import LargecapContrarianStrategy
 from .momentum import MomentumStrategy
 from .theme_policy import ThemePolicyStrategy
+from .dart_disclosure import DartDisclosureStrategy
 
 __all__ = [
     'BaseStrategy',
@@ -19,4 +20,5 @@ __all__ = [
     'LargecapContrarianStrategy',
     'MomentumStrategy',
     'ThemePolicyStrategy',
+    'DartDisclosureStrategy',
 ]

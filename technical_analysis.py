@@ -11,12 +11,17 @@ from utils import get_kst_now
 class TechnicalAnalyzer:
     def __init__(self):
         self.use_pykrx = True
+        # 네이버 금융 우선, pykrx 폴백
         try:
-            from pykrx import stock
+            from naver_market import stock
             self.pykrx_stock = stock
         except ImportError:
-            print("  ⚠️  pykrx 라이브러리가 설치되지 않았습니다. 기술적 분석을 스킵합니다.")
-            self.use_pykrx = False
+            try:
+                from pykrx import stock
+                self.pykrx_stock = stock
+            except ImportError:
+                print("  ⚠️  naver_market/pykrx 사용 불가. 기술적 분석을 스킵합니다.")
+                self.use_pykrx = False
 
     def get_indicators(self, stock_code, date_str=None):
         """
