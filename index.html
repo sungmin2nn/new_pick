@@ -390,18 +390,6 @@
                 align-items: flex-start;
                 gap: 5px;
             }
-            .strategy-buttons {
-                width: 100%;
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                padding-bottom: 10px;
-                -webkit-overflow-scrolling: touch;
-            }
-            .strategy-btn {
-                flex-shrink: 0;
-                padding: 8px 14px;
-                font-size: 0.85em;
-            }
             .live-status-grid {
                 grid-template-columns: 1fr;
             }
@@ -505,32 +493,15 @@
             color: #8892b0;
         }
 
-        /* Strategy Buttons */
-        .strategy-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+        /* Unified Table Check Cells */
+        .check-cell {
+            text-align: center;
+            font-size: 1.2em;
         }
-        .strategy-btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 2px solid #2a2a4a;
-            background: #16213e;
-            color: #e4e4e4;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .strategy-btn:hover {
-            border-color: #00d9ff;
-            background: rgba(0, 217, 255, 0.1);
-        }
-        .strategy-btn.active {
-            border-color: #00ff88;
-            background: rgba(0, 255, 136, 0.15);
+        .check-cell.checked {
             color: #00ff88;
-            font-weight: 600;
+            background: rgba(0, 255, 136, 0.1);
+            font-weight: bold;
         }
 
         /* Strategy Comparison Grid */
@@ -634,14 +605,6 @@
             </nav>
         </header>
 
-        <!-- Strategy Buttons -->
-        <div class="strategy-buttons">
-            <button class="strategy-btn active" data-strategy="all" onclick="selectStrategy('all', this)">📊 전체 비교</button>
-            <button class="strategy-btn" data-strategy="largecap_contrarian" onclick="selectStrategy('largecap_contrarian', this)">🏢 대형주 역추세</button>
-            <button class="strategy-btn" data-strategy="momentum" onclick="selectStrategy('momentum', this)">📈 모멘텀</button>
-            <button class="strategy-btn" data-strategy="theme_policy" onclick="selectStrategy('theme_policy', this)">🎯 테마/정책</button>
-        </div>
-
         <!-- Control Bar -->
         <div class="control-bar">
             <input type="date" id="selectDate" />
@@ -696,10 +659,30 @@
             </div>
         </div>
 
-        <!-- Strategy Comparison (Live Status 아래로 이동) -->
-        <div class="section" id="strategyComparison" style="display: none;">
-            <h2>⚔️ 전략 비교</h2>
-            <div id="comparisonGrid" class="strategy-comparison-grid"></div>
+        <!-- Unified Stock Analysis Table (통합 종목 분석 테이블) -->
+        <div class="section" id="unifiedAnalysis">
+            <h2>📊 종목 분석 테이블</h2>
+            <div id="analysisDate" style="color: #8892b0; font-size: 0.9em; margin-bottom: 10px;"></div>
+            <div class="table-wrapper">
+                <table id="unifiedTable">
+                    <thead>
+                        <tr>
+                            <th>종목</th>
+                            <th>현재가</th>
+                            <th>등락률</th>
+                            <th>점수</th>
+                            <th>대형주</th>
+                            <th>모멘텀</th>
+                            <th>테마</th>
+                            <th>역추세</th>
+                            <th>테마명</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unifiedTableBody">
+                        <tr><td colspan="9" class="loading-container"><div class="spinner"></div><div>데이터 로딩 중...</div></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Performance Chart -->
@@ -732,7 +715,6 @@
 
     <script>
         let performanceChart = null;
-        let currentStrategy = 'all';
         let chartMode = 'percent'; // 'percent' or 'amount'
         let cachedData = null;
         const INITIAL_CAPITAL = 1000000; // 초기 자본금 100만원
@@ -806,35 +788,14 @@
             }
         }
 
-        // 전략 선택 (버튼)
-        function selectStrategy(strategy, btn) {
-            // 버튼 활성화 상태 변경
-            document.querySelectorAll('.strategy-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            currentStrategy = strategy;
-            const comparisonSection = document.getElementById('strategyComparison');
-
-            if (currentStrategy === 'all') {
-                comparisonSection.style.display = 'block';
-            } else {
-                comparisonSection.style.display = 'none';
-            }
-
-            loadTodayData();
-        }
 
         // 오늘 데이터 로드
         async function loadTodayData() {
             const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
 
-            // 병렬로 모든 데이터 로드 (3배 이상 빠름)
-            const strategyPromise = currentStrategy === 'all'
-                ? loadMultiStrategyData(today)
-                : loadSingleStrategyData(today, currentStrategy);
-
+            // 병렬로 모든 데이터 로드
             await Promise.all([
-                strategyPromise,
+                loadUnifiedTableData(today),
                 loadPaperTradingData(),
                 loadLiveStatus()
             ]);
@@ -850,347 +811,87 @@
             const dateStr = dateInput.replace(/-/g, '');
 
             // 병렬로 모든 데이터 로드
-            const strategyPromise = currentStrategy === 'all'
-                ? loadMultiStrategyData(dateStr)
-                : loadSingleStrategyData(dateStr, currentStrategy);
-
             await Promise.all([
-                strategyPromise,
+                loadUnifiedTableData(dateStr),
                 loadPaperTradingData(dateStr),
                 loadLiveStatus(dateStr)
             ]);
         }
 
-        // 다중 전략 데이터 로드
-        async function loadMultiStrategyData(dateStr) {
-            const grid = document.getElementById('comparisonGrid');
-            grid.innerHTML = '<div class="loading-container"><div class="spinner"></div><div>전략 비교 데이터 로딩 중...</div></div>';
+        // 통합 테이블 데이터 로드
+        async function loadUnifiedTableData(dateStr) {
+            const tbody = document.getElementById('unifiedTableBody');
+            const dateEl = document.getElementById('analysisDate');
+            tbody.innerHTML = '<tr><td colspan="9" class="loading-container"><div class="spinner"></div><div>종목 데이터 로딩 중...</div></td></tr>';
 
             try {
-                // 1. candidates_all 파일 시도
-                const data1 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}_all.json?t=${Date.now()}`);
-                if (data1) {
-                    displayStrategyComparison(data1);
+                // 1. candidates 파일 시도
+                const data1 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
+                if (data1 && data1.candidates && data1.candidates.length > 0) {
+                    displayUnifiedTable(data1.candidates, dateStr);
+                    dateEl.textContent = `📅 ${formatDate(dateStr)} 선정 종목`;
                     return;
                 }
 
-                // 2. 기본 candidates 파일에서 전략별 분류
-                const data2 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
-                if (data2) {
-                    const candidates = data2.candidates || [];
-                    if (candidates.length > 0) {
-                        // 전략별 분류
-                        const largecap = candidates.filter(c => c.cap_tier === 'large');
-                        const momentum = candidates.filter(c => c.theme === '모멘텀' || c.strategy === 'momentum');
-                        const theme = candidates.filter(c => c.theme && c.theme !== '모멘텀');
-
-                        displayStrategyOverview(dateStr, {
-                            total: candidates,
-                            largecap_contrarian: largecap,
-                            momentum: momentum,
-                            theme_policy: theme
-                        });
-                        return;
-                    }
+                // 2. morning_candidates.json 폴백
+                const data2 = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
+                if (data2 && data2.candidates && data2.candidates.length > 0) {
+                    displayUnifiedTable(data2.candidates, data2.date || dateStr);
+                    dateEl.textContent = `📅 ${data2.date || formatDate(dateStr)} 선정 종목`;
+                    return;
                 }
 
-                // 3. morning_candidates.json 폴백
-                const data3 = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
-                if (data3) {
-                    const candidates = data3.candidates || [];
-                    if (candidates.length > 0) {
-                        const largecap = candidates.filter(c => c.cap_tier === 'large');
-                        const momentum = candidates.filter(c => c.theme === '모멘텀' || c.strategy === 'momentum');
-                        const theme = candidates.filter(c => c.theme && c.theme !== '모멘텀');
-
-                        displayStrategyOverview(data3.date || dateStr, {
-                            total: candidates,
-                            largecap_contrarian: largecap,
-                            momentum: momentum,
-                            theme_policy: theme
-                        });
-                        return;
-                    }
-                }
-
-                // 4. intraday 데이터로 전략 비교 생성
-                const data4 = await fetchWithCache(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
-                if (data4) {
-                    const stocks = Object.values(data4.stocks || {});
-                    if (stocks.length > 0) {
-                        grid.innerHTML = `
-                            <div class="strategy-summary">
-                                <p style="color: #8892b0; margin-bottom: 15px;">📅 ${formatDate(dateStr)} 인트라데이 분석 결과</p>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
-                                    <div class="stat-mini"><span class="value">${stocks.length}</span><span class="label">분석 종목</span></div>
-                                    <div class="stat-mini"><span class="value positive">${stocks.filter(s => s.profit_loss_analysis?.first_hit === 'profit').length}</span><span class="label">익절</span></div>
-                                    <div class="stat-mini"><span class="value negative">${stocks.filter(s => s.profit_loss_analysis?.first_hit === 'loss').length}</span><span class="label">손절</span></div>
-                                    <div class="stat-mini"><span class="value">${stocks.filter(s => !s.profit_loss_analysis?.first_hit || s.profit_loss_analysis?.first_hit === 'none').length}</span><span class="label">미도달</span></div>
-                                </div>
-                            </div>
-                        `;
-                        return;
-                    }
-                }
-
-                showError(grid, '해당 날짜의 전략 비교 데이터가 없습니다', 'loadTodayData()');
+                tbody.innerHTML = '<tr><td colspan="9" class="no-data">해당 날짜의 종목 데이터가 없습니다</td></tr>';
+                dateEl.textContent = '';
             } catch (error) {
-                console.log('Multi-strategy load error:', error);
-                showError(grid, '데이터 로드 중 오류가 발생했습니다', 'loadTodayData()');
-            }
-        }
-
-        // 전략 개요 표시 (candidates 파일에서 분류)
-        function displayStrategyOverview(dateStr, strategies) {
-            const grid = document.getElementById('comparisonGrid');
-            const formattedDate = typeof dateStr === 'string' && dateStr.length === 8
-                ? formatDate(dateStr)
-                : dateStr;
-
-            let html = `
-                <div class="strategy-summary" style="grid-column: 1 / -1;">
-                    <p style="color: #00d9ff; margin-bottom: 15px; font-size: 1.1em;">📅 ${formattedDate} 종목 분류</p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('all', document.querySelector('[data-strategy=all]'))">
-                            <span class="value">${strategies.total.length}</span>
-                            <span class="label">전체 종목</span>
-                        </div>
-                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('largecap_contrarian', document.querySelector('[data-strategy=largecap_contrarian]'))">
-                            <span class="value">${strategies.largecap_contrarian.length}</span>
-                            <span class="label">🏢 대형주</span>
-                        </div>
-                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('momentum', document.querySelector('[data-strategy=momentum]'))">
-                            <span class="value">${strategies.momentum.length}</span>
-                            <span class="label">📈 모멘텀</span>
-                        </div>
-                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('theme_policy', document.querySelector('[data-strategy=theme_policy]'))">
-                            <span class="value">${strategies.theme_policy.length}</span>
-                            <span class="label">🎯 테마/정책</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // 전체 종목 리스트 표시
-            if (strategies.total.length > 0) {
-                html += `
-                    <div style="grid-column: 1 / -1; margin-top: 15px;">
-                        <table style="width: 100%;">
-                            <thead>
-                                <tr>
-                                    <th>종목</th>
-                                    <th>분류</th>
-                                    <th>현재가</th>
-                                    <th>등락률</th>
-                                    <th>점수</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${strategies.total.map(c => {
-                                    const capLabel = c.cap_tier === 'large' ? '대형' : c.cap_tier === 'mid' ? '중형' : '소형';
-                                    const themeLabel = c.theme || '-';
-                                    const price = c.current_price || c.price || 0;
-                                    const changePct = c.price_change_percent || c.change_pct || 0;
-                                    const score = c.total_score || c.score || 0;
-                                    return `
-                                        <tr>
-                                            <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
-                                            <td><span class="status-badge">${capLabel}</span> ${themeLabel}</td>
-                                            <td>${price.toLocaleString()}원</td>
-                                            <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
-                                            <td>${score.toFixed(0)}</td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            }
-
-            grid.innerHTML = html;
-            document.getElementById('strategyComparison').style.display = 'block';
-        }
-
-        // 단일 전략 데이터 로드
-        async function loadSingleStrategyData(dateStr, strategyId) {
-            const tbody = document.getElementById('liveStatusBody');
-            tbody.innerHTML = '<tr><td colspan="6" class="loading-container"><div class="spinner"></div><div>전략 데이터 로딩 중...</div></td></tr>';
-
-            try {
-                // 1. 전략별 파일 시도
-                const data1 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}_${strategyId}.json?t=${Date.now()}`);
-                if (data1) {
-                    displaySingleStrategy(data1);
-                    return;
-                }
-
-                // 2. 기본 candidates 파일에서 해당 전략 필터링
-                const data2 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
-                if (data2) {
-                    // 전략별 필터링 (전략 정보가 있으면)
-                    const filtered = {
-                        ...data2,
-                        candidates: (data2.candidates || []).filter(c => {
-                            if (strategyId === 'largecap_contrarian') return c.cap_tier === 'large';
-                            if (strategyId === 'momentum') return c.theme === '모멘텀' || c.strategy === 'momentum';
-                            if (strategyId === 'theme_policy') return c.theme && c.theme !== '모멘텀';
-                            return true;
-                        })
-                    };
-                    displaySingleStrategy(filtered);
-                    return;
-                }
-
-                // 3. morning_candidates.json 폴백
-                const data3 = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
-                if (data3) {
-                    const filtered = {
-                        ...data3,
-                        candidates: (data3.candidates || []).filter(c => {
-                            if (strategyId === 'largecap_contrarian') return c.cap_tier === 'large';
-                            if (strategyId === 'momentum') return c.theme === '모멘텀' || c.strategy === 'momentum';
-                            if (strategyId === 'theme_policy') return c.theme && c.theme !== '모멘텀';
-                            return true;
-                        })
-                    };
-                    displaySingleStrategy(filtered);
-                    return;
-                }
-
-                // 데이터 없음
-                tbody.innerHTML = `<tr><td colspan="4" class="no-data">${getStrategyName(strategyId)} 전략 데이터가 없습니다</td></tr>`;
-            } catch (error) {
-                console.log('Single strategy load error:', error);
+                console.log('Unified table load error:', error);
                 showError(tbody.parentElement, '데이터 로드 중 오류가 발생했습니다', 'loadTodayData()');
             }
         }
 
-        // 전략명 변환
-        function getStrategyName(strategyId) {
-            const names = {
-                'largecap_contrarian': '대형주 역추세',
-                'momentum': '모멘텀',
-                'theme_policy': '테마/정책'
-            };
-            return names[strategyId] || strategyId;
-        }
+        // 통합 테이블 표시
+        function displayUnifiedTable(candidates, dateStr) {
+            const tbody = document.getElementById('unifiedTableBody');
 
-        // 전략 비교 표시
-        function displayStrategyComparison(data) {
-            const grid = document.getElementById('comparisonGrid');
-            const strategies = data.strategies || {};
-
-            if (Object.keys(strategies).length === 0) {
-                grid.innerHTML = '<div class="no-data">전략 데이터가 없습니다</div>';
-                return;
-            }
-
-            // 종목 수 기준 최고 전략 찾기 (simulation 데이터가 없으므로)
-            let bestStrategy = null;
-            let maxCandidates = 0;
-            for (const [id, result] of Object.entries(strategies)) {
-                const count = (result.candidates || []).length;
-                if (count > maxCandidates) {
-                    maxCandidates = count;
-                    bestStrategy = id;
-                }
-            }
-
-            let html = '';
-            for (const [id, result] of Object.entries(strategies)) {
-                const isBest = id === bestStrategy && maxCandidates > 0;
-                const candidates = result.candidates || [];
-
-                // 평균 점수 계산
-                const avgScore = candidates.length > 0
-                    ? candidates.reduce((sum, c) => sum + (c.total_score || 0), 0) / candidates.length
-                    : 0;
-
-                // 대형주 비율 계산
-                const largeCapCount = candidates.filter(c => c.cap_tier === 'large').length;
-                const largeCapRatio = candidates.length > 0 ? (largeCapCount / candidates.length * 100) : 0;
-
-                html += `
-                    <div class="strategy-card ${isBest ? 'best' : ''}">
-                        <div class="strategy-header">
-                            <span class="strategy-name">${result.strategy_name || id}</span>
-                            ${isBest ? '<span class="strategy-badge badge-best">🏆 최다</span>' : ''}
-                        </div>
-                        <div class="strategy-stats">
-                            <div class="stat-item">
-                                <div class="value">${candidates.length}</div>
-                                <div class="label">종목 수</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="value">${avgScore.toFixed(1)}</div>
-                                <div class="label">평균 점수</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="value">${largeCapCount}</div>
-                                <div class="label">대형주</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="value">${largeCapRatio.toFixed(0)}%</div>
-                                <div class="label">대형주 비율</div>
-                            </div>
-                        </div>
-                        <div class="candidates-list">
-                            <strong>선정 종목:</strong>
-                            ${candidates.slice(0, 5).map(c => {
-                                const changePct = c.price_change_percent || c.change_pct || 0;
-                                return `
-                                <div class="candidate-item">
-                                    <span>${c.name}</span>
-                                    <span class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</span>
-                                </div>
-                            `}).join('')}
-                            ${candidates.length > 5 ? `<div style="text-align:center;color:#8892b0;font-size:0.8em;margin-top:8px;">외 ${candidates.length - 5}개 종목</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            }
-
-            grid.innerHTML = html;
-            document.getElementById('strategyComparison').style.display = 'block';
-        }
-
-        // 단일 전략 표시
-        function displaySingleStrategy(data) {
-            const thead = document.getElementById('liveStatusHead');
-            const tbody = document.getElementById('liveStatusBody');
-            const candidates = data.candidates || [];
-
-            // 헤더 설정
-            thead.innerHTML = `
-                <tr>
-                    <th>종목</th>
-                    <th>가격</th>
-                    <th>등락률</th>
-                    <th>점수</th>
-                </tr>
-            `;
-
-            if (candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="no-data">선정된 종목이 없습니다</td></tr>';
+            if (!candidates || candidates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="no-data">선정된 종목이 없습니다</td></tr>';
                 return;
             }
 
             tbody.innerHTML = candidates.map(c => {
                 const price = c.current_price || c.price || 0;
+                const changePct = c.price_change_percent || c.change_pct || 0;
                 const score = c.total_score || c.score || 0;
-                const changePct = c.change_pct || 0;
+
+                // 전략 체크
+                const isLargeCap = c.cap_tier === 'large';
+                const isMomentum = changePct >= 3 && (c.ma_alignment === '정배열' || c.high_break === true);
+                const hasTheme = c.matched_themes && c.matched_themes.length > 0;
+                const isContrarian = isLargeCap && changePct < 0;
+
+                // 테마명
+                const themeName = hasTheme ? c.matched_themes.join(', ') : '-';
 
                 return `
                     <tr>
                         <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
                         <td>${price.toLocaleString()}원</td>
                         <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
-                        <td>${score.toFixed(1)}</td>
+                        <td>${score.toFixed(0)}</td>
+                        <td class="check-cell ${isLargeCap ? 'checked' : ''}">${isLargeCap ? '✓' : ''}</td>
+                        <td class="check-cell ${isMomentum ? 'checked' : ''}">${isMomentum ? '✓' : ''}</td>
+                        <td class="check-cell ${hasTheme ? 'checked' : ''}">${hasTheme ? '✓' : ''}</td>
+                        <td class="check-cell ${isContrarian ? 'checked' : ''}">${isContrarian ? '✓' : ''}</td>
+                        <td style="max-width:150px;white-space:normal;font-size:0.85em;">${themeName}</td>
                     </tr>
                 `;
             }).join('');
         }
+
+
+
+
+
 
         // 수동 체크 트리거
         function triggerManualCheck() {
