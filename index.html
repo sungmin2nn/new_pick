@@ -14,7 +14,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 0 10px; }
 
         /* Header */
         .header {
@@ -539,16 +539,22 @@
         }
         /* 통합 테이블 스타일 */
         .unified-table {
-            width: 100%;
+            width: 100% !important;
+            min-width: 100%;
             font-size: 0.85em;
+            table-layout: auto;
         }
         .unified-table th {
-            padding: 8px 4px;
+            padding: 8px 6px;
             font-size: 0.8em;
             white-space: nowrap;
+            background: rgba(0, 217, 255, 0.1);
         }
         .unified-table td {
-            padding: 8px 4px;
+            padding: 8px 6px;
+        }
+        .unified-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         /* Strategy Comparison Grid */
@@ -717,6 +723,9 @@
                             <th>종목</th>
                             <th>현재가</th>
                             <th>등락</th>
+                            <th>외국인</th>
+                            <th>기관</th>
+                            <th>거래대금</th>
                             <th>점수</th>
                             <th>대형</th>
                             <th>모멘</th>
@@ -726,7 +735,7 @@
                         </tr>
                     </thead>
                     <tbody id="unifiedTableBody">
-                        <tr><td colspan="9" class="loading-container"><div class="spinner"></div><div>로딩 중...</div></td></tr>
+                        <tr><td colspan="12" class="loading-container"><div class="spinner"></div><div>로딩 중...</div></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -901,7 +910,7 @@
             const tbody = document.getElementById('unifiedTableBody');
 
             if (!candidates || candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="no-data">선정된 종목이 없습니다</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" class="no-data">선정된 종목이 없습니다</td></tr>';
                 return;
             }
 
@@ -909,6 +918,9 @@
                 const price = c.current_price || c.price || 0;
                 const changePct = c.price_change_percent || c.change_pct || 0;
                 const score = c.total_score || c.score || 0;
+                const foreignBuy = c.foreign_buy || 0;
+                const instBuy = c.institution_buy || 0;
+                const tradingValue = c.trading_value || 0;
 
                 // 전략 체크
                 const isLargeCap = c.cap_tier === 'large';
@@ -919,11 +931,23 @@
                 // 테마명
                 const themeName = hasTheme ? c.matched_themes.join(', ') : '-';
 
+                // 순매수 포맷
+                const formatBuy = (val) => {
+                    if (val === 0) return '-';
+                    const abs = Math.abs(val);
+                    if (abs >= 1000000) return (val > 0 ? '+' : '') + (val / 1000000).toFixed(1) + '백만';
+                    if (abs >= 10000) return (val > 0 ? '+' : '') + (val / 10000).toFixed(0) + '만';
+                    return (val > 0 ? '+' : '') + val.toLocaleString();
+                };
+
                 return `
                     <tr>
                         <td class="stock-name-cell"><strong>${c.name}</strong><br><span class="stock-code">${c.code}</span></td>
                         <td>${price.toLocaleString()}</td>
                         <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
+                        <td class="${foreignBuy > 0 ? 'positive' : foreignBuy < 0 ? 'negative' : ''}">${formatBuy(foreignBuy)}</td>
+                        <td class="${instBuy > 0 ? 'positive' : instBuy < 0 ? 'negative' : ''}">${formatBuy(instBuy)}</td>
+                        <td>${formatKoreanCurrency(tradingValue)}</td>
                         <td>${score.toFixed(0)}</td>
                         <td class="check-cell ${isLargeCap ? 'checked' : ''}">${isLargeCap ? '✓' : ''}</td>
                         <td class="check-cell ${isMomentum ? 'checked' : ''}">${isMomentum ? '✓' : ''}</td>
