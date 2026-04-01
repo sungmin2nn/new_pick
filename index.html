@@ -994,28 +994,36 @@
                 return;
             }
 
-            // 수익률 기준 최고 전략 찾기
+            // 종목 수 기준 최고 전략 찾기 (simulation 데이터가 없으므로)
             let bestStrategy = null;
-            let bestReturn = -Infinity;
+            let maxCandidates = 0;
             for (const [id, result] of Object.entries(strategies)) {
-                const ret = result.simulation?.total_return || 0;
-                if (ret > bestReturn) {
-                    bestReturn = ret;
+                const count = (result.candidates || []).length;
+                if (count > maxCandidates) {
+                    maxCandidates = count;
                     bestStrategy = id;
                 }
             }
 
             let html = '';
             for (const [id, result] of Object.entries(strategies)) {
-                const isBest = id === bestStrategy && bestReturn > 0;
-                const sim = result.simulation || {};
+                const isBest = id === bestStrategy && maxCandidates > 0;
                 const candidates = result.candidates || [];
+
+                // 평균 점수 계산
+                const avgScore = candidates.length > 0
+                    ? candidates.reduce((sum, c) => sum + (c.total_score || 0), 0) / candidates.length
+                    : 0;
+
+                // 대형주 비율 계산
+                const largeCapCount = candidates.filter(c => c.cap_tier === 'large').length;
+                const largeCapRatio = candidates.length > 0 ? (largeCapCount / candidates.length * 100) : 0;
 
                 html += `
                     <div class="strategy-card ${isBest ? 'best' : ''}">
                         <div class="strategy-header">
                             <span class="strategy-name">${result.strategy_name || id}</span>
-                            ${isBest ? '<span class="strategy-badge badge-best">🏆 최고</span>' : ''}
+                            ${isBest ? '<span class="strategy-badge badge-best">🏆 최다</span>' : ''}
                         </div>
                         <div class="strategy-stats">
                             <div class="stat-item">
@@ -1023,26 +1031,29 @@
                                 <div class="label">종목 수</div>
                             </div>
                             <div class="stat-item">
-                                <div class="value ${sim.total_return > 0 ? 'positive' : sim.total_return < 0 ? 'negative' : ''}">${sim.total_return ? sim.total_return.toFixed(2) + '%' : '-'}</div>
-                                <div class="label">수익률</div>
+                                <div class="value">${avgScore.toFixed(1)}</div>
+                                <div class="label">평균 점수</div>
                             </div>
                             <div class="stat-item">
-                                <div class="value">${sim.win_rate ? sim.win_rate.toFixed(0) + '%' : '-'}</div>
-                                <div class="label">승률</div>
+                                <div class="value">${largeCapCount}</div>
+                                <div class="label">대형주</div>
                             </div>
                             <div class="stat-item">
-                                <div class="value">${sim.total_trades || '-'}</div>
-                                <div class="label">거래 수</div>
+                                <div class="value">${largeCapRatio.toFixed(0)}%</div>
+                                <div class="label">대형주 비율</div>
                             </div>
                         </div>
                         <div class="candidates-list">
                             <strong>선정 종목:</strong>
-                            ${candidates.slice(0, 5).map(c => `
+                            ${candidates.slice(0, 5).map(c => {
+                                const changePct = c.price_change_percent || c.change_pct || 0;
+                                return `
                                 <div class="candidate-item">
                                     <span>${c.name}</span>
-                                    <span class="${c.change_pct > 0 ? 'positive' : 'negative'}">${c.change_pct > 0 ? '+' : ''}${c.change_pct.toFixed(2)}%</span>
+                                    <span class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</span>
                                 </div>
-                            `).join('')}
+                            `}).join('')}
+                            ${candidates.length > 5 ? `<div style="text-align:center;color:#8892b0;font-size:0.8em;margin-top:8px;">외 ${candidates.length - 5}개 종목</div>` : ''}
                         </div>
                     </div>
                 `;
