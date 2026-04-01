@@ -770,7 +770,7 @@
         async function loadMultiStrategyData(dateStr) {
             const grid = document.getElementById('comparisonGrid');
             try {
-                // 먼저 candidates_all 파일 시도
+                // 1. candidates_all 파일 시도
                 const response = await fetch(`data/paper_trading/candidates_${dateStr}_all.json?t=${Date.now()}`);
                 if (response.ok) {
                     const data = await response.json();
@@ -778,7 +778,48 @@
                     return;
                 }
 
-                // 없으면 intraday 데이터로 전략 비교 생성
+                // 2. 기본 candidates 파일에서 전략별 분류
+                const candidatesResponse = await fetch(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
+                if (candidatesResponse.ok) {
+                    const data = await candidatesResponse.json();
+                    const candidates = data.candidates || [];
+                    if (candidates.length > 0) {
+                        // 전략별 분류
+                        const largecap = candidates.filter(c => c.cap_tier === 'large');
+                        const momentum = candidates.filter(c => c.theme === '모멘텀' || c.strategy === 'momentum');
+                        const theme = candidates.filter(c => c.theme && c.theme !== '모멘텀');
+
+                        displayStrategyOverview(dateStr, {
+                            total: candidates,
+                            largecap_contrarian: largecap,
+                            momentum: momentum,
+                            theme_policy: theme
+                        });
+                        return;
+                    }
+                }
+
+                // 3. morning_candidates.json 폴백
+                const morningResponse = await fetch(`data/morning_candidates.json?t=${Date.now()}`);
+                if (morningResponse.ok) {
+                    const data = await morningResponse.json();
+                    const candidates = data.candidates || [];
+                    if (candidates.length > 0) {
+                        const largecap = candidates.filter(c => c.cap_tier === 'large');
+                        const momentum = candidates.filter(c => c.theme === '모멘텀' || c.strategy === 'momentum');
+                        const theme = candidates.filter(c => c.theme && c.theme !== '모멘텀');
+
+                        displayStrategyOverview(data.date || dateStr, {
+                            total: candidates,
+                            largecap_contrarian: largecap,
+                            momentum: momentum,
+                            theme_policy: theme
+                        });
+                        return;
+                    }
+                }
+
+                // 4. intraday 데이터로 전략 비교 생성
                 const intradayResponse = await fetch(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
                 if (intradayResponse.ok) {
                     const data = await intradayResponse.json();
@@ -806,17 +847,141 @@
             }
         }
 
+        // 전략 개요 표시 (candidates 파일에서 분류)
+        function displayStrategyOverview(dateStr, strategies) {
+            const grid = document.getElementById('comparisonGrid');
+            const formattedDate = typeof dateStr === 'string' && dateStr.length === 8
+                ? formatDate(dateStr)
+                : dateStr;
+
+            let html = `
+                <div class="strategy-summary" style="grid-column: 1 / -1;">
+                    <p style="color: #00d9ff; margin-bottom: 15px; font-size: 1.1em;">📅 ${formattedDate} 종목 분류</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('all', document.querySelector('[data-strategy=all]'))">
+                            <span class="value">${strategies.total.length}</span>
+                            <span class="label">전체 종목</span>
+                        </div>
+                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('largecap_contrarian', document.querySelector('[data-strategy=largecap_contrarian]'))">
+                            <span class="value">${strategies.largecap_contrarian.length}</span>
+                            <span class="label">🏢 대형주</span>
+                        </div>
+                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('momentum', document.querySelector('[data-strategy=momentum]'))">
+                            <span class="value">${strategies.momentum.length}</span>
+                            <span class="label">📈 모멘텀</span>
+                        </div>
+                        <div class="stat-mini" style="cursor: pointer;" onclick="selectStrategy('theme_policy', document.querySelector('[data-strategy=theme_policy]'))">
+                            <span class="value">${strategies.theme_policy.length}</span>
+                            <span class="label">🎯 테마/정책</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 전체 종목 리스트 표시
+            if (strategies.total.length > 0) {
+                html += `
+                    <div style="grid-column: 1 / -1; margin-top: 15px;">
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>종목</th>
+                                    <th>분류</th>
+                                    <th>현재가</th>
+                                    <th>등락률</th>
+                                    <th>점수</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${strategies.total.map(c => {
+                                    const capLabel = c.cap_tier === 'large' ? '대형' : c.cap_tier === 'mid' ? '중형' : '소형';
+                                    const themeLabel = c.theme || '-';
+                                    const price = c.current_price || c.price || 0;
+                                    const changePct = c.price_change_percent || c.change_pct || 0;
+                                    const score = c.total_score || c.score || 0;
+                                    return `
+                                        <tr>
+                                            <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
+                                            <td><span class="status-badge">${capLabel}</span> ${themeLabel}</td>
+                                            <td>${price.toLocaleString()}원</td>
+                                            <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
+                                            <td>${score.toFixed(0)}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = html;
+            document.getElementById('strategyComparison').style.display = 'block';
+        }
+
         // 단일 전략 데이터 로드
         async function loadSingleStrategyData(dateStr, strategyId) {
+            const tbody = document.getElementById('liveStatusBody');
             try {
+                // 1. 전략별 파일 시도
                 const response = await fetch(`data/paper_trading/candidates_${dateStr}_${strategyId}.json?t=${Date.now()}`);
                 if (response.ok) {
                     const data = await response.json();
                     displaySingleStrategy(data);
+                    return;
                 }
+
+                // 2. 기본 candidates 파일에서 해당 전략 필터링
+                const fallbackResponse = await fetch(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
+                if (fallbackResponse.ok) {
+                    const data = await fallbackResponse.json();
+                    // 전략별 필터링 (전략 정보가 있으면)
+                    const filtered = {
+                        ...data,
+                        candidates: (data.candidates || []).filter(c => {
+                            if (strategyId === 'largecap_contrarian') return c.cap_tier === 'large';
+                            if (strategyId === 'momentum') return c.theme === '모멘텀' || c.strategy === 'momentum';
+                            if (strategyId === 'theme_policy') return c.theme && c.theme !== '모멘텀';
+                            return true;
+                        })
+                    };
+                    displaySingleStrategy(filtered);
+                    return;
+                }
+
+                // 3. morning_candidates.json 폴백
+                const morningResponse = await fetch(`data/morning_candidates.json?t=${Date.now()}`);
+                if (morningResponse.ok) {
+                    const data = await morningResponse.json();
+                    const filtered = {
+                        ...data,
+                        candidates: (data.candidates || []).filter(c => {
+                            if (strategyId === 'largecap_contrarian') return c.cap_tier === 'large';
+                            if (strategyId === 'momentum') return c.theme === '모멘텀' || c.strategy === 'momentum';
+                            if (strategyId === 'theme_policy') return c.theme && c.theme !== '모멘텀';
+                            return true;
+                        })
+                    };
+                    displaySingleStrategy(filtered);
+                    return;
+                }
+
+                // 데이터 없음
+                tbody.innerHTML = `<tr><td colspan="4" class="no-data">${getStrategyName(strategyId)} 전략 데이터가 없습니다</td></tr>`;
             } catch (error) {
                 console.log('Single strategy load error:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="no-data">데이터 로드 실패</td></tr>';
             }
+        }
+
+        // 전략명 변환
+        function getStrategyName(strategyId) {
+            const names = {
+                'largecap_contrarian': '대형주 역추세',
+                'momentum': '모멘텀',
+                'theme_policy': '테마/정책'
+            };
+            return names[strategyId] || strategyId;
         }
 
         // 전략 비교 표시
@@ -1582,7 +1747,7 @@
 
     <!-- Footer with Last Modified Date -->
     <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-03-31 00:10
+        📅 마지막 수정: 2026-04-02
     </footer>
 </body>
 </html>
