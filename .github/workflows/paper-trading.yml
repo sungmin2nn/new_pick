@@ -65,17 +65,22 @@ jobs:
 
     - name: Select tomorrow stocks
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      env:
+        TZ: Asia/Seoul
       run: |
         python -c "
         import json
-        from datetime import datetime, timedelta
+        from datetime import datetime, timedelta, timezone
         from paper_trading.selector import StockSelector
         import os
 
         selector = StockSelector()
 
+        # KST 시간대 사용
+        kst = timezone(timedelta(hours=9))
+
         # 내일 날짜 계산 (주말 건너뛰기)
-        today = datetime.now()
+        today = datetime.now(kst)
         tomorrow = today + timedelta(days=1)
         while tomorrow.weekday() >= 5:  # 토,일
             tomorrow += timedelta(days=1)
@@ -89,7 +94,7 @@ jobs:
         if candidates:
             result = {
                 'date': tomorrow_str,
-                'selected_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'selected_at': datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S'),
                 'count': len(candidates),
                 'candidates': [c.to_dict() for c in candidates]
             }
@@ -134,6 +139,8 @@ jobs:
 
     - name: Summary
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      env:
+        TZ: Asia/Seoul
       run: |
         echo "## 📊 페이퍼 트레이딩 최종 결과" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
@@ -141,8 +148,9 @@ jobs:
         if [ -f "data/paper_trading/result_${TODAY}.json" ]; then
           python -c "
         import json
-        from datetime import datetime
-        today = datetime.now().strftime('%Y%m%d')
+        from datetime import datetime, timezone, timedelta
+        kst = timezone(timedelta(hours=9))
+        today = datetime.now(kst).strftime('%Y%m%d')
         try:
             with open(f'data/paper_trading/result_{today}.json') as f:
                 data = json.load(f)
