@@ -112,7 +112,7 @@
         .profit-value.negative { color: #ff6b6b; }
         .profit-sub { color: #8892b0; font-size: 0.9em; }
         .profit-amount { font-size: 1.2em; color: #00d9ff; margin-top: 5px; }
-        .mini-chart-container { flex: 1; height: 80px; min-width: 200px; }
+        .mini-chart-container { flex: 1; height: 100px; min-width: 250px; }
 
         /* 3. Trade Summary */
         .trade-summary {
@@ -152,47 +152,85 @@
         .section-header h2 { color: #00ff88; font-size: 1.2em; }
         .section-header .date { color: #8892b0; font-size: 0.85em; }
 
-        /* Stock Cards */
-        .stock-cards { display: flex; flex-direction: column; gap: 12px; }
-        .stock-card {
-            background: rgba(15, 52, 96, 0.5);
-            border-radius: 10px;
-            padding: 15px;
-            border-left: 4px solid #8892b0;
-            display: grid;
-            grid-template-columns: 1fr auto auto auto;
-            align-items: center;
-            gap: 15px;
-        }
-        .stock-card.waiting { border-left-color: #ffaa00; }
-        .stock-card.profit { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.08); }
-        .stock-card.loss { border-left-color: #ff6b6b; background: rgba(255, 107, 107, 0.08); }
-
-        .stock-info .name { font-weight: 600; font-size: 1.05em; }
-        .stock-info .code { color: #8892b0; font-size: 0.8em; }
-        .stock-info .reason { color: #ffaa00; font-size: 0.8em; margin-top: 4px; }
-
-        .stock-prices { text-align: right; font-size: 0.85em; }
-        .stock-prices .current { font-size: 1.1em; font-weight: 600; }
-        .stock-prices .targets { color: #8892b0; margin-top: 4px; }
-        .stock-prices .targets .profit-target { color: #00ff88; }
-        .stock-prices .targets .loss-target { color: #ff6b6b; }
-
-        .stock-pnl { text-align: right; min-width: 80px; }
-        .stock-pnl .pct { font-size: 1.3em; font-weight: bold; }
-        .stock-pnl .pct.positive { color: #00ff88; }
-        .stock-pnl .pct.negative { color: #ff6b6b; }
-
-        .stock-status .badge {
-            padding: 6px 12px;
-            border-radius: 15px;
+        /* Stock Table with Accordion */
+        .stock-table-wrapper { overflow-x: auto; }
+        .stock-table { width: 100%; border-collapse: collapse; }
+        .stock-table th {
+            background: rgba(0, 217, 255, 0.1);
+            padding: 12px 10px;
             font-size: 0.8em;
             font-weight: 600;
+            color: #00d9ff;
+            text-align: left;
+        }
+        .stock-table th.right { text-align: right; }
+        .stock-table th.center { text-align: center; }
+
+        .stock-row {
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .stock-row:hover { background: rgba(0, 217, 255, 0.08); }
+        .stock-row td { padding: 12px 10px; border-bottom: 1px solid #2a2a4a; }
+        .stock-row td.right { text-align: right; }
+        .stock-row td.center { text-align: center; }
+        .stock-row.waiting { border-left-color: #ffaa00; }
+        .stock-row.profit { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.05); }
+        .stock-row.loss { border-left-color: #ff6b6b; background: rgba(255, 107, 107, 0.05); }
+
+        .stock-name { font-weight: 600; }
+        .stock-code { color: #8892b0; font-size: 0.8em; }
+        .expand-icon { color: #8892b0; transition: transform 0.2s; font-size: 0.8em; }
+        .stock-row.expanded .expand-icon { transform: rotate(180deg); }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            display: inline-block;
         }
         .badge.waiting { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
         .badge.profit { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
         .badge.loss { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
         .badge.close { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
+
+        /* Accordion Detail Row */
+        .stock-detail { display: none; }
+        .stock-detail.open { display: table-row; }
+        .stock-detail td {
+            padding: 0 !important;
+            background: rgba(15, 52, 96, 0.3);
+            border-bottom: 1px solid #2a2a4a;
+        }
+        .detail-content {
+            padding: 15px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        .detail-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .detail-item .label { color: #8892b0; font-size: 0.7em; margin-bottom: 4px; }
+        .detail-item .value { font-size: 1em; font-weight: 600; }
+        .detail-item .value.profit { color: #00ff88; }
+        .detail-item .value.loss { color: #ff6b6b; }
+
+        .detail-reason {
+            grid-column: 1 / -1;
+            background: rgba(255, 170, 0, 0.1);
+            border-left: 3px solid #ffaa00;
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            text-align: left;
+        }
+        .detail-reason .label { color: #ffaa00; font-size: 0.75em; margin-bottom: 4px; }
+        .detail-reason .value { color: #e4e4e4; font-size: 0.85em; line-height: 1.4; }
 
         /* 5. Collapsible Section */
         .collapsible {
@@ -273,18 +311,20 @@
             body { padding: 10px; }
             .profit-main { flex-direction: column; align-items: flex-start; gap: 15px; }
             .profit-value { font-size: 2em; }
-            .mini-chart-container { width: 100%; height: 60px; }
+            .mini-chart-container { width: 100%; height: 80px; }
             .trade-summary { grid-template-columns: repeat(3, 1fr); gap: 8px; }
             .summary-card { padding: 12px 8px; }
             .summary-card .value { font-size: 1.4em; }
-            .stock-card { grid-template-columns: 1fr; gap: 10px; }
-            .stock-prices, .stock-pnl, .stock-status { text-align: left; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .detail-content { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 420px) {
             .trading-rules { flex-direction: column; align-items: flex-start; }
             .summary-card .value { font-size: 1.2em; }
             .summary-card .label { font-size: 0.7em; }
+            .stock-table th, .stock-table td { padding: 10px 6px; font-size: 0.85em; }
+            .detail-content { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .detail-item { padding: 8px; }
         }
 
         /* Footer */
@@ -380,14 +420,27 @@
             </div>
         </div>
 
-        <!-- 4. Today's Stocks -->
+        <!-- 4. Today's Stocks (Table with Accordion) -->
         <div class="today-stocks">
             <div class="section-header">
                 <h2>🎯 금일 종목 상세</h2>
                 <span class="date" id="todayDate">-</span>
             </div>
-            <div class="stock-cards" id="stockCards">
-                <div class="loading"><div class="spinner"></div>로딩 중...</div>
+            <div class="stock-table-wrapper">
+                <table class="stock-table" id="stockTable">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;"></th>
+                            <th>종목</th>
+                            <th class="right">현재가</th>
+                            <th class="right">수익률</th>
+                            <th class="center">상태</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody">
+                        <tr><td colspan="5" class="loading"><div class="spinner"></div>로딩 중...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -567,13 +620,15 @@
         }
 
         function displayTodayStocks(stocks, type) {
-            const container = document.getElementById('stockCards');
+            const tbody = document.getElementById('stockTableBody');
 
-            container.innerHTML = stocks.map(s => {
+            tbody.innerHTML = stocks.map((s, idx) => {
                 const price = s.current_price || s.price || 0;
                 const entryPrice = s.entry_price || price;
                 const profitTarget = Math.round(entryPrice * 1.03);
                 const lossTarget = Math.round(entryPrice * 0.985);
+                const score = s.total_score || s.score || 0;
+                const tradingValue = s.trading_value || 0;
 
                 let status = 'waiting';
                 let statusLabel = '대기';
@@ -588,31 +643,57 @@
                 }
 
                 const reason = s.selection_reason || s.strategy_name || s.technical_summary || '-';
-                const shortReason = reason.length > 25 ? reason.slice(0, 25) + '...' : reason;
 
                 return `
-                    <div class="stock-card ${status}">
-                        <div class="stock-info">
-                            <div class="name">${s.name}</div>
-                            <div class="code">${s.code}</div>
-                            <div class="reason">${shortReason}</div>
-                        </div>
-                        <div class="stock-prices">
-                            <div class="current">${price.toLocaleString()}원</div>
-                            <div class="targets">
-                                <span class="profit-target">${profitTarget.toLocaleString()}</span> /
-                                <span class="loss-target">${lossTarget.toLocaleString()}</span>
+                    <tr class="stock-row ${status}" onclick="toggleStockDetail(${idx})">
+                        <td><span class="expand-icon">▼</span></td>
+                        <td>
+                            <div class="stock-name">${s.name}</div>
+                            <div class="stock-code">${s.code}</div>
+                        </td>
+                        <td class="right">${price.toLocaleString()}</td>
+                        <td class="right ${pct >= 0 ? 'positive' : 'negative'}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</td>
+                        <td class="center"><span class="badge ${status}">${statusLabel}</span></td>
+                    </tr>
+                    <tr class="stock-detail" id="detail-${idx}">
+                        <td colspan="5">
+                            <div class="detail-content">
+                                <div class="detail-item">
+                                    <div class="label">진입가</div>
+                                    <div class="value">${entryPrice.toLocaleString()}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="label">익절가 (+3%)</div>
+                                    <div class="value profit">${profitTarget.toLocaleString()}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="label">손절가 (-1.5%)</div>
+                                    <div class="value loss">${lossTarget.toLocaleString()}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="label">점수</div>
+                                    <div class="value">${score.toFixed(0)}점</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="label">거래대금</div>
+                                    <div class="value">${formatKoreanCurrency(tradingValue)}</div>
+                                </div>
+                                <div class="detail-reason">
+                                    <div class="label">선정 사유</div>
+                                    <div class="value">${reason}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="stock-pnl">
-                            <div class="pct ${pct >= 0 ? 'positive' : 'negative'}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
-                        </div>
-                        <div class="stock-status">
-                            <span class="badge ${status}">${statusLabel}</span>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                 `;
             }).join('');
+        }
+
+        function toggleStockDetail(idx) {
+            const row = document.querySelectorAll('.stock-row')[idx];
+            const detail = document.getElementById(`detail-${idx}`);
+            row.classList.toggle('expanded');
+            detail.classList.toggle('open');
         }
 
         // 트레이딩 데이터 로드
@@ -837,36 +918,63 @@
             const days = data.daily_results || [];
             if (days.length === 0) return;
 
-            const recent = days.slice(-7);
+            const recent = days.slice(-10);
             let cumulative = 0;
-            const returns = recent.map(d => {
+            const cumulativeReturns = recent.map(d => {
                 cumulative += d.total_return || 0;
                 return cumulative;
             });
+            const dailyReturns = recent.map(d => d.total_return || 0);
+            const labels = recent.map(d => formatDate(d.date).slice(5));
 
             const ctx = document.getElementById('miniChart').getContext('2d');
             if (miniChart) miniChart.destroy();
 
             miniChart = new Chart(ctx, {
-                type: 'line',
                 data: {
-                    labels: recent.map(d => formatDate(d.date).slice(5)),
-                    datasets: [{
-                        data: returns,
-                        borderColor: '#00d9ff',
-                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 2
-                    }]
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'line',
+                            data: cumulativeReturns,
+                            borderColor: '#00d9ff',
+                            backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#00d9ff',
+                            yAxisID: 'y',
+                            order: 1
+                        },
+                        {
+                            type: 'bar',
+                            data: dailyReturns,
+                            backgroundColor: dailyReturns.map(v => v >= 0 ? 'rgba(0, 255, 136, 0.6)' : 'rgba(255, 107, 107, 0.6)'),
+                            borderRadius: 2,
+                            yAxisID: 'y1',
+                            order: 2
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { display: false },
-                        y: { display: false }
+                        x: {
+                            display: true,
+                            grid: { display: false },
+                            ticks: { color: '#8892b0', font: { size: 9 }, maxRotation: 0 }
+                        },
+                        y: {
+                            display: false,
+                            position: 'left'
+                        },
+                        y1: {
+                            display: false,
+                            position: 'right'
+                        }
                     }
                 }
             });
