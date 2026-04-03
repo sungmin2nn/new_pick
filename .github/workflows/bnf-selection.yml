@@ -178,7 +178,7 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TZ: Asia/Seoul
       run: |
-        python -c "
+        python << 'PYEOF'
 import json
 from datetime import datetime
 import pytz
@@ -200,17 +200,11 @@ try:
     candidates = data.get('candidates', [])
 
     if candidates:
-        # 커스텀 메시지로 BNF 종목 알림
         stock_lines = []
         for c in candidates[:10]:
-            stock_lines.append(f\"{c['rank']}. {c['name']} - 낙폭 {c['max_drop']:.1f}%\")
+            stock_lines.append(f"{c['rank']}. {c['name']} - 낙폭 {c['max_drop']:.1f}%")
 
-        content = f\"\"\"<b>선정 종목:</b> {len(candidates)}개
-
-{chr(10).join(stock_lines)}
-
-<b>기준:</b> 5일 -15% | 10일 -20% | 고점 -25%\"\"\"
-
+        content = f"<b>선정 종목:</b> {len(candidates)}개\n\n" + "\n".join(stock_lines) + "\n\n<b>기준:</b> 5일 -15% | 10일 -20% | 고점 -25%"
         notifier.send_custom('BNF 낙폭과대 종목', content, '🔥')
         print(f'BNF 알림 전송: {len(candidates)}개 종목')
     else:
@@ -219,4 +213,4 @@ try:
 
 except Exception as e:
     print(f'알림 오류: {e}')
-"
+PYEOF

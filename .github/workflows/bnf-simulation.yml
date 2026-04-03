@@ -274,7 +274,7 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TZ: Asia/Seoul
       run: |
-        python -c "
+        python << 'PYEOF'
 import json
 import os
 from datetime import datetime
@@ -283,7 +283,6 @@ from telegram_notifier import TelegramNotifier
 
 kst = pytz.timezone('Asia/Seoul')
 now = datetime.now(kst)
-time_str = now.strftime('%H:%M')
 
 notifier = TelegramNotifier()
 
@@ -295,7 +294,6 @@ positions_file = 'data/bnf/positions.json'
 history_file = 'data/bnf/trade_history.json'
 
 try:
-    # 포지션 현황
     if os.path.exists(positions_file):
         with open(positions_file, 'r', encoding='utf-8') as f:
             pos_data = json.load(f)
@@ -310,13 +308,10 @@ try:
 
             recent_trades = [t for t in hist_data.get('trades', []) if t.get('exit_date', '').startswith(now.strftime('%Y-%m-%d'))]
 
-            for t in recent_trades[-3:]:  # 최근 3건만
+            for t in recent_trades[-3:]:
                 pnl = t.get('pnl_pct', 0)
                 signal = 'profit' if pnl >= 0 else 'loss'
-                notifier.send_sell_signal(
-                    t.get('name', 'N/A'), t.get('code', ''),
-                    t.get('exit_price', 0), signal, pnl
-                )
+                notifier.send_sell_signal(t.get('name', 'N/A'), t.get('code', ''), t.get('exit_price', 0), signal, pnl)
 
         # 보유 포지션 요약 (오후에만)
         if now.hour >= 15 and positions:
@@ -324,17 +319,13 @@ try:
             for p in positions[:5]:
                 pnl = p.get('unrealized_pnl_pct', 0)
                 emoji = '🟢' if pnl >= 0 else '🔴'
-                pos_lines.append(f\"{emoji} {p['name']}: {pnl:+.1f}%\")
+                pos_lines.append(f"{emoji} {p['name']}: {pnl:+.1f}%")
 
-            content = f\"\"\"<b>보유 포지션:</b> {len(positions)}개
-<b>미실현 손익:</b> {stats.get('unrealized_pnl', 0):,.0f}원
-
-{chr(10).join(pos_lines)}\"\"\"
-
+            content = f"<b>보유 포지션:</b> {len(positions)}개\n<b>미실현 손익:</b> {stats.get('unrealized_pnl', 0):,.0f}원\n\n" + "\n".join(pos_lines)
             notifier.send_custom('BNF 포지션 현황', content, '📊')
 
         print('BNF 알림 전송 완료')
 
 except Exception as e:
     print(f'알림 오류: {e}')
-"
+PYEOF
