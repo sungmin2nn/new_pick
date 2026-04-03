@@ -3,11 +3,39 @@
 /* 통합 네비게이션 */
 .global-nav {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
     padding: 15px 20px;
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border-color);
-    flex-wrap: wrap;
+}
+
+.global-nav-main {
+    display: flex;
+    gap: 10px;
+}
+
+.global-nav-sub {
+    display: flex;
+    gap: 15px;
+    padding-left: 5px;
+}
+
+.global-nav-sub a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+}
+
+.global-nav-sub a:hover {
+    color: var(--accent-blue);
+    text-decoration: underline;
+}
+
+.global-nav-sub a.active {
+    color: var(--accent-green);
+    font-weight: 600;
 }
 
 .global-nav .nav-item {

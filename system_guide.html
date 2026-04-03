@@ -169,13 +169,36 @@
         /* 통합 네비게이션 */
         .global-nav {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 8px;
             padding: 15px;
             background: white;
             border-radius: 10px;
             margin-bottom: 20px;
-            flex-wrap: wrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .global-nav-main {
+            display: flex;
+            gap: 10px;
+        }
+        .global-nav-sub {
+            display: flex;
+            gap: 15px;
+            padding-left: 5px;
+        }
+        .global-nav-sub a {
+            color: #666;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+        .global-nav-sub a:hover {
+            color: #667eea;
+            text-decoration: underline;
+        }
+        .global-nav-sub a.active {
+            color: #764ba2;
+            font-weight: 600;
         }
         .global-nav .nav-item {
             display: flex;
@@ -205,10 +228,14 @@
 <body>
     <!-- 통합 네비게이션 -->
     <nav class="global-nav" style="max-width: 1000px; margin: 0 auto 20px auto;">
-        <a href="index.html" class="nav-item">📊 페이퍼 트레이딩</a>
-        <a href="bnf_dashboard.html" class="nav-item">📉 BNF 낙폭과대</a>
-        <a href="backtest_dashboard.html" class="nav-item">📈 백테스트</a>
-        <a href="system_guide.html" class="nav-item active">📚 가이드</a>
+        <div class="global-nav-main">
+            <a href="index.html" class="nav-item">📊 페이퍼 트레이딩</a>
+            <a href="bnf_dashboard.html" class="nav-item">📉 BNF 낙폭과대</a>
+        </div>
+        <div class="global-nav-sub">
+            <a href="backtest_dashboard.html">📈 백테스트</a>
+            <a href="system_guide.html" class="active">📚 가이드</a>
+        </div>
     </nav>
 
     <div class="container">

@@ -39,8 +39,32 @@
         /* Dashboard Navigation */
         .dashboard-nav {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 8px;
             margin-bottom: 20px;
+        }
+        .dashboard-nav-main {
+            display: flex;
+            gap: 10px;
+        }
+        .dashboard-nav-sub {
+            display: flex;
+            gap: 15px;
+            padding-left: 5px;
+        }
+        .dashboard-nav-sub a {
+            color: #8892b0;
+            text-decoration: none;
+            font-size: 0.85em;
+            transition: color 0.2s;
+        }
+        .dashboard-nav-sub a:hover {
+            color: #00d9ff;
+            text-decoration: underline;
+        }
+        .dashboard-nav-sub a.active {
+            color: #00ff88;
+            font-weight: 600;
         }
         .dashboard-nav-btn {
             display: flex;
@@ -677,22 +701,20 @@
         <!-- Header -->
         <!-- Dashboard Navigation -->
         <div class="dashboard-nav">
-            <a href="index.html" class="dashboard-nav-btn active">
-                <span class="nav-icon">📊</span>
-                <span>페이퍼 트레이딩</span>
-            </a>
-            <a href="bnf_dashboard.html" class="dashboard-nav-btn bnf">
-                <span class="nav-icon">📉</span>
-                <span>BNF 낙폭과대</span>
-            </a>
-            <a href="backtest_dashboard.html" class="dashboard-nav-btn">
-                <span class="nav-icon">📈</span>
-                <span>백테스트</span>
-            </a>
-            <a href="system_guide.html" class="dashboard-nav-btn">
-                <span class="nav-icon">📚</span>
-                <span>가이드</span>
-            </a>
+            <div class="dashboard-nav-main">
+                <a href="index.html" class="dashboard-nav-btn active">
+                    <span class="nav-icon">📊</span>
+                    <span>페이퍼 트레이딩</span>
+                </a>
+                <a href="bnf_dashboard.html" class="dashboard-nav-btn bnf">
+                    <span class="nav-icon">📉</span>
+                    <span>BNF 낙폭과대</span>
+                </a>
+            </div>
+            <div class="dashboard-nav-sub">
+                <a href="backtest_dashboard.html">📈 백테스트</a>
+                <a href="system_guide.html">📚 가이드</a>
+            </div>
         </div>
 
         <header class="header">

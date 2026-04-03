@@ -1,7 +1,7 @@
 """
 테마/정책 전략
-- 정부 정책 발표 관련 테마주
-- 미국 섹터 ETF 연동
+- 네이버 금융 실시간 테마 기반
+- 상승 테마 자동 감지 및 종목 선정
 """
 
 import sys
@@ -16,6 +16,13 @@ from .base import BaseStrategy, Candidate
 from .registry import StrategyRegistry
 from utils import format_kst_time, get_headers
 
+# 네이버 테마 크롤러
+try:
+    from paper_trading.utils.naver_theme import NaverThemeCrawler
+    NAVER_THEME_AVAILABLE = True
+except ImportError:
+    NAVER_THEME_AVAILABLE = False
+
 # 네이버 금융 우선, pykrx 폴백
 try:
     from naver_market import stock as naver_stock
@@ -29,19 +36,19 @@ except ImportError:
 
 @StrategyRegistry.register
 class ThemePolicyStrategy(BaseStrategy):
-    """테마/정책 전략"""
+    """테마/정책 전략 - 네이버 실시간 테마 기반"""
 
     STRATEGY_ID = "theme_policy"
     STRATEGY_NAME = "테마/정책"
-    DESCRIPTION = "정부 정책 및 테마 관련주 - 뉴스 기반 선정"
+    DESCRIPTION = "네이버 금융 상승 테마 기반 종목 선정"
 
-    # 테마별 관련 종목
-    THEME_STOCKS = {
-        '우주항공': ['047810', '190650', '012450', '042670'],  # 한국항공우주, 코미팜, 한화에어로, 인트로메딕
-        '방산': ['012450', '047810', '079550', '272210'],  # 한화에어로, 한국항공우주, LIG넥스원, 한화시스템
-        '바이오': ['091990', '086890', '096530', '141080'],  # 셀트리온헬스, 이수앱지스, 씨젠, 레고켐바이오
-        '2차전지': ['247540', '003670', '066970', '373220'],  # 에코프로비엠, 포스코퓨처엠, 엘앤에프, LG에너지솔루션
-        'AI반도체': ['005930', '000660', '042700', '069960'],  # 삼성전자, SK하이닉스, 한미반도체, 현대로템
+    # 폴백용 기본 테마 (네이버 크롤링 실패 시)
+    FALLBACK_THEMES = {
+        '우주항공': ['047810', '190650', '012450', '042670'],
+        '방산': ['012450', '047810', '079550', '272210'],
+        '바이오': ['091990', '086890', '096530', '141080'],
+        '2차전지': ['247540', '003670', '066970', '373220'],
+        'AI반도체': ['005930', '000660', '042700', '069960'],
     }
 
     # 점수 가중치
@@ -49,14 +56,16 @@ class ThemePolicyStrategy(BaseStrategy):
         'theme_relevance': 40,   # 테마 관련도
         'change_pct': 25,        # 등락률
         'trading_value': 20,     # 거래대금
-        'news_count': 15         # 뉴스 언급량
+        'theme_strength': 15     # 테마 강도 (테마 등락률)
     }
 
     def __init__(self):
         super().__init__()
         self.session = requests.Session()
         self.headers = get_headers()
-        self.active_themes = []
+        self.active_themes = []  # [{'name': 테마명, 'code': 코드, 'change_pct': 등락률}, ...]
+        self.theme_stocks = {}   # {'테마명': [종목코드, ...], ...}
+        self.theme_crawler = NaverThemeCrawler() if NAVER_THEME_AVAILABLE else None
 
     def select_stocks(self, date: str = None, top_n: int = 5) -> List[Candidate]:
         """종목 선정"""
@@ -66,25 +75,36 @@ class ThemePolicyStrategy(BaseStrategy):
         self.selection_date = date
         print(f"\n[{self.STRATEGY_NAME}] 종목 선정 시작 ({date})")
 
-        # 1. 활성 테마 감지
+        # 1. 활성 테마 감지 (네이버 상승 테마)
         self.active_themes = self._detect_active_themes()
-        print(f"  활성 테마: {self.active_themes}")
 
         if not self.active_themes:
-            # 기본 테마 사용
-            self.active_themes = ['AI반도체', '2차전지']
-            print(f"  기본 테마 사용: {self.active_themes}")
+            print(f"  테마 감지 실패 - 폴백 테마 사용")
+            self.active_themes = [{'name': k, 'code': '', 'change_pct': 0}
+                                  for k in list(self.FALLBACK_THEMES.keys())[:3]]
+            self.theme_stocks = self.FALLBACK_THEMES
+
+        theme_names = [t['name'] for t in self.active_themes]
+        print(f"  활성 테마 {len(self.active_themes)}개: {', '.join(theme_names[:5])}")
 
         # 2. 테마 관련 종목 수집
-        theme_codes = set()
-        for theme in self.active_themes:
-            codes = self.THEME_STOCKS.get(theme, [])
-            theme_codes.update(codes)
+        all_codes = set()
+        code_to_themes = {}  # 종목코드 -> 소속 테마 리스트
 
-        print(f"  관련 종목: {len(theme_codes)}개")
+        for theme in self.active_themes:
+            theme_name = theme['name']
+            codes = self.theme_stocks.get(theme_name, [])
+
+            for code in codes:
+                all_codes.add(code)
+                if code not in code_to_themes:
+                    code_to_themes[code] = []
+                code_to_themes[code].append(theme)
+
+        print(f"  관련 종목: {len(all_codes)}개")
 
         # 3. 시장 데이터 가져오기
-        stocks = self._fetch_stock_data(list(theme_codes), date)
+        stocks = self._fetch_stock_data(list(all_codes), date, code_to_themes)
 
         # 4. 점수 계산
         scored = self._calculate_scores(stocks)
@@ -99,48 +119,53 @@ class ThemePolicyStrategy(BaseStrategy):
         print(f"  선정 완료: {len(self.candidates)}개")
         return self.candidates
 
-    def _detect_active_themes(self) -> List[str]:
-        """활성 테마 감지 (뉴스 기반)"""
-        active = []
+    def _detect_active_themes(self, top_n: int = 10, min_change: float = 0.5) -> List[Dict]:
+        """
+        활성 테마 감지 (네이버 금융 상승 테마)
 
-        keywords = {
-            '우주': '우주항공',
-            '누리호': '우주항공',
-            '방산': '방산',
-            '무기': '방산',
-            '바이오': '바이오',
-            '신약': '바이오',
-            '배터리': '2차전지',
-            '전기차': '2차전지',
-            'AI': 'AI반도체',
-            '반도체': 'AI반도체',
-            '엔비디아': 'AI반도체',
-        }
+        Args:
+            top_n: 상위 N개 테마
+            min_change: 최소 상승률 (%)
+
+        Returns:
+            [{'name': 테마명, 'code': 코드, 'change_pct': 등락률}, ...]
+        """
+        if not self.theme_crawler:
+            print(f"  네이버 테마 크롤러 미사용")
+            return []
 
         try:
-            # 네이버 뉴스 헤드라인 체크
-            url = 'https://finance.naver.com/news/mainnews.naver'
-            response = self.session.get(url, headers=self.headers, timeout=10)
-            soup = BeautifulSoup(response.text, 'html.parser')
+            # 1. 상승 테마 목록 가져오기
+            hot_themes = self.theme_crawler.get_hot_themes(top_n=top_n, min_change=min_change)
 
-            headlines = soup.find_all('a', {'class': 'articleSubject'})
-            text = ' '.join([h.get_text() for h in headlines[:20]])
+            if not hot_themes:
+                print(f"  상승 테마 없음 (기준: +{min_change}%)")
+                # 기준 낮춰서 재시도
+                hot_themes = self.theme_crawler.get_hot_themes(top_n=top_n, min_change=0)
 
-            for keyword, theme in keywords.items():
-                if keyword in text and theme not in active:
-                    active.append(theme)
+            # 2. 각 테마의 종목 수집
+            self.theme_stocks = {}
+            for theme in hot_themes[:top_n]:
+                stocks = self.theme_crawler.get_theme_stocks(theme['code'], theme['name'])
+                if stocks:
+                    self.theme_stocks[theme['name']] = [s['code'] for s in stocks]
+                    print(f"    {theme['name']}: {theme['change_pct']:+.2f}% ({len(stocks)}종목)")
+
+            return hot_themes[:top_n]
 
         except Exception as e:
-            print(f"  뉴스 체크 실패: {e}")
+            print(f"  테마 감지 오류: {e}")
+            return []
 
-        return active[:3]  # 최대 3개 테마
-
-    def _fetch_stock_data(self, codes: List[str], date: str) -> List[Dict]:
+    def _fetch_stock_data(self, codes: List[str], date: str, code_to_themes: Dict = None) -> List[Dict]:
         """종목 데이터 수집"""
         stocks = []
 
         if pykrx_stock is None:
             return stocks
+
+        if code_to_themes is None:
+            code_to_themes = {}
 
         for code in codes:
             try:
@@ -159,9 +184,10 @@ class ThemePolicyStrategy(BaseStrategy):
 
                 name = pykrx_stock.get_market_ticker_name(code)
 
-                # 어떤 테마에 속하는지
-                themes = [t for t, codes in self.THEME_STOCKS.items()
-                         if code in codes and t in self.active_themes]
+                # 소속 테마 정보
+                themes_info = code_to_themes.get(code, [])
+                theme_names = [t['name'] for t in themes_info] if themes_info else []
+                max_theme_change = max([t['change_pct'] for t in themes_info], default=0) if themes_info else 0
 
                 stocks.append({
                     'code': code,
@@ -170,7 +196,8 @@ class ThemePolicyStrategy(BaseStrategy):
                     'change_pct': change,
                     'volume': volume,
                     'trading_value': trading_value,
-                    'themes': themes
+                    'themes': theme_names,
+                    'theme_strength': max_theme_change  # 소속 테마 중 최고 상승률
                 })
 
             except Exception as e:
@@ -183,6 +210,11 @@ class ThemePolicyStrategy(BaseStrategy):
         if not stocks:
             return []
 
+        # 정규화를 위한 최대값
+        max_theme_count = max(len(s.get('themes', [])) for s in stocks) or 1
+        max_theme_strength = max(s.get('theme_strength', 0) for s in stocks) or 1
+        max_trading_value = max(s.get('trading_value', 0) for s in stocks) or 1
+
         candidates = []
 
         for s in stocks:
@@ -190,21 +222,21 @@ class ThemePolicyStrategy(BaseStrategy):
 
             # 테마 관련도 (여러 테마에 속하면 높은 점수)
             theme_count = len(s.get('themes', []))
-            scores['theme_relevance'] = (theme_count / len(self.active_themes)) * self.WEIGHTS['theme_relevance']
+            scores['theme_relevance'] = (theme_count / max_theme_count) * self.WEIGHTS['theme_relevance']
 
             # 등락률 점수 (상승 우대)
             change = s['change_pct']
             if change > 0:
                 scores['change_pct'] = min(change / 10, 1) * self.WEIGHTS['change_pct']
             else:
-                scores['change_pct'] = 0
+                scores['change_pct'] = max(0, (10 + change) / 20) * self.WEIGHTS['change_pct'] * 0.3
 
             # 거래대금 점수
-            value_score = min(s['trading_value'] / (100 * 100000000), 1)
-            scores['trading_value'] = value_score * self.WEIGHTS['trading_value']
+            scores['trading_value'] = (s['trading_value'] / max_trading_value) * self.WEIGHTS['trading_value']
 
-            # 뉴스 점수 (간단히 거래대금으로 대체)
-            scores['news_count'] = value_score * self.WEIGHTS['news_count']
+            # 테마 강도 점수 (소속 테마가 얼마나 강한지)
+            theme_strength = s.get('theme_strength', 0)
+            scores['theme_strength'] = (theme_strength / max_theme_strength) * self.WEIGHTS['theme_strength']
 
             total_score = sum(scores.values())
 
@@ -214,7 +246,7 @@ class ThemePolicyStrategy(BaseStrategy):
                 price=s['price'],
                 change_pct=s['change_pct'],
                 score=round(total_score, 1),
-                score_detail={**scores, 'themes': s.get('themes', [])},
+                score_detail={**{k: round(v, 1) for k, v in scores.items()}, 'themes': s.get('themes', [])},
                 volume=s['volume'],
                 trading_value=s['trading_value']
             ))
@@ -222,7 +254,11 @@ class ThemePolicyStrategy(BaseStrategy):
         return candidates
 
     def get_params(self) -> Dict:
+        theme_info = [{'name': t['name'], 'change_pct': t['change_pct']}
+                      for t in self.active_themes] if self.active_themes else []
         return {
-            'active_themes': self.active_themes,
+            'active_themes': theme_info,
+            'theme_count': len(self.active_themes),
+            'total_stocks': sum(len(v) for v in self.theme_stocks.values()),
             'weights': self.WEIGHTS
         }
