@@ -166,9 +166,51 @@
             font-size: 14px;
             line-height: 2;
         }
+        /* 통합 네비게이션 */
+        .global-nav {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .global-nav .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background: #f0f0f0;
+            color: #555;
+        }
+        .global-nav .nav-item:hover {
+            background: #e0e0e0;
+            color: #333;
+            transform: translateY(-2px);
+        }
+        .global-nav .nav-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <!-- 통합 네비게이션 -->
+    <nav class="global-nav" style="max-width: 1000px; margin: 0 auto 20px auto;">
+        <a href="index.html" class="nav-item">📊 페이퍼 트레이딩</a>
+        <a href="bnf_dashboard.html" class="nav-item">📉 BNF 낙폭과대</a>
+        <a href="backtest_dashboard.html" class="nav-item">📈 백테스트</a>
+        <a href="system_guide.html" class="nav-item active">📚 가이드</a>
+    </nav>
+
     <div class="container">
         <div class="header">
             <h1>📚 장전 종목 선정 시스템 가이드</h1>
@@ -176,13 +218,11 @@
         </div>
 
         <div class="nav">
-            <a href="index.html">🏠 메인 대시보드</a>
-            <a href="data/backtest_report.html">📊 백테스팅 리포트</a>
-            <a href="#overview">시스템 개요</a>
-            <a href="#scoring">점수 시스템</a>
-            <a href="#backtesting">백테스팅</a>
-            <a href="#strategy">매매 전략</a>
-            <a href="#next-steps">다음 단계</a>
+            <a href="#overview">📌 시스템 개요</a>
+            <a href="#scoring">🎯 점수 시스템</a>
+            <a href="#backtesting">📊 백테스팅</a>
+            <a href="#strategy">💰 매매 전략</a>
+            <a href="#next-steps">🚀 다음 단계</a>
         </div>
 
         <!-- 시스템 개요 -->

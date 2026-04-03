@@ -64,6 +64,58 @@ jobs:
         git diff --quiet && git diff --staged --quiet || \
           (git commit -m "⏱️ 장중 상태 체크 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
 
+    - name: Send Telegram Alert (익절/손절 발생시)
+      if: always()
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TZ: Asia/Seoul
+      run: |
+        TODAY=$(date +'%Y%m%d')
+        if [ -f "data/paper_trading/status_${TODAY}.json" ]; then
+          python -c "
+import json
+import os
+from telegram_notifier import TelegramNotifier
+
+today = '${TODAY}'
+notifier = TelegramNotifier()
+
+if not notifier.is_configured():
+    print('Telegram 미설정 - 알림 생략')
+    exit(0)
+
+try:
+    with open(f'data/paper_trading/status_{today}.json') as f:
+        data = json.load(f)
+
+    profit_hit = data.get('profit_hit', 0)
+    loss_hit = data.get('loss_hit', 0)
+
+    # 익절 또는 손절 발생시에만 알림
+    if profit_hit > 0 or loss_hit > 0:
+        for s in data.get('stocks', []):
+            if s['status'] == 'profit_hit':
+                notifier.send_sell_signal(
+                    s['name'], s.get('code', ''),
+                    s.get('current_price', 0), 'profit',
+                    s.get('pnl_pct', 0)
+                )
+            elif s['status'] == 'loss_hit':
+                notifier.send_sell_signal(
+                    s['name'], s.get('code', ''),
+                    s.get('current_price', 0), 'loss',
+                    s.get('pnl_pct', 0)
+                )
+        print(f'알림 전송: 익절 {profit_hit}건, 손절 {loss_hit}건')
+    else:
+        print('익절/손절 없음 - 알림 생략')
+
+except Exception as e:
+    print(f'알림 오류: {e}')
+"
+        fi
+
     - name: Summary
       env:
         TZ: Asia/Seoul

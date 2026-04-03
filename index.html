@@ -678,12 +678,20 @@
         <!-- Dashboard Navigation -->
         <div class="dashboard-nav">
             <a href="index.html" class="dashboard-nav-btn active">
-                <span class="nav-icon">📈</span>
-                <span>Paper Trading</span>
+                <span class="nav-icon">📊</span>
+                <span>페이퍼 트레이딩</span>
             </a>
             <a href="bnf_dashboard.html" class="dashboard-nav-btn bnf">
                 <span class="nav-icon">📉</span>
                 <span>BNF 낙폭과대</span>
+            </a>
+            <a href="backtest_dashboard.html" class="dashboard-nav-btn">
+                <span class="nav-icon">📈</span>
+                <span>백테스트</span>
+            </a>
+            <a href="system_guide.html" class="dashboard-nav-btn">
+                <span class="nav-icon">📚</span>
+                <span>가이드</span>
             </a>
         </div>
 
@@ -692,10 +700,6 @@
                 <h1>📊 페이퍼 트레이딩 대시보드</h1>
                 <div class="subtitle">다중 전략 비교 | 실시간 모니터링</div>
             </div>
-            <nav class="nav-links">
-                <a href="backtest_dashboard.html">백테스트</a>
-                <a href="system_guide.html">시스템 가이드</a>
-            </nav>
         </header>
 
         <!-- Control Bar -->
@@ -888,12 +892,33 @@
             `;
         }
 
-        // 오늘 날짜 설정
+        // 오늘 날짜 설정 및 자동 새로고침
+        let autoRefreshInterval = null;
+        const AUTO_REFRESH_INTERVAL = 60000; // 1분
+
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('selectDate').value = today;
             loadTodayData();
+
+            // 자동 새로고침 시작 (장중에만)
+            startAutoRefresh();
         });
+
+        function startAutoRefresh() {
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();
+
+            // 평일 09:00~16:00에만 자동 새로고침
+            if (day >= 1 && day <= 5 && hour >= 9 && hour < 16) {
+                autoRefreshInterval = setInterval(() => {
+                    console.log('자동 새로고침:', new Date().toLocaleTimeString());
+                    loadLiveStatus();
+                }, AUTO_REFRESH_INTERVAL);
+                console.log('자동 새로고침 활성화 (1분 간격)');
+            }
+        }
 
         // 차트 모드 전환
         function toggleChartMode(mode) {

@@ -22,13 +22,17 @@ import pandas as pd
 
 from .selector import StockCandidate
 
+# 에러 로거
+from error_logger import get_logger, log_warning, log_error
+_logger = get_logger("simulator")
+
 # 기존 intraday_collector 활용
 try:
     from intraday_collector import IntradayCollector
     INTRADAY_AVAILABLE = True
 except ImportError:
     INTRADAY_AVAILABLE = False
-    print("[Simulator] Warning: intraday_collector not available, using daily data only")
+    log_warning(_logger, "intraday_collector 사용 불가 - 일봉 데이터만 사용")
 
 
 @dataclass
@@ -444,8 +448,8 @@ class TradingSimulator:
         try:
             dates = stock.get_market_ohlcv(start_date, end_date, "005930").index
             trade_dates = [d.strftime("%Y%m%d") for d in dates]
-        except:
-            print("[Simulator] 거래일 조회 실패")
+        except Exception as e:
+            log_error(_logger, "거래일 조회 실패", e)
             return []
 
         daily_results = []
@@ -467,7 +471,7 @@ class TradingSimulator:
                 daily_results.append(summary)
 
             except Exception as e:
-                print(f"[{date}] 오류: {e}")
+                log_warning(_logger, f"일별 시뮬레이션 실패 ({date})", e)
                 continue
 
         # 최종 요약

@@ -171,3 +171,52 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add data/bnf/
         git diff --quiet && git diff --staged --quiet || (git commit -m "🔥 BNF 낙폭과대 종목 선정 - $(date +'%Y-%m-%d')" && git push) || true
+
+    - name: Send Telegram Alert (BNF 종목 선정)
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TZ: Asia/Seoul
+      run: |
+        python -c "
+import json
+from datetime import datetime
+import pytz
+from telegram_notifier import TelegramNotifier
+
+kst = pytz.timezone('Asia/Seoul')
+today = datetime.now(kst).strftime('%Y%m%d')
+
+notifier = TelegramNotifier()
+
+if not notifier.is_configured():
+    print('Telegram 미설정 - 알림 생략')
+    exit(0)
+
+try:
+    with open(f'data/bnf/candidates_{today}.json') as f:
+        data = json.load(f)
+
+    candidates = data.get('candidates', [])
+
+    if candidates:
+        # 커스텀 메시지로 BNF 종목 알림
+        stock_lines = []
+        for c in candidates[:10]:
+            stock_lines.append(f\"{c['rank']}. {c['name']} - 낙폭 {c['max_drop']:.1f}%\")
+
+        content = f\"\"\"<b>선정 종목:</b> {len(candidates)}개
+
+{chr(10).join(stock_lines)}
+
+<b>기준:</b> 5일 -15% | 10일 -20% | 고점 -25%\"\"\"
+
+        notifier.send_custom('BNF 낙폭과대 종목', content, '🔥')
+        print(f'BNF 알림 전송: {len(candidates)}개 종목')
+    else:
+        notifier.send_custom('BNF 낙폭과대 종목', '오늘 조건에 맞는 종목 없음', '📭')
+        print('선정 종목 없음')
+
+except Exception as e:
+    print(f'알림 오류: {e}')
+"

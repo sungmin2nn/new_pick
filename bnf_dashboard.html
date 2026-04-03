@@ -355,7 +355,9 @@
         <!-- Navigation -->
         <div class="nav-buttons">
             <a href="index.html" class="nav-btn">📊 페이퍼 트레이딩</a>
-            <a href="bnf_dashboard.html" class="nav-btn active">🔥 BNF 매매</a>
+            <a href="bnf_dashboard.html" class="nav-btn active">📉 BNF 낙폭과대</a>
+            <a href="backtest_dashboard.html" class="nav-btn">📈 백테스트</a>
+            <a href="system_guide.html" class="nav-btn">📚 가이드</a>
         </div>
 
         <!-- Header -->
@@ -524,13 +526,33 @@
         let performanceChart = null;
         let portfolioChart = null;
         const INITIAL_CAPITAL = 3000000; // 300만원
+        let autoRefreshInterval = null;
+        const AUTO_REFRESH_INTERVAL = 60000; // 1분
 
         // 페이지 로드
         document.addEventListener('DOMContentLoaded', () => {
             // 기본값으로 통계 초기화
             updateStats({ stats: { total_trades: 0, win_rate: 0, total_return: 0, avg_return: 0, open_positions: 0, unrealized_pnl: 0 }});
             loadBNFData();
+
+            // 자동 새로고침 시작 (장중에만)
+            startAutoRefresh();
         });
+
+        function startAutoRefresh() {
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();
+
+            // 평일 09:00~16:00에만 자동 새로고침
+            if (day >= 1 && day <= 5 && hour >= 9 && hour < 16) {
+                autoRefreshInterval = setInterval(() => {
+                    console.log('자동 새로고침:', new Date().toLocaleTimeString());
+                    loadBNFData();
+                }, AUTO_REFRESH_INTERVAL);
+                console.log('자동 새로고침 활성화 (1분 간격)');
+            }
+        }
 
         // BNF 데이터 로드
         async function loadBNFData() {

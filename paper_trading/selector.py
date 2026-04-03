@@ -19,6 +19,10 @@ except ImportError:
 
 import pandas as pd
 
+# 에러 로거
+from error_logger import get_logger, log_warning, log_error
+_logger = get_logger("selector")
+
 # 경고 무시
 import warnings
 warnings.filterwarnings('ignore')
@@ -185,7 +189,8 @@ class StockSelector:
                     try:
                         cap_df = stock.get_market_cap(date, date, code)
                         market_cap = cap_df.iloc[-1]['시가총액'] if not cap_df.empty else 0
-                    except:
+                    except Exception as e:
+                        log_warning(_logger, f"시가총액 조회 실패 ({code})", e)
                         market_cap = 0
 
                     results.append({
@@ -202,6 +207,7 @@ class StockSelector:
                     })
 
                 except Exception as e:
+                    log_warning(_logger, f"종목 데이터 처리 실패 ({code})", e)
                     continue
 
             if not results:
@@ -429,6 +435,7 @@ class StockSelector:
                 candidates.append(candidate)
 
             except Exception as e:
+                log_warning(_logger, f"종목 후보 생성 실패 ({code})", e)
                 continue
 
         # 4. 점수순 정렬 및 상위 N개 선정
