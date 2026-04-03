@@ -14,27 +14,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1600px; margin: 0 auto; padding: 0 10px; }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #2a2a4a;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .header h1 { color: #00d9ff; font-size: 1.8em; }
-        .header .subtitle { color: #8892b0; margin-top: 5px; font-size: 0.9em; }
-        .header .nav-links a {
-            color: #00ff88;
-            text-decoration: none;
-            margin-left: 20px;
-        }
-        .header .nav-links a:hover { text-decoration: underline; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 10px; }
 
         /* Dashboard Navigation */
         .dashboard-nav {
@@ -43,29 +23,15 @@
             gap: 8px;
             margin-bottom: 20px;
         }
-        .dashboard-nav-main {
-            display: flex;
-            gap: 10px;
-        }
-        .dashboard-nav-sub {
-            display: flex;
-            gap: 15px;
-            padding-left: 5px;
-        }
+        .dashboard-nav-main { display: flex; gap: 10px; }
+        .dashboard-nav-sub { display: flex; gap: 15px; padding-left: 5px; }
         .dashboard-nav-sub a {
             color: #8892b0;
             text-decoration: none;
             font-size: 0.85em;
             transition: color 0.2s;
         }
-        .dashboard-nav-sub a:hover {
-            color: #00d9ff;
-            text-decoration: underline;
-        }
-        .dashboard-nav-sub a.active {
-            color: #00ff88;
-            font-weight: 600;
-        }
+        .dashboard-nav-sub a:hover { color: #00d9ff; text-decoration: underline; }
         .dashboard-nav-btn {
             display: flex;
             align-items: center;
@@ -85,22 +51,24 @@
         .dashboard-nav-btn:not(.active):hover {
             background: rgba(42, 42, 74, 0.8);
             color: #e4e4e4;
-            transform: translateY(-2px);
         }
         .dashboard-nav-btn.active {
             background: linear-gradient(135deg, #00d9ff, #00ff88);
             color: #1a1a2e;
         }
-        .dashboard-nav-btn.bnf:not(.active):hover {
-            border-color: #ff6b35;
-            color: #ff6b35;
-        }
-        .dashboard-nav-btn.bnf.active {
-            background: linear-gradient(135deg, #ff6b35, #ff8c5a);
-        }
+        .dashboard-nav-btn.bnf:not(.active):hover { border-color: #ff6b35; color: #ff6b35; }
         .nav-icon { font-size: 1.2em; }
 
-        /* Trading Rules Banner */
+        /* Header */
+        .header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        .header h1 { color: #00d9ff; font-size: 1.6em; }
+        .header .subtitle { color: #8892b0; margin-top: 5px; font-size: 0.85em; }
+
+        /* 1. Trading Rules Banner */
         .trading-rules {
             background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 255, 136, 0.1));
             border: 1px solid rgba(0, 217, 255, 0.3);
@@ -113,715 +81,226 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .trading-rules .rule-title {
-            color: #00d9ff;
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-        .trading-rules .rules-list {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .trading-rules .rule-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85em;
-        }
-        .trading-rules .rule-label {
-            color: #8892b0;
-        }
-        .trading-rules .rule-value {
-            font-weight: 600;
-        }
+        .trading-rules .rule-title { color: #00d9ff; font-weight: 600; font-size: 0.9em; }
+        .trading-rules .rules-list { display: flex; gap: 20px; flex-wrap: wrap; }
+        .trading-rules .rule-item { display: flex; align-items: center; gap: 6px; font-size: 0.85em; }
+        .trading-rules .rule-label { color: #8892b0; }
+        .trading-rules .rule-value { font-weight: 600; }
         .trading-rules .rule-value.profit { color: #00ff88; }
         .trading-rules .rule-value.loss { color: #ff6b6b; }
         .trading-rules .rule-value.time { color: #ffaa00; }
 
-        /* Today's Target Section */
-        .today-target {
+        /* 2. Profit Status Section */
+        .profit-status {
             background: rgba(22, 33, 62, 0.9);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             border: 2px solid #00d9ff;
         }
-        .today-target h2 {
-            color: #00d9ff;
-            margin-bottom: 15px;
-            font-size: 1.2em;
+        .profit-main {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 30px;
+            margin-bottom: 15px;
         }
-        .today-target .target-date {
-            font-size: 0.7em;
-            color: #8892b0;
-            font-weight: normal;
+        .profit-value {
+            font-size: 2.5em;
+            font-weight: bold;
         }
-        .target-cards {
+        .profit-value.positive { color: #00ff88; }
+        .profit-value.negative { color: #ff6b6b; }
+        .profit-sub { color: #8892b0; font-size: 0.9em; }
+        .profit-amount { font-size: 1.2em; color: #00d9ff; margin-top: 5px; }
+        .mini-chart-container { flex: 1; height: 80px; min-width: 200px; }
+
+        /* 3. Trade Summary */
+        .trade-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
+            margin-bottom: 20px;
         }
-        .target-card {
+        .summary-card {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #2a2a4a;
+        }
+        .summary-card .label { color: #8892b0; font-size: 0.8em; margin-bottom: 8px; }
+        .summary-card .value { font-size: 1.8em; font-weight: bold; color: #00d9ff; }
+        .summary-card .sub { font-size: 0.75em; color: #8892b0; margin-top: 5px; }
+        .summary-card.highlight { border-color: #00d9ff; }
+        .summary-card .value.positive { color: #00ff88; }
+        .summary-card .value.negative { color: #ff6b6b; }
+
+        /* 4. Today's Stocks Section */
+        .today-stocks {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2a4a;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .section-header h2 { color: #00ff88; font-size: 1.2em; }
+        .section-header .date { color: #8892b0; font-size: 0.85em; }
+
+        /* Stock Cards */
+        .stock-cards { display: flex; flex-direction: column; gap: 12px; }
+        .stock-card {
             background: rgba(15, 52, 96, 0.5);
             border-radius: 10px;
             padding: 15px;
-            border-left: 4px solid #00d9ff;
+            border-left: 4px solid #8892b0;
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            align-items: center;
+            gap: 15px;
         }
-        .target-card .stock-header {
+        .stock-card.waiting { border-left-color: #ffaa00; }
+        .stock-card.profit { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.08); }
+        .stock-card.loss { border-left-color: #ff6b6b; background: rgba(255, 107, 107, 0.08); }
+
+        .stock-info .name { font-weight: 600; font-size: 1.05em; }
+        .stock-info .code { color: #8892b0; font-size: 0.8em; }
+        .stock-info .reason { color: #ffaa00; font-size: 0.8em; margin-top: 4px; }
+
+        .stock-prices { text-align: right; font-size: 0.85em; }
+        .stock-prices .current { font-size: 1.1em; font-weight: 600; }
+        .stock-prices .targets { color: #8892b0; margin-top: 4px; }
+        .stock-prices .targets .profit-target { color: #00ff88; }
+        .stock-prices .targets .loss-target { color: #ff6b6b; }
+
+        .stock-pnl { text-align: right; min-width: 80px; }
+        .stock-pnl .pct { font-size: 1.3em; font-weight: bold; }
+        .stock-pnl .pct.positive { color: #00ff88; }
+        .stock-pnl .pct.negative { color: #ff6b6b; }
+
+        .stock-status .badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .badge.waiting { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        .badge.profit { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .badge.loss { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+        .badge.close { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
+
+        /* 5. Collapsible Section */
+        .collapsible {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2a4a;
+            overflow: hidden;
+        }
+        .collapsible-header {
+            padding: 15px 20px;
+            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-        }
-        .target-card .stock-name {
-            font-weight: 600;
-            font-size: 1.1em;
-        }
-        .target-card .stock-code {
-            color: #8892b0;
-            font-size: 0.85em;
-        }
-        .target-card .stock-score {
-            background: linear-gradient(135deg, #00d9ff, #00ff88);
-            color: #1a1a2e;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.85em;
-        }
-        .target-card .stock-strategy {
-            color: #ffaa00;
-            font-size: 0.85em;
-            margin-bottom: 10px;
-        }
-        .target-card .price-targets {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            font-size: 0.85em;
-        }
-        .target-card .price-target {
-            text-align: center;
-            padding: 8px;
-            border-radius: 6px;
             background: rgba(0, 0, 0, 0.2);
         }
-        .target-card .price-target .label {
-            color: #8892b0;
-            font-size: 0.8em;
-            margin-bottom: 3px;
+        .collapsible-header h2 { color: #00d9ff; font-size: 1.1em; }
+        .collapsible-header .toggle { color: #8892b0; transition: transform 0.3s; }
+        .collapsible.open .toggle { transform: rotate(180deg); }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
         }
-        .target-card .price-target .value {
-            font-weight: 600;
-        }
-        .target-card .price-target.profit .value { color: #00ff88; }
-        .target-card .price-target.loss .value { color: #ff6b6b; }
-        .target-card .price-target.current .value { color: #00d9ff; }
+        .collapsible.open .collapsible-content { max-height: 2000px; }
+        .collapsible-inner { padding: 20px; }
 
-        /* Control Bar */
-        .control-bar {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        .control-bar input[type="date"] {
-            padding: 10px 15px;
-            border-radius: 8px;
+        /* 6. Statistics Section */
+        .statistics {
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 15px;
+            padding: 20px;
             border: 1px solid #2a2a4a;
-            background: #16213e;
-            color: #e4e4e4;
-            font-size: 1em;
         }
-        .control-bar button {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #00d9ff, #00ff88);
-            color: #1a1a2e;
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3); }
-        .btn-secondary {
-            background: #2a2a4a;
-            color: #e4e4e4;
-        }
-        .btn-secondary:hover { background: #3a3a5a; }
-        .btn-refresh {
-            background: linear-gradient(135deg, #ffaa00, #ff6b6b);
-            color: #1a1a2e;
-        }
-
-        /* Stats Grid */
+        .statistics h2 { color: #00ff88; font-size: 1.2em; margin-bottom: 15px; }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: rgba(22, 33, 62, 0.8);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid #2a2a4a;
-            transition: transform 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #00d9ff;
-            margin-bottom: 8px;
-        }
-        .stat-value.positive { color: #00ff88; }
-        .stat-value.negative { color: #ff6b6b; }
-        .stat-label { color: #8892b0; font-size: 0.85em; }
-
-        /* Loading Spinner */
-        .spinner {
-            border: 3px solid rgba(0, 217, 255, 0.2);
-            border-top: 3px solid #00d9ff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            color: #8892b0;
-        }
-        .loading-container .spinner { margin-bottom: 15px; }
-
-        /* Section */
-        .section {
-            background: rgba(22, 33, 62, 0.8);
-            border-radius: 15px;
-            padding: 15px 10px;
-            margin-bottom: 20px;
-            border: 1px solid #2a2a4a;
-        }
-        .section .table-wrapper {
-            margin: 0 -10px;
-            padding: 0;
-        }
-        .section .table-wrapper table {
-            width: calc(100% + 20px);
-            margin: 0;
-        }
-        .section h2 {
-            color: #00ff88;
-            margin-bottom: 20px;
-            font-size: 1.3em;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        .section h2 .update-time {
-            font-size: 0.7em;
-            color: #8892b0;
-            font-weight: normal;
-        }
-
-        /* Live Status Grid */
-        .live-status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 15px;
         }
-        .stock-status-card {
-            background: rgba(15, 52, 96, 0.5);
-            border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid #8892b0;
-            transition: all 0.3s;
-        }
-        .stock-status-card.profit { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.1); }
-        .stock-status-card.loss { border-left-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
-        .stock-status-card.waiting { border-left-color: #ffaa00; }
-        .stock-status-card .stock-name {
-            font-weight: 600;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .stock-status-card .stock-code { color: #8892b0; font-size: 0.9em; }
-        .stock-status-card .stock-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            font-size: 0.9em;
-        }
-        .stock-status-card .info-label { color: #8892b0; }
-        .stock-status-card .info-value { text-align: right; }
-        .stock-status-card .status-badge,
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
+        .stat-item {
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 10px;
-            font-size: 0.75em;
-            font-weight: 600;
-            background: rgba(255, 170, 0, 0.2);
-            color: #ffaa00;
+            padding: 15px;
+            text-align: center;
         }
-        .status-badge.positive { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
-        .status-badge.negative { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
-        .status-badge.profit { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
-        .status-badge.loss { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
-        .status-badge.waiting { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        .stat-item .value { font-size: 1.5em; font-weight: bold; color: #00d9ff; }
+        .stat-item .value.positive { color: #00ff88; }
+        .stat-item .value.negative { color: #ff6b6b; }
+        .stat-item .label { color: #8892b0; font-size: 0.8em; margin-top: 5px; }
 
-        /* Table */
-        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
-        th, td {
-            padding: 8px 10px;
-            text-align: left;
-            border-bottom: 1px solid #2a2a4a;
-            white-space: nowrap;
-        }
-        th { background: #0f3460; color: #00d9ff; font-weight: 600; font-size: 0.85em; }
+        /* Table Styles */
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #2a2a4a; }
+        th { background: rgba(0, 217, 255, 0.1); color: #00d9ff; font-weight: 600; }
         tr:hover { background: rgba(0, 217, 255, 0.05); }
         .positive { color: #00ff88; }
         .negative { color: #ff6b6b; }
         .table-wrapper { overflow-x: auto; }
 
-        /* Live Status Table */
-        #liveStatusTable th:nth-child(1) { width: 130px; }
-        #liveStatusTable th:nth-child(2) { width: 50px; }
-        #liveStatusTable th:nth-child(3),
-        #liveStatusTable th:nth-child(4) { width: 90px; text-align: right; }
-        #liveStatusTable th:nth-child(5) { width: 70px; text-align: right; }
-        #liveStatusTable th:nth-child(6) { width: 100px; }
-        #liveStatusTable td:nth-child(3),
-        #liveStatusTable td:nth-child(4),
-        #liveStatusTable td:nth-child(5) { text-align: right; }
+        /* Loading & No Data */
+        .loading { text-align: center; padding: 30px; color: #8892b0; }
+        .spinner {
+            border: 3px solid rgba(0, 217, 255, 0.2);
+            border-top: 3px solid #00d9ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .no-data { text-align: center; padding: 30px; color: #8892b0; }
 
-        /* Chart Container */
-        .chart-container {
-            height: 300px;
-            position: relative;
-            margin-top: 15px;
-        }
-
-        /* Badge */
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-        }
-        .badge-profit { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
-        .badge-loss { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
-        .badge-close { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
-
-        /* Chart Toggle Button */
-        .chart-toggle-btn {
-            padding: 4px 12px;
-            border-radius: 4px;
-            border: 1px solid #2a2a4a;
-            background: transparent;
-            color: #8892b0;
-            font-size: 0.75em;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .chart-toggle-btn.active {
-            background: #00d9ff;
-            color: #1a1a2e;
-            border-color: #00d9ff;
-        }
-        .chart-toggle-btn:hover:not(.active) {
-            border-color: #00d9ff;
-            color: #00d9ff;
-        }
-
-        /* Status Message */
-        .status-message {
-            text-align: center;
-            padding: 30px 20px;
-            color: #8892b0;
-            font-size: 1em;
-        }
-        .status-message.waiting { color: #ffaa00; }
-        .status-message.no-data { color: #8892b0; }
-        .status-message.error {
-            color: #ff6b6b;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-        .status-message.error .retry-btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .status-message.error .retry-btn:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
-        }
-
-        /* Mini Stat for Strategy Summary */
-        .stat-mini {
-            background: rgba(15, 52, 96, 0.5);
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-        .stat-mini .value {
-            display: block;
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #00d9ff;
-        }
-        .stat-mini .value.positive { color: #00ff88; }
-        .stat-mini .value.negative { color: #ff6b6b; }
-        .stat-mini .label {
-            display: block;
-            font-size: 0.75em;
-            color: #8892b0;
-            margin-top: 4px;
-        }
-
-        /* Responsive - Tablet */
+        /* Responsive */
         @media (max-width: 768px) {
             body { padding: 10px; }
-            .container { padding: 0 5px; }
-            .header { flex-direction: column; text-align: center; }
-            .header h1 { font-size: 1.4em; }
-            .header .nav-links { margin-top: 15px; }
-            .header .nav-links a { margin: 0 10px; font-size: 0.9em; }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            .stat-card { padding: 15px 10px; }
-            .stat-value { font-size: 1.5em; }
-            .stat-label { font-size: 0.75em; }
-            .control-bar {
-                justify-content: center;
-                gap: 8px;
-            }
-            .control-bar input[type="date"],
-            .control-bar button {
-                padding: 8px 12px;
-                font-size: 0.85em;
-            }
-            .section {
-                padding: 12px 6px;
-                margin-bottom: 15px;
-                border-radius: 10px;
-            }
-            .section .table-wrapper {
-                margin: 0 -6px;
-            }
-            .section .table-wrapper table {
-                width: calc(100% + 12px);
-            }
-            .section h2 {
-                font-size: 1.1em;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            .live-status-grid {
-                grid-template-columns: 1fr;
-            }
-            .stock-status-card { padding: 15px; }
-            .table-wrapper {
-                overflow-x: auto;
-                overflow-y: hidden;
-                margin: 0;
-                padding: 0;
-                max-width: 100%;
-            }
-            table {
-                min-width: 500px;
-                font-size: 0.85em;
-                width: 100%;
-            }
-            th, td {
-                padding: 10px 8px;
-                white-space: nowrap;
-            }
-            .chart-container { height: 250px; }
+            .profit-main { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .profit-value { font-size: 2em; }
+            .mini-chart-container { width: 100%; height: 60px; }
+            .trade-summary { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .summary-card { padding: 12px 8px; }
+            .summary-card .value { font-size: 1.4em; }
+            .stock-card { grid-template-columns: 1fr; gap: 10px; }
+            .stock-prices, .stock-pnl, .stock-status { text-align: left; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
-        /* Responsive - Mobile (S23 등) */
         @media (max-width: 420px) {
-            body { padding: 8px; }
-            .container { padding: 0; }
-            .header { margin-bottom: 15px; padding-bottom: 12px; }
-            .header h1 { font-size: 1.15em; }
-            .header .subtitle { font-size: 0.75em; }
-            .header .nav-links a { margin: 0 8px; font-size: 0.8em; }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
-                margin-bottom: 15px;
-            }
-            .stat-card {
-                padding: 10px 6px;
-                border-radius: 10px;
-            }
-            .stat-value { font-size: 1.1em; }
-            .stat-label { font-size: 0.65em; }
-            .control-bar {
-                gap: 6px;
-                margin-bottom: 15px;
-            }
-            .control-bar input[type="date"] {
-                padding: 6px 8px;
-                font-size: 0.8em;
-                max-width: 130px;
-            }
-            .control-bar button {
-                padding: 6px 10px;
-                font-size: 0.75em;
-            }
-            .section {
-                padding: 10px 4px;
-                margin-bottom: 12px;
-                border-radius: 8px;
-            }
-            .section .table-wrapper {
-                margin: 0 -4px;
-            }
-            .section .table-wrapper table {
-                width: calc(100% + 8px);
-            }
-            .section h2 { font-size: 1em; margin-bottom: 10px; padding: 0 4px; }
-            .strategy-buttons { gap: 6px; padding-bottom: 8px; }
-            .strategy-btn {
-                padding: 6px 10px;
-                font-size: 0.75em;
-                border-radius: 6px;
-            }
-            .stock-status-card {
-                padding: 12px;
-                border-radius: 8px;
-            }
-            .stock-status-card .stock-name { font-size: 0.95em; }
-            .stock-status-card .stock-info { font-size: 0.8em; gap: 6px; }
-            .table-wrapper {
-                margin: 0;
-                padding: 0;
-                overflow-x: auto;
-                overflow-y: hidden;
-                max-width: 100%;
-            }
-            /* Mobile table optimization - hide unnecessary columns */
-            table { min-width: 350px; font-size: 0.75em; width: 100%; }
-            th, td { padding: 8px 4px; }
-
-            /* Hide columns on mobile */
-            #liveStatusTable th:nth-child(3),
-            #liveStatusTable td:nth-child(3),
-            table thead tr th:nth-child(3),
-            table tbody tr td:nth-child(3) {
-                display: none;
-            }
-
-            .chart-container { height: 200px; }
-            .no-data { padding: 25px; font-size: 0.85em; }
+            .trading-rules { flex-direction: column; align-items: flex-start; }
+            .summary-card .value { font-size: 1.2em; }
+            .summary-card .label { font-size: 0.7em; }
         }
 
-        /* No Data */
-        .no-data {
+        /* Footer */
+        footer {
             text-align: center;
-            padding: 40px;
-            color: #8892b0;
-        }
-
-        /* Unified Table Check Cells */
-        .check-cell {
-            text-align: center;
-            font-size: 1.1em;
-            padding: 6px 4px;
-        }
-        .check-cell.checked {
-            color: #00ff88;
-            background: rgba(0, 255, 136, 0.1);
-            font-weight: bold;
-        }
-        .stock-name-cell {
-            line-height: 1.3;
-        }
-        .stock-code {
-            color: #8892b0;
-            font-size: 0.8em;
-        }
-        .theme-cell {
-            max-width: 100px;
-            white-space: normal;
-            font-size: 0.8em;
-            color: #8892b0;
-        }
-        /* 통합 테이블 스타일 */
-        .unified-table {
-            font-size: 0.85em;
-            table-layout: auto;
-        }
-        .section .table-wrapper .unified-table {
-            width: calc(100% + 20px);
-            margin: 0;
-        }
-        .unified-table th {
-            padding: 8px 6px;
-            font-size: 0.8em;
-            white-space: nowrap;
-            background: rgba(0, 217, 255, 0.1);
-        }
-        .unified-table td {
-            padding: 8px 6px;
-        }
-        .unified-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        /* Strategy Legend */
-        .strategy-legend {
-            margin-top: 15px;
-            padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            border: 1px solid #2a2a4a;
-        }
-        .strategy-legend .legend-title {
-            font-size: 0.85em;
-            color: #00d9ff;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        .strategy-legend .legend-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 8px;
-        }
-        .strategy-legend .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8em;
-        }
-        .strategy-legend .legend-label {
-            background: rgba(0, 255, 136, 0.2);
-            color: #00ff88;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-            min-width: 36px;
-            text-align: center;
-        }
-        .strategy-legend .legend-desc {
-            color: #8892b0;
-        }
-
-        /* Strategy Comparison Grid */
-        .strategy-comparison-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-        .strategy-card {
-            background: rgba(22, 33, 62, 0.9);
-            border-radius: 15px;
             padding: 20px;
-            border: 2px solid #2a2a4a;
-            transition: all 0.3s;
-        }
-        .strategy-card:hover {
-            border-color: #00d9ff;
-            transform: translateY(-3px);
-        }
-        .strategy-card.best {
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
-        }
-        .strategy-card .strategy-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #2a2a4a;
-        }
-        .strategy-card .strategy-name {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #00d9ff;
-        }
-        .strategy-card .strategy-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: 600;
-        }
-        .strategy-card .badge-best {
-            background: #00ff88;
-            color: #1a1a2e;
-        }
-        .strategy-card .strategy-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .strategy-card .stat-item {
-            text-align: center;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-        }
-        .strategy-card .stat-item .value {
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-        .strategy-card .stat-item .label {
-            font-size: 0.8em;
+            margin-top: 30px;
+            border-top: 1px solid #2a2a4a;
             color: #8892b0;
-        }
-        .strategy-card .candidates-list {
-            font-size: 0.9em;
-        }
-        .strategy-card .candidate-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <!-- Dashboard Navigation -->
+        <!-- Navigation -->
         <div class="dashboard-nav">
             <div class="dashboard-nav-main">
                 <a href="index.html" class="dashboard-nav-btn active">
@@ -839,14 +318,13 @@
             </div>
         </div>
 
+        <!-- Header -->
         <header class="header">
-            <div>
-                <h1>📊 페이퍼 트레이딩 대시보드</h1>
-                <div class="subtitle">다중 전략 비교 | 실시간 모니터링</div>
-            </div>
+            <h1>📊 페이퍼 트레이딩 대시보드</h1>
+            <div class="subtitle">실시간 모니터링 | <span id="currentTime">-</span></div>
         </header>
 
-        <!-- Trading Rules Banner -->
+        <!-- 1. Trading Rules -->
         <div class="trading-rules">
             <span class="rule-title">📋 매매 규칙</span>
             <div class="rules-list">
@@ -869,141 +347,125 @@
             </div>
         </div>
 
-        <!-- Control Bar -->
-        <div class="control-bar">
-            <input type="date" id="selectDate" />
-            <button class="btn-secondary" onclick="loadHistoryData()">히스토리 조회</button>
-            <button class="btn-primary" onclick="loadTodayData()">오늘 데이터</button>
-            <button class="btn-refresh" onclick="triggerManualCheck()">🔄 수동 체크</button>
-        </div>
-
-        <!-- Stats (4개로 축소) -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalReturn">-</div>
-                <div class="stat-label">누적 수익률</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalTrades">-</div>
-                <div class="stat-label">총 거래</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="winRate">-</div>
-                <div class="stat-label">승률</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="tradingDays">-</div>
-                <div class="stat-label">거래일</div>
-            </div>
-        </div>
-
-        <!-- Today's Target Section -->
-        <div class="today-target" id="todayTarget">
-            <h2>🎯 오늘의 매매 대상 <span class="target-date" id="todayTargetDate">-</span></h2>
-            <div class="target-cards" id="targetCards">
-                <p style="text-align: center; color: #8892b0;">로딩 중...</p>
-            </div>
-        </div>
-
-        <!-- Live Status (Stats 바로 아래로 이동) -->
-        <div class="section">
-            <h2>
-                ⏱️ 실시간 상태
-                <span class="update-time" id="statusUpdateTime">-</span>
-            </h2>
-            <div id="targetDate" style="color: #00d9ff; font-size: 0.9em; margin-bottom: 10px;"></div>
-            <div class="table-wrapper">
-                <table id="liveStatusTable">
-                    <thead id="liveStatusHead">
-                        <tr>
-                            <th>종목</th>
-                            <th>상태</th>
-                            <th>진입가</th>
-                            <th>현재가</th>
-                            <th>수익률</th>
-                            <th>비고</th>
-                        </tr>
-                    </thead>
-                    <tbody id="liveStatusBody">
-                        <tr><td colspan="6" class="loading-container"><div class="spinner"></div><div>상태 확인 중...</div></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Unified Stock Analysis Table (통합 종목 분석 테이블) - 간소화 버전 -->
-        <div class="section" id="unifiedAnalysis">
-            <h2>📊 종목 분석 테이블</h2>
-            <div id="analysisDate" style="color: #8892b0; font-size: 0.9em; margin-bottom: 10px;"></div>
-            <div class="table-wrapper">
-                <table id="unifiedTable" class="unified-table">
-                    <thead>
-                        <tr>
-                            <th>종목</th>
-                            <th>현재가</th>
-                            <th>등락</th>
-                            <th>점수</th>
-                            <th>익절가</th>
-                            <th>손절가</th>
-                            <th>선정사유</th>
-                        </tr>
-                    </thead>
-                    <tbody id="unifiedTableBody">
-                        <tr><td colspan="7" class="loading-container"><div class="spinner"></div><div>로딩 중...</div></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Performance Chart -->
-        <div class="section">
-            <h2>
-                📈 성과 차트
-                <div style="display: flex; gap: 8px;">
-                    <button class="chart-toggle-btn active" onclick="toggleChartMode('percent')">%</button>
-                    <button class="chart-toggle-btn" onclick="toggleChartMode('amount')">금액</button>
+        <!-- 2. Profit Status -->
+        <div class="profit-status">
+            <div class="profit-main">
+                <div>
+                    <div class="profit-sub">누적 수익률</div>
+                    <div class="profit-value positive" id="totalReturnBig">+0.00%</div>
+                    <div class="profit-amount" id="totalProfitAmount">+0원</div>
                 </div>
-            </h2>
-            <div id="initialCapitalInfo" style="color: #8892b0; font-size: 0.85em; margin-bottom: 10px;">초기 자본금: 1,000,000원</div>
-            <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
+                <div class="mini-chart-container">
+                    <canvas id="miniChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Recent Trades -->
-        <div class="section">
-            <h2>📋 최근 매매 내역</h2>
-            <div id="recentTrades" class="loading-container"><div class="spinner"></div><div>데이터 로딩 중...</div></div>
+        <!-- 3. Trade Summary -->
+        <div class="trade-summary">
+            <div class="summary-card">
+                <div class="label">현재 보유</div>
+                <div class="value" id="currentHoldings">0</div>
+                <div class="sub">종목</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">전일 매매</div>
+                <div class="value" id="yesterdayTrades">0</div>
+                <div class="sub" id="yesterdayResult">-</div>
+            </div>
+            <div class="summary-card highlight">
+                <div class="label">금일 매매</div>
+                <div class="value" id="todayTrades">0</div>
+                <div class="sub" id="todayResult">진행중</div>
+            </div>
         </div>
 
-        <!-- Daily Results -->
-        <div class="section">
-            <h2>📅 일별 결과</h2>
-            <div id="dailyResults" class="loading-container"><div class="spinner"></div><div>데이터 로딩 중...</div></div>
+        <!-- 4. Today's Stocks -->
+        <div class="today-stocks">
+            <div class="section-header">
+                <h2>🎯 금일 종목 상세</h2>
+                <span class="date" id="todayDate">-</span>
+            </div>
+            <div class="stock-cards" id="stockCards">
+                <div class="loading"><div class="spinner"></div>로딩 중...</div>
+            </div>
+        </div>
+
+        <!-- 5. Recent Trades (Collapsible) -->
+        <div class="collapsible" id="recentTradesSection">
+            <div class="collapsible-header" onclick="toggleCollapsible('recentTradesSection')">
+                <h2>📋 최근 거래 내역</h2>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="collapsible-inner">
+                    <div class="table-wrapper" id="recentTradesTable">
+                        <div class="loading"><div class="spinner"></div>로딩 중...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Statistics -->
+        <div class="statistics">
+            <h2>📈 전체 통계</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="value" id="statTotalDays">0</div>
+                    <div class="label">거래일</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="statTotalTrades">0</div>
+                    <div class="label">총 거래</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="statWinRate">0%</div>
+                    <div class="label">승률</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value positive" id="statAvgProfit">0%</div>
+                    <div class="label">평균 수익</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value negative" id="statAvgLoss">0%</div>
+                    <div class="label">평균 손실</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="statProfitFactor">0</div>
+                    <div class="label">손익비</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value negative" id="statMDD">0%</div>
+                    <div class="label">MDD</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="statConsecWins">0</div>
+                    <div class="label">최대연승</div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <footer>
+        📅 마지막 수정: 2026-04-04
+    </footer>
+
     <script>
-        let performanceChart = null;
-        let chartMode = 'percent'; // 'percent' or 'amount'
+        let miniChart = null;
         let cachedData = null;
-        const INITIAL_CAPITAL = 1000000; // 초기 자본금 100만원
-        const POSITION_SIZE = 200000; // 종목당 투자금액 20만원
+        const INITIAL_CAPITAL = 1000000;
+        const POSITION_SIZE = 200000;
 
         // 데이터 캐싱
         const dataCache = new Map();
-        const CACHE_DURATION = 60000; // 1분
+        const CACHE_DURATION = 60000;
 
-        // 캐싱된 fetch
         async function fetchWithCache(url) {
             const now = Date.now();
             const cached = dataCache.get(url);
-
             if (cached && (now - cached.timestamp < CACHE_DURATION)) {
-                console.log('Using cached data for:', url);
                 return cached.data;
             }
-
             try {
                 const response = await fetch(url);
                 if (response.ok) {
@@ -1017,705 +479,285 @@
             return null;
         }
 
-        // 억 단위 포맷
         function formatKoreanCurrency(amount) {
-            if (amount >= 100000000) {
-                return (amount / 100000000).toFixed(1) + '억';
-            } else if (amount >= 10000) {
-                return (amount / 10000).toFixed(0) + '만';
-            }
-            return amount.toLocaleString();
+            const abs = Math.abs(amount);
+            const sign = amount >= 0 ? '+' : '-';
+            if (abs >= 100000000) return sign + (abs / 100000000).toFixed(1) + '억';
+            if (abs >= 10000) return sign + (abs / 10000).toFixed(0) + '만';
+            return sign + abs.toLocaleString();
         }
 
-        // 에러 메시지 표시
-        function showError(container, message, retryCallback = null) {
-            const retryBtn = retryCallback
-                ? `<button class="retry-btn" onclick="${retryCallback}">다시 시도</button>`
-                : '';
-            container.innerHTML = `
-                <div class="status-message error">
-                    <div>${message}</div>
-                    ${retryBtn}
-                </div>
-            `;
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            if (dateStr.includes('-')) return dateStr;
+            return dateStr.slice(0, 4) + '-' + dateStr.slice(4, 6) + '-' + dateStr.slice(6, 8);
         }
 
-        // 오늘 날짜 설정 및 자동 새로고침
-        let autoRefreshInterval = null;
-        const AUTO_REFRESH_INTERVAL = 60000; // 1분
+        function toggleCollapsible(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
 
+        // 초기화
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('selectDate').value = today;
-            loadTodayData();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            loadAllData();
 
-            // 자동 새로고침 시작 (장중에만)
-            startAutoRefresh();
-        });
-
-        function startAutoRefresh() {
+            // 장중 자동 새로고침
             const now = new Date();
             const hour = now.getHours();
             const day = now.getDay();
-
-            // 평일 09:00~16:00에만 자동 새로고침
             if (day >= 1 && day <= 5 && hour >= 9 && hour < 16) {
-                autoRefreshInterval = setInterval(() => {
-                    console.log('자동 새로고침:', new Date().toLocaleTimeString());
-                    loadLiveStatus();
-                }, AUTO_REFRESH_INTERVAL);
-                console.log('자동 새로고침 활성화 (1분 간격)');
+                setInterval(loadAllData, 60000);
             }
+        });
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent =
+                now.toLocaleString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' });
         }
 
-        // 차트 모드 전환
-        function toggleChartMode(mode) {
-            chartMode = mode;
-            document.querySelectorAll('.chart-toggle-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent.trim() === (mode === 'percent' ? '%' : '금액'));
-            });
-            if (cachedData) {
-                displayPerformanceChart(cachedData);
-            }
-        }
-
-
-        // 오늘 데이터 로드
-        async function loadTodayData() {
+        async function loadAllData() {
             const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            document.getElementById('todayDate').textContent = formatDate(today);
 
-            // 병렬로 모든 데이터 로드
             await Promise.all([
-                loadUnifiedTableData(today),
-                loadPaperTradingData(),
-                loadLiveStatus(),
-                loadTodayTargets()
+                loadTodayStocks(today),
+                loadTradingData()
             ]);
         }
 
-        // 히스토리 조회
-        async function loadHistoryData() {
-            const dateInput = document.getElementById('selectDate').value;
-            if (!dateInput) {
-                alert('날짜를 선택해주세요');
-                return;
-            }
-            const dateStr = dateInput.replace(/-/g, '');
-
-            // 병렬로 모든 데이터 로드
-            await Promise.all([
-                loadUnifiedTableData(dateStr),
-                loadPaperTradingData(dateStr),
-                loadLiveStatus(dateStr)
-            ]);
-        }
-
-        // 통합 테이블 데이터 로드
-        async function loadUnifiedTableData(dateStr) {
-            const tbody = document.getElementById('unifiedTableBody');
-            const dateEl = document.getElementById('analysisDate');
-            tbody.innerHTML = '<tr><td colspan="7" class="loading-container"><div class="spinner"></div><div>종목 데이터 로딩 중...</div></td></tr>';
+        // 금일 종목 로드
+        async function loadTodayStocks(today) {
+            const container = document.getElementById('stockCards');
 
             try {
-                // 1. candidates 파일 시도
-                const data1 = await fetchWithCache(`data/paper_trading/candidates_${dateStr}.json?t=${Date.now()}`);
-                if (data1 && data1.candidates && data1.candidates.length > 0) {
-                    displayUnifiedTable(data1.candidates, dateStr);
-                    dateEl.textContent = `📅 ${formatDate(dateStr)} 선정 종목`;
+                // 상태 파일 우선
+                let data = await fetchWithCache(`data/paper_trading/status_${today}.json?t=${Date.now()}`);
+
+                if (data && data.stocks && data.stocks.length > 0) {
+                    displayTodayStocks(data.stocks, 'status');
+                    document.getElementById('currentHoldings').textContent = data.stocks.filter(s => s.status === 'waiting').length;
+                    document.getElementById('todayTrades').textContent = data.stocks.length;
                     return;
                 }
 
-                // 2. morning_candidates.json 폴백
-                const data2 = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
-                if (data2 && data2.candidates && data2.candidates.length > 0) {
-                    displayUnifiedTable(data2.candidates, data2.date || dateStr);
-                    dateEl.textContent = `📅 ${data2.date || formatDate(dateStr)} 선정 종목`;
+                // candidates 파일
+                data = await fetchWithCache(`data/paper_trading/candidates_${today}.json?t=${Date.now()}`);
+                if (!data || !data.candidates || data.candidates.length === 0) {
+                    data = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
+                }
+
+                if (data && data.candidates && data.candidates.length > 0) {
+                    displayTodayStocks(data.candidates, 'candidates');
+                    document.getElementById('currentHoldings').textContent = data.candidates.length;
+                    document.getElementById('todayTrades').textContent = data.candidates.length;
                     return;
                 }
 
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">해당 날짜의 종목 데이터가 없습니다</td></tr>';
-                dateEl.textContent = '';
+                container.innerHTML = '<div class="no-data">금일 선정된 종목이 없습니다</div>';
+                document.getElementById('currentHoldings').textContent = '0';
+                document.getElementById('todayTrades').textContent = '0';
+
             } catch (error) {
-                console.log('Unified table load error:', error);
-                showError(tbody.parentElement, '데이터 로드 중 오류가 발생했습니다', 'loadTodayData()');
+                console.log('Today stocks error:', error);
+                container.innerHTML = '<div class="no-data">데이터 로드 실패</div>';
             }
         }
 
-        // 통합 테이블 표시 (간소화 버전)
-        function displayUnifiedTable(candidates, dateStr) {
-            const tbody = document.getElementById('unifiedTableBody');
+        function displayTodayStocks(stocks, type) {
+            const container = document.getElementById('stockCards');
 
-            if (!candidates || candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">선정된 종목이 없습니다</td></tr>';
-                return;
-            }
+            container.innerHTML = stocks.map(s => {
+                const price = s.current_price || s.price || 0;
+                const entryPrice = s.entry_price || price;
+                const profitTarget = Math.round(entryPrice * 1.03);
+                const lossTarget = Math.round(entryPrice * 0.985);
 
-            tbody.innerHTML = candidates.map(c => {
-                const price = c.current_price || c.price || 0;
-                const changePct = c.price_change_percent || c.change_pct || 0;
-                const score = c.total_score || c.score || 0;
+                let status = 'waiting';
+                let statusLabel = '대기';
+                let pct = 0;
 
-                // 목표가 계산
-                const profitTarget = Math.round(price * 1.03);
-                const lossTarget = Math.round(price * 0.985);
+                if (type === 'status') {
+                    status = s.status === 'profit_hit' ? 'profit' : s.status === 'loss_hit' ? 'loss' : 'waiting';
+                    statusLabel = s.status === 'profit_hit' ? '익절' : s.status === 'loss_hit' ? '손절' : '대기';
+                    pct = s.current_pct || ((price - entryPrice) / entryPrice * 100);
+                } else {
+                    pct = s.price_change_percent || s.change_pct || 0;
+                }
 
-                // 선정사유 (간략화)
-                const reason = c.selection_reason || c.strategy_name || c.technical_summary || '-';
-                const shortReason = reason.length > 20 ? reason.slice(0, 20) + '...' : reason;
+                const reason = s.selection_reason || s.strategy_name || s.technical_summary || '-';
+                const shortReason = reason.length > 25 ? reason.slice(0, 25) + '...' : reason;
 
                 return `
-                    <tr>
-                        <td class="stock-name-cell"><strong>${c.name}</strong><br><span class="stock-code">${c.code}</span></td>
-                        <td>${price.toLocaleString()}</td>
-                        <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
-                        <td><strong>${score.toFixed(0)}</strong></td>
-                        <td class="positive">${profitTarget.toLocaleString()}</td>
-                        <td class="negative">${lossTarget.toLocaleString()}</td>
-                        <td style="font-size:0.85em;max-width:120px;white-space:normal;">${shortReason}</td>
-                    </tr>
+                    <div class="stock-card ${status}">
+                        <div class="stock-info">
+                            <div class="name">${s.name}</div>
+                            <div class="code">${s.code}</div>
+                            <div class="reason">${shortReason}</div>
+                        </div>
+                        <div class="stock-prices">
+                            <div class="current">${price.toLocaleString()}원</div>
+                            <div class="targets">
+                                <span class="profit-target">${profitTarget.toLocaleString()}</span> /
+                                <span class="loss-target">${lossTarget.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="stock-pnl">
+                            <div class="pct ${pct >= 0 ? 'positive' : 'negative'}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</div>
+                        </div>
+                        <div class="stock-status">
+                            <span class="badge ${status}">${statusLabel}</span>
+                        </div>
+                    </div>
                 `;
             }).join('');
         }
 
-
-
-
-
-
-        // 수동 체크 트리거
-        function triggerManualCheck() {
-            const confirmed = confirm('GitHub Actions에서 수동 체크를 실행할까요?\n(GitHub 로그인 필요)');
-            if (confirmed) {
-                window.open('https://github.com/sungmin2nn/new_pick/actions/workflows/paper-trading-check.yml', '_blank');
-            }
-        }
-
-        // 메인 데이터 로드
-        async function loadPaperTradingData(dateStr = null) {
+        // 트레이딩 데이터 로드
+        async function loadTradingData() {
             try {
-                // 1. 실제 페이퍼 트레이딩 결과 로드 시도
                 const results = await fetchWithCache('data/paper_trading/results.json?t=' + Date.now());
+
                 if (results && results.daily_results && results.daily_results.length > 0) {
-                    console.log('Paper trading results loaded:', results.daily_results.length, 'days');
-                    displayStats(results);
-                    displayRecentTrades(results, dateStr);
-                    displayDailyResults(results);
-                    displayPerformanceChart(results);
+                    cachedData = results;
+                    displayProfitStatus(results);
+                    displayTradesSummary(results);
+                    displayRecentTrades(results);
+                    displayStatistics(results);
+                    displayMiniChart(results);
                     return;
                 }
 
-                // 2. intraday 데이터 직접 로드
+                // intraday 폴백
                 const intradayData = await loadIntradayFiles();
                 if (intradayData && intradayData.daily_results.length > 0) {
-                    console.log('Intraday results loaded:', intradayData.daily_results.length, 'days');
-                    displayStats(intradayData);
-                    displayRecentTrades(intradayData, dateStr);
-                    displayDailyResults(intradayData);
-                    displayPerformanceChart(intradayData);
-                    return;
+                    cachedData = intradayData;
+                    displayProfitStatus(intradayData);
+                    displayTradesSummary(intradayData);
+                    displayRecentTrades(intradayData);
+                    displayStatistics(intradayData);
+                    displayMiniChart(intradayData);
                 }
-
-                displayNoData();
             } catch (error) {
-                console.log('Data load error:', error);
-                displayNoData();
+                console.log('Trading data error:', error);
             }
         }
 
-        // 백테스트 데이터를 페이퍼 트레이딩 형식으로 변환
-        function transformBacktestData(backtest) {
-            const strategies = backtest.strategies || {};
-            const dailyMap = {};
-
-            // 모든 전략의 일별 데이터를 합산
-            for (const [strategyId, strategy] of Object.entries(strategies)) {
-                const daily = strategy.daily || [];
-                daily.forEach(d => {
-                    if (!dailyMap[d.date]) {
-                        dailyMap[d.date] = {
-                            date: d.date,
-                            total_trades: 0,
-                            wins: 0,
-                            losses: 0,
-                            close_exits: 0,
-                            total_return: 0,
-                            profit_exits: 0,
-                            loss_exits: 0,
-                            results: []
-                        };
-                    }
-                    const day = dailyMap[d.date];
-                    day.total_trades += d.trades || 0;
-                    day.wins += d.wins || 0;
-                    day.losses += d.losses || 0;
-                    day.total_return += d.return || 0;
-                    day.profit_exits += d.wins || 0;
-                    day.loss_exits += d.losses || 0;
-
-                    // 종목별 결과 추가
-                    (d.stocks || []).forEach(s => {
-                        day.results.push({
-                            code: s.code,
-                            name: s.name,
-                            return_pct: s.return_pct,
-                            exit_type: s.exit_type,
-                            strategy: strategyId
-                        });
-                    });
-                });
-            }
-
-            // 날짜순 정렬 및 누적 수익률 계산
-            const dailyResults = Object.values(dailyMap).sort((a, b) => a.date.localeCompare(b.date));
-            let cumulative = 0;
-            dailyResults.forEach(d => {
-                d.win_rate = d.total_trades > 0 ? Math.round(d.wins / d.total_trades * 100) : 0;
-                cumulative += d.total_return;
-                d.cumulative_return = cumulative;
-            });
-
-            return {
-                daily_results: dailyResults,
-                source: 'backtest',
-                period: backtest.period
-            };
-        }
-
-        // intraday 파일들 직접 로드 (병렬)
         async function loadIntradayFiles() {
-            // 최근 30일 날짜 목록 생성 (주말 제외)
             const dates = [];
             const today = new Date();
             for (let i = 0; i < 45; i++) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
-                const dayOfWeek = d.getDay();
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                if (d.getDay() !== 0 && d.getDay() !== 6) {
                     dates.push(d.toISOString().split('T')[0].replace(/-/g, ''));
                 }
             }
 
-            // 병렬로 모든 파일 로드 (10배 이상 빠름)
-            const fetchPromises = dates.map(async dateStr => {
+            const results = await Promise.all(dates.map(async dateStr => {
                 try {
                     const data = await fetchWithCache(`data/intraday/intraday_${dateStr}.json?t=${Date.now()}`);
-                    if (data) {
-                        return transformIntradayData(data, dateStr);
-                    }
-                } catch (e) {
-                    // 파일 없으면 null
-                }
+                    if (data) return transformIntradayData(data, dateStr);
+                } catch (e) {}
                 return null;
-            });
+            }));
 
-            const results = await Promise.all(fetchPromises);
-            const dailyResults = results.filter(r => r !== null);
-
-            // 날짜순 정렬 및 누적 수익률 계산
-            dailyResults.sort((a, b) => a.date.localeCompare(b.date));
+            const dailyResults = results.filter(r => r !== null).sort((a, b) => a.date.localeCompare(b.date));
             let cumulative = 0;
             dailyResults.forEach(d => {
                 cumulative += d.total_return;
                 d.cumulative_return = cumulative;
             });
 
-            return { daily_results: dailyResults, source: 'intraday' };
+            return { daily_results: dailyResults };
         }
 
-        // intraday 데이터 변환
         function transformIntradayData(data, dateStr) {
-            const stocks = data.stocks || {};
-            const stockList = Object.values(stocks);
-
+            const stockList = Object.values(data.stocks || {});
             if (stockList.length === 0) return null;
 
-            let wins = 0, losses = 0, closes = 0;
-            let totalReturn = 0;
+            let wins = 0, losses = 0, closes = 0, totalReturn = 0;
             const results = [];
 
             stockList.forEach(s => {
                 const pl = s.profit_loss_analysis || {};
-                const firstHit = pl.first_hit;
-                let exitType = 'close';
-                let returnPct = pl.closing_percent || 0;
+                let exitType = 'close', returnPct = pl.closing_percent || 0;
 
-                if (firstHit === 'profit') {
-                    exitType = 'profit';
-                    returnPct = pl.profit_target_percent || 3;
-                    wins++;
-                } else if (firstHit === 'loss') {
-                    exitType = 'loss';
-                    returnPct = pl.loss_target_percent || -1.5;
-                    losses++;
-                } else {
-                    closes++;
-                }
+                if (pl.first_hit === 'profit') { exitType = 'profit'; returnPct = 3; wins++; }
+                else if (pl.first_hit === 'loss') { exitType = 'loss'; returnPct = -1.5; losses++; }
+                else { closes++; }
 
                 totalReturn += returnPct;
                 results.push({
-                    code: s.code,
-                    name: s.name,
+                    code: s.code, name: s.name,
                     return_pct: parseFloat(returnPct.toFixed(2)),
                     exit_type: exitType,
                     entry_price: pl.actual_result?.entry_price,
-                    exit_price: pl.actual_result?.closing_price,
-                    entry_time: pl.actual_result?.entry_time,
-                    exit_time: pl.first_hit_time || '15:30:00'
+                    exit_price: pl.actual_result?.closing_price
                 });
             });
 
-            const totalTrades = stockList.length;
             return {
                 date: dateStr,
-                total_trades: totalTrades,
-                wins: wins,
-                losses: losses,
-                close_exits: closes,
-                total_return: parseFloat((totalReturn / totalTrades).toFixed(2)),
-                profit_exits: wins,
-                loss_exits: losses,
-                win_rate: totalTrades > 0 ? Math.round(wins / totalTrades * 100) : 0,
-                results: results
+                total_trades: stockList.length,
+                wins, losses, close_exits: closes,
+                total_return: parseFloat((totalReturn / stockList.length).toFixed(2)),
+                win_rate: stockList.length > 0 ? Math.round(wins / stockList.length * 100) : 0,
+                results
             };
         }
 
-        // 실시간 상태 로드
-        async function loadLiveStatus(dateStr = null) {
-            const tbody = document.getElementById('liveStatusBody');
-            const updateTime = document.getElementById('statusUpdateTime');
-            const targetDateEl = document.getElementById('targetDate');
-
-            tbody.innerHTML = '<tr><td colspan="6" class="loading-container"><div class="spinner"></div><div>실시간 상태 확인 중...</div></td></tr>';
-
-            try {
-                const today = dateStr || new Date().toISOString().split('T')[0].replace(/-/g, '');
-                const formattedDate = formatDate(today);
-                targetDateEl.textContent = `📅 대상 날짜: ${formattedDate}`;
-
-                // 현재 시간 체크
-                const now = new Date();
-                const hour = now.getHours();
-                const isWeekend = now.getDay() === 0 || now.getDay() === 6;
-                const isMarketOpen = hour >= 9 && hour < 16;
-
-                // 상태 파일 로드 시도
-                const status = await fetchWithCache(`data/paper_trading/status_${today}.json?t=${Date.now()}`);
-
-                if (status) {
-                    displayLiveStatus(status);
-                    updateTime.textContent = `최근 업데이트: ${status.checked_at || '-'}`;
-                    return;
-                }
-
-                // 상태 파일 없으면 candidates 파일 로드
-                const candidates = await fetchWithCache(`data/paper_trading/candidates_${today}.json?t=${Date.now()}`);
-
-                if (candidates) {
-                    displayCandidatesAsStatus(candidates);
-                    updateTime.textContent = `선정 시간: ${candidates.selected_at || '-'}`;
-                    return;
-                }
-
-                // morning_candidates.json 로드 시도
-                const morningData = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
-                if (morningData) {
-                    // 오늘 날짜와 일치하는지 확인
-                    const morningDate = (morningData.date || '').replace(/-/g, '');
-                    if (morningDate === today || morningDate === today.slice(0,4) + '-' + today.slice(4,6) + '-' + today.slice(6,8)) {
-                        displayMorningCandidates(morningData);
-                        updateTime.textContent = `선정 시간: ${morningData.generated_at || '-'}`;
-                        return;
-                    }
-                }
-
-                // 상태 메시지 표시
-                let statusMsg = '';
-                if (isWeekend) {
-                    statusMsg = '📅 주말 - 장 휴무';
-                } else if (hour < 8) {
-                    statusMsg = '⏳ 장 시작 전 - 08:10 종목 선정 예정';
-                } else if (hour < 9) {
-                    statusMsg = '⏳ 대기 중 - 09:00 장 시작 예정';
-                } else if (isMarketOpen) {
-                    statusMsg = '📊 장중 - 충족 종목 없음';
-                } else {
-                    statusMsg = '📋 장 마감 - 오늘 충족 종목 없음';
-                }
-                tbody.innerHTML = `<tr><td colspan="6" class="no-data">${statusMsg}</td></tr>`;
-                updateTime.textContent = '-';
-
-            } catch (error) {
-                console.log('Live status load error:', error);
-                showError(tbody.parentElement, '상태 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.', 'loadLiveStatus()');
-            }
-        }
-
-        // 실시간 상태 표시
-        function displayLiveStatus(status) {
-            const thead = document.getElementById('liveStatusHead');
-            const tbody = document.getElementById('liveStatusBody');
-            const stocks = status.stocks || [];
-
-            // 헤더 설정
-            thead.innerHTML = `
-                <tr>
-                    <th>종목</th>
-                    <th>상태</th>
-                    <th>진입가</th>
-                    <th>현재가</th>
-                    <th>수익률</th>
-                    <th>비고</th>
-                </tr>
-            `;
-
-            if (stocks.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="no-data">선정된 종목이 없습니다.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = stocks.map(s => {
-                const statusClass = s.status === 'profit_hit' ? 'positive' :
-                                  s.status === 'loss_hit' ? 'negative' : '';
-                const statusLabel = s.status === 'profit_hit' ? '익절' :
-                                  s.status === 'loss_hit' ? '손절' : '대기';
-                const currentPct = s.current_pct || 0;
-                const note = s.hit_time || (s.max_profit_pct ? `최대 +${s.max_profit_pct}%` : '-');
-
-                return `
-                    <tr>
-                        <td><strong>${s.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${s.code}</span></td>
-                        <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
-                        <td>${(s.entry_price || 0).toLocaleString()}원</td>
-                        <td>${(s.current_price || 0).toLocaleString()}원</td>
-                        <td class="${currentPct >= 0 ? 'positive' : 'negative'}">${currentPct >= 0 ? '+' : ''}${currentPct.toFixed(2)}%</td>
-                        <td>${note}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // candidates를 상태로 표시
-        function displayCandidatesAsStatus(data) {
-            const thead = document.getElementById('liveStatusHead');
-            const tbody = document.getElementById('liveStatusBody');
-            const candidates = data.candidates || [];
-
-            // 헤더 설정 (장 시작 전 - 후보 종목)
-            thead.innerHTML = `
-                <tr>
-                    <th>종목</th>
-                    <th>상태</th>
-                    <th>전일종가</th>
-                    <th>전일등락</th>
-                    <th>점수</th>
-                    <th>거래대금</th>
-                </tr>
-            `;
-
-            if (candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="no-data">선정된 종목이 없습니다.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = candidates.map(c => {
-                const price = c.current_price || c.price || 0;
-                const score = c.total_score || c.score || 0;
-                const tradingValue = c.trading_value ? formatKoreanCurrency(c.trading_value) : '-';
-
-                return `
-                    <tr>
-                        <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
-                        <td><span class="status-badge">대기</span></td>
-                        <td>${price.toLocaleString()}원</td>
-                        <td class="${(c.change_pct || 0) >= 0 ? 'positive' : 'negative'}">${(c.change_pct || 0) >= 0 ? '+' : ''}${(c.change_pct || 0).toFixed(2)}%</td>
-                        <td>${score.toFixed(1)}</td>
-                        <td>${tradingValue}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // morning_candidates.json 표시
-        function displayMorningCandidates(data) {
-            const thead = document.getElementById('liveStatusHead');
-            const tbody = document.getElementById('liveStatusBody');
-            const candidates = data.candidates || [];
-            const sentiment = data.market_sentiment || {};
-
-            // 헤더 설정
-            thead.innerHTML = `
-                <tr>
-                    <th>종목</th>
-                    <th>분류</th>
-                    <th>현재가</th>
-                    <th>등락률</th>
-                    <th>점수</th>
-                    <th>선정사유</th>
-                </tr>
-            `;
-
-            if (candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="no-data">선정된 종목이 없습니다.</td></tr>';
-                return;
-            }
-
-            // 날짜/시장 정보 표시
-            const targetDateEl = document.getElementById('targetDate');
-            targetDateEl.innerHTML = `📊 ${data.date} (${data.weekday_short}) 선정 종목 <span style="margin-left:10px;">시장: ${sentiment.mode || '-'}</span>`;
-
-            tbody.innerHTML = candidates.map(c => {
-                const price = c.current_price || c.price || 0;
-                const score = c.total_score || c.score || 0;
-                const changePct = c.price_change_percent || 0;
-                const capLabel = c.cap_tier === 'large' ? '대형' : c.cap_tier === 'mid' ? '중형' : '소형';
-
-                return `
-                    <tr>
-                        <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
-                        <td><span class="status-badge" style="background:${c.is_leading ? '#00ff88' : '#ffaa00'};color:#1a1a2e;">${capLabel}</span></td>
-                        <td>${price.toLocaleString()}원</td>
-                        <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
-                        <td>${score.toFixed(0)}</td>
-                        <td style="font-size:0.8em;max-width:150px;white-space:normal;">${c.selection_reason || c.technical_summary || '-'}</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // 통계 표시
-        function displayStats(data) {
+        function displayProfitStatus(data) {
             const days = data.daily_results || [];
-            const totalTrades = days.reduce((sum, d) => sum + (d.total_trades || 0), 0);
-            const totalWins = days.reduce((sum, d) => sum + (d.wins || 0), 0);
             const totalReturn = days.reduce((sum, d) => sum + (d.total_return || 0), 0);
+            const totalPnL = days.reduce((sum, d) => {
+                return sum + ((d.total_trades || 0) * POSITION_SIZE * (d.total_return || 0) / 100);
+            }, 0);
 
-            document.getElementById('tradingDays').textContent = days.length + '일';
-            document.getElementById('totalTrades').textContent = totalTrades + '건';
-
-            const winRate = totalTrades > 0 ? (totalWins / totalTrades * 100).toFixed(1) : 0;
-            document.getElementById('winRate').textContent = winRate + '%';
-
-            const returnEl = document.getElementById('totalReturn');
+            const returnEl = document.getElementById('totalReturnBig');
             returnEl.textContent = (totalReturn >= 0 ? '+' : '') + totalReturn.toFixed(2) + '%';
-            returnEl.className = 'stat-value ' + (totalReturn >= 0 ? 'positive' : 'negative');
+            returnEl.className = 'profit-value ' + (totalReturn >= 0 ? 'positive' : 'negative');
+
+            document.getElementById('totalProfitAmount').textContent = formatKoreanCurrency(Math.round(totalPnL)) + '원';
         }
 
-        // 성과 차트
-        function displayPerformanceChart(data) {
-            cachedData = data; // 캐시 저장
+        function displayTradesSummary(data) {
             const days = data.daily_results || [];
-
             if (days.length === 0) return;
 
-            const labels = days.map(d => formatDate(d.date));
-            let cumulative = 0;
-            const cumulativeReturns = days.map(d => {
-                cumulative += d.total_return || 0;
-                return cumulative;
-            });
-            const dailyReturns = days.map(d => d.total_return || 0);
-
-            // 금액 모드용 데이터
-            let balance = INITIAL_CAPITAL;
-            const cumulativeAmounts = days.map(d => {
-                const dailyPnL = (d.total_trades || 0) * POSITION_SIZE * (d.total_return || 0) / 100;
-                balance += dailyPnL;
-                return balance;
-            });
-            const dailyAmounts = days.map(d => {
-                return (d.total_trades || 0) * POSITION_SIZE * (d.total_return || 0) / 100;
-            });
-
-            const isPercent = chartMode === 'percent';
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-
-            if (performanceChart) {
-                performanceChart.destroy();
+            const yesterday = days[days.length - 1];
+            if (yesterday) {
+                document.getElementById('yesterdayTrades').textContent = yesterday.total_trades || 0;
+                const yReturn = yesterday.total_return || 0;
+                document.getElementById('yesterdayResult').textContent =
+                    (yReturn >= 0 ? '+' : '') + yReturn.toFixed(1) + '%';
+                document.getElementById('yesterdayResult').className =
+                    'sub ' + (yReturn >= 0 ? 'positive' : 'negative');
             }
-
-            performanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: isPercent ? '누적 수익률 (%)' : '총 자산 (원)',
-                            data: isPercent ? cumulativeReturns : cumulativeAmounts,
-                            borderColor: '#00d9ff',
-                            backgroundColor: 'rgba(0, 217, 255, 0.1)',
-                            fill: true,
-                            tension: 0.3,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: isPercent ? '일일 수익률 (%)' : '일일 손익 (원)',
-                            data: isPercent ? dailyReturns : dailyAmounts,
-                            borderColor: '#00ff88',
-                            backgroundColor: 'rgba(0, 255, 136, 0.5)',
-                            type: 'bar',
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            position: 'left',
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#8892b0' }
-                        },
-                        y1: {
-                            type: 'linear',
-                            position: 'right',
-                            grid: { display: false },
-                            ticks: { color: '#8892b0' }
-                        },
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#8892b0', maxRotation: 45 }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: { color: '#e4e4e4' }
-                        }
-                    }
-                }
-            });
         }
 
-        // 최근 매매 내역
-        function displayRecentTrades(data, filterDate = null) {
-            const container = document.getElementById('recentTrades');
-            container.classList.remove('loading-container'); // 로딩 클래스 제거
+        function displayRecentTrades(data) {
+            const container = document.getElementById('recentTradesTable');
             const days = data.daily_results || [];
 
             let allTrades = [];
-            const targetDays = filterDate
-                ? days.filter(d => d.date === filterDate)
-                : days.slice(-5);
-
-            targetDays.forEach(day => {
+            days.slice(-7).forEach(day => {
                 (day.results || []).forEach(trade => {
                     allTrades.push({ ...trade, date: day.date });
                 });
             });
 
             if (allTrades.length === 0) {
-                container.innerHTML = '<div class="no-data">해당 기간에 거래 내역이 없습니다.</div>';
+                container.innerHTML = '<div class="no-data">거래 내역이 없습니다</div>';
                 return;
             }
 
-            const html = `
-                <div class="table-wrapper">
-                <table class="unified-table">
+            const exitLabels = { profit: '익절', loss: '손절', close: '종가' };
+
+            container.innerHTML = `
+                <table>
                     <thead>
                         <tr>
                             <th>날짜</th>
@@ -1723,180 +765,112 @@
                             <th>진입</th>
                             <th>청산</th>
                             <th>수익률</th>
-                            <th>손익</th>
                             <th>결과</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${allTrades.slice(-15).reverse().map(t => {
-                            const shares = t.entry_price ? Math.floor(POSITION_SIZE / t.entry_price) : 0;
-                            const pnlAmount = shares * (t.exit_price || t.entry_price) * (t.return_pct || 0) / 100;
-                            return `
+                        ${allTrades.slice(-15).reverse().map(t => `
                             <tr>
                                 <td>${formatDate(t.date).slice(5)}</td>
-                                <td class="stock-name-cell"><strong>${t.name}</strong><br><span class="stock-code">${t.code || ''}</span></td>
+                                <td>${t.name}</td>
                                 <td>${t.entry_price?.toLocaleString() || '-'}</td>
                                 <td>${t.exit_price?.toLocaleString() || '-'}</td>
                                 <td class="${t.return_pct >= 0 ? 'positive' : 'negative'}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct}%</td>
-                                <td class="${pnlAmount >= 0 ? 'positive' : 'negative'}">${pnlAmount >= 0 ? '+' : ''}${Math.round(pnlAmount).toLocaleString()}</td>
-                                <td><span class="badge badge-${t.exit_type}">${getExitTypeLabel(t.exit_type)}</span></td>
-                            </tr>
-                        `}).join('')}
-                    </tbody>
-                </table>
-                </div>
-            `;
-            container.innerHTML = html;
-        }
-
-        // 일별 결과
-        function displayDailyResults(data) {
-            const container = document.getElementById('dailyResults');
-            container.classList.remove('loading-container'); // 로딩 클래스 제거
-            const days = data.daily_results || [];
-
-            if (days.length === 0) {
-                container.innerHTML = '<div class="no-data">아직 일별 결과가 없습니다.</div>';
-                return;
-            }
-
-            // 누적 손익 계산
-            let cumulativePnL = 0;
-            const daysWithPnL = days.map(d => {
-                const dailyPnL = (d.total_trades || 0) * POSITION_SIZE * (d.total_return || 0) / 100;
-                cumulativePnL += dailyPnL;
-                return { ...d, dailyPnL, cumulativePnL };
-            });
-
-            const html = `
-                <div class="table-wrapper">
-                <table class="unified-table">
-                    <thead>
-                        <tr>
-                            <th>날짜</th>
-                            <th>거래</th>
-                            <th>승률</th>
-                            <th>수익률</th>
-                            <th>일손익</th>
-                            <th>누적</th>
-                            <th>익/손/종</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${daysWithPnL.slice(-20).reverse().map(d => `
-                            <tr>
-                                <td>${formatDate(d.date).slice(5)}</td>
-                                <td>${d.total_trades}건</td>
-                                <td>${d.win_rate}%</td>
-                                <td class="${d.total_return >= 0 ? 'positive' : 'negative'}">${d.total_return >= 0 ? '+' : ''}${d.total_return?.toFixed(1)}%</td>
-                                <td class="${d.dailyPnL >= 0 ? 'positive' : 'negative'}">${d.dailyPnL >= 0 ? '+' : ''}${formatKoreanCurrency(Math.round(d.dailyPnL))}</td>
-                                <td class="${d.cumulativePnL >= 0 ? 'positive' : 'negative'}">${d.cumulativePnL >= 0 ? '+' : ''}${formatKoreanCurrency(Math.round(d.cumulativePnL))}</td>
-                                <td>${d.profit_exits || 0}/${d.loss_exits || 0}/${d.close_exits || 0}</td>
+                                <td><span class="badge ${t.exit_type}">${exitLabels[t.exit_type] || t.exit_type}</span></td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
-                </div>
             `;
-            container.innerHTML = html;
         }
 
-        // No Data 표시
-        function displayNoData() {
-            document.getElementById('tradingDays').textContent = '0일';
-            document.getElementById('totalTrades').textContent = '0건';
-            document.getElementById('winRate').textContent = '0%';
-            document.getElementById('totalReturn').textContent = '+0.00%';
-            document.getElementById('recentTrades').innerHTML = '<div class="no-data">아직 거래 내역이 없습니다.</div>';
-            document.getElementById('dailyResults').innerHTML = '<div class="no-data">아직 일별 결과가 없습니다.</div>';
+        function displayStatistics(data) {
+            const days = data.daily_results || [];
+            if (days.length === 0) return;
+
+            const totalTrades = days.reduce((sum, d) => sum + (d.total_trades || 0), 0);
+            const totalWins = days.reduce((sum, d) => sum + (d.wins || 0), 0);
+            const totalLosses = days.reduce((sum, d) => sum + (d.losses || 0), 0);
+
+            // 평균 수익/손실 계산
+            let profitSum = 0, profitCount = 0, lossSum = 0, lossCount = 0;
+            days.forEach(d => {
+                (d.results || []).forEach(r => {
+                    if (r.return_pct > 0) { profitSum += r.return_pct; profitCount++; }
+                    else if (r.return_pct < 0) { lossSum += Math.abs(r.return_pct); lossCount++; }
+                });
+            });
+
+            const avgProfit = profitCount > 0 ? (profitSum / profitCount).toFixed(2) : 0;
+            const avgLoss = lossCount > 0 ? (lossSum / lossCount).toFixed(2) : 0;
+            const profitFactor = lossSum > 0 ? (profitSum / lossSum).toFixed(2) : '-';
+
+            // MDD 계산
+            let peak = 0, mdd = 0, cumulative = 0;
+            days.forEach(d => {
+                cumulative += d.total_return || 0;
+                if (cumulative > peak) peak = cumulative;
+                const drawdown = peak - cumulative;
+                if (drawdown > mdd) mdd = drawdown;
+            });
+
+            // 최대 연승
+            let maxConsecWins = 0, currentStreak = 0;
+            days.forEach(d => {
+                (d.results || []).forEach(r => {
+                    if (r.return_pct > 0) { currentStreak++; maxConsecWins = Math.max(maxConsecWins, currentStreak); }
+                    else { currentStreak = 0; }
+                });
+            });
+
+            document.getElementById('statTotalDays').textContent = days.length + '일';
+            document.getElementById('statTotalTrades').textContent = totalTrades + '건';
+            document.getElementById('statWinRate').textContent = totalTrades > 0 ? (totalWins / totalTrades * 100).toFixed(1) + '%' : '0%';
+            document.getElementById('statAvgProfit').textContent = '+' + avgProfit + '%';
+            document.getElementById('statAvgLoss').textContent = '-' + avgLoss + '%';
+            document.getElementById('statProfitFactor').textContent = profitFactor;
+            document.getElementById('statMDD').textContent = '-' + mdd.toFixed(2) + '%';
+            document.getElementById('statConsecWins').textContent = maxConsecWins + '연승';
         }
 
-        // 날짜 포맷
-        function formatDate(dateStr) {
-            if (!dateStr) return '-';
-            if (dateStr.includes('-')) return dateStr;
-            return dateStr.slice(0, 4) + '-' + dateStr.slice(4, 6) + '-' + dateStr.slice(6, 8);
-        }
+        function displayMiniChart(data) {
+            const days = data.daily_results || [];
+            if (days.length === 0) return;
 
-        // 청산 유형 라벨
-        function getExitTypeLabel(type) {
-            const labels = { 'profit': '익절', 'loss': '손절', 'close': '종가' };
-            return labels[type] || type;
-        }
+            const recent = days.slice(-7);
+            let cumulative = 0;
+            const returns = recent.map(d => {
+                cumulative += d.total_return || 0;
+                return cumulative;
+            });
 
-        // 오늘의 매매 대상 표시
-        async function loadTodayTargets() {
-            const container = document.getElementById('targetCards');
-            const dateEl = document.getElementById('todayTargetDate');
-            const todayTarget = document.getElementById('todayTarget');
+            const ctx = document.getElementById('miniChart').getContext('2d');
+            if (miniChart) miniChart.destroy();
 
-            try {
-                const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
-
-                // 1. candidates 파일 시도
-                let data = await fetchWithCache(`data/paper_trading/candidates_${today}.json?t=${Date.now()}`);
-
-                // 2. morning_candidates 폴백
-                if (!data || !data.candidates || data.candidates.length === 0) {
-                    data = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
+            miniChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: recent.map(d => formatDate(d.date).slice(5)),
+                    datasets: [{
+                        data: returns,
+                        borderColor: '#00d9ff',
+                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
                 }
-
-                if (!data || !data.candidates || data.candidates.length === 0) {
-                    todayTarget.style.display = 'none';
-                    return;
-                }
-
-                todayTarget.style.display = 'block';
-                dateEl.textContent = `(${data.date || formatDate(today)})`;
-
-                // 상위 5개만 표시
-                const targets = data.candidates.slice(0, 5);
-
-                container.innerHTML = targets.map(c => {
-                    const price = c.current_price || c.price || 0;
-                    const score = c.total_score || c.score || 0;
-                    const profitTarget = Math.round(price * 1.03);
-                    const lossTarget = Math.round(price * 0.985);
-                    const strategy = c.strategy_name || c.selection_reason || '복합전략';
-
-                    return `
-                        <div class="target-card">
-                            <div class="stock-header">
-                                <div>
-                                    <div class="stock-name">${c.name}</div>
-                                    <div class="stock-code">${c.code}</div>
-                                </div>
-                                <div class="stock-score">${score.toFixed(0)}점</div>
-                            </div>
-                            <div class="stock-strategy">${strategy}</div>
-                            <div class="price-targets">
-                                <div class="price-target profit">
-                                    <div class="label">익절(+3%)</div>
-                                    <div class="value">${profitTarget.toLocaleString()}</div>
-                                </div>
-                                <div class="price-target current">
-                                    <div class="label">진입가</div>
-                                    <div class="value">${price.toLocaleString()}</div>
-                                </div>
-                                <div class="price-target loss">
-                                    <div class="label">손절(-1.5%)</div>
-                                    <div class="value">${lossTarget.toLocaleString()}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-            } catch (error) {
-                console.log('Today targets load error:', error);
-                todayTarget.style.display = 'none';
-            }
+            });
         }
     </script>
-
-    <!-- Footer with Last Modified Date -->
-    <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-04-03
-    </footer>
 </body>
 </html>
