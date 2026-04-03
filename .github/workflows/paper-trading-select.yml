@@ -43,12 +43,16 @@ jobs:
     - name: Run multi-strategy selection
       id: select
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      env:
+        TZ: Asia/Seoul
       run: |
         python -c "
         from paper_trading.multi_strategy_runner import run_all_strategies
-        from datetime import datetime
+        from datetime import datetime, timezone, timedelta
 
-        today = datetime.now().strftime('%Y%m%d')
+        # KST 시간대 사용
+        kst = timezone(timedelta(hours=9))
+        today = datetime.now(kst).strftime('%Y%m%d')
         print(f'=== 다중 전략 종목 선정 ({today}) ===')
 
         # 모든 전략 실행 (전략당 5개 종목)
@@ -70,6 +74,8 @@ jobs:
 
     - name: Summary
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      env:
+        TZ: Asia/Seoul
       run: |
         echo "## 🎯 다중 전략 종목 선정 완료" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
@@ -77,9 +83,11 @@ jobs:
         python -c "
         import json
         import glob
-        from datetime import datetime
+        from datetime import datetime, timezone, timedelta
 
-        today = datetime.now().strftime('%Y%m%d')
+        # KST 시간대 사용
+        kst = timezone(timedelta(hours=9))
+        today = datetime.now(kst).strftime('%Y%m%d')
 
         # 통합 파일 로드
         try:
