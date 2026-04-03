@@ -177,26 +177,4 @@ jobs:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TZ: Asia/Seoul
-      run: |
-        python -c "
-        import json
-        from datetime import datetime
-        import pytz
-        from telegram_notifier import TelegramNotifier
-        kst = pytz.timezone('Asia/Seoul')
-        today = datetime.now(kst).strftime('%Y%m%d')
-        notifier = TelegramNotifier()
-        if not notifier.is_configured():
-            print('Telegram 미설정'); exit(0)
-        try:
-            with open(f'data/bnf/candidates_{today}.json') as f: data = json.load(f)
-            candidates = data.get('candidates', [])
-            if candidates:
-                lines = [f\"{c['rank']}. {c['name']} -{c['max_drop']:.1f}%\" for c in candidates[:5]]
-                notifier.send_custom('BNF 낙폭과대', f'선정: {len(candidates)}개\\n' + '\\n'.join(lines), '🔥')
-            else:
-                notifier.send_custom('BNF 낙폭과대', '조건 충족 종목 없음', '📭')
-            print('BNF 알림 완료')
-        except Exception as e:
-            print(f'오류: {e}')
-        "
+      run: python scripts/send_bnf_telegram.py selection || echo "Telegram alert skipped"
