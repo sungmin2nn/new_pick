@@ -178,39 +178,25 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TZ: Asia/Seoul
       run: |
-        python << 'PYEOF'
-import json
-from datetime import datetime
-import pytz
-from telegram_notifier import TelegramNotifier
-
-kst = pytz.timezone('Asia/Seoul')
-today = datetime.now(kst).strftime('%Y%m%d')
-
-notifier = TelegramNotifier()
-
-if not notifier.is_configured():
-    print('Telegram 미설정 - 알림 생략')
-    exit(0)
-
-try:
-    with open(f'data/bnf/candidates_{today}.json') as f:
-        data = json.load(f)
-
-    candidates = data.get('candidates', [])
-
-    if candidates:
-        stock_lines = []
-        for c in candidates[:10]:
-            stock_lines.append(f"{c['rank']}. {c['name']} - 낙폭 {c['max_drop']:.1f}%")
-
-        content = f"<b>선정 종목:</b> {len(candidates)}개\n\n" + "\n".join(stock_lines) + "\n\n<b>기준:</b> 5일 -15% | 10일 -20% | 고점 -25%"
-        notifier.send_custom('BNF 낙폭과대 종목', content, '🔥')
-        print(f'BNF 알림 전송: {len(candidates)}개 종목')
-    else:
-        notifier.send_custom('BNF 낙폭과대 종목', '오늘 조건에 맞는 종목 없음', '📭')
-        print('선정 종목 없음')
-
-except Exception as e:
-    print(f'알림 오류: {e}')
-PYEOF
+        python -c "
+        import json
+        from datetime import datetime
+        import pytz
+        from telegram_notifier import TelegramNotifier
+        kst = pytz.timezone('Asia/Seoul')
+        today = datetime.now(kst).strftime('%Y%m%d')
+        notifier = TelegramNotifier()
+        if not notifier.is_configured():
+            print('Telegram 미설정'); exit(0)
+        try:
+            with open(f'data/bnf/candidates_{today}.json') as f: data = json.load(f)
+            candidates = data.get('candidates', [])
+            if candidates:
+                lines = [f\"{c['rank']}. {c['name']} -{c['max_drop']:.1f}%\" for c in candidates[:5]]
+                notifier.send_custom('BNF 낙폭과대', f'선정: {len(candidates)}개\\n' + '\\n'.join(lines), '🔥')
+            else:
+                notifier.send_custom('BNF 낙폭과대', '조건 충족 종목 없음', '📭')
+            print('BNF 알림 완료')
+        except Exception as e:
+            print(f'오류: {e}')
+        "
