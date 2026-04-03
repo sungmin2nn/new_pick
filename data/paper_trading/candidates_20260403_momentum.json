@@ -1,7 +1,107 @@
 {
+  "strategy_id": "momentum",
+  "strategy_name": "모멘텀 추세",
   "date": "20260403",
-  "strategy": "momentum",
-  "strategy_name": "모멘텀",
-  "candidates": [],
-  "count": 0
+  "selected_at": "2026-04-03 18:39:42",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "065660",
+      "name": "안트로젠",
+      "price": 47050,
+      "change_pct": 14.48,
+      "score": 68.8,
+      "score_detail": {
+        "change_pct": 35.0,
+        "trading_value": 0.012813945753570513,
+        "volume_surge": 18.832,
+        "price_level": 15
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 500,
+      "trading_value": 4708000000
+    },
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "price": 186200,
+      "change_pct": 4.37,
+      "score": 68.1,
+      "score_detail": {
+        "change_pct": 10.562845303867404,
+        "trading_value": 30.0,
+        "volume_surge": 20,
+        "price_level": 7.5
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 100,
+      "trading_value": 11022366000000
+    },
+    {
+      "code": "077970",
+      "name": "STX엔진",
+      "price": 36200,
+      "change_pct": 13.66,
+      "score": 68.1,
+      "score_detail": {
+        "change_pct": 33.01795580110497,
+        "trading_value": 0.03955775012370302,
+        "volume_surge": 20,
+        "price_level": 15
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 2500,
+      "trading_value": 14534000000
+    },
+    {
+      "code": "017960",
+      "name": "한국카본",
+      "price": 45000,
+      "change_pct": 13.64,
+      "score": 68.0,
+      "score_detail": {
+        "change_pct": 32.969613259668506,
+        "trading_value": 0.06357709406492218,
+        "volume_surge": 20,
+        "price_level": 15
+      },
+      "rank": 4,
+      "market_cap": 0,
+      "volume": 500,
+      "trading_value": 23359000000
+    },
+    {
+      "code": "044490",
+      "name": "태웅",
+      "price": 50700,
+      "change_pct": 14.32,
+      "score": 62.1,
+      "score_detail": {
+        "change_pct": 34.61325966850829,
+        "trading_value": 0.027609317273623465,
+        "volume_surge": 20,
+        "price_level": 7.5
+      },
+      "rank": 5,
+      "market_cap": 0,
+      "volume": 500,
+      "trading_value": 10144000000
+    }
+  ],
+  "params": {
+    "min_price": 3000,
+    "min_change": 3.0,
+    "max_change": 15.0,
+    "min_trading_value": 30,
+    "weights": {
+      "change_pct": 35,
+      "trading_value": 30,
+      "volume_surge": 20,
+      "price_level": 15
+    }
+  },
+  "simulation": null
 }
