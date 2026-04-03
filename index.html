@@ -100,6 +100,128 @@
         }
         .nav-icon { font-size: 1.2em; }
 
+        /* Trading Rules Banner */
+        .trading-rules {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 255, 136, 0.1));
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 10px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .trading-rules .rule-title {
+            color: #00d9ff;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .trading-rules .rules-list {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .trading-rules .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85em;
+        }
+        .trading-rules .rule-label {
+            color: #8892b0;
+        }
+        .trading-rules .rule-value {
+            font-weight: 600;
+        }
+        .trading-rules .rule-value.profit { color: #00ff88; }
+        .trading-rules .rule-value.loss { color: #ff6b6b; }
+        .trading-rules .rule-value.time { color: #ffaa00; }
+
+        /* Today's Target Section */
+        .today-target {
+            background: rgba(22, 33, 62, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #00d9ff;
+        }
+        .today-target h2 {
+            color: #00d9ff;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .today-target .target-date {
+            font-size: 0.7em;
+            color: #8892b0;
+            font-weight: normal;
+        }
+        .target-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        .target-card {
+            background: rgba(15, 52, 96, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #00d9ff;
+        }
+        .target-card .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .target-card .stock-name {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        .target-card .stock-code {
+            color: #8892b0;
+            font-size: 0.85em;
+        }
+        .target-card .stock-score {
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+        .target-card .stock-strategy {
+            color: #ffaa00;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        .target-card .price-targets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            font-size: 0.85em;
+        }
+        .target-card .price-target {
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .target-card .price-target .label {
+            color: #8892b0;
+            font-size: 0.8em;
+            margin-bottom: 3px;
+        }
+        .target-card .price-target .value {
+            font-weight: 600;
+        }
+        .target-card .price-target.profit .value { color: #00ff88; }
+        .target-card .price-target.loss .value { color: #ff6b6b; }
+        .target-card .price-target.current .value { color: #00d9ff; }
+
         /* Control Bar */
         .control-bar {
             display: flex;
@@ -724,6 +846,29 @@
             </div>
         </header>
 
+        <!-- Trading Rules Banner -->
+        <div class="trading-rules">
+            <span class="rule-title">📋 매매 규칙</span>
+            <div class="rules-list">
+                <div class="rule-item">
+                    <span class="rule-label">익절:</span>
+                    <span class="rule-value profit">+3%</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-label">손절:</span>
+                    <span class="rule-value loss">-1.5%</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-label">종가청산:</span>
+                    <span class="rule-value time">15:20</span>
+                </div>
+                <div class="rule-item">
+                    <span class="rule-label">종목당:</span>
+                    <span class="rule-value">20만원</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Control Bar -->
         <div class="control-bar">
             <input type="date" id="selectDate" />
@@ -749,6 +894,14 @@
             <div class="stat-card">
                 <div class="stat-value" id="tradingDays">-</div>
                 <div class="stat-label">거래일</div>
+            </div>
+        </div>
+
+        <!-- Today's Target Section -->
+        <div class="today-target" id="todayTarget">
+            <h2>🎯 오늘의 매매 대상 <span class="target-date" id="todayTargetDate">-</span></h2>
+            <div class="target-cards" id="targetCards">
+                <p style="text-align: center; color: #8892b0;">로딩 중...</p>
             </div>
         </div>
 
@@ -778,7 +931,7 @@
             </div>
         </div>
 
-        <!-- Unified Stock Analysis Table (통합 종목 분석 테이블) -->
+        <!-- Unified Stock Analysis Table (통합 종목 분석 테이블) - 간소화 버전 -->
         <div class="section" id="unifiedAnalysis">
             <h2>📊 종목 분석 테이블</h2>
             <div id="analysisDate" style="color: #8892b0; font-size: 0.9em; margin-bottom: 10px;"></div>
@@ -789,43 +942,16 @@
                             <th>종목</th>
                             <th>현재가</th>
                             <th>등락</th>
-                            <th>외국인</th>
-                            <th>기관</th>
-                            <th>거래대금</th>
                             <th>점수</th>
-                            <th>대형</th>
-                            <th>모멘</th>
-                            <th>테마</th>
-                            <th>역추</th>
-                            <th>테마명</th>
+                            <th>익절가</th>
+                            <th>손절가</th>
+                            <th>선정사유</th>
                         </tr>
                     </thead>
                     <tbody id="unifiedTableBody">
-                        <tr><td colspan="12" class="loading-container"><div class="spinner"></div><div>로딩 중...</div></td></tr>
+                        <tr><td colspan="7" class="loading-container"><div class="spinner"></div><div>로딩 중...</div></td></tr>
                     </tbody>
                 </table>
-            </div>
-            <!-- 전략 조건 설명 -->
-            <div class="strategy-legend">
-                <div class="legend-title">📋 전략 조건 기준</div>
-                <div class="legend-grid">
-                    <div class="legend-item">
-                        <span class="legend-label">대형</span>
-                        <span class="legend-desc">시가총액 10조원 이상</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-label">모멘</span>
-                        <span class="legend-desc">+3% 이상 상승 + 정배열 or 고가돌파</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-label">테마</span>
-                        <span class="legend-desc">당일 테마 키워드 매칭</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-label">역추</span>
-                        <span class="legend-desc">대형주 + -1% 이상 하락 + 거래대금 500억↑</span>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -962,7 +1088,8 @@
             await Promise.all([
                 loadUnifiedTableData(today),
                 loadPaperTradingData(),
-                loadLiveStatus()
+                loadLiveStatus(),
+                loadTodayTargets()
             ]);
         }
 
@@ -987,7 +1114,7 @@
         async function loadUnifiedTableData(dateStr) {
             const tbody = document.getElementById('unifiedTableBody');
             const dateEl = document.getElementById('analysisDate');
-            tbody.innerHTML = '<tr><td colspan="9" class="loading-container"><div class="spinner"></div><div>종목 데이터 로딩 중...</div></td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="loading-container"><div class="spinner"></div><div>종목 데이터 로딩 중...</div></td></tr>';
 
             try {
                 // 1. candidates 파일 시도
@@ -1006,7 +1133,7 @@
                     return;
                 }
 
-                tbody.innerHTML = '<tr><td colspan="9" class="no-data">해당 날짜의 종목 데이터가 없습니다</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">해당 날짜의 종목 데이터가 없습니다</td></tr>';
                 dateEl.textContent = '';
             } catch (error) {
                 console.log('Unified table load error:', error);
@@ -1014,12 +1141,12 @@
             }
         }
 
-        // 통합 테이블 표시
+        // 통합 테이블 표시 (간소화 버전)
         function displayUnifiedTable(candidates, dateStr) {
             const tbody = document.getElementById('unifiedTableBody');
 
             if (!candidates || candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" class="no-data">선정된 종목이 없습니다</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">선정된 종목이 없습니다</td></tr>';
                 return;
             }
 
@@ -1027,42 +1154,24 @@
                 const price = c.current_price || c.price || 0;
                 const changePct = c.price_change_percent || c.change_pct || 0;
                 const score = c.total_score || c.score || 0;
-                const foreignBuy = c.foreign_buy || 0;
-                const instBuy = c.institution_buy || 0;
-                const tradingValue = c.trading_value || 0;
 
-                // 전략 체크
-                const isLargeCap = c.cap_tier === 'large';
-                const isMomentum = changePct >= 3 && (c.ma_alignment === '정배열' || c.high_break === true);
-                const hasTheme = c.matched_themes && c.matched_themes.length > 0;
-                const isContrarian = isLargeCap && changePct < 0;
+                // 목표가 계산
+                const profitTarget = Math.round(price * 1.03);
+                const lossTarget = Math.round(price * 0.985);
 
-                // 테마명
-                const themeName = hasTheme ? c.matched_themes.join(', ') : '-';
-
-                // 순매수 포맷
-                const formatBuy = (val) => {
-                    if (val === 0) return '-';
-                    const abs = Math.abs(val);
-                    if (abs >= 1000000) return (val > 0 ? '+' : '') + (val / 1000000).toFixed(1) + '백만';
-                    if (abs >= 10000) return (val > 0 ? '+' : '') + (val / 10000).toFixed(0) + '만';
-                    return (val > 0 ? '+' : '') + val.toLocaleString();
-                };
+                // 선정사유 (간략화)
+                const reason = c.selection_reason || c.strategy_name || c.technical_summary || '-';
+                const shortReason = reason.length > 20 ? reason.slice(0, 20) + '...' : reason;
 
                 return `
                     <tr>
                         <td class="stock-name-cell"><strong>${c.name}</strong><br><span class="stock-code">${c.code}</span></td>
                         <td>${price.toLocaleString()}</td>
                         <td class="${changePct >= 0 ? 'positive' : 'negative'}">${changePct >= 0 ? '+' : ''}${changePct.toFixed(2)}%</td>
-                        <td class="${foreignBuy > 0 ? 'positive' : foreignBuy < 0 ? 'negative' : ''}">${formatBuy(foreignBuy)}</td>
-                        <td class="${instBuy > 0 ? 'positive' : instBuy < 0 ? 'negative' : ''}">${formatBuy(instBuy)}</td>
-                        <td>${formatKoreanCurrency(tradingValue)}</td>
-                        <td>${score.toFixed(0)}</td>
-                        <td class="check-cell ${isLargeCap ? 'checked' : ''}">${isLargeCap ? '✓' : ''}</td>
-                        <td class="check-cell ${isMomentum ? 'checked' : ''}">${isMomentum ? '✓' : ''}</td>
-                        <td class="check-cell ${hasTheme ? 'checked' : ''}">${hasTheme ? '✓' : ''}</td>
-                        <td class="check-cell ${isContrarian ? 'checked' : ''}">${isContrarian ? '✓' : ''}</td>
-                        <td class="theme-cell">${themeName}</td>
+                        <td><strong>${score.toFixed(0)}</strong></td>
+                        <td class="positive">${profitTarget.toLocaleString()}</td>
+                        <td class="negative">${lossTarget.toLocaleString()}</td>
+                        <td style="font-size:0.85em;max-width:120px;white-space:normal;">${shortReason}</td>
                     </tr>
                 `;
             }).join('');
@@ -1714,11 +1823,80 @@
             const labels = { 'profit': '익절', 'loss': '손절', 'close': '종가' };
             return labels[type] || type;
         }
+
+        // 오늘의 매매 대상 표시
+        async function loadTodayTargets() {
+            const container = document.getElementById('targetCards');
+            const dateEl = document.getElementById('todayTargetDate');
+            const todayTarget = document.getElementById('todayTarget');
+
+            try {
+                const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+
+                // 1. candidates 파일 시도
+                let data = await fetchWithCache(`data/paper_trading/candidates_${today}.json?t=${Date.now()}`);
+
+                // 2. morning_candidates 폴백
+                if (!data || !data.candidates || data.candidates.length === 0) {
+                    data = await fetchWithCache(`data/morning_candidates.json?t=${Date.now()}`);
+                }
+
+                if (!data || !data.candidates || data.candidates.length === 0) {
+                    todayTarget.style.display = 'none';
+                    return;
+                }
+
+                todayTarget.style.display = 'block';
+                dateEl.textContent = `(${data.date || formatDate(today)})`;
+
+                // 상위 5개만 표시
+                const targets = data.candidates.slice(0, 5);
+
+                container.innerHTML = targets.map(c => {
+                    const price = c.current_price || c.price || 0;
+                    const score = c.total_score || c.score || 0;
+                    const profitTarget = Math.round(price * 1.03);
+                    const lossTarget = Math.round(price * 0.985);
+                    const strategy = c.strategy_name || c.selection_reason || '복합전략';
+
+                    return `
+                        <div class="target-card">
+                            <div class="stock-header">
+                                <div>
+                                    <div class="stock-name">${c.name}</div>
+                                    <div class="stock-code">${c.code}</div>
+                                </div>
+                                <div class="stock-score">${score.toFixed(0)}점</div>
+                            </div>
+                            <div class="stock-strategy">${strategy}</div>
+                            <div class="price-targets">
+                                <div class="price-target profit">
+                                    <div class="label">익절(+3%)</div>
+                                    <div class="value">${profitTarget.toLocaleString()}</div>
+                                </div>
+                                <div class="price-target current">
+                                    <div class="label">진입가</div>
+                                    <div class="value">${price.toLocaleString()}</div>
+                                </div>
+                                <div class="price-target loss">
+                                    <div class="label">손절(-1.5%)</div>
+                                    <div class="value">${lossTarget.toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.log('Today targets load error:', error);
+                todayTarget.style.display = 'none';
+            }
+        }
     </script>
 
     <!-- Footer with Last Modified Date -->
     <footer style="text-align: center; padding: 20px; margin-top: 30px; border-top: 1px solid #2a2a4a; color: #8892b0; font-size: 0.85em;">
-        📅 마지막 수정: 2026-04-02
+        📅 마지막 수정: 2026-04-03
     </footer>
 </body>
 </html>
