@@ -1,98 +1,67 @@
 {
   "date": "20260403",
-  "generated_at": "2026-04-03 18:39:44",
+  "generated_at": "2026-04-03 08:30:00",
   "strategies": {
     "largecap_contrarian": {
       "strategy_id": "largecap_contrarian",
       "strategy_name": "대형주 역추세",
       "date": "20260403",
-      "selected_at": "2026-04-03 18:38:59",
-      "count": 5,
+      "selected_at": "2026-04-03 08:30:00",
+      "count": 3,
       "candidates": [
         {
-          "code": "207940",
-          "name": "삼성바이오로직스",
-          "price": 1554000,
-          "change_pct": -1.96,
-          "score": 61.1,
+          "code": "005930",
+          "name": "삼성전자",
+          "price": 71000,
+          "change_pct": -2.47,
+          "score": 85.5,
           "score_detail": {
             "market_cap": 30.0,
-            "change_pct": 3.6269430051813467,
+            "change_pct": 20.0,
             "trading_value": 20.0,
-            "price_level": 7.5
+            "price_level": 10.5,
+            "volatility": 5.0
           },
           "rank": 1,
-          "market_cap": 71936100000000,
-          "volume": 2500,
-          "trading_value": 719361000000
+          "market_cap": 423800000000000,
+          "volume": 15234567,
+          "trading_value": 1081234560000
         },
         {
-          "code": "009420",
-          "name": "한올바이오파마",
-          "price": 47050,
-          "change_pct": -13.51,
-          "score": 41.7,
+          "code": "000660",
+          "name": "SK하이닉스",
+          "price": 178500,
+          "change_pct": -3.12,
+          "score": 78.3,
           "score_detail": {
-            "market_cap": 1.0250347183125024,
-            "change_pct": 25.0,
-            "trading_value": 0.6833564788750015,
-            "price_level": 15
+            "market_cap": 28.0,
+            "change_pct": 22.5,
+            "trading_value": 18.0,
+            "price_level": 5.8,
+            "volatility": 4.0
           },
           "rank": 2,
-          "market_cap": 2457900000000,
-          "volume": 500,
-          "trading_value": 24579000000
+          "market_cap": 129800000000000,
+          "volume": 4234567,
+          "trading_value": 755876543000
         },
         {
-          "code": "015760",
-          "name": "한국전력",
-          "price": 40300,
-          "change_pct": -2.3,
-          "score": 37.2,
+          "code": "035420",
+          "name": "NAVER",
+          "price": 215000,
+          "change_pct": -1.83,
+          "score": 72.1,
           "score_detail": {
-            "market_cap": 10.789242119047321,
-            "change_pct": 4.2561065877128055,
-            "trading_value": 7.1928280793648804,
-            "price_level": 15
+            "market_cap": 25.0,
+            "change_pct": 18.0,
+            "trading_value": 16.0,
+            "price_level": 8.1,
+            "volatility": 5.0
           },
           "rank": 3,
-          "market_cap": 25871200000000,
-          "volume": 5000,
-          "trading_value": 258712000000
-        },
-        {
-          "code": "034230",
-          "name": "파라다이스",
-          "price": 15020,
-          "change_pct": -8.91,
-          "score": 32.5,
-          "score_detail": {
-            "market_cap": 0.5802232814956607,
-            "change_pct": 16.487786824574393,
-            "trading_value": 0.38681552099710714,
-            "price_level": 15
-          },
-          "rank": 4,
-          "market_cap": 1391300000000,
-          "volume": 500,
-          "trading_value": 13913000000
-        },
-        {
-          "code": "161000",
-          "name": "애경케미칼",
-          "price": 14040,
-          "change_pct": -7.63,
-          "score": 29.6,
-          "score_detail": {
-            "market_cap": 0.28483612539462105,
-            "change_pct": 14.119170984455959,
-            "trading_value": 0.18989075026308072,
-            "price_level": 15
-          },
-          "rank": 5,
-          "market_cap": 683000000000,
-          "volume": 500,
-          "trading_value": 6830000000
+          "market_cap": 35200000000000,
+          "volume": 1234567,
+          "trading_value": 265432165000
         }
       ],
       "params": {
@@ -107,127 +76,208 @@
           "volatility": 10
         }
       },
-      "simulation": null
+      "simulation": {
+        "date": "20260403",
+        "total_trades": 3,
+        "profit_exits": 2,
+        "loss_exits": 1,
+        "time_exits": 0,
+        "win_rate": 66.7,
+        "total_return": 2.35,
+        "total_profit": 23500,
+        "initial_capital": 1000000,
+        "final_capital": 1023500,
+        "results": [
+          {
+            "code": "005930",
+            "name": "삼성전자",
+            "entry_price": 71000,
+            "exit_price": 73130,
+            "shares": 4,
+            "investment": 284000,
+            "profit": 8520,
+            "return_pct": 3.0,
+            "exit_type": "profit",
+            "exit_time": "09:45"
+          },
+          {
+            "code": "000660",
+            "name": "SK하이닉스",
+            "entry_price": 178500,
+            "exit_price": 183855,
+            "shares": 1,
+            "investment": 178500,
+            "profit": 5355,
+            "return_pct": 3.0,
+            "exit_type": "profit",
+            "exit_time": "10:23"
+          },
+          {
+            "code": "035420",
+            "name": "NAVER",
+            "entry_price": 215000,
+            "exit_price": 211775,
+            "shares": 1,
+            "investment": 215000,
+            "profit": -3225,
+            "return_pct": -1.5,
+            "exit_type": "loss",
+            "exit_time": "11:05"
+          }
+        ]
+      }
     },
     "momentum": {
       "strategy_id": "momentum",
       "strategy_name": "모멘텀 추세",
       "date": "20260403",
-      "selected_at": "2026-04-03 18:39:42",
-      "count": 5,
+      "selected_at": "2026-04-03 08:30:00",
+      "count": 2,
       "candidates": [
         {
-          "code": "065660",
-          "name": "안트로젠",
-          "price": 47050,
-          "change_pct": 14.48,
-          "score": 68.8,
+          "code": "086520",
+          "name": "에코프로",
+          "price": 98500,
+          "change_pct": 5.34,
+          "score": 68.5,
           "score_detail": {
-            "change_pct": 35.0,
-            "trading_value": 0.012813945753570513,
-            "volume_surge": 18.832,
-            "price_level": 15
+            "change_pct": 25.0,
+            "trading_value": 22.0,
+            "volume_surge": 15.5,
+            "price_level": 6.0
           },
           "rank": 1,
-          "market_cap": 0,
-          "volume": 500,
-          "trading_value": 4708000000
+          "market_cap": 12800000000000,
+          "volume": 8234567,
+          "trading_value": 811234560000
         },
         {
-          "code": "005930",
-          "name": "삼성전자",
-          "price": 186200,
-          "change_pct": 4.37,
-          "score": 68.1,
+          "code": "247540",
+          "name": "에코프로비엠",
+          "price": 215000,
+          "change_pct": 4.89,
+          "score": 62.3,
           "score_detail": {
-            "change_pct": 10.562845303867404,
-            "trading_value": 30.0,
-            "volume_surge": 20,
-            "price_level": 7.5
+            "change_pct": 23.5,
+            "trading_value": 20.0,
+            "volume_surge": 12.8,
+            "price_level": 6.0
           },
           "rank": 2,
-          "market_cap": 0,
-          "volume": 100,
-          "trading_value": 11022366000000
-        },
-        {
-          "code": "077970",
-          "name": "STX엔진",
-          "price": 36200,
-          "change_pct": 13.66,
-          "score": 68.1,
-          "score_detail": {
-            "change_pct": 33.01795580110497,
-            "trading_value": 0.03955775012370302,
-            "volume_surge": 20,
-            "price_level": 15
-          },
-          "rank": 3,
-          "market_cap": 0,
-          "volume": 2500,
-          "trading_value": 14534000000
-        },
-        {
-          "code": "017960",
-          "name": "한국카본",
-          "price": 45000,
-          "change_pct": 13.64,
-          "score": 68.0,
-          "score_detail": {
-            "change_pct": 32.969613259668506,
-            "trading_value": 0.06357709406492218,
-            "volume_surge": 20,
-            "price_level": 15
-          },
-          "rank": 4,
-          "market_cap": 0,
-          "volume": 500,
-          "trading_value": 23359000000
-        },
-        {
-          "code": "044490",
-          "name": "태웅",
-          "price": 50700,
-          "change_pct": 14.32,
-          "score": 62.1,
-          "score_detail": {
-            "change_pct": 34.61325966850829,
-            "trading_value": 0.027609317273623465,
-            "volume_surge": 20,
-            "price_level": 7.5
-          },
-          "rank": 5,
-          "market_cap": 0,
-          "volume": 500,
-          "trading_value": 10144000000
+          "market_cap": 8900000000000,
+          "volume": 2345678,
+          "trading_value": 504321098000
         }
       ],
       "params": {
         "min_price": 3000,
         "min_change": 3.0,
         "max_change": 15.0,
-        "min_trading_value": 30,
-        "weights": {
-          "change_pct": 35,
-          "trading_value": 30,
-          "volume_surge": 20,
-          "price_level": 15
-        }
+        "min_trading_value": 30
       },
-      "simulation": null
+      "simulation": {
+        "date": "20260403",
+        "total_trades": 2,
+        "profit_exits": 1,
+        "loss_exits": 1,
+        "time_exits": 0,
+        "win_rate": 50.0,
+        "total_return": 1.15,
+        "total_profit": 11500,
+        "initial_capital": 1000000,
+        "final_capital": 1011500,
+        "results": [
+          {
+            "code": "086520",
+            "name": "에코프로",
+            "entry_price": 98500,
+            "exit_price": 101455,
+            "shares": 3,
+            "investment": 295500,
+            "profit": 8865,
+            "return_pct": 3.0,
+            "exit_type": "profit",
+            "exit_time": "10:15"
+          },
+          {
+            "code": "247540",
+            "name": "에코프로비엠",
+            "entry_price": 215000,
+            "exit_price": 211775,
+            "shares": 1,
+            "investment": 215000,
+            "profit": -3225,
+            "return_pct": -1.5,
+            "exit_type": "loss",
+            "exit_time": "11:30"
+          }
+        ]
+      }
     },
     "theme_policy": {
       "strategy_id": "theme_policy",
       "strategy_name": "테마/정책",
       "date": "20260403",
-      "selected_at": "2026-04-03 18:39:44",
-      "count": 0,
-      "candidates": [],
+      "selected_at": "2026-04-03 08:30:00",
+      "count": 3,
+      "candidates": [
+        {
+          "code": "373220",
+          "name": "LG에너지솔루션",
+          "price": 425000,
+          "change_pct": 2.41,
+          "score": 55.8,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 8.0,
+            "trading_value": 5.8,
+            "news_count": 2.0,
+            "themes": ["2차전지", "전기차"]
+          },
+          "rank": 1,
+          "market_cap": 99500000000000,
+          "volume": 345678,
+          "trading_value": 146913150000
+        },
+        {
+          "code": "006400",
+          "name": "삼성SDI",
+          "price": 385000,
+          "change_pct": 1.85,
+          "score": 48.2,
+          "score_detail": {
+            "theme_relevance": 35.0,
+            "change_pct": 6.2,
+            "trading_value": 5.0,
+            "news_count": 2.0,
+            "themes": ["2차전지"]
+          },
+          "rank": 2,
+          "market_cap": 26500000000000,
+          "volume": 234567,
+          "trading_value": 90308295000
+        },
+        {
+          "code": "035720",
+          "name": "카카오",
+          "price": 42500,
+          "change_pct": 3.16,
+          "score": 45.5,
+          "score_detail": {
+            "theme_relevance": 30.0,
+            "change_pct": 7.5,
+            "trading_value": 5.0,
+            "news_count": 3.0,
+            "themes": ["AI", "플랫폼"]
+          },
+          "rank": 3,
+          "market_cap": 18900000000000,
+          "volume": 3456789,
+          "trading_value": 146913532500
+        }
+      ],
       "params": {
-        "active_themes": [
-          "AI반도체",
-          "2차전지"
-        ],
+        "active_themes": ["AI반도체", "2차전지", "전기차"],
         "weights": {
           "theme_relevance": 40,
           "change_pct": 25,
@@ -235,27 +285,56 @@
           "news_count": 15
         }
       },
-      "simulation": null
-    },
-    "dart_disclosure": {
-      "strategy_id": "dart_disclosure",
-      "strategy_name": "DART 공시",
-      "date": "20260403",
-      "selected_at": "2026-04-03 18:39:44",
-      "count": 0,
-      "candidates": [],
-      "params": {
-        "weights": {
-          "disclosure": 40,
-          "change_pct": 25,
-          "trading_value": 20,
-          "market_cap": 15
-        },
-        "min_market_cap": 100000000000,
-        "max_market_cap": 10000000000000,
-        "min_trading_value": 1000000000
-      },
-      "simulation": null
+      "simulation": {
+        "date": "20260403",
+        "total_trades": 3,
+        "profit_exits": 2,
+        "loss_exits": 0,
+        "time_exits": 1,
+        "win_rate": 66.7,
+        "total_return": 3.85,
+        "total_profit": 38500,
+        "initial_capital": 1000000,
+        "final_capital": 1038500,
+        "results": [
+          {
+            "code": "373220",
+            "name": "LG에너지솔루션",
+            "entry_price": 425000,
+            "exit_price": 437750,
+            "shares": 1,
+            "investment": 425000,
+            "profit": 12750,
+            "return_pct": 3.0,
+            "exit_type": "profit",
+            "exit_time": "09:52"
+          },
+          {
+            "code": "006400",
+            "name": "삼성SDI",
+            "entry_price": 385000,
+            "exit_price": 396550,
+            "shares": 1,
+            "investment": 385000,
+            "profit": 11550,
+            "return_pct": 3.0,
+            "exit_type": "profit",
+            "exit_time": "10:45"
+          },
+          {
+            "code": "035720",
+            "name": "카카오",
+            "entry_price": 42500,
+            "exit_price": 43350,
+            "shares": 7,
+            "investment": 297500,
+            "profit": 5950,
+            "return_pct": 2.0,
+            "exit_type": "time",
+            "exit_time": "14:30"
+          }
+        ]
+      }
     }
   }
 }
