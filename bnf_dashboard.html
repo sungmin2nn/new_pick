@@ -6,13 +6,14 @@
     <title>BNF 매매 시뮬레이터</title>
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/adriel-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
-            color: #e4e4e4;
+            background: #F8FAFB;
+            color: #1A1A2E;
             min-height: 100vh;
             padding: 15px;
             font-size: 13px;
@@ -36,21 +37,21 @@
             padding-left: 5px;
         }
         .nav-buttons-sub a {
-            color: #8892b0;
+            color: #6B7280;
             text-decoration: none;
             font-size: 0.85em;
             transition: color 0.2s;
         }
         .nav-buttons-sub a:hover {
-            color: #00d9ff;
+            color: #00C6BE;
             text-decoration: underline;
         }
         .nav-btn {
             padding: 8px 16px;
             border-radius: 6px;
-            border: 2px solid #2a2a4a;
-            background: transparent;
-            color: #8892b0;
+            border: 2px solid #E5E7EB;
+            background: #FFFFFF;
+            color: #6B7280;
             font-size: 0.85em;
             cursor: pointer;
             transition: all 0.2s;
@@ -58,15 +59,18 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .nav-btn:hover {
-            border-color: #00d9ff;
-            color: #00d9ff;
+            border-color: #00C6BE;
+            color: #00C6BE;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
         .nav-btn.active {
-            border-color: #ff6b35;
-            background: rgba(255, 107, 53, 0.15);
-            color: #ff6b35;
+            border-color: #00C6BE;
+            background: rgba(0, 198, 190, 0.1);
+            color: #00C6BE;
         }
 
         /* Header */
@@ -76,20 +80,20 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #2a2a4a;
+            border-bottom: 1px solid #E5E7EB;
             flex-wrap: wrap;
             gap: 10px;
         }
         .header h1 {
-            color: #ff6b35;
+            color: #00C6BE;
             font-size: 1.4em;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .header .subtitle { color: #8892b0; margin-top: 3px; font-size: 0.8em; }
+        .header .subtitle { color: #6B7280; margin-top: 3px; font-size: 0.8em; }
         .bnf-badge {
-            background: linear-gradient(135deg, #ff6b35, #ff8c42);
+            background: linear-gradient(135deg, #00C6BE, #00E5D7);
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -99,14 +103,15 @@
 
         /* Strategy Info */
         .strategy-info {
-            background: rgba(255, 107, 53, 0.1);
-            border: 1px solid rgba(255, 107, 53, 0.3);
+            background: rgba(0, 198, 190, 0.05);
+            border: 1px solid rgba(0, 198, 190, 0.2);
             border-radius: 10px;
             padding: 12px;
             margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .strategy-info h3 {
-            color: #ff6b35;
+            color: #00C6BE;
             margin-bottom: 10px;
             font-size: 0.95em;
         }
@@ -116,17 +121,18 @@
             gap: 10px;
         }
         .rule-card {
-            background: rgba(15, 15, 35, 0.5);
+            background: #FFFFFF;
             border-radius: 6px;
             padding: 10px;
+            border: 1px solid #E5E7EB;
         }
         .rule-card .label {
-            color: #8892b0;
+            color: #6B7280;
             font-size: 0.7em;
             margin-bottom: 3px;
         }
         .rule-card .value {
-            color: #e4e4e4;
+            color: #1A1A2E;
             font-size: 0.85em;
             font-weight: 500;
         }
@@ -139,47 +145,49 @@
             margin-bottom: 15px;
         }
         .stat-card {
-            background: rgba(22, 33, 62, 0.8);
+            background: #FFFFFF;
             border-radius: 8px;
             padding: 12px;
             text-align: center;
-            border: 1px solid #2a2a4a;
+            border: 1px solid #E5E7EB;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
         .kpi-primary .stat-value {
             font-size: 1.8em;
         }
         .kpi-primary {
-            background: rgba(0, 198, 190, 0.15);
-            border: 1px solid rgba(0, 198, 190, 0.3);
+            background: rgba(0, 198, 190, 0.05);
+            border: 1px solid rgba(0, 198, 190, 0.2);
         }
         .kpi-secondary {
-            opacity: 0.9;
+            opacity: 0.95;
         }
         .stat-value {
             font-size: 1.3em;
             font-weight: bold;
-            color: #ff6b35;
+            color: #00C6BE;
             margin-bottom: 3px;
         }
-        .stat-value.positive { color: #00ff88; }
-        .stat-value.negative { color: #ff6b6b; }
-        .stat-label { color: #8892b0; font-size: 0.7em; }
+        .stat-value.positive { color: #10B981; }
+        .stat-value.negative { color: #EF4444; }
+        .stat-label { color: #6B7280; font-size: 0.7em; }
 
         /* Section */
         .section {
-            background: rgba(22, 33, 62, 0.8);
+            background: #FFFFFF;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
-            border: 1px solid #2a2a4a;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .section h2 {
-            color: #ff8c42;
+            color: #00C6BE;
             margin-bottom: 12px;
             font-size: 1em;
             display: flex;
@@ -194,14 +202,16 @@
             gap: 10px;
         }
         .candidate-card {
-            background: rgba(15, 15, 35, 0.6);
+            background: #F8FAFB;
             border-radius: 8px;
             padding: 12px;
-            border-left: 3px solid #ff6b35;
+            border-left: 3px solid #00C6BE;
+            border: 1px solid #E5E7EB;
+            border-left-width: 3px;
         }
         .candidate-card.selected {
-            border-left-color: #00ff88;
-            background: rgba(0, 255, 136, 0.05);
+            border-left-color: #10B981;
+            background: rgba(16, 185, 129, 0.05);
         }
         .candidate-header {
             display: flex;
@@ -214,12 +224,12 @@
             font-size: 0.95em;
         }
         .candidate-code {
-            color: #8892b0;
+            color: #6B7280;
             font-size: 0.75em;
         }
         .drop-badge {
-            background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
             padding: 3px 8px;
             border-radius: 10px;
             font-size: 0.75em;
@@ -231,26 +241,29 @@
             gap: 6px;
             font-size: 0.8em;
         }
-        .candidate-stats .label { color: #8892b0; }
+        .candidate-stats .label { color: #6B7280; }
         .candidate-stats .value { text-align: right; }
         .candidate-reason {
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px solid rgba(255,107,53,0.2);
+            border-top: 1px solid rgba(0,198,190,0.2);
             font-size: 0.7em;
-            color: #ff8c5a;
+            color: #00C6BE;
         }
 
         /* Position Card */
         .position-card {
-            background: rgba(15, 15, 35, 0.6);
+            background: #FFFFFF;
             border-radius: 8px;
             padding: 12px;
-            border-left: 3px solid #00d9ff;
+            border-left: 3px solid #00C6BE;
             margin-bottom: 10px;
+            border: 1px solid #E5E7EB;
+            border-left-width: 3px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        .position-card.profit { border-left-color: #00ff88; }
-        .position-card.loss { border-left-color: #ff6b6b; }
+        .position-card.profit { border-left-color: #10B981; }
+        .position-card.loss { border-left-color: #EF4444; }
         .position-header {
             display: flex;
             justify-content: space-between;
@@ -263,15 +276,15 @@
             font-size: 0.7em;
             font-weight: 600;
         }
-        .position-state.partial { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
-        .position-state.full { background: rgba(0, 217, 255, 0.2); color: #00d9ff; }
-        .position-state.exiting { background: rgba(255, 107, 53, 0.2); color: #ff6b35; }
+        .position-state.partial { background: rgba(251, 146, 60, 0.1); color: #F59E0B; }
+        .position-state.full { background: rgba(0, 198, 190, 0.1); color: #00C6BE; }
+        .position-state.exiting { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
 
         /* Entry/Exit Timeline */
         .timeline {
             margin-top: 10px;
             padding-left: 15px;
-            border-left: 2px solid #2a2a4a;
+            border-left: 2px solid #E5E7EB;
         }
         .timeline-item {
             position: relative;
@@ -285,18 +298,18 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: #2a2a4a;
+            background: #E5E7EB;
         }
-        .timeline-item.entry::before { background: #00d9ff; }
-        .timeline-item.exit::before { background: #ff6b35; }
-        .timeline-item.profit::before { background: #00ff88; }
-        .timeline-item.loss::before { background: #ff6b6b; }
+        .timeline-item.entry::before { background: #00C6BE; }
+        .timeline-item.exit::before { background: #F59E0B; }
+        .timeline-item.profit::before { background: #10B981; }
+        .timeline-item.loss::before { background: #EF4444; }
         .timeline-time {
-            color: #8892b0;
+            color: #6B7280;
             font-size: 0.7em;
         }
         .timeline-detail {
-            color: #e4e4e4;
+            color: #1A1A2E;
             font-size: 0.8em;
             margin-top: 2px;
         }
@@ -315,13 +328,13 @@
         th, td {
             padding: 6px 8px;
             text-align: left;
-            border-bottom: 1px solid #2a2a4a;
+            border-bottom: 1px solid #E5E7EB;
             white-space: nowrap;
         }
-        th { background: #0f3460; color: #ff8c42; font-weight: 600; font-size: 0.8em; }
-        tr:hover { background: rgba(255, 107, 53, 0.05); }
-        .positive { color: #00ff88; }
-        .negative { color: #ff6b6b; }
+        th { background: #F8FAFB; color: #00C6BE; font-weight: 600; font-size: 0.8em; }
+        tr:hover { background: rgba(0, 198, 190, 0.03); }
+        .positive { color: #10B981; }
+        .negative { color: #EF4444; }
 
         /* Candidates Table */
         #candidatesTable th:nth-child(1) { width: 30px; }
@@ -357,7 +370,7 @@
         .no-data {
             text-align: center;
             padding: 25px;
-            color: #8892b0;
+            color: #6B7280;
             font-size: 0.85em;
         }
 
@@ -381,8 +394,8 @@
             text-align: center;
             padding: 20px;
             margin-top: 30px;
-            border-top: 1px solid #2a2a4a;
-            color: #8892b0;
+            border-top: 1px solid #E5E7EB;
+            color: #6B7280;
             font-size: 0.85em;
         }
     </style>
@@ -635,7 +648,7 @@
                     return `
                         <tr>
                             <td>${i + 1}</td>
-                            <td><strong>${c.name}</strong> <span style="color:#8892b0;font-size:0.8em;">${c.code}</span></td>
+                            <td><strong>${c.name}</strong> <span style="color:#6B7280;font-size:0.8em;">${c.code}</span></td>
                             <td>${(c.price || 0).toLocaleString()}원</td>
                             <td>${(c.high_20d || 0).toLocaleString()}원</td>
                             <td class="negative">-${dropHigh.toFixed(1)}%</td>
@@ -686,7 +699,7 @@
 
                     return `
                         <tr>
-                            <td><strong>${p.name}</strong><br><span style="color:#8892b0;font-size:0.75em;">${p.code}</span></td>
+                            <td><strong>${p.name}</strong><br><span style="color:#6B7280;font-size:0.75em;">${p.code}</span></td>
                             <td><span class="position-state ${p.state?.toLowerCase()}">${getStateLabel(p.state)}</span></td>
                             <td>${holdingDays}일</td>
                             <td>${(p.avg_price || 0).toLocaleString()}</td>
@@ -921,12 +934,12 @@
                         datasets: [{
                             label: '미실현 수익률 (%)',
                             data: [0, unrealizedPct],
-                            borderColor: unrealizedPct >= 0 ? '#00ff88' : '#ff6b6b',
-                            backgroundColor: unrealizedPct >= 0 ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                            borderColor: unrealizedPct >= 0 ? '#10B981' : '#EF4444',
+                            backgroundColor: unrealizedPct >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                             fill: true,
                             tension: 0.3,
                             pointRadius: 8,
-                            pointBackgroundColor: unrealizedPct >= 0 ? '#00ff88' : '#ff6b6b'
+                            pointBackgroundColor: unrealizedPct >= 0 ? '#10B981' : '#EF4444'
                         }]
                     },
                     options: {
@@ -934,21 +947,21 @@
                         maintainAspectRatio: false,
                         scales: {
                             y: {
-                                grid: { color: 'rgba(255,255,255,0.1)' },
+                                grid: { color: 'rgba(0,0,0,0.05)' },
                                 ticks: {
-                                    color: '#8892b0',
+                                    color: '#6B7280',
                                     callback: v => v.toFixed(1) + '%'
                                 },
                                 suggestedMin: Math.min(0, unrealizedPct - 5),
                                 suggestedMax: Math.max(0, unrealizedPct + 5)
                             },
                             x: {
-                                grid: { color: 'rgba(255,255,255,0.1)' },
-                                ticks: { color: '#8892b0', font: { size: 10 } }
+                                grid: { color: 'rgba(0,0,0,0.05)' },
+                                ticks: { color: '#6B7280', font: { size: 10 } }
                             }
                         },
                         plugins: {
-                            legend: { labels: { color: '#e4e4e4', font: { size: 11 } } },
+                            legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => ctx.parsed.y.toFixed(2) + '%'
@@ -971,12 +984,12 @@
                         datasets: [{
                             label: '자산 (원)',
                             data: [INITIAL_CAPITAL, currentValue],
-                            borderColor: currentValue >= INITIAL_CAPITAL ? '#00ff88' : '#ff6b6b',
-                            backgroundColor: currentValue >= INITIAL_CAPITAL ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 107, 107, 0.1)',
+                            borderColor: currentValue >= INITIAL_CAPITAL ? '#10B981' : '#EF4444',
+                            backgroundColor: currentValue >= INITIAL_CAPITAL ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                             fill: true,
                             tension: 0.3,
                             pointRadius: 8,
-                            pointBackgroundColor: currentValue >= INITIAL_CAPITAL ? '#00ff88' : '#ff6b6b'
+                            pointBackgroundColor: currentValue >= INITIAL_CAPITAL ? '#10B981' : '#EF4444'
                         }]
                     },
                     options: {
@@ -984,21 +997,21 @@
                         maintainAspectRatio: false,
                         scales: {
                             y: {
-                                grid: { color: 'rgba(255,255,255,0.1)' },
+                                grid: { color: 'rgba(0,0,0,0.05)' },
                                 ticks: {
-                                    color: '#8892b0',
+                                    color: '#6B7280',
                                     callback: v => (v / 10000).toFixed(0) + '만'
                                 },
                                 suggestedMin: Math.min(INITIAL_CAPITAL, currentValue) * 0.95,
                                 suggestedMax: Math.max(INITIAL_CAPITAL, currentValue) * 1.05
                             },
                             x: {
-                                grid: { color: 'rgba(255,255,255,0.1)' },
-                                ticks: { color: '#8892b0', font: { size: 10 } }
+                                grid: { color: 'rgba(0,0,0,0.05)' },
+                                ticks: { color: '#6B7280', font: { size: 10 } }
                             }
                         },
                         plugins: {
-                            legend: { labels: { color: '#e4e4e4', font: { size: 11 } } },
+                            legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => ctx.parsed.y.toLocaleString() + '원'
@@ -1027,12 +1040,12 @@
                     datasets: [{
                         label: '자산 (원)',
                         data: [INITIAL_CAPITAL, INITIAL_CAPITAL],
-                        borderColor: '#00d9ff',
-                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                        borderColor: '#00C6BE',
+                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
                         fill: true,
                         tension: 0.3,
                         pointRadius: 6,
-                        pointBackgroundColor: '#00d9ff'
+                        pointBackgroundColor: '#00C6BE'
                     }]
                 },
                 options: {
@@ -1040,9 +1053,9 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
                             ticks: {
-                                color: '#8892b0',
+                                color: '#6B7280',
                                 callback: function(value) {
                                     return (value / 10000).toFixed(0) + '만원';
                                 }
@@ -1051,12 +1064,12 @@
                             max: INITIAL_CAPITAL * 1.2
                         },
                         x: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#8892b0', font: { size: 10 } }
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { color: '#6B7280', font: { size: 10 } }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#e4e4e4', font: { size: 11 } } }
+                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } }
                     }
                 }
             });
@@ -1102,12 +1115,12 @@
                     datasets: [{
                         label: '자산 (원)',
                         data: [INITIAL_CAPITAL, ...portfolioValues],
-                        borderColor: '#00d9ff',
-                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                        borderColor: '#00C6BE',
+                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
                         fill: true,
                         tension: 0.3,
                         pointRadius: 4,
-                        pointBackgroundColor: '#00d9ff'
+                        pointBackgroundColor: '#00C6BE'
                     }]
                 },
                 options: {
@@ -1115,9 +1128,9 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
                             ticks: {
-                                color: '#8892b0',
+                                color: '#6B7280',
                                 callback: function(value) {
                                     return (value / 10000).toFixed(0) + '만원';
                                 }
@@ -1126,12 +1139,12 @@
                             suggestedMax: INITIAL_CAPITAL * 1.2
                         },
                         x: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#8892b0', maxRotation: 45, font: { size: 10 } }
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { color: '#6B7280', maxRotation: 45, font: { size: 10 } }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#e4e4e4', font: { size: 11 } } },
+                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -1156,8 +1169,8 @@
                     datasets: [{
                         label: '누적 수익률 (%)',
                         data: cumulativeReturns,
-                        borderColor: '#ff6b35',
-                        backgroundColor: 'rgba(255, 107, 53, 0.1)',
+                        borderColor: '#00C6BE',
+                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
                         fill: true,
                         tension: 0.3
                     }]
@@ -1167,16 +1180,16 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#8892b0' }
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { color: '#6B7280' }
                         },
                         x: {
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            ticks: { color: '#8892b0', maxRotation: 45, font: { size: 10 } }
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: { color: '#6B7280', maxRotation: 45, font: { size: 10 } }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#e4e4e4', font: { size: 11 } } }
+                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } }
                     }
                 }
             });
