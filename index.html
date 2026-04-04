@@ -65,138 +65,32 @@
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 2px solid #E2E8F0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         .header h1 { color: #1A1A2E; font-size: 1.6em; font-weight: 700; }
         .header .subtitle { color: #64748B; margin-top: 5px; font-size: 0.85em; }
-        .header-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .rule-tooltip-btn {
+
+        /* 1. Trading Rules Banner */
+        .trading-rules {
             background: rgba(0, 198, 190, 0.1);
             border: 1px solid #00C6BE;
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #00C6BE;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        .rule-tooltip-btn:hover {
-            background: #00C6BE;
-            color: #FFFFFF;
-        }
-        .rule-tooltip {
-            font-size: 0.9em;
-            font-weight: 500;
-            color: #64748B;
-        }
-        .rule-tooltip-btn:hover .rule-tooltip {
-            color: #FFFFFF;
-        }
-        .refresh-btn {
-            background: #FFFFFF;
-            border: 2px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #64748B;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .refresh-btn:hover {
-            background: rgba(0, 198, 190, 0.1);
-            border-color: #00C6BE;
-            color: #00C6BE;
-        }
-
-        /* Hero Section - Today's Trading */
-        .today-hero {
-            background: linear-gradient(135deg, rgba(0, 198, 190, 0.1), rgba(16, 185, 129, 0.1));
-            border: 2px solid #00C6BE;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .today-hero h2 {
-            color: #1A1A2E;
-            font-size: 1.3em;
-            font-weight: 700;
+            border-left-width: 4px;
+            border-radius: 12px;
+            padding: 16px 24px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
             gap: 10px;
         }
-        .date-badge {
-            font-size: 0.6em;
-            font-weight: 500;
-            color: #64748B;
-            background: #FFFFFF;
-            padding: 4px 12px;
-            border-radius: 6px;
-        }
-        .hero-stats {
-            display: flex;
-            gap: 24px;
-            justify-content: center;
-            margin: 16px 0 24px;
-            flex-wrap: wrap;
-        }
-        .hero-stat {
-            text-align: center;
-            padding: 16px 28px;
-            background: #FFFFFF;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            min-width: 100px;
-            flex: 1;
-            max-width: 150px;
-        }
-        .hero-stat.total { border-bottom: 3px solid #00C6BE; }
-        .hero-stat.profit { border-bottom: 3px solid #10B981; }
-        .hero-stat.loss { border-bottom: 3px solid #EF4444; }
-        .hero-stat.waiting { border-bottom: 3px solid #F59E0B; }
-        .hero-value {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #1A1A2E;
-            line-height: 1;
-            display: block;
-            margin-bottom: 8px;
-        }
-        .hero-label {
-            font-size: 0.75em;
-            font-weight: 600;
-            color: #64748B;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .hero-return {
-            text-align: center;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 12px;
-        }
-        .return-value {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-right: 8px;
-        }
-        .return-value.positive { color: #10B981; }
-        .return-value.negative { color: #EF4444; }
-        .return-amount {
-            font-size: 1.1rem;
-            color: #64748B;
-            font-weight: 600;
-        }
+        .trading-rules .rule-title { color: #00C6BE; font-weight: 700; font-size: 0.9em; }
+        .trading-rules .rules-list { display: flex; gap: 20px; flex-wrap: wrap; }
+        .trading-rules .rule-item { display: flex; align-items: center; gap: 6px; font-size: 0.85em; }
+        .trading-rules .rule-label { color: #64748B; font-weight: 500; }
+        .trading-rules .rule-value { font-weight: 700; color: #1A1A2E; }
+        .trading-rules .rule-value.profit { color: #10B981; }
+        .trading-rules .rule-value.loss { color: #EF4444; }
+        .trading-rules .rule-value.time { color: #F59E0B; }
 
         /* 2. Profit Status Section */
         .profit-status {
@@ -408,28 +302,6 @@
         .stat-item .value.positive { color: #10B981; }
         .stat-item .value.negative { color: #EF4444; }
         .stat-item .label { color: #64748B; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; }
-        .stats-extended { display: none; }
-        .stats-extended.show { display: contents; }
-        .show-more-btn {
-            grid-column: 1 / -1;
-            text-align: center;
-            margin-top: 12px;
-        }
-        .show-more-btn button {
-            background: rgba(0, 198, 190, 0.1);
-            border: 1px solid #00C6BE;
-            border-radius: 8px;
-            padding: 10px 24px;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #00C6BE;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .show-more-btn button:hover {
-            background: #00C6BE;
-            color: #FFFFFF;
-        }
 
         /* Table Styles */
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9em; }
@@ -457,11 +329,6 @@
         /* Responsive */
         @media (max-width: 768px) {
             body { padding: 16px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .hero-stats { gap: 12px; }
-            .hero-stat { padding: 12px 16px; min-width: 80px; }
-            .hero-value { font-size: 1.8rem; }
-            .return-value { font-size: 1.5rem; }
             .profit-main { flex-direction: column; align-items: flex-start; gap: 20px; }
             .profit-value { font-size: 2em; }
             .mini-chart-container { width: 100%; height: 80px; }
@@ -472,9 +339,7 @@
             .detail-content { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 420px) {
-            .hero-stats { flex-direction: row; justify-content: space-between; }
-            .hero-stat { flex: 1; padding: 12px 8px; min-width: 70px; max-width: none; }
-            .hero-value { font-size: 1.5rem; }
+            .trading-rules { flex-direction: column; align-items: flex-start; }
             .summary-card .value { font-size: 1.2em; }
             .summary-card .label { font-size: 0.65em; }
             .stock-table th, .stock-table td { padding: 12px 8px; font-size: 0.85em; }
@@ -515,46 +380,67 @@
 
         <!-- Header -->
         <header class="header">
-            <div>
-                <h1>📊 페이퍼 트레이딩</h1>
-                <div class="subtitle">실시간 모니터링 | <span id="currentTime">-</span></div>
-            </div>
-            <div class="header-actions">
-                <button class="rule-tooltip-btn" title="매매 규칙 보기">
-                    📋 <span class="rule-tooltip">익절 +3% | 손절 -1.5% | 15:20 청산</span>
-                </button>
-                <button class="refresh-btn" onclick="location.reload()">🔄 새로고침</button>
-            </div>
+            <h1>📊 페이퍼 트레이딩 대시보드</h1>
+            <div class="subtitle">실시간 모니터링 | <span id="currentTime">-</span></div>
         </header>
 
-        <!-- 1. Hero Section - Today's Trading -->
-        <section class="today-hero">
-            <h2>🎯 오늘의 매매 <span class="date-badge" id="todayDateBadge">-</span></h2>
-            <div class="hero-stats">
-                <div class="hero-stat total">
-                    <span class="hero-value" id="todayStockCount">0</span>
-                    <span class="hero-label">종목</span>
+        <!-- 1. Trading Rules -->
+        <div class="trading-rules">
+            <span class="rule-title">📋 매매 규칙</span>
+            <div class="rules-list">
+                <div class="rule-item">
+                    <span class="rule-label">익절:</span>
+                    <span class="rule-value profit">+3%</span>
                 </div>
-                <div class="hero-stat waiting">
-                    <span class="hero-value" id="waitingCount">0</span>
-                    <span class="hero-label">대기</span>
+                <div class="rule-item">
+                    <span class="rule-label">손절:</span>
+                    <span class="rule-value loss">-1.5%</span>
                 </div>
-                <div class="hero-stat profit">
-                    <span class="hero-value" id="profitCount">0</span>
-                    <span class="hero-label">익절</span>
+                <div class="rule-item">
+                    <span class="rule-label">종가청산:</span>
+                    <span class="rule-value time">15:20</span>
                 </div>
-                <div class="hero-stat loss">
-                    <span class="hero-value" id="lossCount">0</span>
-                    <span class="hero-label">손절</span>
+                <div class="rule-item">
+                    <span class="rule-label">종목당:</span>
+                    <span class="rule-value">20만원</span>
                 </div>
             </div>
-            <div class="hero-return">
-                <span class="return-value positive" id="todayReturn">+0.0%</span>
-                <span class="return-amount" id="todayAmount">(+0원)</span>
-            </div>
-        </section>
+        </div>
 
-        <!-- 2. Today's Stocks (Table with Accordion) -->
+        <!-- 2. Profit Status -->
+        <div class="profit-status">
+            <div class="profit-main">
+                <div>
+                    <div class="profit-sub">누적 수익률</div>
+                    <div class="profit-value positive" id="totalReturnBig">+0.00%</div>
+                    <div class="profit-amount" id="totalProfitAmount">+0원</div>
+                </div>
+                <div class="mini-chart-container">
+                    <canvas id="miniChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Trade Summary -->
+        <div class="trade-summary">
+            <div class="summary-card">
+                <div class="label">현재 보유</div>
+                <div class="value" id="currentHoldings">0</div>
+                <div class="sub">종목</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">전일 매매</div>
+                <div class="value" id="yesterdayTrades">0</div>
+                <div class="sub" id="yesterdayResult">-</div>
+            </div>
+            <div class="summary-card highlight">
+                <div class="label">금일 매매</div>
+                <div class="value" id="todayTrades">0</div>
+                <div class="sub" id="todayResult">진행중</div>
+            </div>
+        </div>
+
+        <!-- 4. Today's Stocks (Table with Accordion) -->
         <div class="today-stocks">
             <div class="section-header">
                 <h2>🎯 금일 종목 상세</h2>
@@ -578,39 +464,6 @@
             </div>
         </div>
 
-        <!-- 3. Performance Summary -->
-        <div class="profit-status">
-            <div class="profit-main">
-                <div>
-                    <div class="profit-sub">누적 수익률</div>
-                    <div class="profit-value positive" id="totalReturnBig">+0.00%</div>
-                    <div class="profit-amount" id="totalProfitAmount">+0원</div>
-                </div>
-                <div class="mini-chart-container">
-                    <canvas id="miniChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. Trade Summary -->
-        <div class="trade-summary">
-            <div class="summary-card">
-                <div class="label">현재 보유</div>
-                <div class="value" id="currentHoldings">0</div>
-                <div class="sub">종목</div>
-            </div>
-            <div class="summary-card">
-                <div class="label">전일 매매</div>
-                <div class="value" id="yesterdayTrades">0</div>
-                <div class="sub" id="yesterdayResult">-</div>
-            </div>
-            <div class="summary-card highlight">
-                <div class="label">금일 매매</div>
-                <div class="value" id="todayTrades">0</div>
-                <div class="sub" id="todayResult">진행중</div>
-            </div>
-        </div>
-
         <!-- 5. Recent Trades (Collapsible) -->
         <div class="collapsible" id="recentTradesSection">
             <div class="collapsible-header" onclick="toggleCollapsible('recentTradesSection')">
@@ -628,11 +481,27 @@
 
         <!-- 6. Statistics -->
         <div class="statistics">
-            <h2>📈 핵심 통계</h2>
+            <h2>📈 전체 통계</h2>
             <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="value" id="statTotalDays">0</div>
+                    <div class="label">거래일</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="statTotalTrades">0</div>
+                    <div class="label">총 거래</div>
+                </div>
                 <div class="stat-item">
                     <div class="value" id="statWinRate">0%</div>
                     <div class="label">승률</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value positive" id="statAvgProfit">0%</div>
+                    <div class="label">평균 수익</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value negative" id="statAvgLoss">0%</div>
+                    <div class="label">평균 손실</div>
                 </div>
                 <div class="stat-item">
                     <div class="value" id="statProfitFactor">0</div>
@@ -643,29 +512,8 @@
                     <div class="label">MDD</div>
                 </div>
                 <div class="stat-item">
-                    <div class="value" id="statTotalTrades">0</div>
-                    <div class="label">총 거래</div>
-                </div>
-                <div class="stats-extended" id="statsExtended">
-                    <div class="stat-item">
-                        <div class="value" id="statTotalDays">0</div>
-                        <div class="label">거래일</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value positive" id="statAvgProfit">0%</div>
-                        <div class="label">평균 수익</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value negative" id="statAvgLoss">0%</div>
-                        <div class="label">평균 손실</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="value" id="statConsecWins">0</div>
-                        <div class="label">최대연승</div>
-                    </div>
-                </div>
-                <div class="show-more-btn">
-                    <button onclick="toggleExtendedStats()">전체 통계 보기</button>
+                    <div class="value" id="statConsecWins">0</div>
+                    <div class="label">최대연승</div>
                 </div>
             </div>
         </div>
@@ -722,13 +570,6 @@
             document.getElementById(id).classList.toggle('open');
         }
 
-        function toggleExtendedStats() {
-            const extended = document.getElementById('statsExtended');
-            const btn = event.target;
-            extended.classList.toggle('show');
-            btn.textContent = extended.classList.contains('show') ? '통계 접기' : '전체 통계 보기';
-        }
-
         // 초기화
         document.addEventListener('DOMContentLoaded', () => {
             updateCurrentTime();
@@ -752,9 +593,7 @@
 
         async function loadAllData() {
             const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
-            const formattedDate = formatDate(today);
-            document.getElementById('todayDate').textContent = formattedDate;
-            document.getElementById('todayDateBadge').textContent = formattedDate;
+            document.getElementById('todayDate').textContent = formatDate(today);
 
             await Promise.all([
                 loadTodayStocks(today),
@@ -794,14 +633,6 @@
                 document.getElementById('currentHoldings').textContent = '0';
                 document.getElementById('todayTrades').textContent = '0';
 
-                // Reset hero section
-                document.getElementById('todayStockCount').textContent = '0';
-                document.getElementById('waitingCount').textContent = '0';
-                document.getElementById('profitCount').textContent = '0';
-                document.getElementById('lossCount').textContent = '0';
-                document.getElementById('todayReturn').textContent = '+0.0%';
-                document.getElementById('todayAmount').textContent = '(+0원)';
-
             } catch (error) {
                 console.log('Today stocks error:', error);
                 container.innerHTML = '<div class="no-data">데이터 로드 실패</div>';
@@ -810,39 +641,6 @@
 
         function displayTodayStocks(stocks, type) {
             const tbody = document.getElementById('stockTableBody');
-
-            // Calculate hero section stats
-            let waitingCount = 0, profitCount = 0, lossCount = 0;
-            let totalReturn = 0;
-
-            stocks.forEach(s => {
-                if (type === 'status') {
-                    if (s.status === 'profit_hit') profitCount++;
-                    else if (s.status === 'loss_hit') lossCount++;
-                    else waitingCount++;
-
-                    const price = s.current_price || s.price || 0;
-                    const entryPrice = s.entry_price || price;
-                    totalReturn += ((price - entryPrice) / entryPrice * 100);
-                } else {
-                    waitingCount++;
-                    totalReturn += (s.price_change_percent || s.change_pct || 0);
-                }
-            });
-
-            // Update hero section
-            document.getElementById('todayStockCount').textContent = stocks.length;
-            document.getElementById('waitingCount').textContent = waitingCount;
-            document.getElementById('profitCount').textContent = profitCount;
-            document.getElementById('lossCount').textContent = lossCount;
-
-            const avgReturn = stocks.length > 0 ? (totalReturn / stocks.length) : 0;
-            const returnEl = document.getElementById('todayReturn');
-            returnEl.textContent = (avgReturn >= 0 ? '+' : '') + avgReturn.toFixed(1) + '%';
-            returnEl.className = 'return-value ' + (avgReturn >= 0 ? 'positive' : 'negative');
-
-            const returnAmount = Math.round(stocks.length * POSITION_SIZE * avgReturn / 100);
-            document.getElementById('todayAmount').textContent = '(' + formatKoreanCurrency(returnAmount) + '원)';
 
             tbody.innerHTML = stocks.map((s, idx) => {
                 const price = s.current_price || s.price || 0;
