@@ -121,9 +121,15 @@
 .backtest-controls {
     background: var(--bg-primary);
     padding: var(--space-lg);
-    border-radius: 8px;
+    border-radius: 12px;
     margin-bottom: var(--space-lg);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.backtest-controls:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .control-group {
@@ -221,10 +227,16 @@
 .stat-card {
     background: var(--bg-primary);
     padding: var(--space-md);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     min-width: 0;
     overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .stat-label {
@@ -241,13 +253,55 @@
     word-break: break-all;
 }
 
+/* KPI 강조 스타일 */
+.kpi-highlight {
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdfc 100%);
+    border: 2px solid var(--accent-teal);
+    position: relative;
+    overflow: visible;
+}
+
+.kpi-highlight::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, var(--accent-teal), #00a89f);
+    border-radius: 12px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.kpi-highlight:hover::before {
+    opacity: 0.1;
+}
+
+.kpi-highlight .stat-value {
+    color: var(--accent-teal);
+    font-size: 1.25rem;
+}
+
+.kpi-highlight .stat-label {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
 /* 차트 */
 .chart-container {
     background: var(--bg-primary);
     padding: var(--space-lg);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     margin-bottom: var(--space-lg);
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .chart-container h3 {
@@ -280,8 +334,14 @@
 .info-card {
     background: var(--bg-primary);
     padding: var(--space-lg);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .info-card h3 {

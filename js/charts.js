@@ -34,22 +34,33 @@ const Charts = {
                 datasets: [{
                     label: '자본',
                     data: equityData.map(d => d.capital),
-                    borderColor: '#0066cc',
-                    backgroundColor: 'rgba(0, 102, 204, 0.1)',
-                    tension: 0.2,
+                    borderColor: '#00C6BE',
+                    backgroundColor: 'rgba(0, 198, 190, 0.15)',
+                    tension: 0.4,
                     fill: true,
-                    pointRadius: 3,
-                    pointHoverRadius: 5
+                    pointRadius: 0,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 800
+                },
                 plugins: {
                     legend: {
                         display: false
                     },
                     tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
                         callbacks: {
                             label: function(context) {
                                 return '자본: ' + context.parsed.y.toLocaleString('ko-KR') + '원';

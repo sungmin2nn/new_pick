@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BNF 매매 시뮬레이터</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -142,6 +144,21 @@
             padding: 12px;
             text-align: center;
             border: 1px solid #2a2a4a;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .kpi-primary .stat-value {
+            font-size: 1.8em;
+        }
+        .kpi-primary {
+            background: rgba(0, 198, 190, 0.15);
+            border: 1px solid rgba(0, 198, 190, 0.3);
+        }
+        .kpi-secondary {
+            opacity: 0.9;
         }
         .stat-value {
             font-size: 1.3em;
@@ -428,29 +445,29 @@
 
         <!-- Stats -->
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalTrades">-</div>
-                <div class="stat-label">매수/매도</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="winRate">-</div>
-                <div class="stat-label">승률</div>
-            </div>
-            <div class="stat-card">
+            <div class="stat-card kpi-primary">
                 <div class="stat-value" id="totalReturn">-</div>
                 <div class="stat-label">총 수익률</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card kpi-primary">
+                <div class="stat-value" id="winRate">-</div>
+                <div class="stat-label">승률</div>
+            </div>
+            <div class="stat-card kpi-primary">
+                <div class="stat-value" id="unrealizedPnl">-</div>
+                <div class="stat-label">평가손익</div>
+            </div>
+            <div class="stat-card kpi-secondary">
+                <div class="stat-value" id="totalTrades">-</div>
+                <div class="stat-label">매수/매도</div>
+            </div>
+            <div class="stat-card kpi-secondary">
                 <div class="stat-value" id="avgReturn">-</div>
                 <div class="stat-label">평균 수익</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card kpi-secondary">
                 <div class="stat-value" id="openPositions">-</div>
                 <div class="stat-label">보유 포지션</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="unrealizedPnl">-</div>
-                <div class="stat-label">평가손익</div>
             </div>
         </div>
 
