@@ -389,6 +389,83 @@
             .stat-value { font-size: 1.4em; }
         }
 
+        /* Hero Section */
+        .hero-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi-large {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #E5E7EB;
+            transition: all 0.3s ease;
+        }
+        .kpi-large:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .kpi-large .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1A1A2E;
+            margin-bottom: 8px;
+        }
+        .kpi-large.profit .kpi-value { color: #10B981; }
+        .kpi-large.loss .kpi-value { color: #EF4444; }
+        .kpi-large .kpi-label {
+            font-size: 0.9em;
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        /* Action Required */
+        .action-required {
+            border-left: 4px solid #F59E0B;
+            background: rgba(245, 158, 11, 0.03);
+        }
+        .action-required h2 {
+            color: #F59E0B;
+        }
+
+        /* Collapsible Strategy */
+        details.strategy-details {
+            background: rgba(0, 198, 190, 0.05);
+            border: 1px solid rgba(0, 198, 190, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        details.strategy-details summary {
+            cursor: pointer;
+            color: #00C6BE;
+            font-weight: 600;
+            font-size: 0.95em;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        details.strategy-details summary::-webkit-details-marker {
+            display: none;
+        }
+        details.strategy-details summary::before {
+            content: '▶';
+            font-size: 0.7em;
+            transition: transform 0.2s;
+        }
+        details.strategy-details[open] summary::before {
+            transform: rotate(90deg);
+        }
+        details.strategy-details .strategy-rules {
+            margin-top: 12px;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -397,6 +474,11 @@
             border-top: 1px solid #E5E7EB;
             color: #6B7280;
             font-size: 0.85em;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section { grid-template-columns: 1fr; }
+            .kpi-large .kpi-value { font-size: 2rem; }
         }
     </style>
 </head>
@@ -425,9 +507,120 @@
             </div>
         </div>
 
-        <!-- Strategy Info -->
-        <div class="strategy-info">
-            <h3>📋 BNF 낙폭과대 역추세 전략</h3>
+        <!-- Hero Section: 핵심 KPI 3개 -->
+        <div class="hero-section">
+            <div class="kpi-large" id="heroUnrealizedCard">
+                <div class="kpi-value" id="heroUnrealizedPnl">-</div>
+                <div class="kpi-label">평가손익</div>
+            </div>
+            <div class="kpi-large" id="heroReturnCard">
+                <div class="kpi-value" id="heroTotalReturn">-</div>
+                <div class="kpi-label">총 수익률</div>
+            </div>
+            <div class="kpi-large">
+                <div class="kpi-value" id="heroOpenPositions">-</div>
+                <div class="kpi-label">보유 중</div>
+            </div>
+        </div>
+
+        <!-- Open Positions (2번째 위치로 상승) -->
+        <div class="section">
+            <h2>💼 보유 포지션</h2>
+            <div class="table-wrapper">
+                <table id="positionsTable">
+                    <thead>
+                        <tr>
+                            <th>종목</th>
+                            <th>상태</th>
+                            <th>보유</th>
+                            <th>평균단가</th>
+                            <th>현재가</th>
+                            <th>수량</th>
+                            <th>평가금액</th>
+                            <th>손익</th>
+                            <th>수익률</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionsBody">
+                        <tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Candidates (액션 필요 - 강조) -->
+        <div class="section action-required">
+            <h2>📉 오늘의 매수 후보 (낙폭과대)</h2>
+            <div class="table-wrapper">
+                <table id="candidatesTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>종목</th>
+                            <th>현재가</th>
+                            <th>20일고점</th>
+                            <th>고점대비</th>
+                            <th>5일</th>
+                            <th>10일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidatesBody">
+                        <tr><td colspan="7" class="no-data">데이터 로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Unified Performance Chart (자산 + 수익률 통합) -->
+        <div class="section">
+            <h2>📊 성과 추이 (자산 및 수익률)</h2>
+            <div class="chart-container" style="height: 280px;">
+                <canvas id="unifiedChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Trade History (최근 5건만) -->
+        <div class="section">
+            <h2>📋 최근 매매 내역 (최근 5건)</h2>
+            <div class="table-wrapper">
+                <table id="tradeHistory">
+                    <thead>
+                        <tr>
+                            <th>날짜</th>
+                            <th>구분</th>
+                            <th>종목</th>
+                            <th>가격</th>
+                            <th>수량</th>
+                            <th>금액</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Secondary Stats -->
+        <div class="stats-grid">
+            <div class="stat-card kpi-secondary">
+                <div class="stat-value" id="totalTrades">-</div>
+                <div class="stat-label">매수/매도</div>
+            </div>
+            <div class="stat-card kpi-secondary">
+                <div class="stat-value" id="winRate">-</div>
+                <div class="stat-label">승률</div>
+            </div>
+            <div class="stat-card kpi-secondary">
+                <div class="stat-value" id="avgReturn">-</div>
+                <div class="stat-label">평균 수익</div>
+            </div>
+        </div>
+
+        <!-- Strategy Info (접기 가능, 하단) -->
+        <details class="strategy-details">
+            <summary>📋 BNF 낙폭과대 역추세 전략 상세</summary>
             <div class="strategy-rules">
                 <div class="rule-card">
                     <div class="label">대상 종목</div>
@@ -454,122 +647,7 @@
                     <div class="value">최대 5종목, 총자금 80%</div>
                 </div>
             </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card kpi-primary">
-                <div class="stat-value" id="totalReturn">-</div>
-                <div class="stat-label">총 수익률</div>
-            </div>
-            <div class="stat-card kpi-primary">
-                <div class="stat-value" id="winRate">-</div>
-                <div class="stat-label">승률</div>
-            </div>
-            <div class="stat-card kpi-primary">
-                <div class="stat-value" id="unrealizedPnl">-</div>
-                <div class="stat-label">평가손익</div>
-            </div>
-            <div class="stat-card kpi-secondary">
-                <div class="stat-value" id="totalTrades">-</div>
-                <div class="stat-label">매수/매도</div>
-            </div>
-            <div class="stat-card kpi-secondary">
-                <div class="stat-value" id="avgReturn">-</div>
-                <div class="stat-label">평균 수익</div>
-            </div>
-            <div class="stat-card kpi-secondary">
-                <div class="stat-value" id="openPositions">-</div>
-                <div class="stat-label">보유 포지션</div>
-            </div>
-        </div>
-
-        <!-- Candidates -->
-        <div class="section">
-            <h2>📉 낙폭과대 후보 종목</h2>
-            <div class="table-wrapper">
-                <table id="candidatesTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>종목</th>
-                            <th>현재가</th>
-                            <th>20일고점</th>
-                            <th>고점대비</th>
-                            <th>5일</th>
-                            <th>10일</th>
-                        </tr>
-                    </thead>
-                    <tbody id="candidatesBody">
-                        <tr><td colspan="7" class="no-data">데이터 로딩 중...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Open Positions -->
-        <div class="section">
-            <h2>💼 보유 포지션</h2>
-            <div class="table-wrapper">
-                <table id="positionsTable">
-                    <thead>
-                        <tr>
-                            <th>종목</th>
-                            <th>상태</th>
-                            <th>보유</th>
-                            <th>평균단가</th>
-                            <th>현재가</th>
-                            <th>수량</th>
-                            <th>평가금액</th>
-                            <th>손익</th>
-                            <th>수익률</th>
-                        </tr>
-                    </thead>
-                    <tbody id="positionsBody">
-                        <tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Portfolio Value Chart -->
-        <div class="section">
-            <h2>💰 자산 추이 (300만원 시작)</h2>
-            <div class="chart-container">
-                <canvas id="portfolioChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Performance Chart -->
-        <div class="section">
-            <h2>📈 누적 수익률</h2>
-            <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Trade History -->
-        <div class="section">
-            <h2>📋 매매 내역</h2>
-            <div class="table-wrapper">
-                <table id="tradeHistory">
-                    <thead>
-                        <tr>
-                            <th>날짜</th>
-                            <th>구분</th>
-                            <th>종목</th>
-                            <th>가격</th>
-                            <th>수량</th>
-                            <th>금액</th>
-                            <th>비고</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        </details>
     </div>
 
     <footer>
@@ -577,8 +655,7 @@
     </footer>
 
     <script>
-        let performanceChart = null;
-        let portfolioChart = null;
+        let unifiedChart = null;
         const INITIAL_CAPITAL = 3000000; // 300만원
         let autoRefreshInterval = null;
         const AUTO_REFRESH_INTERVAL = 60000; // 1분
@@ -785,16 +862,21 @@
             const unrealizedPnl = stats.unrealized_pnl || 0;
             const unrealizedPct = totalCost > 0 ? (unrealizedPnl / totalCost * 100) : 0;
 
-            const totalReturnEl = document.getElementById('totalReturn');
-            totalReturnEl.textContent = (unrealizedPct >= 0 ? '+' : '') + unrealizedPct.toFixed(2) + '%';
-            totalReturnEl.className = 'stat-value ' + (unrealizedPct >= 0 ? 'positive' : 'negative');
-
             document.getElementById('avgReturn').textContent = (stats.avg_return || 0).toFixed(2) + '%';
-            document.getElementById('openPositions').textContent = (stats.open_positions || 0) + '개';
 
-            const unrealizedEl = document.getElementById('unrealizedPnl');
-            unrealizedEl.textContent = (unrealizedPnl >= 0 ? '+' : '') + unrealizedPnl.toLocaleString() + '원';
-            unrealizedEl.className = 'stat-value ' + (unrealizedPnl >= 0 ? 'positive' : 'negative');
+            // Hero Section 업데이트
+            const heroUnrealizedEl = document.getElementById('heroUnrealizedPnl');
+            heroUnrealizedEl.textContent = (unrealizedPnl >= 0 ? '+' : '') + unrealizedPnl.toLocaleString() + '원';
+            const heroUnrealizedCard = document.getElementById('heroUnrealizedCard');
+            heroUnrealizedCard.className = 'kpi-large ' + (unrealizedPnl >= 0 ? 'profit' : 'loss');
+
+            const heroReturnEl = document.getElementById('heroTotalReturn');
+            heroReturnEl.textContent = (unrealizedPct >= 0 ? '+' : '') + unrealizedPct.toFixed(2) + '%';
+            const heroReturnCard = document.getElementById('heroReturnCard');
+            heroReturnCard.className = 'kpi-large ' + (unrealizedPct >= 0 ? 'profit' : 'loss');
+
+            const heroOpenEl = document.getElementById('heroOpenPositions');
+            heroOpenEl.textContent = (stats.open_positions || 0) + '종목';
         }
 
         // 거래 이력 로드
@@ -861,15 +943,14 @@
                 });
 
                 // 초기 차트 표시
-                initEmptyChart();
-                updateUnrealizedChart();
+                updateUnifiedChart();
 
                 if (allTrades.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>';
                     return;
                 }
 
-                tbody.innerHTML = allTrades.slice(0, 20).map(t => {
+                tbody.innerHTML = allTrades.slice(0, 5).map(t => {
                     const isBuy = t.type === 'BUY';
                     const typeClass = isBuy ? 'positive' : 'negative';
                     const typeLabel = isBuy ? '매수' : '매도';
@@ -899,57 +980,249 @@
             }
         }
 
-        // 미실현 손익 기반 차트 업데이트
-        async function updateUnrealizedChart() {
+        // 통합 차트 업데이트 (자산 + 수익률)
+        async function updateUnifiedChart() {
             try {
                 const response = await fetch('data/bnf/positions.json?t=' + Date.now());
-                if (!response.ok) return;
+                const ctx = document.getElementById('unifiedChart').getContext('2d');
+
+                if (!response.ok) {
+                    // 데이터 없을 때 초기 차트
+                    if (unifiedChart) unifiedChart.destroy();
+                    const today = new Date().toISOString().split('T')[0];
+                    unifiedChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['시작', today],
+                            datasets: [
+                                {
+                                    label: '자산 (원)',
+                                    data: [INITIAL_CAPITAL, INITIAL_CAPITAL],
+                                    borderColor: '#00C6BE',
+                                    backgroundColor: 'rgba(0, 198, 190, 0.1)',
+                                    fill: true,
+                                    tension: 0.3,
+                                    pointRadius: 6,
+                                    yAxisID: 'y-asset'
+                                },
+                                {
+                                    label: '수익률 (%)',
+                                    data: [0, 0],
+                                    borderColor: '#F59E0B',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                                    fill: false,
+                                    tension: 0.3,
+                                    pointRadius: 6,
+                                    yAxisID: 'y-return'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            scales: {
+                                'y-asset': {
+                                    type: 'linear',
+                                    position: 'left',
+                                    grid: { color: 'rgba(0,0,0,0.05)' },
+                                    ticks: {
+                                        color: '#00C6BE',
+                                        callback: v => (v / 10000).toFixed(0) + '만'
+                                    },
+                                    min: INITIAL_CAPITAL * 0.85,
+                                    max: INITIAL_CAPITAL * 1.15
+                                },
+                                'y-return': {
+                                    type: 'linear',
+                                    position: 'right',
+                                    grid: { drawOnChartArea: false },
+                                    ticks: {
+                                        color: '#F59E0B',
+                                        callback: v => v.toFixed(1) + '%'
+                                    },
+                                    min: -10,
+                                    max: 10
+                                },
+                                x: {
+                                    grid: { color: 'rgba(0,0,0,0.05)' },
+                                    ticks: { color: '#6B7280', font: { size: 10 } }
+                                }
+                            },
+                            plugins: {
+                                legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            if (context.datasetIndex === 0) {
+                                                return '자산: ' + context.parsed.y.toLocaleString() + '원';
+                                            } else {
+                                                return '수익률: ' + context.parsed.y.toFixed(2) + '%';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    return;
+                }
 
                 const data = await response.json();
                 const positions = data.positions || [];
                 const stats = data.stats || {};
 
-                if (positions.length === 0) return;
+                if (positions.length === 0) {
+                    // 포지션 없을 때 기본 차트
+                    const today = new Date().toISOString().split('T')[0];
+                    if (unifiedChart) unifiedChart.destroy();
+                    unifiedChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['시작', today],
+                            datasets: [
+                                {
+                                    label: '자산 (원)',
+                                    data: [INITIAL_CAPITAL, INITIAL_CAPITAL],
+                                    borderColor: '#00C6BE',
+                                    backgroundColor: 'rgba(0, 198, 190, 0.1)',
+                                    fill: true,
+                                    tension: 0.3,
+                                    pointRadius: 6,
+                                    yAxisID: 'y-asset'
+                                },
+                                {
+                                    label: '수익률 (%)',
+                                    data: [0, 0],
+                                    borderColor: '#F59E0B',
+                                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                                    fill: false,
+                                    tension: 0.3,
+                                    pointRadius: 6,
+                                    yAxisID: 'y-return'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            scales: {
+                                'y-asset': {
+                                    type: 'linear',
+                                    position: 'left',
+                                    grid: { color: 'rgba(0,0,0,0.05)' },
+                                    ticks: {
+                                        color: '#00C6BE',
+                                        callback: v => (v / 10000).toFixed(0) + '만'
+                                    },
+                                    min: INITIAL_CAPITAL * 0.85,
+                                    max: INITIAL_CAPITAL * 1.15
+                                },
+                                'y-return': {
+                                    type: 'linear',
+                                    position: 'right',
+                                    grid: { drawOnChartArea: false },
+                                    ticks: {
+                                        color: '#F59E0B',
+                                        callback: v => v.toFixed(1) + '%'
+                                    },
+                                    min: -10,
+                                    max: 10
+                                },
+                                x: {
+                                    grid: { color: 'rgba(0,0,0,0.05)' },
+                                    ticks: { color: '#6B7280', font: { size: 10 } }
+                                }
+                            },
+                            plugins: {
+                                legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            if (context.datasetIndex === 0) {
+                                                return '자산: ' + context.parsed.y.toLocaleString() + '원';
+                                            } else {
+                                                return '수익률: ' + context.parsed.y.toFixed(2) + '%';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    return;
+                }
 
-                // 시작일과 현재 데이터 포인트
+                // 포지션 있을 때
                 const entryDates = positions.map(p => p.entry_date).filter(d => d);
-                if (entryDates.length === 0) return;
-
-                const startDate = entryDates.sort()[0];
+                const startDate = entryDates.length > 0 ? entryDates.sort()[0] : new Date().toISOString().split('T')[0];
                 const today = new Date().toISOString().split('T')[0];
 
                 const totalCost = positions.reduce((sum, p) => sum + (p.avg_price * p.total_quantity), 0);
                 const totalValue = positions.reduce((sum, p) => sum + (p.current_price * p.total_quantity), 0);
                 const unrealizedPnl = stats.unrealized_pnl || (totalValue - totalCost);
                 const unrealizedPct = totalCost > 0 ? (unrealizedPnl / totalCost * 100) : 0;
+                const currentValue = INITIAL_CAPITAL + unrealizedPnl;
 
-                // 누적 수익률 차트 업데이트
-                const ctx = document.getElementById('performanceChart').getContext('2d');
-                if (performanceChart) performanceChart.destroy();
+                if (unifiedChart) unifiedChart.destroy();
 
-                performanceChart = new Chart(ctx, {
+                const assetColor = currentValue >= INITIAL_CAPITAL ? '#10B981' : '#EF4444';
+                const returnColor = unrealizedPct >= 0 ? '#10B981' : '#EF4444';
+
+                unifiedChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: ['시작 (' + startDate + ')', '현재 (' + today + ')'],
-                        datasets: [{
-                            label: '미실현 수익률 (%)',
-                            data: [0, unrealizedPct],
-                            borderColor: unrealizedPct >= 0 ? '#10B981' : '#EF4444',
-                            backgroundColor: unrealizedPct >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 8,
-                            pointBackgroundColor: unrealizedPct >= 0 ? '#10B981' : '#EF4444'
-                        }]
+                        datasets: [
+                            {
+                                label: '자산 (원)',
+                                data: [INITIAL_CAPITAL, currentValue],
+                                borderColor: assetColor,
+                                backgroundColor: assetColor === '#10B981' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 8,
+                                pointBackgroundColor: assetColor,
+                                yAxisID: 'y-asset'
+                            },
+                            {
+                                label: '수익률 (%)',
+                                data: [0, unrealizedPct],
+                                borderColor: returnColor,
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                fill: false,
+                                tension: 0.3,
+                                pointRadius: 8,
+                                pointBackgroundColor: returnColor,
+                                yAxisID: 'y-return'
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
                         scales: {
-                            y: {
+                            'y-asset': {
+                                type: 'linear',
+                                position: 'left',
                                 grid: { color: 'rgba(0,0,0,0.05)' },
                                 ticks: {
-                                    color: '#6B7280',
+                                    color: '#00C6BE',
+                                    callback: v => (v / 10000).toFixed(0) + '만'
+                                },
+                                suggestedMin: Math.min(INITIAL_CAPITAL, currentValue) * 0.95,
+                                suggestedMax: Math.max(INITIAL_CAPITAL, currentValue) * 1.05
+                            },
+                            'y-return': {
+                                type: 'linear',
+                                position: 'right',
+                                grid: { drawOnChartArea: false },
+                                ticks: {
+                                    color: '#F59E0B',
                                     callback: v => v.toFixed(1) + '%'
                                 },
                                 suggestedMin: Math.min(0, unrealizedPct - 5),
@@ -964,57 +1237,13 @@
                             legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
                             tooltip: {
                                 callbacks: {
-                                    label: ctx => ctx.parsed.y.toFixed(2) + '%'
-                                }
-                            }
-                        }
-                    }
-                });
-
-                // 자산 추이 차트도 업데이트
-                const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
-                if (portfolioChart) portfolioChart.destroy();
-
-                const currentValue = INITIAL_CAPITAL + unrealizedPnl;
-
-                portfolioChart = new Chart(portfolioCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['시작', '현재'],
-                        datasets: [{
-                            label: '자산 (원)',
-                            data: [INITIAL_CAPITAL, currentValue],
-                            borderColor: currentValue >= INITIAL_CAPITAL ? '#10B981' : '#EF4444',
-                            backgroundColor: currentValue >= INITIAL_CAPITAL ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 8,
-                            pointBackgroundColor: currentValue >= INITIAL_CAPITAL ? '#10B981' : '#EF4444'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                grid: { color: 'rgba(0,0,0,0.05)' },
-                                ticks: {
-                                    color: '#6B7280',
-                                    callback: v => (v / 10000).toFixed(0) + '만'
-                                },
-                                suggestedMin: Math.min(INITIAL_CAPITAL, currentValue) * 0.95,
-                                suggestedMax: Math.max(INITIAL_CAPITAL, currentValue) * 1.05
-                            },
-                            x: {
-                                grid: { color: 'rgba(0,0,0,0.05)' },
-                                ticks: { color: '#6B7280', font: { size: 10 } }
-                            }
-                        },
-                        plugins: {
-                            legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => ctx.parsed.y.toLocaleString() + '원'
+                                    label: function(context) {
+                                        if (context.datasetIndex === 0) {
+                                            return '자산: ' + context.parsed.y.toLocaleString() + '원';
+                                        } else {
+                                            return '수익률: ' + context.parsed.y.toFixed(2) + '%';
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1022,177 +1251,8 @@
                 });
 
             } catch (error) {
-                console.error('Chart update error:', error);
+                console.error('Unified chart update error:', error);
             }
-        }
-
-        // 초기 차트 (거래 없을 때)
-        function initEmptyChart() {
-            const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
-            const today = new Date().toISOString().split('T')[0];
-
-            if (portfolioChart) portfolioChart.destroy();
-
-            portfolioChart = new Chart(portfolioCtx, {
-                type: 'line',
-                data: {
-                    labels: ['시작', today],
-                    datasets: [{
-                        label: '자산 (원)',
-                        data: [INITIAL_CAPITAL, INITIAL_CAPITAL],
-                        borderColor: '#00C6BE',
-                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 6,
-                        pointBackgroundColor: '#00C6BE'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: {
-                                color: '#6B7280',
-                                callback: function(value) {
-                                    return (value / 10000).toFixed(0) + '만원';
-                                }
-                            },
-                            min: INITIAL_CAPITAL * 0.8,
-                            max: INITIAL_CAPITAL * 1.2
-                        },
-                        x: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280', font: { size: 10 } }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } }
-                    }
-                }
-            });
-        }
-
-        // 성과 차트 업데이트
-        function updatePerformanceChart(trades) {
-            if (!trades || trades.length === 0) return;
-
-            // 날짜별 누적 수익률 계산
-            const dailyReturns = {};
-            const dailyProfits = {};
-            trades.forEach(t => {
-                const date = t.exit_date;
-                if (!dailyReturns[date]) dailyReturns[date] = 0;
-                if (!dailyProfits[date]) dailyProfits[date] = 0;
-                dailyReturns[date] += t.return_pct || 0;
-                dailyProfits[date] += t.profit || 0;
-            });
-
-            const dates = Object.keys(dailyReturns).sort();
-            let cumulative = 0;
-            let cumulativeProfit = 0;
-            const cumulativeReturns = dates.map(d => {
-                cumulative += dailyReturns[d];
-                return cumulative;
-            });
-            const portfolioValues = dates.map(d => {
-                cumulativeProfit += dailyProfits[d];
-                return INITIAL_CAPITAL + cumulativeProfit;
-            });
-
-            // 자산 추이 차트
-            const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
-            if (portfolioChart) {
-                portfolioChart.destroy();
-            }
-
-            portfolioChart = new Chart(portfolioCtx, {
-                type: 'line',
-                data: {
-                    labels: ['시작', ...dates],
-                    datasets: [{
-                        label: '자산 (원)',
-                        data: [INITIAL_CAPITAL, ...portfolioValues],
-                        borderColor: '#00C6BE',
-                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#00C6BE'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: {
-                                color: '#6B7280',
-                                callback: function(value) {
-                                    return (value / 10000).toFixed(0) + '만원';
-                                }
-                            },
-                            min: INITIAL_CAPITAL * 0.8,
-                            suggestedMax: INITIAL_CAPITAL * 1.2
-                        },
-                        x: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280', maxRotation: 45, font: { size: 10 } }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.parsed.y.toLocaleString() + '원';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 수익률 차트
-            const ctx = document.getElementById('performanceChart').getContext('2d');
-            if (performanceChart) {
-                performanceChart.destroy();
-            }
-
-            performanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: '누적 수익률 (%)',
-                        data: cumulativeReturns,
-                        borderColor: '#00C6BE',
-                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280' }
-                        },
-                        x: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280', maxRotation: 45, font: { size: 10 } }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } }
-                    }
-                }
-            });
         }
     </script>
 </body>
