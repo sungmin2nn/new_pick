@@ -69,8 +69,8 @@ class TradingSimulator:
     """
 
     # 매매 파라미터
-    PROFIT_TARGET = 3.0     # 익절 +3%
-    LOSS_TARGET = -1.5      # 손절 -1.5%
+    PROFIT_TARGET = 5.0     # 익절 +5%
+    LOSS_TARGET = -3.0      # 손절 -3%
     EXIT_DEADLINE = "14:30"
     INITIAL_CAPITAL = 1_000_000  # 초기 자본 100만원
     MAX_STOCKS = 5          # 최대 종목 수

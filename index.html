@@ -370,11 +370,11 @@
             <div class="strategy-rules">
                 <div class="rule-card">
                     <div class="label">익절 목표</div>
-                    <div class="value profit">+3%</div>
+                    <div class="value profit">+5%</div>
                 </div>
                 <div class="rule-card">
                     <div class="label">손절 라인</div>
-                    <div class="value loss">-1.5%</div>
+                    <div class="value loss">-3%</div>
                 </div>
                 <div class="rule-card">
                     <div class="label">종가 청산</div>
@@ -623,8 +623,8 @@
             tbody.innerHTML = stocks.map((s, idx) => {
                 const price = s.current_price || s.price || 0;
                 const entryPrice = s.entry_price || price;
-                const profitTarget = Math.round(entryPrice * 1.03);
-                const lossTarget = Math.round(entryPrice * 0.985);
+                const profitTarget = Math.round(entryPrice * 1.05);
+                const lossTarget = Math.round(entryPrice * 0.97);
                 const score = s.total_score || s.score || 0;
                 const tradingValue = s.trading_value || 0;
 
@@ -661,11 +661,11 @@
                                     <div class="value">${entryPrice.toLocaleString()}</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="label">익절가 (+3%)</div>
+                                    <div class="label">익절가 (+5%)</div>
                                     <div class="value profit">${profitTarget.toLocaleString()}</div>
                                 </div>
                                 <div class="detail-item">
-                                    <div class="label">손절가 (-1.5%)</div>
+                                    <div class="label">손절가 (-3%)</div>
                                     <div class="value loss">${lossTarget.toLocaleString()}</div>
                                 </div>
                                 <div class="detail-item">
@@ -764,8 +764,8 @@
                 const pl = s.profit_loss_analysis || {};
                 let exitType = 'close', returnPct = pl.closing_percent || 0;
 
-                if (pl.first_hit === 'profit') { exitType = 'profit'; returnPct = 3; wins++; }
-                else if (pl.first_hit === 'loss') { exitType = 'loss'; returnPct = -1.5; losses++; }
+                if (pl.first_hit === 'profit') { exitType = 'profit'; returnPct = 5; wins++; }
+                else if (pl.first_hit === 'loss') { exitType = 'loss'; returnPct = -3; losses++; }
                 else { closes++; }
 
                 totalReturn += returnPct;

@@ -230,7 +230,7 @@ class IntradayCollector:
 
         return result
 
-    def analyze_profit_loss(self, stock_code, date_str, profit_target=3.0, loss_target=-2.0, avg_volume_20d=0):
+    def analyze_profit_loss(self, stock_code, date_str, profit_target=5.0, loss_target=-3.0, avg_volume_20d=0):
         """
         시초가 매매 익절/손절 분석 (매수 조건 체크 포함)
 
@@ -638,7 +638,7 @@ class IntradayCollector:
             'signal': signal,
         }
 
-    def collect_intraday_data(self, candidates, date_str=None, profit_target=3.0, loss_target=-2.0):
+    def collect_intraday_data(self, candidates, date_str=None, profit_target=5.0, loss_target=-3.0):
         """
         선정 종목들의 당일 거래 데이터 수집 + 익절/손절 분석
         멀티 시나리오 + 단타 + 스윙 전략 포함
