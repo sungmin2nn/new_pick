@@ -189,6 +189,7 @@ https://sungmin2nn.github.io/new_pick/
 | 문서 | 설명 |
 |------|------|
 | [PROJECT_KNOWLEDGE_BASE.md](docs/PROJECT_KNOWLEDGE_BASE.md) | 프로젝트 히스토리, 의사결정 |
+| [STRATEGY_AND_WORKFLOW.md](docs/STRATEGY_AND_WORKFLOW.md) | 전략 상세, GitHub Actions 플로우 |
 | [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) | 구현 상세 |
 | [system_guide.html](system_guide.html) | 사용자 가이드 |
 
