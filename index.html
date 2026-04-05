@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/adriel-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/analytics.js?v=12"></script>
-    <script src="js/benchmark.js?v=12"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -354,7 +352,6 @@
                 <a href="bnf_dashboard.html" class="nav-btn">📉 BNF 낙폭과대</a>
             </div>
             <div class="nav-buttons-sub">
-                <a href="backtest_dashboard.html">📈 백테스트</a>
                 <a href="system_guide.html">📚 가이드</a>
             </div>
         </div>
@@ -495,60 +492,6 @@
                 <div class="stat-card">
                     <div class="stat-value" id="statConsecLosses">0</div>
                     <div class="stat-label">최대연패</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="statSharpe">-</div>
-                    <div class="stat-label">샤프비율</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="statSortino">-</div>
-                    <div class="stat-label">소르티노</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="statCalmar">-</div>
-                    <div class="stat-label">칼마비율</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Benchmark Comparison - BNF Style -->
-        <div class="section">
-            <h2>📊 KOSPI 대비 성과</h2>
-            <div class="stats-grid" style="margin-bottom: 15px;">
-                <div class="stat-card">
-                    <div class="stat-value" id="kospiReturn">-</div>
-                    <div class="stat-label">KOSPI 수익률</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="strategyReturn">-</div>
-                    <div class="stat-label">전략 수익률</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="alphaValue">-</div>
-                    <div class="stat-label">알파 (α)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="betaValue">-</div>
-                    <div class="stat-label">베타 (β)</div>
-                </div>
-            </div>
-            <div style="height: 200px;">
-                <canvas id="benchmarkChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Advanced Charts - BNF Style -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
-            <div class="section">
-                <h2>📉 드로우다운</h2>
-                <div style="height: 180px;">
-                    <canvas id="drawdownChart"></canvas>
-                </div>
-            </div>
-            <div class="section">
-                <h2>📊 수익률 분포</h2>
-                <div style="height: 180px;">
-                    <canvas id="returnHistogram"></canvas>
                 </div>
             </div>
         </div>
@@ -978,25 +921,6 @@
             });
             document.getElementById('statConsecLosses').textContent = maxConsecLosses + '연패';
 
-            // 리스크 지표 계산 (analytics.js 사용)
-            if (typeof Analytics !== 'undefined') {
-                const dailyReturns = days.map(d => d.total_return || 0);
-
-                const sharpe = Analytics.calculateSharpeRatio(dailyReturns);
-                document.getElementById('statSharpe').textContent = sharpe !== null ? sharpe.toFixed(2) : '-';
-
-                const sortino = Analytics.calculateSortinoRatio(dailyReturns);
-                document.getElementById('statSortino').textContent = sortino !== null ? sortino.toFixed(2) : '-';
-
-                const calmar = Analytics.calculateCalmarRatio(dailyReturns, mdd);
-                document.getElementById('statCalmar').textContent = calmar !== null ? calmar.toFixed(2) : '-';
-            }
-
-            // 벤치마크 비교 (benchmark.js 사용)
-            displayBenchmarkComparison(days);
-
-            // 고급 차트 렌더링
-            displayAdvancedCharts(days);
         }
 
         function displayMiniChart(data) {
@@ -1065,174 +989,6 @@
             });
         }
 
-        let benchmarkChart = null;
-        let drawdownChart = null;
-        let histogramChart = null;
-
-        function displayBenchmarkComparison(days) {
-            if (typeof Benchmark === 'undefined' || days.length === 0) return;
-
-            const startDate = days[0].date;
-            const endDate = days[days.length - 1].date;
-
-            // 전략 누적 수익률
-            const strategyReturn = days.reduce((sum, d) => sum + (d.total_return || 0), 0);
-
-            // 벤치마크 수익률
-            const benchmarkReturns = Benchmark.getBenchmarkReturns(startDate, endDate);
-            const kospiReturn = benchmarkReturns.length > 0 ? benchmarkReturns[benchmarkReturns.length - 1].cumulativeReturn : 0;
-
-            // 알파, 베타 계산
-            const strategyDailyReturns = days.map(d => (d.total_return || 0) / 100);
-            const benchmarkDailyReturns = benchmarkReturns.map(b => (b.dailyReturn || 0) / 100);
-
-            let alpha = strategyReturn - kospiReturn;
-            let beta = 1.0;
-
-            if (strategyDailyReturns.length > 5 && benchmarkDailyReturns.length > 5) {
-                const minLen = Math.min(strategyDailyReturns.length, benchmarkDailyReturns.length);
-                const sReturns = strategyDailyReturns.slice(0, minLen);
-                const bReturns = benchmarkDailyReturns.slice(0, minLen);
-
-                const covariance = sReturns.reduce((sum, s, i) => sum + s * bReturns[i], 0) / minLen;
-                const benchVariance = bReturns.reduce((sum, b) => sum + b * b, 0) / minLen;
-                if (benchVariance > 0) beta = covariance / benchVariance;
-            }
-
-            // UI 업데이트
-            const kospiEl = document.getElementById('kospiReturn');
-            kospiEl.textContent = (kospiReturn >= 0 ? '+' : '') + kospiReturn.toFixed(2) + '%';
-            kospiEl.className = 'value ' + (kospiReturn >= 0 ? 'positive' : 'negative');
-
-            const stratEl = document.getElementById('strategyReturn');
-            stratEl.textContent = (strategyReturn >= 0 ? '+' : '') + strategyReturn.toFixed(2) + '%';
-            stratEl.className = 'value ' + (strategyReturn >= 0 ? 'positive' : 'negative');
-
-            const alphaEl = document.getElementById('alphaValue');
-            alphaEl.textContent = (alpha >= 0 ? '+' : '') + alpha.toFixed(2) + '%';
-            alphaEl.className = 'value ' + (alpha >= 0 ? 'positive' : 'negative');
-
-            document.getElementById('betaValue').textContent = beta.toFixed(2);
-
-            // 벤치마크 차트
-            const ctx = document.getElementById('benchmarkChart').getContext('2d');
-            if (benchmarkChart) benchmarkChart.destroy();
-
-            let cumStrategy = 0;
-            const strategyData = days.map(d => {
-                cumStrategy += d.total_return || 0;
-                return { date: d.date, value: cumStrategy };
-            });
-
-            benchmarkChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: strategyData.map(d => formatDate(d.date).slice(5)),
-                    datasets: [
-                        {
-                            label: '전략',
-                            data: strategyData.map(d => d.value),
-                            borderColor: '#00C6BE',
-                            backgroundColor: 'rgba(0, 198, 190, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'KOSPI',
-                            data: benchmarkReturns.slice(0, strategyData.length).map(b => b.cumulativeReturn),
-                            borderColor: '#64748B',
-                            borderDash: [5, 5],
-                            fill: false,
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
-                    },
-                    scales: {
-                        x: { ticks: { maxRotation: 0, font: { size: 10 } } },
-                        y: { ticks: { callback: v => v + '%' } }
-                    }
-                }
-            });
-        }
-
-        function displayAdvancedCharts(days) {
-            if (days.length === 0) return;
-
-            // 드로우다운 차트
-            const drawdownCtx = document.getElementById('drawdownChart').getContext('2d');
-            if (drawdownChart) drawdownChart.destroy();
-
-            let peak = 0, cumulative = 0;
-            const drawdownData = days.map(d => {
-                cumulative += d.total_return || 0;
-                if (cumulative > peak) peak = cumulative;
-                return { date: d.date, drawdown: cumulative - peak };
-            });
-
-            drawdownChart = new Chart(drawdownCtx, {
-                type: 'line',
-                data: {
-                    labels: drawdownData.map(d => formatDate(d.date).slice(5)),
-                    datasets: [{
-                        label: '드로우다운',
-                        data: drawdownData.map(d => d.drawdown),
-                        borderColor: '#EF4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.3)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { maxRotation: 0, font: { size: 9 } } },
-                        y: { ticks: { callback: v => v + '%' } }
-                    }
-                }
-            });
-
-            // 수익률 히스토그램
-            const histCtx = document.getElementById('returnHistogram').getContext('2d');
-            if (histogramChart) histogramChart.destroy();
-
-            const returns = days.map(d => d.total_return || 0);
-            const bins = [-3, -2, -1, 0, 1, 2, 3];
-            const counts = bins.map((_, i) => {
-                if (i === 0) return returns.filter(r => r < -2).length;
-                if (i === bins.length - 1) return returns.filter(r => r >= 2).length;
-                return returns.filter(r => r >= bins[i] - 1 && r < bins[i]).length;
-            });
-
-            histogramChart = new Chart(histCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['<-2%', '-2~-1%', '-1~0%', '0~1%', '1~2%', '>2%'],
-                    datasets: [{
-                        label: '빈도',
-                        data: counts.slice(0, 6),
-                        backgroundColor: counts.slice(0, 6).map((_, i) => i < 3 ? 'rgba(239, 68, 68, 0.6)' : 'rgba(16, 185, 129, 0.6)'),
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { font: { size: 10 } } },
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                    }
-                }
-            });
-        }
     </script>
 </body>
 </html>

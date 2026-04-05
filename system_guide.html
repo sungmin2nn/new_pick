@@ -237,7 +237,6 @@
             <a href="bnf_dashboard.html" class="nav-item">📉 BNF 낙폭과대</a>
         </div>
         <div class="global-nav-sub">
-            <a href="backtest_dashboard.html">📈 백테스트</a>
             <a href="system_guide.html" class="active">📚 가이드</a>
         </div>
     </nav>
@@ -245,13 +244,12 @@
     <div class="container">
         <div class="header">
             <h1>📚 장전 종목 선정 시스템 가이드</h1>
-            <p>시스템 구조, 점수 기준, 백테스팅 방법 완전 정리</p>
+            <p>시스템 구조, 점수 기준, 매매 전략 완전 정리</p>
         </div>
 
         <div class="nav">
             <a href="#overview">📌 시스템 개요</a>
             <a href="#scoring">🎯 점수 시스템</a>
-            <a href="#backtesting">📊 백테스팅</a>
             <a href="#strategy">💰 매매 전략</a>
             <a href="#next-steps">🚀 다음 단계</a>
         </div>
@@ -284,13 +282,10 @@
 <br>
 매일 16:30 (결과 수집)<br>
 ↓<br>
-<strong>5. 백테스팅 데이터 수집</strong><br>
+<strong>5. 장중 데이터 수집</strong><br>
 ├─ 시초가, 고가, 저가, 종가<br>
-├─ 익절/손절 도달 분석 (+3%/-2%)<br>
-└─ data/intraday/intraday_YYYYMMDD.json<br>
-↓<br>
-<strong>6. 리포트 생성</strong><br>
-└─ data/backtest_report.html
+├─ 익절/손절 도달 분석 (+3%/-1.5%)<br>
+└─ data/intraday/intraday_YYYYMMDD.json
             </div>
 
             <h3>주요 파일</h3>
@@ -310,13 +305,8 @@
                     </tr>
                     <tr>
                         <td>intraday_collector.py</td>
-                        <td>장중 데이터 수집 & 백테스팅</td>
+                        <td>장중 데이터 수집 & 결과 분석</td>
                         <td>매일 16:30</td>
-                    </tr>
-                    <tr>
-                        <td>backtest_report.py</td>
-                        <td>백테스팅 리포트 생성</td>
-                        <td>수동 실행</td>
                     </tr>
                     <tr>
                         <td>config.py</td>
@@ -480,71 +470,6 @@ SCORE_WEIGHTS = {
             </div>
         </div>
 
-        <!-- 백테스팅 -->
-        <div class="section" id="backtesting">
-            <h2>📊 백테스팅</h2>
-
-            <h3>백테스팅이란?</h3>
-            <p>선정된 종목이 실제로 수익을 냈는지 검증하는 과정입니다. 매일 16:30에 자동으로 당일 결과를 수집하여 데이터를 축적합니다.</p>
-
-            <h3>수집 데이터</h3>
-            <ul>
-                <li><strong>시초가:</strong> 실제 매수 가격</li>
-                <li><strong>고가/저가:</strong> 당일 최고/최저 가격</li>
-                <li><strong>종가:</strong> 장 마감 가격</li>
-                <li><strong>익절 도달 시점:</strong> +3% 도달한 시간</li>
-                <li><strong>손절 도달 시점:</strong> -2% 도달한 시간</li>
-                <li><strong>최대 수익률:</strong> 고점 대비 수익률</li>
-                <li><strong>종가 수익률:</strong> 시초가 대비 종가 수익률</li>
-            </ul>
-
-            <h3>익절/손절 기준</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>구분</th>
-                        <th>기준</th>
-                        <th>설명</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>익절</td>
-                        <td>+3%</td>
-                        <td>시초가 대비 +3% 도달 시 익절 성공</td>
-                    </tr>
-                    <tr>
-                        <td>손절</td>
-                        <td>-2%</td>
-                        <td>시초가 대비 -2% 도달 시 손절 발생</td>
-                    </tr>
-                    <tr>
-                        <td>미도달</td>
-                        <td>-</td>
-                        <td>익절/손절 모두 미도달 (종가 수익률로 평가)</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3>백테스팅 리포트 보는 법</h3>
-            <ol>
-                <li><a href="data/backtest_report.html" target="_blank">백테스팅 리포트</a> 열기</li>
-                <li><strong>전체 통계:</strong> 승률, 평균 수익률 확인</li>
-                <li><strong>점수대별 분석:</strong> 어떤 점수대가 유효한지 확인</li>
-                <li><strong>날짜별 상세:</strong> 개별 종목 성과 확인</li>
-            </ol>
-
-            <div class="warning">
-                <strong>⚠️ 주의:</strong> 최소 <strong>2주(10거래일)</strong> 데이터가 쌓여야 의미 있는 분석이 가능합니다. 현재 데이터가 부족하면 매일 자동 수집될 때까지 기다려주세요.
-            </div>
-
-            <h3>리포트 수동 생성</h3>
-            <p>새로운 데이터가 추가되면 다음 명령으로 리포트를 재생성할 수 있습니다:</p>
-            <div class="code-block">
-python3 backtest_report.py
-            </div>
-        </div>
-
         <!-- 매매 전략 -->
         <div class="section" id="strategy">
             <h2>💰 매매 전략 가이드</h2>
@@ -638,12 +563,12 @@ python3 backtest_report.py
             <ul>
                 <li>시스템이 매일 자동으로 데이터 수집</li>
                 <li>최소 10거래일 데이터 확보</li>
-                <li>백테스팅 리포트 주기적 확인</li>
+                <li>대시보드에서 결과 주기적 확인</li>
             </ul>
 
             <h3>2단계: 첫 분석 (2주 후)</h3>
             <ul>
-                <li>백테스팅 리포트에서 승률 확인</li>
+                <li>대시보드에서 승률 확인</li>
                 <li>점수대별 성과 분석</li>
                 <li>어떤 공시 카테고리가 유효한지 확인</li>
                 <li>필요시 점수 가중치 조정</li>
@@ -675,7 +600,7 @@ python3 backtest_report.py
                 <tbody>
                     <tr>
                         <td>점수 가중치</td>
-                        <td>백테스팅 결과 기반 조정</td>
+                        <td>실전 결과 기반 조정</td>
                         <td>1개월마다</td>
                     </tr>
                     <tr>
@@ -713,15 +638,7 @@ python3 backtest_report.py
                 <li>공시는 매일 발생하는 것이 아니므로 0점이 정상일 수 있음</li>
             </ol>
 
-            <h3>Q2. 백테스팅 리포트가 비어있습니다</h3>
-            <p><strong>A:</strong> 아직 데이터가 수집되지 않았습니다.</p>
-            <ul>
-                <li>매일 16:30에 자동으로 데이터 수집</li>
-                <li>최소 1-2일 기다려주세요</li>
-                <li><code>data/intraday/</code> 폴더에 JSON 파일이 있는지 확인</li>
-            </ul>
-
-            <h3>Q3. 점수가 너무 낮습니다 (20-30점대)</h3>
+            <h3>Q2. 점수가 너무 낮습니다 (20-30점대)</h3>
             <p><strong>A:</strong> 공시나 뉴스가 없으면 낮은 점수가 정상입니다.</p>
             <ul>
                 <li>공시(40점) + 뉴스(25점) = 65점이 핵심</li>
@@ -729,7 +646,7 @@ python3 backtest_report.py
                 <li>점수가 낮다면 매수 보류 권장</li>
             </ul>
 
-            <h3>Q4. 외국인/기관 점수가 0점입니다</h3>
+            <h3>Q3. 외국인/기관 점수가 0점입니다</h3>
             <p><strong>A:</strong> pykrx 라이브러리가 설치되지 않았거나, KRX 데이터 조회 실패입니다.</p>
             <ul>
                 <li>로컬 실행 시: <code>pip install pykrx</code></li>
