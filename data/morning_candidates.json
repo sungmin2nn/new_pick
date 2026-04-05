@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-04-06T01:06:15",
+  "generated_at": "2026-04-06T01:52:20",
   "date": "2026-04-06",
   "weekday": "월요일",
   "weekday_short": "월",
   "is_market_day": true,
   "market_sentiment": {
     "vix": {
-      "value": 23.87,
-      "change": 0.0,
-      "direction": "up",
-      "status": "경계"
+      "value": null,
+      "change": 0,
+      "direction": "unknown",
+      "status": "unknown"
     },
     "usd_krw": {
       "value": 1510.1,
@@ -46,9 +46,36 @@
     "score": 0,
     "mode": "중립",
     "mode_desc": "시장 혼조 - 선별적 매매",
-    "generated_at": "2026-04-06 01:03:04"
+    "generated_at": "2026-04-06 01:49:17"
   },
   "count": 7,
+  "strategy_stats": {
+    "momentum": {
+      "name": "모멘텀",
+      "count": 2,
+      "codes": [
+        "005930",
+        "042660"
+      ]
+    },
+    "mixed": {
+      "name": "복합",
+      "count": 2,
+      "codes": [
+        "047040",
+        "122870"
+      ]
+    },
+    "theme": {
+      "name": "테마/반도체",
+      "count": 3,
+      "codes": [
+        "010170",
+        "005380",
+        "469150"
+      ]
+    }
+  },
   "candidates": [
     {
       "code": "005930",
@@ -156,6 +183,8 @@
           "message": "OK"
         }
       },
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀",
       "technical_indicators": {
         "code": "005930",
         "current_price": 186200,
@@ -288,6 +317,8 @@
           "message": "OK"
         }
       },
+      "strategy_id": "mixed",
+      "strategy_name": "복합",
       "technical_indicators": {
         "code": "047040",
         "current_price": 16810,
@@ -422,6 +453,8 @@
           "message": "OK"
         }
       },
+      "strategy_id": "theme",
+      "strategy_name": "테마/반도체",
       "technical_indicators": {
         "code": "010170",
         "current_price": 12740,
@@ -556,6 +589,8 @@
           "message": "OK"
         }
       },
+      "strategy_id": "theme",
+      "strategy_name": "테마/반도체",
       "technical_indicators": {
         "code": "005380",
         "current_price": 471000,
@@ -688,6 +723,8 @@
           "message": "OK"
         }
       },
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀",
       "technical_indicators": {
         "code": "042660",
         "current_price": 128000,
@@ -823,6 +860,8 @@
           "message": "OK"
         }
       },
+      "strategy_id": "theme",
+      "strategy_name": "테마/반도체",
       "technical_indicators": {
         "code": "469150",
         "current_price": 43060,
@@ -956,6 +995,8 @@
           "message": "OK"
         }
       },
+      "strategy_id": "mixed",
+      "strategy_name": "복합",
       "technical_indicators": {
         "code": "122870",
         "current_price": 51000,
