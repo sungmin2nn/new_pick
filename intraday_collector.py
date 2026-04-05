@@ -684,6 +684,8 @@ class IntradayCollector:
                 'code': stock_code,
                 'name': stock_name,
                 'date': date_str,
+                'strategy_id': candidate.get('strategy_id', 'mixed'),
+                'strategy_name': candidate.get('strategy_name', '복합'),
                 'profit_loss_analysis': pl_analysis,
                 'multi_scenario': multi_scenario,
                 'scalp_strategy': scalp_result,
@@ -702,10 +704,32 @@ class IntradayCollector:
         os.makedirs('data/intraday', exist_ok=True)
         output_path = f'data/intraday/intraday_{date_str}.json'
 
+        # 전략별 성과 통계
+        strategy_results = {}
+        for code, data in intraday_data.items():
+            strategy_id = data.get('strategy_id', 'mixed')
+            strategy_name = data.get('strategy_name', '복합')
+            pl = data.get('profit_loss_analysis', {})
+            first_hit = pl.get('first_hit', 'none')
+
+            if strategy_id not in strategy_results:
+                strategy_results[strategy_id] = {
+                    'name': strategy_name,
+                    'total': 0, 'profit': 0, 'loss': 0, 'close': 0
+                }
+            strategy_results[strategy_id]['total'] += 1
+            if first_hit == 'profit':
+                strategy_results[strategy_id]['profit'] += 1
+            elif first_hit == 'loss':
+                strategy_results[strategy_id]['loss'] += 1
+            else:
+                strategy_results[strategy_id]['close'] += 1
+
         result = {
             'generated_at': format_kst_time(format_str='%Y-%m-%dT%H:%M:%S'),
             'date': date_str,
             'count': len(intraday_data),
+            'strategy_results': strategy_results,
             'stocks': intraday_data
         }
 

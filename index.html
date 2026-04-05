@@ -149,6 +149,56 @@
         .stat-value.negative { color: #EF4444; }
         .stat-label { color: #6B7280; font-size: 0.7em; }
 
+        /* Strategy Tabs */
+        .strategy-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .strategy-tab {
+            padding: 8px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 20px;
+            background: #FFFFFF;
+            color: #6B7280;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .strategy-tab:hover {
+            border-color: #00C6BE;
+            color: #00C6BE;
+        }
+        .strategy-tab.active {
+            background: #00C6BE;
+            border-color: #00C6BE;
+            color: white;
+        }
+        .tab-count {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.85em;
+        }
+        .strategy-tab.active .tab-count {
+            background: rgba(255,255,255,0.3);
+        }
+        .strategy-badge {
+            font-size: 0.65em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+        .strategy-badge.dart { background: #FEF3C7; color: #92400E; }
+        .strategy-badge.theme { background: #DBEAFE; color: #1E40AF; }
+        .strategy-badge.largecap_contrarian { background: #FEE2E2; color: #991B1B; }
+        .strategy-badge.momentum { background: #D1FAE5; color: #065F46; }
+        .strategy-badge.mixed { background: #F3F4F6; color: #4B5563; }
+
         /* Section - BNF Style */
         .section {
             background: #FFFFFF;
@@ -429,6 +479,25 @@
             </div>
         </div>
 
+        <!-- Strategy Tabs -->
+        <div class="strategy-tabs">
+            <button class="strategy-tab active" data-strategy="all" onclick="filterByStrategy('all')">
+                전체 <span class="tab-count" id="count-all">0</span>
+            </button>
+            <button class="strategy-tab" data-strategy="dart" onclick="filterByStrategy('dart')">
+                📋 DART <span class="tab-count" id="count-dart">0</span>
+            </button>
+            <button class="strategy-tab" data-strategy="theme" onclick="filterByStrategy('theme')">
+                🎯 테마 <span class="tab-count" id="count-theme">0</span>
+            </button>
+            <button class="strategy-tab" data-strategy="largecap_contrarian" onclick="filterByStrategy('largecap_contrarian')">
+                📉 역추세 <span class="tab-count" id="count-largecap_contrarian">0</span>
+            </button>
+            <button class="strategy-tab" data-strategy="momentum" onclick="filterByStrategy('momentum')">
+                🚀 모멘텀 <span class="tab-count" id="count-momentum">0</span>
+            </button>
+        </div>
+
         <!-- Today's Stocks - BNF Style -->
         <div class="section">
             <h2>🎯 금일 종목 상세 <span style="font-weight:normal;font-size:0.8em;color:#6B7280;" id="todayDate">-</span></h2>
@@ -504,12 +573,53 @@
     <script>
         let miniChart = null;
         let cachedData = null;
+        let allStocks = [];  // 전체 종목 저장
+        let currentStrategy = 'all';  // 현재 선택된 전략
         const INITIAL_CAPITAL = 1000000;
         const POSITION_SIZE = 200000;
 
         // 데이터 캐싱
         const dataCache = new Map();
         const CACHE_DURATION = 60000;
+
+        // 전략 필터링
+        function filterByStrategy(strategyId) {
+            currentStrategy = strategyId;
+
+            // 탭 활성화 상태 변경
+            document.querySelectorAll('.strategy-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.strategy === strategyId) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // 종목 필터링 및 재표시
+            const filtered = strategyId === 'all'
+                ? allStocks
+                : allStocks.filter(s => s.strategy_id === strategyId || s.strategy_id?.startsWith(strategyId.split('_')[0]));
+
+            displayTodayStocks(filtered, 'candidates');
+        }
+
+        // 탭 카운트 업데이트
+        function updateTabCounts(stocks) {
+            const counts = { all: stocks.length, dart: 0, theme: 0, largecap_contrarian: 0, momentum: 0, mixed: 0 };
+
+            stocks.forEach(s => {
+                const sid = s.strategy_id || 'mixed';
+                if (sid === 'dart') counts.dart++;
+                else if (sid === 'theme' || sid.startsWith('theme')) counts.theme++;
+                else if (sid === 'largecap_contrarian') counts.largecap_contrarian++;
+                else if (sid === 'momentum') counts.momentum++;
+                else counts.mixed++;
+            });
+
+            Object.keys(counts).forEach(key => {
+                const el = document.getElementById(`count-${key}`);
+                if (el) el.textContent = counts[key];
+            });
+        }
 
         async function fetchWithCache(url) {
             const now = Date.now();
@@ -581,14 +691,16 @@
 
         // 금일 종목 로드
         async function loadTodayStocks(today) {
-            const container = document.getElementById('stockCards');
+            const tbody = document.getElementById('stockTableBody');
 
             try {
                 // 상태 파일 우선
                 let data = await fetchWithCache(`data/paper_trading/status_${today}.json?t=${Date.now()}`);
 
                 if (data && data.stocks && data.stocks.length > 0) {
-                    displayTodayStocks(data.stocks, 'status');
+                    allStocks = data.stocks;
+                    updateTabCounts(allStocks);
+                    displayTodayStocks(allStocks, 'status');
                     document.getElementById('currentHoldings').textContent = data.stocks.filter(s => s.status === 'waiting').length;
                     document.getElementById('todayTrades').textContent = data.stocks.length;
                     return;
@@ -601,24 +713,31 @@
                 }
 
                 if (data && data.candidates && data.candidates.length > 0) {
-                    displayTodayStocks(data.candidates, 'candidates');
+                    allStocks = data.candidates;
+                    updateTabCounts(allStocks);
+                    displayTodayStocks(allStocks, 'candidates');
                     document.getElementById('currentHoldings').textContent = data.candidates.length;
                     document.getElementById('todayTrades').textContent = data.candidates.length;
                     return;
                 }
 
-                container.innerHTML = '<div class="no-data">금일 선정된 종목이 없습니다</div>';
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">금일 선정된 종목이 없습니다</td></tr>';
                 document.getElementById('currentHoldings').textContent = '0';
                 document.getElementById('todayTrades').textContent = '0';
 
             } catch (error) {
                 console.log('Today stocks error:', error);
-                container.innerHTML = '<div class="no-data">데이터 로드 실패</div>';
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">데이터 로드 실패</td></tr>';
             }
         }
 
         function displayTodayStocks(stocks, type) {
             const tbody = document.getElementById('stockTableBody');
+
+            if (!stocks || stocks.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">종목이 없습니다</td></tr>';
+                return;
+            }
 
             tbody.innerHTML = stocks.map((s, idx) => {
                 const price = s.current_price || s.price || 0;
@@ -627,6 +746,11 @@
                 const lossTarget = Math.round(entryPrice * 0.97);
                 const score = s.total_score || s.score || 0;
                 const tradingValue = s.trading_value || 0;
+
+                // 전략 정보
+                const strategyId = s.strategy_id || 'mixed';
+                const strategyName = s.strategy_name || '복합';
+                const strategyBadge = `<span class="strategy-badge ${strategyId}">${strategyName}</span>`;
 
                 let status = 'waiting';
                 let statusLabel = '대기';
@@ -646,7 +770,7 @@
                     <tr class="stock-row ${status}" onclick="toggleStockDetail(${idx})">
                         <td><span class="expand-icon">▼</span></td>
                         <td>
-                            <div class="stock-name">${s.name}</div>
+                            <div class="stock-name">${s.name}${strategyBadge}</div>
                             <div class="stock-code">${s.code}</div>
                         </td>
                         <td class="right">${price.toLocaleString()}</td>

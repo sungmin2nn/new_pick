@@ -688,6 +688,44 @@ class StockScreener:
 
         return final_stocks
 
+    def classify_strategy(self, stock):
+        """
+        종목의 주된 선정 사유에 따라 전략 분류
+
+        Returns:
+            strategy_id: 전략 ID
+            strategy_name: 전략 이름 (한글)
+        """
+        score_detail = stock.get('score_detail', {})
+        price_change = stock.get('price_change_percent', 0)
+
+        disclosure_score = score_detail.get('disclosure', 0)
+        theme_score = score_detail.get('theme_keywords', 0)
+        market_cap_score = score_detail.get('market_cap', 0)
+        momentum_score = score_detail.get('price_momentum', 0)
+        volume_surge = score_detail.get('volume_surge', 0)
+
+        # 1. DART 공시 (공시 점수 20점 이상)
+        if disclosure_score >= 20:
+            return 'dart', 'DART 공시'
+
+        # 2. 테마/정책 (테마 점수 10점 이상)
+        if theme_score >= 10:
+            themes = stock.get('matched_themes', [])
+            theme_name = themes[0] if themes else '테마'
+            return 'theme', f'테마/{theme_name}'
+
+        # 3. 대형주 역추세 (하락 + 대형주)
+        if price_change < 0 and market_cap_score >= 6:  # 1조 이상
+            return 'largecap_contrarian', '대형주 역추세'
+
+        # 4. 모멘텀 (기본값)
+        if volume_surge >= 6 or momentum_score >= 3:
+            return 'momentum', '모멘텀'
+
+        # 5. 기타
+        return 'mixed', '복합'
+
     def save_results(self, stocks):
         """결과 저장 (JSON + DB)"""
         print("\n💾 결과 저장 중...")
@@ -695,9 +733,23 @@ class StockScreener:
         # 디렉토리 생성
         os.makedirs(config.OUTPUT_DIR, exist_ok=True)
 
-        # 각 종목에 메타데이터 추가
+        # 전략별 통계
+        strategy_stats = {}
+
+        # 각 종목에 메타데이터 및 전략 정보 추가
         for stock in stocks:
             stock['score_metadata'] = self.generate_score_metadata(stock)
+
+            # 전략 분류 추가
+            strategy_id, strategy_name = self.classify_strategy(stock)
+            stock['strategy_id'] = strategy_id
+            stock['strategy_name'] = strategy_name
+
+            # 전략별 통계 집계
+            if strategy_id not in strategy_stats:
+                strategy_stats[strategy_id] = {'name': strategy_name, 'count': 0, 'codes': []}
+            strategy_stats[strategy_id]['count'] += 1
+            strategy_stats[strategy_id]['codes'].append(stock.get('code', ''))
 
             # 기술적 지표 추가 (표시용, 점수 미반영)
             code = stock.get('code', '')
@@ -722,6 +774,7 @@ class StockScreener:
             'is_market_day': is_market_day(),
             'market_sentiment': self.market_sentiment_data,
             'count': len(stocks),
+            'strategy_stats': strategy_stats,
             'candidates': stocks
         }
 
