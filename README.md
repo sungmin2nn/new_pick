@@ -1,169 +1,203 @@
-# 🔮 장전 종목 선정 시스템
+# 뉴스 트레이딩 봇 (News Trading Bot)
 
-시초가 매매를 위한 자동 종목 선정 시스템입니다. 매일 08:30에 자동으로 실행되어 공시, 뉴스, 테마를 기반으로 주목할 종목을 선정합니다.
+> **현재 단계**: 백테스팅 (전략 검증) → 모의투자 → 실매매
 
-## 📊 주요 기능
+자동 종목 선정 및 페이퍼 트레이딩 시스템입니다. 매일 자동으로 종목을 선정하고, 실데이터 기반으로 성과를 측정하여 대시보드에 표시합니다.
 
-- **자동 실행**: 매일 08:30 GitHub Actions를 통해 자동 실행
-- **공시 기반 선정**: DART API를 통한 전일 18:00 ~ 당일 08:30 공시 수집
-- **뉴스 분석**: 네이버 금융 뉴스 실시간 수집 및 언급 횟수 분석
-- **테마 매칭**: AI, 반도체, 2차전지 등 주요 테마 자동 분류
-- **대시보드**: GitHub Pages를 통한 실시간 대시보드 제공
+---
 
-## 🎯 점수 시스템 (총 145점)
+## 프로젝트 로드맵
+
+```
+[Phase 1] 전략 수립 및 백테스팅 ◀── 현재 단계
+    ↓
+[Phase 2] 모의투자 (페이퍼 트레이딩)
+    ↓
+[Phase 3] 소액 실매매 (10~50만원)
+    ↓
+[Phase 4] 본격 자동매매
+```
+
+---
+
+## 핵심 기능
+
+### 1. 종목 선정 (매일 08:30)
+- **공시 분석**: DART API로 전일~당일 공시 수집
+- **뉴스 분석**: 네이버 금융 뉴스 실시간 수집
+- **테마 매칭**: AI, 반도체, 2차전지 등 주요 테마 분류
+- **145점 점수 시스템**: 다양한 지표 종합 평가
+
+### 2. 성과 측정 (매일 16:30)
+- **장중 데이터 수집**: 시초가, 고가, 저가, 종가
+- **익절/손절 분석**: +3%/-1.5% 기준 자동 판정
+- **결과 기록**: JSON 파일로 일별 데이터 축적
+
+### 3. 대시보드 시각화
+- **실시간 모니터링**: GitHub Pages로 자동 배포
+- **성과 분석**: 승률, MDD, 손익비 등 통계
+- **거래 내역**: 최근 거래 상세 기록
+
+---
+
+## 투자 전략
+
+### 페이퍼 트레이딩 (index.html)
+| 전략 | 설명 |
+|------|------|
+| **모멘텀** | 상승세 + 뉴스/공시 기반 |
+| **대형주 역추세** | 전일 하락 대형주 반등 노림 |
+| **DART 공시** | 호재 공시 발표 종목 |
+| **테마/정책** | AI, 반도체 등 테마주 |
+
+**매매 규칙**:
+- 익절: +3%
+- 손절: -1.5%
+- 종가 청산: 15:20
+
+### BNF 낙폭과대 (bnf_dashboard.html)
+| 단계 | 규칙 |
+|------|------|
+| **진입** | -5% 이상 급락 종목 |
+| **분할 매수** | 3회 분할 (1차→2차→3차) |
+| **트레일링 스탑** | 고점 대비 -2% 이탈 시 |
+| **분할 매도** | 반등 시 3회 분할 청산 |
+
+---
+
+## 점수 시스템 (145점 만점)
 
 | 항목 | 배점 | 설명 |
 |------|------|------|
-| 공시 | 40점 | DART 공시 개수 및 중요도 (실적, 계약, 투자 등) |
+| 공시 | 40점 | DART 공시 (실적, 계약, 투자) |
 | 뉴스 | 25점 | 뉴스 언급 횟수 및 긍정도 |
-| 테마 | 15점 | 주요 테마 매칭 (AI, 반도체, 2차전지 등) |
-| 투자자 | 10점 | 외국인/기관 순매수 정보 (pykrx) |
-| 거래대금 | 15점 | 거래대금 tier 기반 점수 |
-| 시가총액 | 10점 | 시가총액 tier 기반 점수 |
+| 테마 | 15점 | AI, 반도체, 2차전지 등 |
+| 거래대금 | 15점 | tier 기반 점수 |
+| 거래량급증 | 10점 | 평균 대비 급증 |
+| 투자자 | 10점 | 외국인/기관 순매수 |
+| 시가총액 | 10점 | tier 기반 점수 |
+| 회전율 | 5점 | 거래대금/시가총액 |
+| 재료중복도 | 5점 | 공시+뉴스+테마 동시 |
+| 뉴스시간대 | 5점 | 장전 뉴스 우대 |
 | 가격모멘텀 | 5점 | 전일 대비 등락률 |
-| 거래량급증 | 10점 | 평균 거래량 대비 급증 비율 |
-| 회전율 | 5점 | 거래대금/시가총액 비율 |
-| 재료중복도 | 5점 | 공시+뉴스+테마 동시 보유 |
-| 뉴스시간대 | 5점 | 뉴스 발행 시간 가중치 (장전 우대) |
 
-## 🔧 설정 방법
+---
 
-### 1. DART API 키 설정 (필수)
+## 파일 구조
 
-DART API 키가 없으면 공시 점수가 0점 처리됩니다.
+```
+news-trading-bot/
+├── 대시보드
+│   ├── index.html              # 페이퍼 트레이딩 대시보드
+│   ├── bnf_dashboard.html      # BNF 낙폭과대 대시보드
+│   └── system_guide.html       # 시스템 가이드
+│
+├── 핵심 모듈
+│   ├── stock_screener.py       # 종목 선정 엔진
+│   ├── intraday_collector.py   # 장중 데이터 수집
+│   ├── market_data.py          # 시장 데이터
+│   ├── disclosure_collector.py # DART 공시
+│   ├── news_collector.py       # 뉴스 수집
+│   └── investor_collector.py   # 외국인/기관
+│
+├── 페이퍼 트레이딩
+│   └── paper_trading/
+│       ├── selector.py         # 종목 선정
+│       ├── simulator.py        # 시뮬레이션
+│       └── checker.py          # 결과 체크
+│
+├── 설정
+│   ├── config.py               # 점수 가중치
+│   └── database.py             # SQLite 관리
+│
+├── 데이터
+│   └── data/
+│       ├── morning_candidates.json
+│       ├── paper_trading/results.json
+│       └── intraday/*.json
+│
+└── 자동화
+    └── .github/workflows/
+        ├── morning-scan.yml    # 08:30 종목 선정
+        └── intraday.yml        # 16:30 결과 수집
+```
 
-1. [DART 오픈API](https://opendart.fss.or.kr/) 접속
-2. 회원가입 후 API 키 발급
-3. GitHub Repository Settings > Secrets and variables > Actions
-4. New repository secret 클릭
-5. Name: `DART_API_KEY`, Value: 발급받은 API 키 입력
+---
+
+## 설정 방법
+
+### 1. DART API 키 (필수)
+```bash
+# GitHub Secrets 설정
+DART_API_KEY=your_api_key_here
+```
+- [DART 오픈API](https://opendart.fss.or.kr/)에서 발급
 
 ### 2. GitHub Pages 활성화
-
-1. Repository Settings > Pages
+1. Repository Settings → Pages
 2. Source: Deploy from a branch
 3. Branch: master, Folder: / (root)
-4. Save
 
-### 3. GitHub Actions 권한 설정
+### 3. Actions 권한 설정
+1. Settings → Actions → General
+2. Workflow permissions: Read and write
 
-1. Repository Settings > Actions > General
-2. Workflow permissions: Read and write permissions 선택
-3. Save
+---
 
-## 🚀 실행 방법
+## 실행 방법
 
-### 자동 실행 (GitHub Actions)
+### 자동 실행 (권장)
+- **08:30**: 종목 선정 자동 실행
+- **16:30**: 결과 수집 자동 실행
 
-매일 08:30 KST에 자동으로 실행됩니다.
-
-### 수동 실행 (GitHub Actions)
-
-1. Actions 탭 이동
-2. Morning Stock Scan 워크플로우 선택
-3. Run workflow 클릭
-
-### 로컬 실행
-
+### 수동 실행
 ```bash
-# 환경변수 설정
-export DART_API_KEY='your_api_key_here'
-
-# 의존성 설치
-pip install -r requirements.txt
-
-# 실행
+# 종목 선정
 python3 stock_screener.py
+
+# 장중 데이터 수집
+python3 intraday_collector.py
 ```
 
-## 📁 파일 구조
+---
+
+## 대시보드 URL
 
 ```
-.
-├── stock_screener.py          # 메인 스크리너 로직
-├── market_data.py             # 시장 데이터 수집
-├── news_collector.py          # 뉴스 수집
-├── disclosure_collector.py    # DART 공시 수집
-├── database.py                # 데이터베이스 관리
-├── config.py                  # 설정 파일
-├── index.html                 # 대시보드
-├── requirements.txt           # 의존성
-└── .github/workflows/
-    └── morning-scan.yml       # 자동 실행 워크플로우
+https://sungmin2nn.github.io/new_pick/
 ```
 
-## 📈 필터링 기준 (최소 조건)
+| 페이지 | 설명 |
+|--------|------|
+| `/index.html` | 페이퍼 트레이딩 대시보드 |
+| `/bnf_dashboard.html` | BNF 낙폭과대 대시보드 |
+| `/system_guide.html` | 시스템 가이드 |
 
-| 항목 | 기준 |
+---
+
+## 주의사항
+
+- 이 시스템은 **참고용 도구**입니다
+- 투자 판단과 손실 책임은 **본인**에게 있습니다
+- 반드시 **소액으로 시작**하세요
+- 과거 성과가 미래를 보장하지 않습니다
+
+---
+
+## 문서
+
+| 문서 | 설명 |
 |------|------|
-| 거래대금 | 100억원 이상 (극소형만 제외) |
-| 시가총액 | 100억원 이상 (극소형만 제외) |
-| 주가 범위 | 100원 ~ 100만원 |
-| 등락률 | -30% 이상 (폭락주 제외) |
+| [PROJECT_KNOWLEDGE_BASE.md](docs/PROJECT_KNOWLEDGE_BASE.md) | 프로젝트 히스토리, 의사결정 |
+| [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) | 구현 상세 |
+| [system_guide.html](system_guide.html) | 사용자 가이드 |
 
-**참고:** 거래대금과 시가총액은 필터가 아닌 점수로 반영됩니다.
+---
 
-## 🔍 테마 키워드
-
-- AI: 인공지능, ChatGPT, 생성형AI, LLM 등
-- 반도체: HBM, 파운드리, 메모리, GPU 등
-- 2차전지: 배터리, EV, 양극재, 음극재 등
-- 바이오: 신약, 임상, FDA, 치료제 등
-- 방산: 국방, 방위산업, 무기, 미사일 등
-- 기타: 엔터, 게임, 수소 등
-
-## 📊 대시보드 & 백테스팅
-
-GitHub Pages를 통해 자동으로 배포됩니다.
-
-URL: `https://[username].github.io/[repository-name]/`
-
-**종목 선정 대시보드:**
-- 실시간 종목 정보 (index.html)
-- 145점 만점 점수 상세 표시
-- 선정 사유 및 재료 확인
-- 히스토리 조회 (최근 30일)
-
-**백테스팅 리포트:**
-- 장중 데이터 수집 (매일 16:30)
-- 익절/손절 분석 (+3%/-2%)
-- 승률 및 평균 수익률 통계
-- 점수대별 성과 분석
-- 리포트: `data/backtest_report.html`
-
-## ⚠️ 주의사항
-
-1. **투자 책임**: 이 시스템은 참고용이며, 투자 책임은 본인에게 있습니다
-2. **데이터 정확성**: 크롤링 오류나 API 장애로 데이터가 부정확할 수 있습니다
-3. **시장 변동성**: 시초가 매매는 높은 변동성이 있으니 주의하세요
-4. **API 제한**: DART API는 일일 요청 제한이 있을 수 있습니다
-
-## 🐛 문제 해결
-
-### DART API 오류
-
-```
-⚠️  DART API 키가 설정되지 않았습니다
-```
-
-→ GitHub Secrets에 `DART_API_KEY` 설정 확인
-
-### 뉴스 수집 0개
-
-```
-✓ 총 0개 뉴스 수집 완료
-```
-
-→ 네이버 금융 사이트 구조 변경 또는 네트워크 오류. 시간이 지나면 해결될 수 있습니다.
-
-### 대시보드 로딩 중
-
-→ GitHub Pages가 활성화되어 있는지 확인하고, `morning_candidates.json` 파일이 생성되었는지 확인
-
-## 📝 라이선스
+## 라이선스
 
 MIT License
 
-## 🤝 기여
+---
 
-이슈 및 풀 리퀘스트 환영합니다!
+**최종 업데이트**: 2026-04-06
