@@ -76,6 +76,22 @@
                     <div class="stat-label">승률</div>
                     <div class="stat-value" id="winRate">-</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-label">샤프 비율</div>
+                    <div class="stat-value" id="sharpeRatio">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">소르티노 비율</div>
+                    <div class="stat-value" id="sortinoRatio">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">칼마 비율</div>
+                    <div class="stat-value" id="calmarRatio">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">최대 연패</div>
+                    <div class="stat-value" id="maxConsecLosses">-</div>
+                </div>
             </div>
         </section>
 
@@ -92,6 +108,52 @@
             <h2>🍩 결과 분포</h2>
             <div class="chart-container-small">
                 <canvas id="resultChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 섹션 4-1: 드로우다운 추이 -->
+        <section class="drawdown-section">
+            <h2>📉 드로우다운 추이</h2>
+            <div class="chart-container-large">
+                <canvas id="drawdownChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 섹션 4-2: KOSPI 벤치마크 비교 -->
+        <section class="benchmark-section">
+            <h2>📊 KOSPI 벤치마크 비교</h2>
+            <div class="benchmark-stats">
+                <div class="stat-card">
+                    <div class="stat-label">KOSPI 수익률</div>
+                    <div class="stat-value" id="kospiReturn">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">초과 성과 (Alpha)</div>
+                    <div class="stat-value" id="alphaValue">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">베타</div>
+                    <div class="stat-value" id="betaValue">-</div>
+                </div>
+            </div>
+            <div class="chart-container-large">
+                <canvas id="benchmarkChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 섹션 4-3: 월별 수익률 히트맵 -->
+        <section class="heatmap-section">
+            <h2>🗓️ 월별 수익률 히트맵</h2>
+            <div class="chart-container-medium">
+                <canvas id="monthlyHeatmap"></canvas>
+            </div>
+        </section>
+
+        <!-- 섹션 4-4: 수익률 분포 -->
+        <section class="distribution-section">
+            <h2>📈 수익률 분포</h2>
+            <div class="chart-container-medium">
+                <canvas id="returnHistogram"></canvas>
             </div>
         </section>
 
@@ -236,6 +298,7 @@
     <script src="js/utils.js?v=9"></script>
     <script src="js/analytics.js?v=9"></script>
     <script src="js/charts.js?v=9"></script>
+    <script src="js/benchmark.js?v=1"></script>
     <script src="js/table.js?v=9"></script>
     <script src="js/dashboard.js?v=9"></script>
     <script>

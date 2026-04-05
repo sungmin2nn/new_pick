@@ -181,6 +181,13 @@ const Dashboard = {
             const byTimeOfDay = Analytics.analyzeByTimeOfDay(this.state.trades);
             const returnDist = Analytics.analyzeReturnDistribution(this.state.trades);
 
+            // 새로운 리스크 지표 계산
+            const drawdownSeries = Analytics.calculateDrawdownSeries(this.state.equityCurve);
+            const monthlyReturns = Analytics.calculateMonthlyReturns(this.state.trades);
+
+            // 벤치마크 비교
+            const benchmarkComparison = Benchmark.compareToBenchmark(this.state.equityCurve, this.state.initialCapital);
+
             this.state.analytics = {
                 stats,
                 scoreRange,
@@ -188,13 +195,20 @@ const Dashboard = {
                 byDayOfWeek,
                 byReason,
                 byTimeOfDay,
-                returnDist
+                returnDist,
+                drawdownSeries,
+                monthlyReturns,
+                benchmarkComparison
             };
 
             // 3. UI 렌더링
             this.renderOverallStats(stats);
             this.renderCharts(stats);
             this.renderAnalytics();
+            this.renderAdvancedCharts();
+            if (benchmarkComparison) {
+                this.renderBenchmarkSection(benchmarkComparison);
+            }
             await this.renderTodayStocks();
             this.renderTransactionTable();
 
@@ -220,6 +234,12 @@ const Dashboard = {
 
         document.getElementById('totalTrades').textContent = Utils.formatNumber(stats.totalTrades) + '건';
         document.getElementById('winRate').textContent = Utils.formatPercent(stats.winRate);
+
+        // 새로운 리스크 지표 렌더링
+        document.getElementById('sharpeRatio').textContent = Utils.formatNumber(stats.sharpeRatio, 2);
+        document.getElementById('sortinoRatio').textContent = Utils.formatNumber(stats.sortinoRatio, 2);
+        document.getElementById('calmarRatio').textContent = Utils.formatNumber(stats.calmarRatio, 2);
+        document.getElementById('maxConsecLosses').textContent = stats.maxConsecutiveLosses + '연패';
     },
 
     /**
@@ -622,6 +642,79 @@ const Dashboard = {
         const message = document.getElementById('noDataMessage');
         if (message) {
             message.remove();
+        }
+    },
+
+    /**
+     * 고급 차트 렌더링 (드로우다운, 월별 히트맵, 수익률 분포)
+     */
+    renderAdvancedCharts() {
+        const analytics = this.state.analytics;
+
+        // 드로우다운 차트
+        if (analytics.drawdownSeries && analytics.drawdownSeries.length > 0) {
+            Charts.renderDrawdownChart('drawdownChart', analytics.drawdownSeries);
+        }
+
+        // 월별 히트맵
+        if (analytics.monthlyReturns && analytics.monthlyReturns.length > 0) {
+            Charts.renderMonthlyHeatmap('monthlyHeatmap', analytics.monthlyReturns);
+        }
+
+        // 수익률 히스토그램
+        if (analytics.returnDist && analytics.returnDist.distribution) {
+            Charts.renderReturnHistogram('returnHistogram', analytics.returnDist.distribution);
+        }
+    },
+
+    /**
+     * 벤치마크 비교 섹션 렌더링
+     */
+    renderBenchmarkSection(comparison) {
+        // KOSPI 수익률
+        const kospiEl = document.getElementById('kospiReturn');
+        if (kospiEl) {
+            kospiEl.textContent = Utils.formatPercent(comparison.benchmark.totalReturn);
+        }
+
+        // Alpha (초과 성과)
+        const alphaEl = document.getElementById('alphaValue');
+        if (alphaEl) {
+            const alpha = comparison.comparison.outperformance;
+            alphaEl.textContent = Utils.formatPercent(alpha);
+            alphaEl.style.color = alpha >= 0 ? '#10B981' : '#EF4444';
+        }
+
+        // Beta (계산 필요)
+        const betaEl = document.getElementById('betaValue');
+        if (betaEl) {
+            // Beta 계산을 위해 일별 수익률 필요
+            const strategyReturns = this.state.trades.map(t => t.return_percent);
+            const benchmarkData = Benchmark.getBenchmarkReturns(
+                this.state.equityCurve[0].date,
+                this.state.equityCurve[this.state.equityCurve.length - 1].date
+            );
+
+            // 일별 수익률로 변환
+            const benchmarkReturns = [];
+            for (let i = 1; i < benchmarkData.cumulative.length; i++) {
+                benchmarkReturns.push(benchmarkData.cumulative[i] - benchmarkData.cumulative[i - 1]);
+            }
+
+            const alphaBeta = Analytics.calculateAlphaBeta(strategyReturns, benchmarkReturns);
+            betaEl.textContent = alphaBeta.beta.toFixed(2);
+        }
+
+        // 비교 차트
+        const chartData = Benchmark.prepareChartData(this.state.equityCurve, this.state.initialCapital);
+        if (chartData) {
+            Charts.renderBenchmarkComparison('benchmarkChart', chartData.datasets[0].data.map((val, idx) => ({
+                date: chartData.labels[idx],
+                cumulativeReturn: val
+            })), chartData.datasets[1].data.map((val, idx) => ({
+                date: chartData.labels[idx],
+                cumulativeReturn: val
+            })));
         }
     }
 };

@@ -170,6 +170,22 @@ const Analytics = {
             }
         });
 
+        // 최대 연패 계산 (전문 지표)
+        const maxConsecutiveLosses = this.calculateMaxConsecutiveLosses(trades);
+
+        // 연간 환산 기간 계산 (거래 기간)
+        const tradingDays = this.calculateTradingDays(trades);
+        const years = tradingDays / 252; // 1년 = 252 거래일
+
+        // 샤프 비율 계산
+        const sharpeRatio = this.calculateSharpeRatio(trades);
+
+        // 소르티노 비율 계산
+        const sortinoRatio = this.calculateSortinoRatio(trades);
+
+        // 칼마 비율 계산
+        const calmarRatio = this.calculateCalmarRatio(trades, initialCapital, finalCapital, years);
+
         return {
             finalCapital,
             totalReturn,
@@ -184,8 +200,407 @@ const Analytics = {
             avgWin,
             avgLoss,
             maxWinStreak,
-            maxLossStreak
+            maxLossStreak,
+            maxConsecutiveLosses,
+            sharpeRatio,
+            sortinoRatio,
+            calmarRatio
         };
+    },
+
+    /**
+     * 거래일 수 계산
+     */
+    calculateTradingDays(trades) {
+        if (trades.length === 0) return 0;
+
+        const uniqueDates = new Set(trades.map(t => t.date));
+        return uniqueDates.size;
+    },
+
+    /**
+     * 샤프 비율 계산
+     * Formula: (평균수익률 - 무위험수익률) / 표준편차
+     * 일간 수익률 기준, 연간 환산 (√252)
+     */
+    calculateSharpeRatio(trades, riskFreeRate = 0.035) {
+        if (trades.length === 0) return 0;
+
+        // 일간 수익률 배열 (%)
+        const returns = trades.map(t => t.return_percent);
+
+        // 평균 수익률 (% → 소수로 변환)
+        const avgReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length / 100;
+
+        // 표준편차 계산 (소수 단위)
+        const returnsDecimal = returns.map(r => r / 100);
+        const variance = returnsDecimal.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returnsDecimal.length;
+        const stdDev = Math.sqrt(variance);
+
+        if (stdDev === 0) return 0;
+
+        // 무위험수익률 일간 환산 (연 3.5% → 일 0.00014)
+        const dailyRiskFreeRate = (riskFreeRate / 252);
+
+        // 샤프 비율 (일간, 단위 일치)
+        const dailySharpe = (avgReturn - dailyRiskFreeRate) / stdDev;
+
+        // 연간 환산: √252
+        return dailySharpe * Math.sqrt(252);
+    },
+
+    /**
+     * 소르티노 비율 계산
+     * Formula: (평균수익률 - 무위험수익률) / 하락편차
+     * 손실 변동성만 고려 (상승 변동성 제외)
+     */
+    calculateSortinoRatio(trades, riskFreeRate = 0.035) {
+        if (trades.length === 0) return 0;
+
+        const returns = trades.map(t => t.return_percent);
+
+        // 평균 수익률 (% → 소수로 변환)
+        const avgReturn = returns.reduce((sum, r) => sum + r, 0) / returns.length / 100;
+
+        // 무위험수익률 일간 환산
+        const dailyRiskFreeRate = (riskFreeRate / 252);
+
+        // 하락편차 계산 (손실만 고려, 소수 단위로 변환)
+        const returnsDecimal = returns.map(r => r / 100);
+        const downReturns = returnsDecimal.filter(r => r < dailyRiskFreeRate);
+
+        if (downReturns.length === 0) return Infinity; // 손실이 없으면 무한대
+
+        const downVariance = downReturns.reduce((sum, r) =>
+            sum + Math.pow(r - dailyRiskFreeRate, 2), 0) / downReturns.length;
+        const downDev = Math.sqrt(downVariance);
+
+        if (downDev === 0) return 0;
+
+        // 소르티노 비율 (일간, 단위 일치)
+        const dailySortino = (avgReturn - dailyRiskFreeRate) / downDev;
+
+        // 연간 환산: √252
+        return dailySortino * Math.sqrt(252);
+    },
+
+    /**
+     * 칼마 비율 계산
+     * Formula: CAGR / MDD
+     * CAGR: 연평균 복리 수익률
+     * MDD: 최대 낙폭
+     */
+    calculateCalmarRatio(trades, initialCapital, finalCapital, years) {
+        if (years <= 0 || initialCapital <= 0) return 0;
+
+        // CAGR 계산: ((최종자본 / 초기자본)^(1/년수) - 1) * 100
+        const cagr = (Math.pow(finalCapital / initialCapital, 1 / years) - 1) * 100;
+
+        // MDD 계산
+        const mdd = this.calculateMaxDrawdown(trades, initialCapital);
+
+        if (mdd === 0) return Infinity; // MDD가 0이면 무한대
+
+        // 칼마 비율: CAGR / |MDD|
+        return cagr / Math.abs(mdd);
+    },
+
+    /**
+     * 최대 낙폭 (MDD) 계산
+     * 누적 자본의 최고점 대비 최대 하락률
+     */
+    calculateMaxDrawdown(trades, initialCapital) {
+        if (trades.length === 0) return 0;
+
+        let capital = initialCapital;
+        let peak = initialCapital;
+        let maxDrawdown = 0;
+
+        trades.forEach(trade => {
+            capital = trade.capital_after;
+
+            // 신고점 갱신
+            if (capital > peak) {
+                peak = capital;
+            }
+
+            // 현재 낙폭 계산
+            const drawdown = ((capital - peak) / peak) * 100;
+
+            // 최대 낙폭 갱신
+            if (drawdown < maxDrawdown) {
+                maxDrawdown = drawdown;
+            }
+        });
+
+        return maxDrawdown;
+    },
+
+    /**
+     * 최대 연패 계산
+     */
+    calculateMaxConsecutiveLosses(trades) {
+        let currentLosses = 0;
+        let maxLosses = 0;
+
+        trades.forEach(trade => {
+            if (trade.result === 'loss') {
+                currentLosses++;
+                maxLosses = Math.max(maxLosses, currentLosses);
+            } else if (trade.result === 'profit') {
+                currentLosses = 0;
+            }
+            // 'none'은 연패 카운트에 영향 없음 (유지)
+        });
+
+        return maxLosses;
+    },
+
+    /**
+     * 드로우다운 시계열 계산 (차트용)
+     * 각 시점의 누적 자본과 드로우다운 비율 반환
+     */
+    calculateDrawdownSeries(equityCurve) {
+        if (!equityCurve || equityCurve.length === 0) return [];
+
+        const series = [];
+        let peak = equityCurve[0].capital;
+
+        equityCurve.forEach(point => {
+            // 신고점 갱신
+            if (point.capital > peak) {
+                peak = point.capital;
+            }
+
+            // 드로우다운 비율 계산
+            const drawdown = ((point.capital - peak) / peak) * 100;
+
+            series.push({
+                date: point.date,
+                capital: point.capital,
+                peak: peak,
+                drawdown: drawdown
+            });
+        });
+
+        return series;
+    },
+
+    /**
+     * 월별 수익률 계산 (히트맵용)
+     * 각 월의 수익률을 계산하여 반환
+     */
+    calculateMonthlyReturns(trades) {
+        if (trades.length === 0) return [];
+
+        const monthlyData = {};
+
+        trades.forEach(trade => {
+            // 날짜에서 년-월 추출 (YYYY-MM)
+            const yearMonth = trade.date.substring(0, 7);
+
+            if (!monthlyData[yearMonth]) {
+                monthlyData[yearMonth] = {
+                    yearMonth: yearMonth,
+                    trades: [],
+                    startCapital: trade.capital_after - trade.profit,
+                    endCapital: trade.capital_after
+                };
+            } else {
+                monthlyData[yearMonth].endCapital = trade.capital_after;
+            }
+
+            monthlyData[yearMonth].trades.push(trade);
+        });
+
+        // 월별 수익률 계산
+        return Object.values(monthlyData).map(month => {
+            const returnPercent = ((month.endCapital - month.startCapital) / month.startCapital) * 100;
+
+            return {
+                yearMonth: month.yearMonth,
+                year: month.yearMonth.split('-')[0],
+                month: month.yearMonth.split('-')[1],
+                tradesCount: month.trades.length,
+                startCapital: month.startCapital,
+                endCapital: month.endCapital,
+                returnPercent: returnPercent
+            };
+        }).sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+    },
+
+    /**
+     * 수익률 분포 분석 (개선 버전 - 히스토그램용)
+     * 더 세분화된 버킷으로 분포 파악
+     */
+    analyzeReturnDistribution(trades) {
+        const buckets = [
+            { label: '-20% 이하', min: -Infinity, max: -20 },
+            { label: '-20% ~ -15%', min: -20, max: -15 },
+            { label: '-15% ~ -10%', min: -15, max: -10 },
+            { label: '-10% ~ -5%', min: -10, max: -5 },
+            { label: '-5% ~ -3%', min: -5, max: -3 },
+            { label: '-3% ~ -2%', min: -3, max: -2 },
+            { label: '-2% ~ -1%', min: -2, max: -1 },
+            { label: '-1% ~ 0%', min: -1, max: 0 },
+            { label: '0% ~ 1%', min: 0, max: 1 },
+            { label: '1% ~ 2%', min: 1, max: 2 },
+            { label: '2% ~ 3%', min: 2, max: 3 },
+            { label: '3% ~ 5%', min: 3, max: 5 },
+            { label: '5% ~ 10%', min: 5, max: 10 },
+            { label: '10% ~ 15%', min: 10, max: 15 },
+            { label: '15% ~ 20%', min: 15, max: 20 },
+            { label: '20% 이상', min: 20, max: Infinity }
+        ];
+
+        const distribution = buckets.map(bucket => {
+            const filteredTrades = trades.filter(t =>
+                t.return_percent >= bucket.min && t.return_percent < bucket.max
+            );
+
+            return {
+                bucket: bucket.label,
+                count: filteredTrades.length,
+                percentage: trades.length > 0 ? (filteredTrades.length / trades.length * 100) : 0
+            };
+        });
+
+        // 통계 추가
+        const returns = trades.map(t => t.return_percent);
+        const mean = returns.reduce((sum, r) => sum + r, 0) / returns.length;
+        const variance = returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / returns.length;
+        const stdDev = Math.sqrt(variance);
+        const skewness = this.calculateSkewness(returns, mean, stdDev);
+        const kurtosis = this.calculateKurtosis(returns, mean, stdDev);
+
+        return {
+            distribution: distribution,
+            stats: {
+                mean: mean,
+                median: this.calculateMedian(returns),
+                stdDev: stdDev,
+                skewness: skewness,
+                kurtosis: kurtosis
+            }
+        };
+    },
+
+    /**
+     * 알파/베타 계산 (벤치마크 대비)
+     * Alpha: 벤치마크 대비 초과 수익률
+     * Beta: 벤치마크 대비 민감도
+     */
+    calculateAlphaBeta(strategyReturns, benchmarkReturns, riskFreeRate = 0.035) {
+        if (strategyReturns.length === 0 || benchmarkReturns.length === 0) {
+            return { alpha: 0, beta: 0 };
+        }
+
+        // 길이 맞추기 (짧은 쪽에 맞춤)
+        const minLength = Math.min(strategyReturns.length, benchmarkReturns.length);
+        const strategyR = strategyReturns.slice(0, minLength);
+        const benchmarkR = benchmarkReturns.slice(0, minLength);
+
+        // 수익률을 소수로 변환 (% → decimal)
+        const strategyDecimal = strategyR.map(r => r / 100);
+        const benchmarkDecimal = benchmarkR.map(r => r / 100);
+
+        // 평균 수익률 (소수 단위)
+        const strategyMean = strategyDecimal.reduce((sum, r) => sum + r, 0) / strategyDecimal.length;
+        const benchmarkMean = benchmarkDecimal.reduce((sum, r) => sum + r, 0) / benchmarkDecimal.length;
+
+        // 공분산 계산: Cov(Rs, Rb)
+        let covariance = 0;
+        for (let i = 0; i < strategyDecimal.length; i++) {
+            covariance += (strategyDecimal[i] - strategyMean) * (benchmarkDecimal[i] - benchmarkMean);
+        }
+        covariance /= strategyDecimal.length;
+
+        // 벤치마크 분산 계산: Var(Rb)
+        const benchmarkVariance = benchmarkDecimal.reduce((sum, r) =>
+            sum + Math.pow(r - benchmarkMean, 2), 0) / benchmarkDecimal.length;
+
+        // Beta 계산: Cov(Rs, Rb) / Var(Rb)
+        const beta = benchmarkVariance !== 0 ? covariance / benchmarkVariance : 0;
+
+        // 무위험수익률 일간 환산
+        const dailyRiskFreeRate = (riskFreeRate / 252);
+
+        // Alpha 계산: Rs - (Rf + β × (Rb - Rf))
+        // 일별 알파 계산 후 연간 환산하여 % 단위로 반환
+        const dailyAlpha = strategyMean - (dailyRiskFreeRate + beta * (benchmarkMean - dailyRiskFreeRate));
+        const annualAlpha = dailyAlpha * 252 * 100;
+
+        return {
+            alpha: annualAlpha,
+            beta: beta,
+            correlation: this.calculateCorrelation(strategyDecimal, benchmarkDecimal)
+        };
+    },
+
+    /**
+     * 상관계수 계산
+     */
+    calculateCorrelation(arr1, arr2) {
+        if (arr1.length !== arr2.length || arr1.length === 0) return 0;
+
+        const mean1 = arr1.reduce((sum, v) => sum + v, 0) / arr1.length;
+        const mean2 = arr2.reduce((sum, v) => sum + v, 0) / arr2.length;
+
+        let numerator = 0;
+        let sum1Sq = 0;
+        let sum2Sq = 0;
+
+        for (let i = 0; i < arr1.length; i++) {
+            const diff1 = arr1[i] - mean1;
+            const diff2 = arr2[i] - mean2;
+            numerator += diff1 * diff2;
+            sum1Sq += diff1 * diff1;
+            sum2Sq += diff2 * diff2;
+        }
+
+        const denominator = Math.sqrt(sum1Sq * sum2Sq);
+        return denominator !== 0 ? numerator / denominator : 0;
+    },
+
+    /**
+     * 중앙값 계산
+     */
+    calculateMedian(arr) {
+        if (arr.length === 0) return 0;
+
+        const sorted = [...arr].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+
+        return sorted.length % 2 === 0
+            ? (sorted[mid - 1] + sorted[mid]) / 2
+            : sorted[mid];
+    },
+
+    /**
+     * 왜도 계산 (Skewness)
+     * 분포의 비대칭성 측정
+     */
+    calculateSkewness(arr, mean, stdDev) {
+        if (arr.length === 0 || stdDev === 0) return 0;
+
+        const n = arr.length;
+        const sum = arr.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0);
+
+        return (n / ((n - 1) * (n - 2))) * sum;
+    },
+
+    /**
+     * 첨도 계산 (Kurtosis)
+     * 분포의 꼬리 두께 측정
+     */
+    calculateKurtosis(arr, mean, stdDev) {
+        if (arr.length === 0 || stdDev === 0) return 0;
+
+        const n = arr.length;
+        const sum = arr.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 4), 0);
+
+        return ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum -
+               (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
     },
 
     /**
@@ -428,35 +843,6 @@ const Analytics = {
                 timeSlot: slot.label,
                 profitHits,
                 lossHits
-            };
-        });
-    },
-
-    /**
-     * 수익률 분포 분석
-     */
-    analyzeReturnDistribution(trades) {
-        const buckets = [
-            { label: '-10% 이하', min: -Infinity, max: -10 },
-            { label: '-10% ~ -5%', min: -10, max: -5 },
-            { label: '-5% ~ -3%', min: -5, max: -3 },
-            { label: '-3% ~ -1%', min: -3, max: -1 },
-            { label: '-1% ~ 0%', min: -1, max: 0 },
-            { label: '0% ~ 1%', min: 0, max: 1 },
-            { label: '1% ~ 3%', min: 1, max: 3 },
-            { label: '3% ~ 5%', min: 3, max: 5 },
-            { label: '5% ~ 10%', min: 5, max: 10 },
-            { label: '10% 이상', min: 10, max: Infinity }
-        ];
-
-        return buckets.map(bucket => {
-            const count = trades.filter(t =>
-                t.return_percent >= bucket.min && t.return_percent < bucket.max
-            ).length;
-
-            return {
-                bucket: bucket.label,
-                count
             };
         });
     },
