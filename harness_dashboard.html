@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harness Dashboard - Agent Status</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/adriel-theme.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F8FAFB;
+            color: #1A1A2E;
+            min-height: 100vh;
+            padding: 15px;
+            font-size: 13px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .nav-buttons-main { display: flex; gap: 10px; flex-wrap: wrap; }
+        .nav-buttons-sub { display: flex; gap: 15px; padding-left: 5px; }
+        .nav-buttons-sub a {
+            color: #6B7280;
+            text-decoration: none;
+            font-size: 0.85em;
+            transition: color 0.2s;
+        }
+        .nav-buttons-sub a:hover { color: #00C6BE; text-decoration: underline; }
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 2px solid #E5E7EB;
+            background: #FFFFFF;
+            color: #6B7280;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .nav-btn:hover {
+            border-color: #00C6BE;
+            color: #00C6BE;
+            transform: translateY(-2px);
+        }
+        .nav-btn.active {
+            border-color: #8B5CF6;
+            background: rgba(139, 92, 246, 0.1);
+            color: #8B5CF6;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .header h1 {
+            color: #8B5CF6;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header .subtitle { color: #6B7280; margin-top: 3px; font-size: 0.8em; }
+        .harness-badge {
+            background: linear-gradient(135deg, #8B5CF6, #A78BFA);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.6em;
+            font-weight: bold;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .stat-card {
+            background: #FFFFFF;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .stat-card.primary {
+            background: rgba(139, 92, 246, 0.05);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #8B5CF6;
+        }
+        .stat-value.success { color: #10B981; }
+        .stat-value.warning { color: #F59E0B; }
+        .stat-value.error { color: #EF4444; }
+        .stat-label { color: #6B7280; font-size: 0.7em; margin-top: 5px; }
+
+        /* Section */
+        .section {
+            background: #FFFFFF;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .section h2 {
+            color: #8B5CF6;
+            margin-bottom: 15px;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Agent Hierarchy */
+        .agent-hierarchy {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .layer {
+            background: #F8FAFB;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .layer-title {
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+        }
+        .layer-title.core { color: #8B5CF6; border-color: #8B5CF6; }
+        .layer-title.domain { color: #00C6BE; border-color: #00C6BE; }
+        .layer-title.utility { color: #F59E0B; border-color: #F59E0B; }
+
+        .agent-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
+            background: #FFFFFF;
+            border-radius: 6px;
+            font-size: 0.8em;
+            border-left: 3px solid transparent;
+        }
+        .agent-item.active { border-left-color: #10B981; background: rgba(16, 185, 129, 0.05); }
+        .agent-item.idle { border-left-color: #6B7280; }
+        .agent-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .agent-status.active { background: #10B981; }
+        .agent-status.idle { background: #6B7280; }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #E5E7EB;
+        }
+        .timeline-item {
+            position: relative;
+            padding: 10px 0 10px 20px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -17px;
+            top: 14px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #8B5CF6;
+            border: 2px solid #FFFFFF;
+        }
+        .timeline-item.success::before { background: #10B981; }
+        .timeline-item.warning::before { background: #F59E0B; }
+        .timeline-item.error::before { background: #EF4444; }
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .timeline-agent {
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+        .timeline-id {
+            font-size: 0.7em;
+            color: #6B7280;
+            font-family: monospace;
+        }
+        .timeline-summary {
+            font-size: 0.8em;
+            color: #4B5563;
+            line-height: 1.4;
+        }
+
+        /* Issues */
+        .issue-list { display: flex; flex-direction: column; gap: 10px; }
+        .issue-item {
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid;
+        }
+        .issue-item.resolved {
+            background: rgba(16, 185, 129, 0.05);
+            border-left-color: #10B981;
+        }
+        .issue-item.open {
+            background: rgba(239, 68, 68, 0.05);
+            border-left-color: #EF4444;
+        }
+        .issue-title {
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+        .issue-meta {
+            font-size: 0.7em;
+            color: #6B7280;
+        }
+
+        /* Artifacts */
+        .artifact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+        }
+        .artifact-item {
+            padding: 8px 12px;
+            background: #F8FAFB;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-family: monospace;
+            color: #4B5563;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            color: #6B7280;
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 768px) {
+            .agent-hierarchy { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <div class="nav-buttons-main">
+                <a href="index.html" class="nav-btn">📊 페이퍼 트레이딩</a>
+                <a href="bnf_dashboard.html" class="nav-btn">📉 BNF 낙폭과대</a>
+                <a href="harness_dashboard.html" class="nav-btn active">🔧 하네스</a>
+            </div>
+            <div class="nav-buttons-sub">
+                <a href="backtest_dashboard.html">📈 백테스트</a>
+                <a href="system_guide.html">📚 가이드</a>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <div>
+                <h1>🔧 Harness Dashboard <span class="harness-badge">AGENT TEAMS</span></h1>
+                <div class="subtitle">에이전트 상태 모니터링 | <span id="lastUpdated">-</span></div>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-value" id="totalAgents">15</div>
+                <div class="stat-label">등록 에이전트</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value success" id="successCount">0</div>
+                <div class="stat-label">성공</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value warning" id="warningCount">0</div>
+                <div class="stat-label">경고</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value error" id="errorCount">0</div>
+                <div class="stat-label">오류</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="artifactCount">0</div>
+                <div class="stat-label">생성 파일</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value success" id="issueResolved">0</div>
+                <div class="stat-label">해결 이슈</div>
+            </div>
+        </div>
+
+        <!-- Agent Hierarchy -->
+        <div class="section">
+            <h2>🏗️ 에이전트 계층 구조</h2>
+            <div class="agent-hierarchy">
+                <div class="layer">
+                    <div class="layer-title core">L1 - Core</div>
+                    <div class="agent-item active">
+                        <span class="agent-status active"></span>
+                        core-orchestrator
+                    </div>
+                    <div class="agent-item active">
+                        <span class="agent-status active"></span>
+                        core-audit-agent
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        core-state-manager
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        core-dashboard-agent
+                    </div>
+                </div>
+                <div class="layer">
+                    <div class="layer-title domain">L2 - Domain</div>
+                    <div class="agent-item active">
+                        <span class="agent-status active"></span>
+                        domain-backtest-agent
+                    </div>
+                    <div class="agent-item active">
+                        <span class="agent-status active"></span>
+                        domain-data-collector
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        domain-monitor-agent
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        domain-news-tracker
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        domain-score-optimizer
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        domain-innovator-agent
+                    </div>
+                </div>
+                <div class="layer">
+                    <div class="layer-title utility">L3 - Utility</div>
+                    <div class="agent-item active">
+                        <span class="agent-status active"></span>
+                        utility-dev-agent
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        utility-test-agent
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        utility-cicd-agent
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        utility-research-agent
+                    </div>
+                    <div class="agent-item idle">
+                        <span class="agent-status idle"></span>
+                        utility-business-agent
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="section">
+            <h2>📋 최근 에이전트 활동</h2>
+            <div class="timeline" id="timeline">
+                <div class="loading">로딩 중...</div>
+            </div>
+        </div>
+
+        <!-- Issues -->
+        <div class="section">
+            <h2>🐛 이슈 현황</h2>
+            <div class="issue-list" id="issueList">
+                <div class="loading">로딩 중...</div>
+            </div>
+        </div>
+
+        <!-- Artifacts -->
+        <div class="section">
+            <h2>📁 생성된 아티팩트</h2>
+            <div class="artifact-grid" id="artifactGrid">
+                <div class="loading">로딩 중...</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        🔧 Harness Dashboard | Agent Teams Enabled
+    </footer>
+
+    <script>
+        async function loadState() {
+            try {
+                const response = await fetch('.claude/context/state.json?t=' + Date.now());
+                if (!response.ok) throw new Error('State not found');
+                const state = await response.json();
+                renderState(state);
+            } catch (error) {
+                console.log('State load error:', error);
+                renderDemoState();
+            }
+        }
+
+        function renderState(state) {
+            // Last updated
+            document.getElementById('lastUpdated').textContent =
+                new Date(state.last_updated).toLocaleString('ko-KR');
+
+            // Stats
+            const results = state.agent_results || [];
+            const successCount = results.filter(r => r.status === 'success').length;
+            const warningCount = results.filter(r => r.status === 'warning').length;
+            const errorCount = results.filter(r => r.status === 'error').length;
+
+            document.getElementById('successCount').textContent = successCount;
+            document.getElementById('warningCount').textContent = warningCount;
+            document.getElementById('errorCount').textContent = errorCount;
+            document.getElementById('artifactCount').textContent = (state.artifacts || []).length;
+            document.getElementById('issueResolved').textContent = (state.issues_resolved || []).length;
+
+            // Timeline
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = results.map(r => `
+                <div class="timeline-item ${r.status}">
+                    <div class="timeline-header">
+                        <span class="timeline-agent">${r.agent}</span>
+                        <span class="timeline-id">${r.request_id}</span>
+                    </div>
+                    <div class="timeline-summary">${r.summary}</div>
+                </div>
+            `).join('');
+
+            // Issues
+            const issueList = document.getElementById('issueList');
+            const issues = state.issues_resolved || [];
+            issueList.innerHTML = issues.map(issue => `
+                <div class="issue-item resolved">
+                    <div class="issue-title">${issue}</div>
+                    <div class="issue-meta">상태: 해결됨</div>
+                </div>
+            `).join('') || '<div class="no-data">등록된 이슈가 없습니다</div>';
+
+            // Artifacts
+            const artifactGrid = document.getElementById('artifactGrid');
+            const artifacts = state.artifacts || [];
+            artifactGrid.innerHTML = artifacts.map(a => `
+                <div class="artifact-item">${a}</div>
+            `).join('');
+        }
+
+        function renderDemoState() {
+            document.getElementById('lastUpdated').textContent = '데이터 없음';
+            document.getElementById('timeline').innerHTML = '<div class="no-data">state.json을 불러올 수 없습니다</div>';
+            document.getElementById('issueList').innerHTML = '<div class="no-data">데이터 없음</div>';
+            document.getElementById('artifactGrid').innerHTML = '<div class="no-data">데이터 없음</div>';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadState);
+    </script>
+</body>
+</html>

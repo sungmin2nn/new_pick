@@ -1,0 +1,32 @@
+# Context Directory Index
+# Auto-generated: 2026-04-05
+
+## Quick Reference
+
+### 상태 확인
+cat state.json | jq '.current_phase'
+
+### 에이전트 결과 확인
+cat state.json | jq '.agent_results'
+
+### 실패한 작업 찾기
+cat state.json | jq '.agent_results[] | select(.status=="error")'
+
+### 아티팩트 목록
+cat state.json | jq -r '.artifacts[]'
+
+### 의사결정 검색
+grep -n "결정" decisions.md
+
+## File List
+- state.json       (1.6K) - Project state and agent results
+- decisions.md     (5.5K) - Major decision records
+- SUMMARY.md       (7.6K) - Task completion summary
+- README.md        (2.8K) - Directory documentation
+- .index           (this file) - Quick reference
+
+## Total Files: 5
+## Total Size: ~24K
+
+## Last Updated: 2026-04-05T15:46:00+09:00
+## Status: ✓ All files validated

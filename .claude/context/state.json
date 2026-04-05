@@ -1,0 +1,79 @@
+{
+  "current_phase": "completed",
+  "last_updated": "2026-04-05T17:30:00+09:00",
+  "project": "news-trading-bot",
+  "task": "대시보드 업그레이드 및 BNF 테마 적용",
+  "agent_results": [
+    {
+      "request_id": "req-dashboard-001",
+      "agent": "dev-agent-analytics",
+      "status": "success",
+      "summary": "analytics.js에 15개 리스크 지표 함수 추가 (Sharpe, Sortino, Calmar, MDD, Alpha/Beta 등)"
+    },
+    {
+      "request_id": "req-dashboard-002",
+      "agent": "dev-agent-charts",
+      "status": "success",
+      "summary": "charts.js에 4개 차트 컴포넌트 추가 (Drawdown, Heatmap, Benchmark, Histogram)"
+    },
+    {
+      "request_id": "req-dashboard-003",
+      "agent": "data-collector-agent",
+      "status": "success",
+      "summary": "benchmark.js KOSPI 모듈 생성 - 네이버 금융에서 36일 실제 데이터 수집 (2026-02-09 ~ 2026-04-03)"
+    },
+    {
+      "request_id": "req-dashboard-004",
+      "agent": "dev-agent-integration",
+      "status": "success",
+      "summary": "backtest_dashboard.html에 8개 통계 카드 + 4개 차트 섹션 통합"
+    },
+    {
+      "request_id": "req-dashboard-005",
+      "agent": "audit-agent",
+      "status": "warning",
+      "summary": "3개 Critical 이슈 발견 (계산 단위 불일치 - Sharpe, Sortino, Alpha)"
+    },
+    {
+      "request_id": "req-dashboard-006",
+      "agent": "dev-agent-fix",
+      "status": "success",
+      "summary": "3개 Critical 이슈 수정 완료 - 수익률 단위 100으로 나눠 소수점 통일"
+    },
+    {
+      "request_id": "req-dashboard-007",
+      "agent": "dev-agent-paper",
+      "status": "success",
+      "summary": "index.html(페이퍼 트레이딩) 업그레이드 - 리스크 지표, 벤치마크 비교, 고급 차트 추가"
+    },
+    {
+      "request_id": "req-dashboard-008",
+      "agent": "dev-agent-theme",
+      "status": "success",
+      "summary": "index.html에 BNF 테마 스타일 적용 - 컴팩트 카드, 통일된 네비게이션"
+    }
+  ],
+  "artifacts": [
+    "js/analytics.js",
+    "js/charts.js",
+    "js/benchmark.js",
+    "js/dashboard.js",
+    "backtest_dashboard.html",
+    "index.html",
+    "css/dashboard.css",
+    "fetch_kospi_index.py",
+    "data/kospi_daily_data.js",
+    "data/kospi_index_data.json"
+  ],
+  "git_commits": [
+    "15559ad - Upgrade dashboard with professional-grade analytics",
+    "8bfd7c0 - Bump version to v=12 for cache busting",
+    "b5cc669 - Upgrade paper trading dashboard with risk metrics",
+    "94d2b2e - Apply BNF theme style to paper trading dashboard"
+  ],
+  "issues_resolved": [
+    "ISSUE-001: 리스크 지표 계산 단위 불일치",
+    "ISSUE-002: pykrx 데이터 미반환",
+    "ISSUE-003: GitHub Pages 캐시 미갱신"
+  ]
+}
