@@ -693,30 +693,52 @@
 
         // 빈 미니차트 초기화
         function initEmptyMiniChart() {
-            const ctx = document.getElementById('miniChart').getContext('2d');
-            if (miniChart) miniChart.destroy();
-
-            miniChart = new Chart(ctx, {
-                data: {
-                    labels: [''],
-                    datasets: [{
-                        type: 'line',
-                        data: [0],
-                        borderColor: '#00C6BE',
-                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { display: false },
-                        y: { display: false }
-                    }
+            try {
+                const canvas = document.getElementById('miniChart');
+                if (!canvas) {
+                    console.error('miniChart canvas not found');
+                    return;
                 }
-            });
+                const ctx = canvas.getContext('2d');
+                if (miniChart) miniChart.destroy();
+
+                // 기본 데이터로 차트 생성 (빈 상태여도 보이도록)
+                miniChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['시작', '현재'],
+                        datasets: [{
+                            data: [0, 0],
+                            borderColor: '#00C6BE',
+                            backgroundColor: 'rgba(0, 198, 190, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#00C6BE'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                display: true,
+                                grid: { display: false },
+                                ticks: { color: '#9CA3AF', font: { size: 9 } }
+                            },
+                            y: {
+                                display: false,
+                                min: -5,
+                                max: 5
+                            }
+                        }
+                    }
+                });
+                console.log('Mini chart initialized');
+            } catch (e) {
+                console.error('Mini chart init error:', e);
+            }
         }
 
         function updateCurrentTime() {
@@ -1100,22 +1122,32 @@
         }
 
         function displayMiniChart(data) {
-            const days = data.daily_results || [];
-            if (days.length === 0) return;
+            try {
+                const days = data.daily_results || [];
+                if (days.length === 0) {
+                    console.log('No daily results for mini chart');
+                    return;
+                }
 
-            const recent = days.slice(-10);
-            let cumulative = 0;
-            const cumulativeReturns = recent.map(d => {
-                cumulative += d.total_return || 0;
-                return cumulative;
-            });
-            const dailyReturns = recent.map(d => d.total_return || 0);
-            const labels = recent.map(d => formatDate(d.date).slice(5));
+                const recent = days.slice(-10);
+                let cumulative = 0;
+                const cumulativeReturns = recent.map(d => {
+                    cumulative += d.total_return || 0;
+                    return cumulative;
+                });
+                const dailyReturns = recent.map(d => d.total_return || 0);
+                const labels = recent.map(d => formatDate(d.date).slice(5));
 
-            const ctx = document.getElementById('miniChart').getContext('2d');
-            if (miniChart) miniChart.destroy();
+                const canvas = document.getElementById('miniChart');
+                if (!canvas) {
+                    console.error('miniChart canvas not found');
+                    return;
+                }
+                const ctx = canvas.getContext('2d');
+                if (miniChart) miniChart.destroy();
 
-            miniChart = new Chart(ctx, {
+                console.log('Rendering mini chart with', recent.length, 'days');
+                miniChart = new Chart(ctx, {
                 data: {
                     labels: labels,
                     datasets: [
@@ -1163,6 +1195,9 @@
                     }
                 }
             });
+            } catch (e) {
+                console.error('Mini chart display error:', e);
+            }
         }
 
     </script>
