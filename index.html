@@ -822,8 +822,8 @@
                     <tr class="stock-row ${status}" onclick="toggleStockDetail(${idx})">
                         <td><span class="expand-icon">▼</span></td>
                         <td>
-                            <div class="stock-name">${s.name}${strategyBadge}</div>
-                            <div class="stock-code">${s.code}</div>
+                            <div class="stock-name">${s.name}</div>
+                            <div class="stock-code">${s.code} ${strategyBadge}</div>
                         </td>
                         <td class="right">${price.toLocaleString()}</td>
                         <td class="right ${pct >= 0 ? 'positive' : 'negative'}">${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%</td>
