@@ -115,26 +115,30 @@
             margin-bottom: 10px;
             font-size: 0.95em;
         }
-        .strategy-rules {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        .rule-card {
+        .strategy-description {
             background: #FFFFFF;
             border-radius: 6px;
-            padding: 10px;
+            padding: 12px 15px;
             border: 1px solid #E5E7EB;
-        }
-        .rule-card .label {
-            color: #6B7280;
-            font-size: 0.7em;
-            margin-bottom: 3px;
-        }
-        .rule-card .value {
-            color: #1A1A2E;
+            line-height: 1.8;
             font-size: 0.85em;
-            font-weight: 500;
+            color: #1A1A2E;
+        }
+        .strategy-description .rule-item {
+            display: flex;
+            align-items: baseline;
+        }
+        .strategy-description .rule-label {
+            color: #00C6BE;
+            font-weight: 600;
+            min-width: 85px;
+        }
+        .strategy-description .rule-value {
+            color: #1A1A2E;
+        }
+        .strategy-description .rule-separator {
+            color: #E5E7EB;
+            margin: 0 10px;
         }
 
         /* Stats Grid */
@@ -346,20 +350,24 @@
         #candidatesTable th:nth-child(7) { width: 60px; text-align: right; }
 
         /* Positions Table */
-        #positionsTable th:nth-child(1) { width: 130px; }
-        #positionsTable th:nth-child(2) { width: 50px; }
-        #positionsTable th:nth-child(3),
+        #positionsTable th:nth-child(1) { width: 110px; }
+        #positionsTable th:nth-child(2) { width: 80px; }
+        #positionsTable th:nth-child(3) { width: 45px; text-align: right; }
         #positionsTable th:nth-child(4),
-        #positionsTable th:nth-child(6) { width: 90px; text-align: right; }
-        #positionsTable th:nth-child(5) { width: 50px; text-align: right; }
+        #positionsTable th:nth-child(5) { width: 70px; text-align: right; }
+        #positionsTable th:nth-child(6) { width: 50px; text-align: right; }
         #positionsTable th:nth-child(7),
         #positionsTable th:nth-child(8) { width: 80px; text-align: right; }
+        #positionsTable th:nth-child(9) { width: 60px; text-align: right; }
+        #positionsTable th:nth-child(10) { width: 130px; }
+        #positionsTable th:nth-child(11) { width: 80px; }
         #positionsTable td:nth-child(3),
         #positionsTable td:nth-child(4),
         #positionsTable td:nth-child(5),
         #positionsTable td:nth-child(6),
         #positionsTable td:nth-child(7),
-        #positionsTable td:nth-child(8) { text-align: right; }
+        #positionsTable td:nth-child(8),
+        #positionsTable td:nth-child(9) { text-align: right; }
         #candidatesTable td:nth-child(3),
         #candidatesTable td:nth-child(4),
         #candidatesTable td:nth-child(5),
@@ -427,31 +435,13 @@
         <!-- Strategy Info -->
         <div class="strategy-info">
             <h3>📋 BNF 낙폭과대 역추세 전략</h3>
-            <div class="strategy-rules">
-                <div class="rule-card">
-                    <div class="label">대상 종목</div>
-                    <div class="value">시가총액 1조↑ 대형주</div>
-                </div>
-                <div class="rule-card">
-                    <div class="label">매수 조건</div>
-                    <div class="value">52주 고점 -30%↓ 낙폭</div>
-                </div>
-                <div class="rule-card">
-                    <div class="label">분할 매수</div>
-                    <div class="value">3단계 (30/40/30%)</div>
-                </div>
-                <div class="rule-card">
-                    <div class="label">익절 목표</div>
-                    <div class="value">+15~20% 도달 시</div>
-                </div>
-                <div class="rule-card">
-                    <div class="label">손절 기준</div>
-                    <div class="value">평단가 -10% 하회</div>
-                </div>
-                <div class="rule-card">
-                    <div class="label">보유 한도</div>
-                    <div class="value">최대 5종목, 총자금 80%</div>
-                </div>
+            <div class="strategy-description">
+                <div class="rule-item"><span class="rule-label">대상 종목:</span> <span class="rule-value">시가총액 1조↑ 대형주</span></div>
+                <div class="rule-item"><span class="rule-label">매수 조건:</span> <span class="rule-value">52주 고점 대비 -30%↓ 낙폭</span></div>
+                <div class="rule-item"><span class="rule-label">분할 매수:</span> <span class="rule-value">3단계 (30/40/30%)</span></div>
+                <div class="rule-item"><span class="rule-label">익절 목표:</span> <span class="rule-value">+15~20% 도달 시 분할 매도</span></div>
+                <div class="rule-item"><span class="rule-label">손절 기준:</span> <span class="rule-value">평균단가 -10% 하회 시 전량 매도</span></div>
+                <div class="rule-item"><span class="rule-label">보유 한도:</span> <span class="rule-value">최대 5종목, 총자금의 80%</span></div>
             </div>
         </div>
 
@@ -514,7 +504,7 @@
                     <thead>
                         <tr>
                             <th>종목</th>
-                            <th>상태</th>
+                            <th>매수일</th>
                             <th>보유</th>
                             <th>평균단가</th>
                             <th>현재가</th>
@@ -522,10 +512,12 @@
                             <th>평가금액</th>
                             <th>손익</th>
                             <th>수익률</th>
+                            <th>매도조건</th>
+                            <th>매도예정일</th>
                         </tr>
                     </thead>
                     <tbody id="positionsBody">
-                        <tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>
+                        <tr><td colspan="11" class="no-data">보유 중인 포지션이 없습니다</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -554,17 +546,22 @@
                 <table id="tradeHistory">
                     <thead>
                         <tr>
-                            <th>날짜</th>
+                            <th>매수일</th>
                             <th>구분</th>
                             <th>종목</th>
-                            <th>가격</th>
+                            <th>매수가</th>
                             <th>수량</th>
                             <th>금액</th>
+                            <th>분할</th>
+                            <th>매도가</th>
+                            <th>매도일</th>
+                            <th>손익률</th>
+                            <th>보유기간</th>
                             <th>비고</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>
+                        <tr><td colspan="12" class="no-data">매매 내역이 없습니다</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -572,7 +569,7 @@
     </div>
 
     <footer>
-        📅 마지막 수정: 2026-04-02
+        📅 마지막 수정: 2026-04-06
     </footer>
 
     <script>
@@ -621,11 +618,25 @@
             }
         }
 
-        // 후보 종목 로드
+        // 후보 종목 로드 (보유 종목 제외)
         async function loadCandidates() {
             const tbody = document.getElementById('candidatesBody');
 
             try {
+                // 먼저 보유 종목 코드 가져오기
+                let ownedCodes = [];
+                try {
+                    const posResponse = await fetch('data/bnf/positions.json?t=' + Date.now());
+                    if (posResponse.ok) {
+                        const posData = await posResponse.json();
+                        ownedCodes = (posData.positions || [])
+                            .filter(p => p.state !== 'CLOSED')
+                            .map(p => p.code);
+                    }
+                } catch (e) {
+                    console.log('No positions data');
+                }
+
                 const response = await fetch('data/bnf/candidates.json?t=' + Date.now());
                 if (!response.ok) {
                     tbody.innerHTML = '<tr><td colspan="7" class="no-data">후보 종목 데이터가 없습니다</td></tr>';
@@ -633,10 +644,11 @@
                 }
 
                 const data = await response.json();
-                const candidates = data.candidates || [];
+                // 보유 종목 제외
+                const candidates = (data.candidates || []).filter(c => !ownedCodes.includes(c.code));
 
                 if (candidates.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">조건을 충족하는 종목이 없습니다</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">조건을 충족하는 종목이 없습니다 (또는 모두 보유 중)</td></tr>';
                     return;
                 }
 
@@ -669,7 +681,7 @@
             try {
                 const response = await fetch('data/bnf/positions.json?t=' + Date.now());
                 if (!response.ok) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="no-data">포지션 데이터가 없습니다</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="no-data">포지션 데이터가 없습니다</td></tr>';
                     updateStats({});
                     return;
                 }
@@ -682,7 +694,7 @@
                 updateStats(data);
 
                 if (openPositions.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="no-data">보유 중인 포지션이 없습니다</td></tr>';
                     return;
                 }
 
@@ -696,10 +708,18 @@
                     const today = new Date();
                     const holdingDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
 
+                    // 매도 조건 계산
+                    const profitTarget = Math.round((p.avg_price || 0) * 1.15);
+                    const lossTarget = Math.round((p.avg_price || 0) * 0.9);
+                    const sellCondition = `익절 ${profitTarget.toLocaleString()}↑ / 손절 ${lossTarget.toLocaleString()}↓`;
+
+                    // 매도 예정일 (매수일 + 20영업일 예상)
+                    const expectedSellDate = p.expected_sell_date || '-';
+
                     return `
                         <tr>
                             <td><strong>${p.name}</strong><br><span style="color:#6B7280;font-size:0.75em;">${p.code}</span></td>
-                            <td><span class="position-state ${p.state?.toLowerCase()}">${getStateLabel(p.state)}</span></td>
+                            <td>${p.entry_date || '-'}</td>
                             <td>${holdingDays}일</td>
                             <td>${(p.avg_price || 0).toLocaleString()}</td>
                             <td>${(p.current_price || 0).toLocaleString()}</td>
@@ -707,13 +727,15 @@
                             <td>${evalAmount.toLocaleString()}</td>
                             <td class="${pnlClass}">${p.unrealized_pnl >= 0 ? '+' : ''}${(p.unrealized_pnl || 0).toLocaleString()}</td>
                             <td class="${pnlClass}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</td>
+                            <td style="font-size:0.75em;">${sellCondition}</td>
+                            <td>${expectedSellDate}</td>
                         </tr>
                     `;
                 }).join('');
 
             } catch (error) {
                 console.error('Position load error:', error);
-                tbody.innerHTML = '<tr><td colspan="8" class="no-data">포지션 로드 실패</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" class="no-data">포지션 로드 실패</td></tr>';
                 // 에러 시에도 기본 통계 표시
                 updateStats({ stats: { total_trades: 0, win_rate: 0, total_return: 0, avg_return: 0, open_positions: 0, unrealized_pnl: 0 }});
             }
@@ -811,34 +833,60 @@
 
                     // 각 포지션의 entries와 exits를 수집
                     positions.forEach(p => {
+                        const entries = p.entries || [];
+                        const exits = p.exits || [];
+                        const totalEntries = entries.length;
+                        const totalExits = exits.length;
+
                         // 매수 내역
-                        (p.entries || []).forEach(e => {
+                        entries.forEach((e, idx) => {
                             allTrades.push({
                                 type: 'BUY',
-                                date: e.date,
-                                time: e.time,
+                                buy_date: e.date,
+                                buy_time: e.time,
                                 name: p.name,
                                 code: p.code,
-                                price: e.price,
+                                buy_price: e.price,
                                 quantity: e.quantity,
                                 amount: e.price * e.quantity,
+                                partial: `${idx + 1}/${totalEntries}차`,
+                                sell_price: null,
+                                sell_date: null,
+                                return_pct: null,
+                                holding_days: null,
                                 reason: p.selection_reason || ''
                             });
                         });
 
                         // 매도 내역
-                        (p.exits || []).forEach(e => {
+                        exits.forEach((ex, idx) => {
+                            // 해당 매도에 대응하는 매수 찾기 (간단히 첫 번째 매수 기준)
+                            const firstEntry = entries[0] || {};
+                            const buyDate = firstEntry.date || p.entry_date;
+
+                            // 보유기간 계산
+                            let holdingDays = '-';
+                            if (buyDate && ex.date) {
+                                const bd = new Date(buyDate);
+                                const sd = new Date(ex.date);
+                                holdingDays = Math.floor((sd - bd) / (1000 * 60 * 60 * 24)) + '일';
+                            }
+
                             allTrades.push({
                                 type: 'SELL',
-                                date: e.date,
-                                time: e.time,
+                                buy_date: buyDate,
+                                buy_time: firstEntry.time,
                                 name: p.name,
                                 code: p.code,
-                                price: e.price,
-                                quantity: e.quantity,
-                                amount: e.price * e.quantity,
-                                return_pct: e.pnl_pct,
-                                reason: e.reason || ''
+                                buy_price: p.avg_price || firstEntry.price,
+                                quantity: ex.quantity,
+                                amount: (p.avg_price || firstEntry.price) * ex.quantity,
+                                partial: `${idx + 1}/${totalExits}차`,
+                                sell_price: ex.price,
+                                sell_date: ex.date,
+                                return_pct: ex.pnl_pct,
+                                holding_days: holdingDays,
+                                reason: ex.reason || ''
                             });
                         });
                     });
@@ -849,13 +897,20 @@
                 if (histResponse.ok) {
                     const histData = await histResponse.json();
                     const histTrades = histData.all_trades || [];
+                    // 기존 형식을 새 형식으로 변환
+                    histTrades.forEach(t => {
+                        if (!t.buy_date) {
+                            t.buy_date = t.date;
+                            t.buy_price = t.price;
+                        }
+                    });
                     allTrades = [...allTrades, ...histTrades];
                 }
 
-                // 날짜순 정렬
+                // 날짜순 정렬 (최신순)
                 allTrades.sort((a, b) => {
-                    const dateA = a.date + (a.time || '');
-                    const dateB = b.date + (b.time || '');
+                    const dateA = (a.sell_date || a.buy_date) + (a.buy_time || '');
+                    const dateB = (b.sell_date || b.buy_date) + (b.buy_time || '');
                     return dateB.localeCompare(dateA);
                 });
 
@@ -864,37 +919,43 @@
                 updateUnrealizedChart();
 
                 if (allTrades.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">매매 내역이 없습니다</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="12" class="no-data">매매 내역이 없습니다</td></tr>';
                     return;
                 }
 
-                tbody.innerHTML = allTrades.slice(0, 20).map(t => {
+                tbody.innerHTML = allTrades.slice(0, 30).map(t => {
                     const isBuy = t.type === 'BUY';
                     const typeClass = isBuy ? 'positive' : 'negative';
                     const typeLabel = isBuy ? '매수' : '매도';
 
-                    let extraInfo = t.reason || '';
-                    if (!isBuy && t.return_pct !== undefined) {
+                    // 손익률 표시
+                    let pnlDisplay = '-';
+                    if (!isBuy && t.return_pct !== undefined && t.return_pct !== null) {
                         const pnlClass = t.return_pct >= 0 ? 'positive' : 'negative';
-                        extraInfo = `<span class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct.toFixed(1)}%</span> ${extraInfo}`;
+                        pnlDisplay = `<span class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct.toFixed(1)}%</span>`;
                     }
 
                     return `
                         <tr>
-                            <td>${t.date || '-'}</td>
+                            <td>${t.buy_date || '-'}</td>
                             <td><span class="${typeClass}" style="font-weight:600;">${typeLabel}</span></td>
                             <td>${t.name}</td>
-                            <td>${(t.price || 0).toLocaleString()}</td>
+                            <td>${(t.buy_price || 0).toLocaleString()}</td>
                             <td>${t.quantity}주</td>
                             <td>${(t.amount || 0).toLocaleString()}</td>
-                            <td style="font-size:0.8em;">${extraInfo}</td>
+                            <td>${t.partial || '-'}</td>
+                            <td>${isBuy ? '-' : (t.sell_price || 0).toLocaleString()}</td>
+                            <td>${isBuy ? '-' : (t.sell_date || '-')}</td>
+                            <td>${pnlDisplay}</td>
+                            <td>${isBuy ? '-' : (t.holding_days || '-')}</td>
+                            <td style="font-size:0.8em;">${t.reason || ''}</td>
                         </tr>
                     `;
                 }).join('');
 
             } catch (error) {
                 console.error('Trade history load error:', error);
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">매매 내역 로드 실패</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="12" class="no-data">매매 내역 로드 실패</td></tr>';
             }
         }
 

@@ -1,0 +1,156 @@
+{
+  "version": "1.0.0",
+  "description": "프로젝트별 품질 게이트 점수 누적 기록",
+  "current_phase": "Phase 2",
+  "phase_config": {
+    "Phase 1": {
+      "cutline": 70,
+      "description": "초기 - MVP 단계"
+    },
+    "Phase 2": {
+      "cutline": 80,
+      "description": "안정 - 영역별 커트라인 적용"
+    },
+    "Phase 3": {
+      "cutline": 85,
+      "description": "고도화 - 항목 세분화"
+    },
+    "Phase 4": {
+      "cutline": 90,
+      "description": "완숙 - 전 영역 고품질"
+    }
+  },
+  "cutlines": {
+    "functionality": 24,
+    "security": 18,
+    "code_quality": 10,
+    "ux_usability": 14,
+    "performance": 7,
+    "documentation": 3
+  },
+  "statistics": {
+    "total_evaluations": 1,
+    "passed": 1,
+    "failed": 0,
+    "pass_rate": 100.0,
+    "average_score": 88,
+    "by_area": {
+      "functionality": {
+        "avg": 28,
+        "fail_count": 0
+      },
+      "security": {
+        "avg": 19,
+        "fail_count": 0
+      },
+      "code_quality": {
+        "avg": 11,
+        "fail_count": 0
+      },
+      "ux_usability": {
+        "avg": 17,
+        "fail_count": 0
+      },
+      "performance": {
+        "avg": 8,
+        "fail_count": 0
+      },
+      "documentation": {
+        "avg": 5,
+        "fail_count": 0
+      }
+    }
+  },
+  "phase_progress": {
+    "consecutive_passes": 1,
+    "required_for_upgrade": 5,
+    "last_upgrade": null
+  },
+  "history": [
+    {
+      "project": "news-trading-bot",
+      "task": "전체 프로젝트 품질 평가",
+      "timestamp": "2026-04-07T21:20:36.583703",
+      "phase": "Phase 2",
+      "cutline": 80,
+      "scores": {
+        "functionality": {
+          "score": 28,
+          "max": 30,
+          "cutline": 24,
+          "passed": true,
+          "details": {
+            "요구사항 구현": "12/12 - 종목 선정, 백테스트, 대시보드 모두 동작",
+            "기존 기능": "8/8 - 안정적으로 동작 중",
+            "에러 없이 실행": "5/6 - 일부 경고 있으나 치명적이지 않음",
+            "엣지케이스": "3/4 - 빈 데이터 처리 양호"
+          }
+        },
+        "security": {
+          "score": 19,
+          "max": 20,
+          "cutline": 18,
+          "passed": true,
+          "details": {
+            "인젝션 방지": "6/6 - SQL 인젝션, XSS 패턴 없음",
+            "인증/인가": "4/5 - API 키 환경변수 사용",
+            "민감정보 보호": "5/5 - .env로 관리",
+            "입력 검증": "4/4 - 적절한 검증"
+          }
+        },
+        "code_quality": {
+          "score": 11,
+          "max": 15,
+          "cutline": 10,
+          "passed": true,
+          "details": {
+            "문법 오류": "4/4 - 모든 파일 컴파일 성공",
+            "타입 오류": "3/4 - 타입 힌트 일부 누락",
+            "린트": "2/3 - 경고 일부 있음",
+            "스타일": "1/2 - 일부 불일치",
+            "중복 코드": "1/2 - 리팩토링 여지 있음"
+          }
+        },
+        "ux_usability": {
+          "score": 17,
+          "max": 20,
+          "cutline": 14,
+          "passed": true,
+          "details": {
+            "빈 상태": "5/5 - no-data 클래스로 처리",
+            "에러 상태": "4/5 - 에러 메시지 있으나 개선 여지",
+            "로딩 상태": "4/4 - 스피너 및 로딩 표시 있음",
+            "네비게이션": "2/2 - 탭 구조 명확",
+            "CTA": "1/2 - 버튼 명확성 개선 필요",
+            "접근성": "1/2 - 기본 수준"
+          }
+        },
+        "performance": {
+          "score": 8,
+          "max": 10,
+          "cutline": 7,
+          "passed": true,
+          "details": {
+            "응답 시간": "3/4 - API 호출 최적화 여지",
+            "리소스 사용": "3/3 - 적정 수준",
+            "최적화": "2/3 - 캐싱 개선 가능"
+          }
+        },
+        "documentation": {
+          "score": 5,
+          "max": 5,
+          "cutline": 3,
+          "passed": true,
+          "details": {
+            "코드 주석": "2/2 - 주요 함수 설명 있음",
+            "API 문서": "2/2 - docs/ 디렉토리에 정리",
+            "README": "1/1 - 상세한 설명"
+          }
+        }
+      },
+      "total": 88,
+      "all_passed": true,
+      "result": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "version": "1.0.0",
+  "harness": {
+    "name": "Agent Harness",
+    "description": "Multi-agent orchestration framework"
+  },
+  "layers": {
+    "L1_core": {
+      "description": "핵심 에이전트 - 조율, 감사, 품질 게이트",
+      "priority": 1,
+      "agents": ["orchestrator", "audit-agent", "state-manager-agent", "dashboard-agent", "ux-reviewer", "security-checker"]
+    },
+    "L2_domain": {
+      "description": "도메인 특화 에이전트 - 비즈니스 로직",
+      "priority": 2,
+      "agents": [
+        "data-collector-agent",
+        "score-optimizer-agent",
+        "backtest-agent",
+        "monitor-agent",
+        "innovator-agent",
+        "news-tracker-agent"
+      ]
+    },
+    "L3_utility": {
+      "description": "유틸리티 에이전트 - 범용 작업",
+      "priority": 3,
+      "agents": ["dev-agent", "research-agent", "business-agent", "test-agent", "cicd-agent"]
+    }
+  },
+  "execution": {
+    "max_concurrent_agents": 3,
+    "timeout_seconds": 300,
+    "retry_policy": {
+      "max_retries": 2,
+      "backoff_multiplier": 1.5
+    }
+  },
+  "context": {
+    "shared_path": ".claude/context",
+    "state_file": "state.json",
+    "persist_decisions": true
+  },
+  "audit": {
+    "enabled": true,
+    "auto_audit_threshold": "L2_domain",
+    "require_audit_for_deploy": true
+  },
+  "quality": {
+    "checklist_path": ".claude/harness/protocols/quality-checklist.md",
+    "quality_gate_path": ".claude/harness/quality_gate.md",
+    "score_history_path": ".claude/harness/score_history.json",
+    "gate_hook_path": ".claude/harness/gate_hook.sh",
+    "max_rework_attempts": 3,
+    "auto_rework": true,
+    "fail_action": "rework_then_report",
+    "scoring": {
+      "enabled": true,
+      "current_phase": "Phase 2",
+      "total_cutline": 80,
+      "area_cutlines": {
+        "functionality": 24,
+        "security": 18,
+        "code_quality": 10,
+        "ux_usability": 14,
+        "performance": 7,
+        "documentation": 3
+      },
+      "critical_areas": ["functionality", "security"],
+      "auto_phase_upgrade": true,
+      "upgrade_threshold": 5
+    }
+  },
+  "issue_tracking": {
+    "enabled": true,
+    "issues_path": ".claude/context/issues.md",
+    "check_before_work": true,
+    "auto_record": true
+  }
+}
