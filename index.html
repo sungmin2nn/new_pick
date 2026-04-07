@@ -916,9 +916,13 @@
                     displayRecentTrades(intradayData);
                     displayStatistics(intradayData);
                     displayMiniChart(intradayData);
+                } else {
+                    // 데이터가 없을 때 로딩 상태 제거
+                    document.getElementById('recentTradesTable').innerHTML = '<div class="no-data">거래 내역이 없습니다</div>';
                 }
             } catch (error) {
                 console.log('Trading data error:', error);
+                document.getElementById('recentTradesTable').innerHTML = '<div class="no-data">데이터를 불러올 수 없습니다</div>';
             }
         }
 
