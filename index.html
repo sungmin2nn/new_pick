@@ -247,7 +247,8 @@
         .profit-value.negative { color: #EF4444; }
         .profit-sub { color: #6B7280; font-size: 0.8em; font-weight: 600; }
         .profit-amount { font-size: 1em; color: #00C6BE; margin-top: 3px; font-weight: 600; }
-        .mini-chart-container { flex: 1; height: 80px; min-width: 200px; }
+        .mini-chart-container { flex: 1; height: 80px; min-width: 200px; position: relative; }
+        .mini-chart-container canvas { width: 100% !important; height: 100% !important; }
 
         /* Stock Table - BNF Style */
         .stock-table-wrapper { overflow-x: auto; }
@@ -662,6 +663,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateCurrentTime();
             setInterval(updateCurrentTime, 1000);
+            initEmptyMiniChart(); // 빈 차트 초기화
             loadAllData();
 
             // 장중 자동 새로고침
@@ -672,6 +674,34 @@
                 setInterval(loadAllData, 60000);
             }
         });
+
+        // 빈 미니차트 초기화
+        function initEmptyMiniChart() {
+            const ctx = document.getElementById('miniChart').getContext('2d');
+            if (miniChart) miniChart.destroy();
+
+            miniChart = new Chart(ctx, {
+                data: {
+                    labels: [''],
+                    datasets: [{
+                        type: 'line',
+                        data: [0],
+                        borderColor: '#00C6BE',
+                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
 
         function updateCurrentTime() {
             const now = new Date();
