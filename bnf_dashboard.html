@@ -374,6 +374,62 @@
         #candidatesTable td:nth-child(6),
         #candidatesTable td:nth-child(7) { text-align: right; }
 
+        /* Capital Status */
+        .capital-status {
+            background: linear-gradient(135deg, rgba(0, 198, 190, 0.08), rgba(0, 198, 190, 0.02));
+            border: 1px solid rgba(0, 198, 190, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .capital-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .capital-icon { font-size: 1.2em; }
+        .capital-text { font-size: 0.9em; color: #1A1A2E; }
+        .capital-bar {
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .capital-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00C6BE, #10B981);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .capital-bar-fill.warning { background: linear-gradient(90deg, #F59E0B, #EF4444); }
+        .capital-slots {
+            font-size: 0.85em;
+            color: #6B7280;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .slot-status {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .slot-status.available { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+        .slot-status.full { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+
+        /* Action Column */
+        .action-cell {
+            font-size: 0.75em;
+            line-height: 1.4;
+        }
+        .action-entry { color: #00C6BE; font-weight: 600; }
+        .action-target { color: #10B981; }
+        .action-stop { color: #EF4444; }
+
         /* No Data */
         .no-data {
             text-align: center;
@@ -448,6 +504,25 @@
             </div>
         </div>
 
+        <!-- Capital Status -->
+        <div class="capital-status" id="capitalStatus">
+            <div class="capital-info">
+                <span class="capital-icon">💰</span>
+                <span class="capital-text">
+                    <strong>자금 현황:</strong>
+                    <span id="usedCapital">0</span>원 / <span id="totalCapital">3,000,000</span>원
+                    (<span id="capitalUsage">0</span>%)
+                </span>
+            </div>
+            <div class="capital-bar">
+                <div class="capital-bar-fill" id="capitalBarFill" style="width: 0%"></div>
+            </div>
+            <div class="capital-slots">
+                📊 포지션: <span id="positionSlots">0/5</span>개
+                <span class="slot-status" id="slotStatus">진입 가능</span>
+            </div>
+        </div>
+
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card kpi-primary">
@@ -478,7 +553,7 @@
 
         <!-- Candidates -->
         <div class="section">
-            <h2>📉 낙폭과대 후보 종목</h2>
+            <h2>📉 낙폭과대 후보 종목 <span style="font-size:0.7em;color:#6B7280;font-weight:normal;">(보유 종목 제외)</span></h2>
             <div class="table-wrapper">
                 <table id="candidatesTable">
                     <thead>
@@ -490,10 +565,12 @@
                             <th>고점대비</th>
                             <th>5일</th>
                             <th>10일</th>
+                            <th>선정 사유</th>
+                            <th>다음 액션</th>
                         </tr>
                     </thead>
                     <tbody id="candidatesBody">
-                        <tr><td colspan="7" class="no-data">데이터 로딩 중...</td></tr>
+                        <tr><td colspan="9" class="no-data">데이터 로딩 중...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -572,7 +649,7 @@
     </div>
 
     <footer>
-        📅 마지막 수정: 2026-04-07
+        📅 마지막 수정: 2026-04-08
     </footer>
 
     <script>
@@ -642,7 +719,7 @@
 
                 const response = await fetch('data/bnf/candidates.json?t=' + Date.now());
                 if (!response.ok) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">후보 종목 데이터가 없습니다</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">후보 종목 데이터가 없습니다</td></tr>';
                     return;
                 }
 
@@ -651,7 +728,7 @@
                 const candidates = (data.candidates || []).filter(c => !ownedCodes.includes(c.code));
 
                 if (candidates.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="no-data">조건을 충족하는 종목이 없습니다 (또는 모두 보유 중)</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">조건을 충족하는 종목이 없습니다 (또는 모두 보유 중)</td></tr>';
                     return;
                 }
 
@@ -659,21 +736,37 @@
                     const drop5d = c.drop_5d || 0;
                     const drop10d = c.drop_10d || 0;
                     const dropHigh = c.drop_from_high || 0;
+                    const price = c.price || 0;
+
+                    // 다음 액션 계산
+                    const entryPrice = Math.round(price * 0.95);  // 현재가 -5% 시 1차 진입
+                    const targetPrice = Math.round(price * 1.15); // +15% 목표
+                    const stopPrice = Math.round(price * 0.90);   // -10% 손절
+
+                    // 선정 사유 포맷팅
+                    const reason = c.reasons || `고점 대비 -${dropHigh.toFixed(1)}%`;
+
                     return `
                         <tr>
                             <td>${i + 1}</td>
                             <td><strong>${c.name}</strong> <span style="color:#6B7280;font-size:0.8em;">${c.code}</span></td>
-                            <td>${(c.price || 0).toLocaleString()}원</td>
+                            <td>${price.toLocaleString()}원</td>
                             <td>${(c.high_20d || 0).toLocaleString()}원</td>
                             <td class="negative">-${dropHigh.toFixed(1)}%</td>
                             <td class="${drop5d > 0 ? 'negative' : 'positive'}">${drop5d > 0 ? '-' : '+'}${Math.abs(drop5d).toFixed(1)}%</td>
                             <td class="${drop10d > 0 ? 'negative' : 'positive'}">${drop10d > 0 ? '-' : '+'}${Math.abs(drop10d).toFixed(1)}%</td>
+                            <td style="font-size:0.75em;color:#00C6BE;">${reason}</td>
+                            <td class="action-cell">
+                                <div class="action-entry">진입: ${entryPrice.toLocaleString()}원↓ (-5%)</div>
+                                <div class="action-target">목표: ${targetPrice.toLocaleString()}원 (+15%)</div>
+                                <div class="action-stop">손절: ${stopPrice.toLocaleString()}원 (-10%)</div>
+                            </td>
                         </tr>
                     `;
                 }).join('');
 
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="7" class="no-data">
+                tbody.innerHTML = `<tr><td colspan="9" class="no-data">
                     <div style="padding: 15px">
                         <div style="margin-bottom: 8px">연결에 문제가 생겼어요</div>
                         <button onclick="loadCandidates()" class="nav-btn" aria-label="다시 시도">🔄 다시 시도</button>
@@ -829,6 +922,48 @@
             const unrealizedEl = document.getElementById('unrealizedPnl');
             unrealizedEl.textContent = (unrealizedPnl >= 0 ? '+' : '') + unrealizedPnl.toLocaleString() + '원';
             unrealizedEl.className = 'stat-value ' + (unrealizedPnl >= 0 ? 'positive' : 'negative');
+
+            // 자금 현황 업데이트
+            updateCapitalStatus(stats, positions);
+        }
+
+        // 자금 현황 업데이트
+        function updateCapitalStatus(stats, positions) {
+            const totalCapital = stats.total_capital || INITIAL_CAPITAL;
+            const usedCapital = stats.used_capital || 0;
+            const openCount = (positions || []).filter(p => p.state !== 'CLOSED').length;
+            const maxPositions = 5;
+            const usagePercent = totalCapital > 0 ? (usedCapital / totalCapital * 100) : 0;
+
+            // 숫자 업데이트
+            document.getElementById('usedCapital').textContent = usedCapital.toLocaleString();
+            document.getElementById('totalCapital').textContent = totalCapital.toLocaleString();
+            document.getElementById('capitalUsage').textContent = usagePercent.toFixed(1);
+
+            // 프로그레스 바 업데이트
+            const barFill = document.getElementById('capitalBarFill');
+            barFill.style.width = Math.min(usagePercent, 100) + '%';
+            if (usagePercent >= 80) {
+                barFill.classList.add('warning');
+            } else {
+                barFill.classList.remove('warning');
+            }
+
+            // 포지션 슬롯 업데이트
+            document.getElementById('positionSlots').textContent = openCount + '/' + maxPositions;
+
+            // 슬롯 상태
+            const slotStatus = document.getElementById('slotStatus');
+            if (openCount >= maxPositions) {
+                slotStatus.textContent = '진입 불가 (슬롯 만원)';
+                slotStatus.className = 'slot-status full';
+            } else if (usagePercent >= 80) {
+                slotStatus.textContent = '진입 주의 (자금 80%↑)';
+                slotStatus.className = 'slot-status full';
+            } else {
+                slotStatus.textContent = '진입 가능';
+                slotStatus.className = 'slot-status available';
+            }
         }
 
         // 거래 이력 로드
