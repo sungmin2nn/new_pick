@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-04-08T00:31:52",
+  "generated_at": "2026-04-08T00:38:43",
   "date": "2026-04-08",
   "weekday": "수요일",
   "weekday_short": "수",
   "is_market_day": true,
   "market_sentiment": {
     "vix": {
-      "value": null,
-      "change": 0,
-      "direction": "unknown",
-      "status": "unknown"
+      "value": 26.78,
+      "change": 2.61,
+      "direction": "up",
+      "status": "불안"
     },
     "usd_krw": {
       "value": 1501.5,
@@ -25,28 +25,28 @@
     },
     "us_market": {
       "S&P500": {
-        "value": 6553.92,
-        "change": -57.91,
-        "change_pct": -0.88,
+        "value": 6551.88,
+        "change": -59.95,
+        "change_pct": -0.91,
         "direction": "down"
       },
       "NASDAQ": {
-        "value": 21660.72,
-        "change": -335.62,
-        "change_pct": -1.53,
+        "value": 21707.36,
+        "change": -288.98,
+        "change_pct": -1.31,
         "direction": "down"
       },
       "DOW": {
-        "value": 46241.16,
-        "change": -428.72,
-        "change_pct": -0.92,
+        "value": 46308.85,
+        "change": -361.03,
+        "change_pct": -0.77,
         "direction": "down"
       }
     },
-    "score": -1,
+    "score": -2,
     "mode": "중립",
     "mode_desc": "시장 혼조 - 선별적 매매",
-    "generated_at": "2026-04-08 00:28:26"
+    "generated_at": "2026-04-08 00:35:41"
   },
   "count": 9,
   "strategy_stats": {
@@ -105,12 +105,12 @@
       "negative_news": 0,
       "matched_themes": [
         "반도체",
-        "바이오",
-        "AI"
+        "AI",
+        "바이오"
       ],
       "foreign_buy": 0,
       "institution_buy": 577919,
-      "selection_reason": "뉴스 7건 (중립) / 반도체·바이오 테마 / 기관 순매수",
+      "selection_reason": "뉴스 7건 (중립) / 반도체·AI 테마 / 기관 순매수",
       "total_score": 84.0,
       "score_detail": {
         "disclosure": 0,
@@ -147,10 +147,10 @@
           "status": "success",
           "matched_themes": [
             "반도체",
-            "바이오",
-            "AI"
+            "AI",
+            "바이오"
           ],
-          "message": "반도체, 바이오, AI"
+          "message": "반도체, AI, 바이오"
         },
         "investor": {
           "value": 5,
@@ -242,13 +242,13 @@
       "positive_news": 1,
       "negative_news": 0,
       "matched_themes": [
-        "AI",
         "반도체",
+        "AI",
         "바이오"
       ],
       "foreign_buy": 135382,
       "institution_buy": 0,
-      "selection_reason": "뉴스 7건 (긍정) / AI·반도체 테마 / 외국인 순매수",
+      "selection_reason": "뉴스 7건 (긍정) / 반도체·AI 테마 / 외국인 순매수",
       "total_score": 68.57142857142857,
       "score_detail": {
         "disclosure": 0,
@@ -284,11 +284,11 @@
           "value": 15,
           "status": "success",
           "matched_themes": [
-            "AI",
             "반도체",
+            "AI",
             "바이오"
           ],
-          "message": "AI, 반도체, 바이오"
+          "message": "반도체, AI, 바이오"
         },
         "investor": {
           "value": 5,
@@ -334,7 +334,7 @@
         }
       },
       "strategy_id": "theme",
-      "strategy_name": "테마/AI",
+      "strategy_name": "테마/반도체",
       "technical_indicators": {
         "code": "000250",
         "current_price": 519000,
