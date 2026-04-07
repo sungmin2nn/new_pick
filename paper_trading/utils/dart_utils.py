@@ -7,6 +7,10 @@ DART API 유틸리티 모듈
 
 import os
 import requests
+from dotenv import load_dotenv
+
+# .env 파일에서 환경변수 로드
+load_dotenv()
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, field
