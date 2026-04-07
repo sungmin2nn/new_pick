@@ -200,6 +200,8 @@
             padding: 2px 6px;
             border-radius: 4px;
             margin-left: 6px;
+            white-space: nowrap;
+            display: inline-block;
         }
         .strategy-badge.dart { background: #FEF3C7; color: #92400E; }
         .strategy-badge.theme { background: #DBEAFE; color: #1E40AF; }
@@ -247,8 +249,22 @@
         .profit-value.negative { color: #EF4444; }
         .profit-sub { color: #6B7280; font-size: 0.8em; font-weight: 600; }
         .profit-amount { font-size: 1em; color: #00C6BE; margin-top: 3px; font-weight: 600; }
-        .mini-chart-container { flex: 1; height: 80px; min-width: 200px; position: relative; }
-        .mini-chart-container canvas { width: 100% !important; height: 100% !important; }
+        .mini-chart-container {
+            flex: 1 1 auto;
+            height: 80px;
+            min-width: 200px;
+            max-width: 400px;
+            position: relative;
+            background: rgba(0, 198, 190, 0.03);
+            border-radius: 6px;
+        }
+        .mini-chart-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+        }
 
         /* Stock Table - BNF Style */
         .stock-table-wrapper { overflow-x: auto; }
@@ -276,7 +292,7 @@
         .stock-row.waiting { border-left-color: #F59E0B; }
         .stock-row.profit { border-left-color: #10B981; background: rgba(16, 185, 129, 0.05); }
         .stock-row.loss { border-left-color: #EF4444; background: rgba(239, 68, 68, 0.05); }
-        .stock-name { font-weight: 600; color: #1A1A2E; }
+        .stock-name { font-weight: 600; color: #1A1A2E; word-break: keep-all; }
         .stock-code { color: #6B7280; font-size: 0.75em; }
         .expand-icon { color: #6B7280; transition: transform 0.2s; font-size: 0.75em; }
         .stock-row.expanded .expand-icon { transform: rotate(180deg); }
@@ -326,7 +342,7 @@
             text-align: left;
         }
         .detail-reason .label { color: #F59E0B; font-size: 0.7em; font-weight: 700; margin-bottom: 5px; }
-        .detail-reason .value { color: #1A1A2E; font-size: 0.8em; line-height: 1.5; }
+        .detail-reason .value { color: #1A1A2E; font-size: 0.8em; line-height: 1.5; word-break: keep-all; }
 
         /* Collapsible - BNF Style */
         .collapsible {
@@ -382,7 +398,7 @@
             body { padding: 10px; }
             .profit-main { flex-direction: column; align-items: flex-start; gap: 15px; }
             .profit-value { font-size: 1.8em; }
-            .mini-chart-container { width: 100%; height: 60px; }
+            .mini-chart-container { flex: none; width: 100%; max-width: none; height: 60px; }
             .stats-grid { grid-template-columns: repeat(3, 1fr); }
             .detail-content { grid-template-columns: repeat(2, 1fr); }
         }
