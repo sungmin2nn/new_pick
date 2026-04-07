@@ -146,57 +146,55 @@ jobs:
         TZ: Asia/Seoul
       run: |
         python -c "
-import json
-from datetime import datetime, timezone, timedelta
-from telegram_notifier import TelegramNotifier
+        import json
+        from datetime import datetime, timezone, timedelta
+        from telegram_notifier import TelegramNotifier
 
-kst = timezone(timedelta(hours=9))
-today = datetime.now(kst).strftime('%Y%m%d')
+        kst = timezone(timedelta(hours=9))
+        today = datetime.now(kst).strftime('%Y%m%d')
 
-notifier = TelegramNotifier()
+        notifier = TelegramNotifier()
 
-if not notifier.is_configured():
-    print('Telegram 미설정 - 알림 생략')
-    exit(0)
+        if not notifier.is_configured():
+            print('Telegram 미설정 - 알림 생략')
+            exit(0)
 
-try:
-    with open(f'data/paper_trading/result_{today}.json') as f:
-        data = json.load(f)
+        try:
+            with open(f'data/paper_trading/result_{today}.json') as f:
+                data = json.load(f)
 
-    sim = data.get('simulation', {})
+            sim = data.get('simulation', {})
 
-    # 일일 요약 데이터 구성
-    summary_data = {
-        'total_stocks': sim.get('total_trades', 0),
-        'profit_hit': sim.get('profit_exits', 0),
-        'loss_hit': sim.get('loss_exits', 0),
-        'waiting': sim.get('time_exits', 0),
-        'total_pnl_pct': sim.get('total_return', 0)
-    }
+            summary_data = {
+                'total_stocks': sim.get('total_trades', 0),
+                'profit_hit': sim.get('profit_exits', 0),
+                'loss_hit': sim.get('loss_exits', 0),
+                'waiting': sim.get('time_exits', 0),
+                'total_pnl_pct': sim.get('total_return', 0)
+            }
 
-    notifier.send_daily_summary(summary_data)
+            notifier.send_daily_summary(summary_data)
 
-    # 개별 매매 결과 알림
-    results = sim.get('results', [])
-    for r in results[:5]:  # 최대 5개만
-        if r.get('exit_type') == 'profit':
-            notifier.send_sell_signal(
-                r['name'], r.get('code', ''),
-                r.get('exit_price', 0), 'profit', r.get('return_pct', 0)
-            )
-        elif r.get('exit_type') == 'loss':
-            notifier.send_sell_signal(
-                r['name'], r.get('code', ''),
-                r.get('exit_price', 0), 'loss', r.get('return_pct', 0)
-            )
+            results = sim.get('results', [])
+            for r in results[:5]:
+                if r.get('exit_type') == 'profit':
+                    notifier.send_sell_signal(
+                        r['name'], r.get('code', ''),
+                        r.get('exit_price', 0), 'profit', r.get('return_pct', 0)
+                    )
+                elif r.get('exit_type') == 'loss':
+                    notifier.send_sell_signal(
+                        r['name'], r.get('code', ''),
+                        r.get('exit_price', 0), 'loss', r.get('return_pct', 0)
+                    )
 
-    print(f'일일 결과 알림 전송 완료')
+            print('일일 결과 알림 전송 완료')
 
-except FileNotFoundError:
-    print(f'결과 파일 없음: result_{today}.json')
-except Exception as e:
-    print(f'알림 오류: {e}')
-"
+        except FileNotFoundError:
+            print(f'결과 파일 없음: result_{today}.json')
+        except Exception as e:
+            print(f'알림 오류: {e}')
+        "
 
     - name: Summary
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'

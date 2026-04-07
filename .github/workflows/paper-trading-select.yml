@@ -81,41 +81,39 @@ jobs:
         TZ: Asia/Seoul
       run: |
         python -c "
-import json
-from datetime import datetime, timezone, timedelta
-from telegram_notifier import TelegramNotifier
+        import json
+        from datetime import datetime, timezone, timedelta
+        from telegram_notifier import TelegramNotifier
 
-kst = timezone(timedelta(hours=9))
-today = datetime.now(kst).strftime('%Y%m%d')
+        kst = timezone(timedelta(hours=9))
+        today = datetime.now(kst).strftime('%Y%m%d')
 
-notifier = TelegramNotifier()
+        notifier = TelegramNotifier()
 
-if not notifier.is_configured():
-    print('Telegram 미설정 - 알림 생략')
-    exit(0)
+        if not notifier.is_configured():
+            print('Telegram 미설정 - 알림 생략')
+            exit(0)
 
-try:
-    with open(f'data/paper_trading/candidates_{today}_all.json') as f:
-        data = json.load(f)
+        try:
+            with open(f'data/paper_trading/candidates_{today}_all.json') as f:
+                data = json.load(f)
 
-    # 전체 종목 리스트 수집
-    all_stocks = []
-    strategies = data.get('strategies', {})
-    for sid, result in strategies.items():
-        for c in result.get('candidates', []):
-            c['strategy'] = result.get('strategy_name', sid)
-            all_stocks.append(c)
+            all_stocks = []
+            strategies = data.get('strategies', {})
+            for sid, result in strategies.items():
+                for c in result.get('candidates', []):
+                    c['strategy'] = result.get('strategy_name', sid)
+                    all_stocks.append(c)
 
-    # 점수 상위 10개만
-    all_stocks.sort(key=lambda x: x.get('score', 0), reverse=True)
-    top_stocks = all_stocks[:10]
+            all_stocks.sort(key=lambda x: x.get('score', 0), reverse=True)
+            top_stocks = all_stocks[:10]
 
-    notifier.send_stock_selection(top_stocks, f'다중전략 ({len(strategies)}개)')
-    print(f'종목 선정 알림 전송: {len(top_stocks)}개')
+            notifier.send_stock_selection(top_stocks, f'다중전략 ({len(strategies)}개)')
+            print(f'종목 선정 알림 전송: {len(top_stocks)}개')
 
-except Exception as e:
-    print(f'알림 오류: {e}')
-"
+        except Exception as e:
+            print(f'알림 오류: {e}')
+        "
 
     - name: Summary
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
