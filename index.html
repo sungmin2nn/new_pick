@@ -108,7 +108,7 @@
             padding: 10px;
             border: 1px solid #E5E7EB;
         }
-        .rule-card .label { color: #6B7280; font-size: 0.7em; margin-bottom: 3px; }
+        .rule-card .label { color: #6B7280; font-size: 0.75em; margin-bottom: 3px; }
         .rule-card .value { color: #1A1A2E; font-size: 0.85em; font-weight: 500; }
         .rule-card .value.profit { color: #10B981; }
         .rule-card .value.loss { color: #EF4444; }
@@ -147,7 +147,7 @@
         }
         .stat-value.positive { color: #10B981; }
         .stat-value.negative { color: #EF4444; }
-        .stat-label { color: #6B7280; font-size: 0.7em; }
+        .stat-label { color: #6B7280; font-size: 0.75em; }
 
         /* Strategy Tabs */
         .strategy-tabs {
@@ -304,7 +304,7 @@
             text-align: center;
             border: 1px solid #E5E7EB;
         }
-        .detail-item .label { color: #6B7280; font-size: 0.65em; font-weight: 600; margin-bottom: 5px; }
+        .detail-item .label { color: #6B7280; font-size: 0.7em; font-weight: 600; margin-bottom: 5px; }
         .detail-item .value { font-size: 0.9em; font-weight: 600; color: #1A1A2E; }
         .detail-item .value.profit { color: #10B981; }
         .detail-item .value.loss { color: #EF4444; }
@@ -316,7 +316,7 @@
             border-radius: 0 6px 6px 0;
             text-align: left;
         }
-        .detail-reason .label { color: #F59E0B; font-size: 0.65em; font-weight: 700; margin-bottom: 5px; }
+        .detail-reason .label { color: #F59E0B; font-size: 0.7em; font-weight: 700; margin-bottom: 5px; }
         .detail-reason .value { color: #1A1A2E; font-size: 0.8em; line-height: 1.5; }
 
         /* Collapsible - BNF Style */
@@ -396,15 +396,15 @@
 <body>
     <div class="container">
         <!-- Navigation - BNF Style -->
-        <div class="nav-buttons">
-            <div class="nav-buttons-main">
-                <a href="index.html" class="nav-btn active">📊 페이퍼 트레이딩</a>
-                <a href="bnf_dashboard.html" class="nav-btn">📉 BNF 낙폭과대</a>
+        <nav class="nav-buttons" aria-label="메인 네비게이션">
+            <div class="nav-buttons-main" role="navigation">
+                <a href="index.html" class="nav-btn active" aria-current="page">📊 페이퍼 트레이딩</a>
+                <a href="bnf_dashboard.html" class="nav-btn" aria-label="BNF 낙폭과대 전략 대시보드">📉 BNF 낙폭과대</a>
             </div>
             <div class="nav-buttons-sub">
-                <a href="system_guide.html">📚 가이드</a>
+                <a href="system_guide.html" aria-label="시스템 사용 가이드">📚 가이드</a>
             </div>
-        </div>
+        </nav>
 
         <!-- Header - BNF Style -->
         <header class="header">
@@ -412,6 +412,9 @@
                 <h1>📊 페이퍼 트레이딩 대시보드</h1>
                 <div class="subtitle">실시간 모니터링 | <span id="currentTime">-</span></div>
             </div>
+            <button class="nav-btn" onclick="loadAllData()" aria-label="데이터 새로고침">
+                🔄 새로고침
+            </button>
         </header>
 
         <!-- Strategy Info - BNF Style -->
@@ -480,20 +483,20 @@
         </div>
 
         <!-- Strategy Tabs -->
-        <div class="strategy-tabs">
-            <button class="strategy-tab active" data-strategy="all" onclick="filterByStrategy('all')">
+        <div class="strategy-tabs" role="tablist" aria-label="전략별 필터">
+            <button class="strategy-tab active" data-strategy="all" onclick="filterByStrategy('all')" role="tab" aria-selected="true" aria-controls="stockTable">
                 전체 <span class="tab-count" id="count-all">0</span>
             </button>
-            <button class="strategy-tab" data-strategy="dart" onclick="filterByStrategy('dart')">
+            <button class="strategy-tab" data-strategy="dart" onclick="filterByStrategy('dart')" role="tab" aria-selected="false" aria-label="DART 공시 기반 전략">
                 📋 DART <span class="tab-count" id="count-dart">0</span>
             </button>
-            <button class="strategy-tab" data-strategy="theme" onclick="filterByStrategy('theme')">
+            <button class="strategy-tab" data-strategy="theme" onclick="filterByStrategy('theme')" role="tab" aria-selected="false" aria-label="테마주 전략">
                 🎯 테마 <span class="tab-count" id="count-theme">0</span>
             </button>
-            <button class="strategy-tab" data-strategy="largecap_contrarian" onclick="filterByStrategy('largecap_contrarian')">
+            <button class="strategy-tab" data-strategy="largecap_contrarian" onclick="filterByStrategy('largecap_contrarian')" role="tab" aria-selected="false" aria-label="대형주 역추세 전략">
                 📉 역추세 <span class="tab-count" id="count-largecap_contrarian">0</span>
             </button>
-            <button class="strategy-tab" data-strategy="momentum" onclick="filterByStrategy('momentum')">
+            <button class="strategy-tab" data-strategy="momentum" onclick="filterByStrategy('momentum')" role="tab" aria-selected="false" aria-label="모멘텀 전략">
                 🚀 모멘텀 <span class="tab-count" id="count-momentum">0</span>
             </button>
         </div>
@@ -567,7 +570,7 @@
     </div>
 
     <footer>
-        📅 마지막 수정: 2026-04-04
+        📅 마지막 수정: 2026-04-07
     </footer>
 
     <script>
@@ -586,12 +589,11 @@
         function filterByStrategy(strategyId) {
             currentStrategy = strategyId;
 
-            // 탭 활성화 상태 변경
+            // 탭 활성화 상태 변경 (aria-selected 포함)
             document.querySelectorAll('.strategy-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.dataset.strategy === strategyId) {
-                    tab.classList.add('active');
-                }
+                const isActive = tab.dataset.strategy === strategyId;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
             });
 
             // 종목 필터링 및 재표시
@@ -727,7 +729,13 @@
 
             } catch (error) {
                 console.log('Today stocks error:', error);
-                tbody.innerHTML = '<tr><td colspan="5" class="no-data">데이터 로드 실패</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="5" class="no-data">
+                    <div style="padding: 20px">
+                        <div style="font-size: 1.1em; margin-bottom: 8px">연결에 문제가 생겼어요</div>
+                        <div style="color: #6B7280; margin-bottom: 12px">잠시 후 다시 시도해주세요</div>
+                        <button onclick="loadAllData()" class="nav-btn" aria-label="다시 시도">🔄 다시 시도</button>
+                    </div>
+                </td></tr>`;
             }
         }
 

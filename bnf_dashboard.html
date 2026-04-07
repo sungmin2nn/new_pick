@@ -179,7 +179,7 @@
         }
         .stat-value.positive { color: #10B981; }
         .stat-value.negative { color: #EF4444; }
-        .stat-label { color: #6B7280; font-size: 0.7em; }
+        .stat-label { color: #6B7280; font-size: 0.75em; }
 
         /* Section */
         .section {
@@ -411,18 +411,18 @@
 <body>
     <div class="container">
         <!-- Navigation -->
-        <div class="nav-buttons">
-            <div class="nav-buttons-main">
-                <a href="index.html" class="nav-btn">📊 페이퍼 트레이딩</a>
-                <a href="bnf_dashboard.html" class="nav-btn active">📉 BNF 낙폭과대</a>
+        <nav class="nav-buttons" aria-label="메인 네비게이션">
+            <div class="nav-buttons-main" role="navigation">
+                <a href="index.html" class="nav-btn" aria-label="페이퍼 트레이딩 대시보드">📊 페이퍼 트레이딩</a>
+                <a href="bnf_dashboard.html" class="nav-btn active" aria-current="page">📉 BNF 낙폭과대</a>
             </div>
             <div class="nav-buttons-sub">
-                <a href="system_guide.html">📚 가이드</a>
+                <a href="system_guide.html" aria-label="시스템 사용 가이드">📚 가이드</a>
             </div>
-        </div>
+        </nav>
 
         <!-- Header -->
-        <div class="header">
+        <header class="header">
             <div>
                 <h1>
                     🔥 BNF 매매 시뮬레이터
@@ -430,7 +430,10 @@
                 </h1>
                 <div class="subtitle">낙폭과대 종목 반등 매매 | 분할 진입/청산 | 트레일링 스탑</div>
             </div>
-        </div>
+            <button class="nav-btn" onclick="loadBNFData()" aria-label="데이터 새로고침">
+                🔄 새로고침
+            </button>
+        </header>
 
         <!-- Strategy Info -->
         <div class="strategy-info">
@@ -569,7 +572,7 @@
     </div>
 
     <footer>
-        📅 마지막 수정: 2026-04-06
+        📅 마지막 수정: 2026-04-07
     </footer>
 
     <script>
@@ -670,7 +673,12 @@
                 }).join('');
 
             } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="7" class="no-data">후보 종목 로드 실패</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="7" class="no-data">
+                    <div style="padding: 15px">
+                        <div style="margin-bottom: 8px">연결에 문제가 생겼어요</div>
+                        <button onclick="loadCandidates()" class="nav-btn" aria-label="다시 시도">🔄 다시 시도</button>
+                    </div>
+                </td></tr>`;
             }
         }
 
@@ -735,7 +743,12 @@
 
             } catch (error) {
                 console.error('Position load error:', error);
-                tbody.innerHTML = '<tr><td colspan="11" class="no-data">포지션 로드 실패</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="11" class="no-data">
+                    <div style="padding: 15px">
+                        <div style="margin-bottom: 8px">포지션 데이터를 불러오지 못했어요</div>
+                        <button onclick="loadPositions()" class="nav-btn" aria-label="다시 시도">🔄 다시 시도</button>
+                    </div>
+                </td></tr>`;
                 // 에러 시에도 기본 통계 표시
                 updateStats({ stats: { total_trades: 0, win_rate: 0, total_return: 0, avg_return: 0, open_positions: 0, unrealized_pnl: 0 }});
             }
@@ -955,7 +968,12 @@
 
             } catch (error) {
                 console.error('Trade history load error:', error);
-                tbody.innerHTML = '<tr><td colspan="12" class="no-data">매매 내역 로드 실패</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="12" class="no-data">
+                    <div style="padding: 15px">
+                        <div style="margin-bottom: 8px">매매 내역을 불러오지 못했어요</div>
+                        <button onclick="loadTradeHistory()" class="nav-btn" aria-label="다시 시도">🔄 다시 시도</button>
+                    </div>
+                </td></tr>`;
             }
         }
 
