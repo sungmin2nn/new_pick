@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-08T02:25:34",
+  "generated_at": "2026-04-08T08:55:38",
   "date": "2026-04-08",
   "weekday": "수요일",
   "weekday_short": "수",
@@ -12,8 +12,8 @@
       "status": "unknown"
     },
     "usd_krw": {
-      "value": 1502.8,
-      "change": 5.7,
+      "value": 1487.0,
+      "change": 10.0,
       "direction": "up",
       "status": "상승 (주의)"
     },
@@ -25,107 +25,93 @@
     },
     "us_market": {
       "S&P500": {
-        "value": 6587.16,
-        "change": -24.67,
-        "change_pct": -0.37,
-        "direction": "down"
+        "value": 6616.85,
+        "change": 5.02,
+        "change_pct": 0.08,
+        "direction": "up"
       },
       "NASDAQ": {
-        "value": 21880.74,
-        "change": -115.6,
-        "change_pct": -0.53,
-        "direction": "down"
+        "value": 22017.85,
+        "change": 21.51,
+        "change_pct": 0.1,
+        "direction": "up"
       },
       "DOW": {
-        "value": 46482.72,
-        "change": -187.16,
-        "change_pct": -0.4,
+        "value": 46584.46,
+        "change": -85.42,
+        "change_pct": -0.18,
         "direction": "down"
       }
     },
     "score": 0,
     "mode": "중립",
     "mode_desc": "시장 혼조 - 선별적 매매",
-    "generated_at": "2026-04-08 02:22:22"
+    "generated_at": "2026-04-08 08:52:05"
   },
   "count": 9,
   "strategy_stats": {
     "theme": {
       "name": "테마/AI",
-      "count": 2,
-      "codes": [
-        "005930",
-        "000250"
-      ]
-    },
-    "momentum": {
-      "name": "모멘텀",
-      "count": 2,
+      "count": 7,
       "codes": [
         "000660",
-        "028050"
+        "005930",
+        "034730",
+        "003550",
+        "095610",
+        "001510",
+        "001680"
       ]
     },
     "mixed": {
       "name": "복합",
-      "count": 4,
+      "count": 2,
       "codes": [
-        "396500",
-        "069500",
-        "091230",
-        "0162"
-      ]
-    },
-    "largecap_contrarian": {
-      "name": "대형주 역추세",
-      "count": 1,
-      "codes": [
-        "016360"
+        "000250",
+        "078930"
       ]
     }
   },
   "candidates": [
     {
-      "code": "005930",
-      "name": "삼성전자",
+      "code": "000660",
+      "name": "SK하이닉스",
       "market": "KOSPI",
-      "current_price": 196500.0,
+      "current_price": 916000.0,
       "price_change": 0,
-      "price_change_percent": 1.76,
-      "volume": 29795287.0,
-      "trading_value": 5854773895500.0,
-      "market_cap": 1163208900000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 26358757.55,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 0,
+      "market_cap": 652835400000000.0,
+      "avg_volume_20d": 4259180.7,
       "avg_volume_20d_actual": true,
       "disclosure_count": 0,
       "disclosures": [],
       "news_mentions": 7,
-      "positive_news": 0,
+      "positive_news": 3,
       "negative_news": 0,
       "matched_themes": [
         "AI",
-        "바이오",
         "반도체"
       ],
-      "foreign_buy": 0,
-      "institution_buy": 577919,
-      "selection_reason": "뉴스 7건 (중립) / AI·바이오 테마 / 기관 순매수",
-      "total_score": 84.0,
+      "foreign_buy": 582600,
+      "institution_buy": 0,
+      "selection_reason": "뉴스 7건 (긍정) / AI·반도체 테마 / 외국인 순매수",
+      "total_score": 56.0,
       "score_detail": {
         "disclosure": 0,
-        "news": 20.0,
-        "theme_keywords": 15,
-        "investor": 5,
-        "trading_value": 20,
+        "news": 22.0,
+        "theme_keywords": 12,
+        "investor": 7,
+        "trading_value": 0,
         "market_cap": 10,
         "price_momentum": 2,
-        "volume_surge": 3,
-        "turnover_rate": 1,
+        "volume_surge": 0,
+        "turnover_rate": 0,
         "material_overlap": 3,
         "news_timing": 0
       },
-      "is_leading": true,
+      "is_leading": false,
       "cap_tier": "large",
       "score_metadata": {
         "disclosure": {
@@ -135,32 +121,31 @@
           "message": "공시 없음"
         },
         "news": {
-          "value": 20.0,
+          "value": 22.0,
           "status": "success",
           "count": 7,
-          "positive": 0,
+          "positive": 3,
           "negative": 0,
-          "message": "7건 (긍정 0)"
+          "message": "7건 (긍정 3)"
         },
         "theme_keywords": {
-          "value": 15,
+          "value": 12,
           "status": "success",
           "matched_themes": [
             "AI",
-            "바이오",
             "반도체"
           ],
-          "message": "AI, 바이오, 반도체"
+          "message": "AI, 반도체"
         },
         "investor": {
-          "value": 5,
+          "value": 7,
           "status": "success",
-          "foreign_buy": 0,
-          "institution_buy": 577919,
-          "message": "기관 순매수"
+          "foreign_buy": 582600,
+          "institution_buy": 0,
+          "message": "외국인 순매수"
         },
         "trading_value": {
-          "value": 20,
+          "value": 0,
           "status": "success",
           "message": "OK"
         },
@@ -175,12 +160,147 @@
           "message": "OK"
         },
         "volume_surge": {
-          "value": 3,
+          "value": 0,
           "status": "success",
           "message": "OK"
         },
         "turnover_rate": {
-          "value": 1,
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "material_overlap": {
+          "value": 3,
+          "status": "success",
+          "message": "OK"
+        },
+        "news_timing": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        }
+      },
+      "strategy_id": "theme",
+      "strategy_name": "테마/AI",
+      "technical_indicators": {
+        "code": "000660",
+        "current_price": 916000,
+        "prev_close": 916000,
+        "prev_high": 933000,
+        "ma5": 884800,
+        "ma20": 931300,
+        "ma60": 884800,
+        "above_ma5": true,
+        "above_ma20": false,
+        "above_ma60": true,
+        "ma5_above_ma20": false,
+        "near_prev_high": true,
+        "above_prev_high": false,
+        "high_20d": 1060000,
+        "near_high_20d": false,
+        "above_high_20d": false,
+        "high_52w": 1099000,
+        "low_52w": 238000,
+        "pct_from_52w_high": -16.65,
+        "near_52w_high": false,
+        "avg_volume_20d": 4063375,
+        "volume_ratio": 0.0
+      },
+      "technical_summary": "5일↑ / 전일고가근접"
+    },
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "market": "KOSPI",
+      "current_price": 196500.0,
+      "price_change": 0,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 0,
+      "market_cap": 1163208900000000.0,
+      "avg_volume_20d": 26411395.85,
+      "avg_volume_20d_actual": true,
+      "disclosure_count": 0,
+      "disclosures": [],
+      "news_mentions": 12,
+      "positive_news": 6,
+      "negative_news": 0,
+      "matched_themes": [
+        "AI",
+        "반도체"
+      ],
+      "foreign_buy": 0,
+      "institution_buy": 577919,
+      "selection_reason": "뉴스 12건 (긍정) / AI·반도체 테마 / 기관 순매수",
+      "total_score": 54.66666666666667,
+      "score_detail": {
+        "disclosure": 0,
+        "news": 22.666666666666668,
+        "theme_keywords": 12,
+        "investor": 5,
+        "trading_value": 0,
+        "market_cap": 10,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 0,
+        "material_overlap": 3,
+        "news_timing": 0
+      },
+      "is_leading": false,
+      "cap_tier": "large",
+      "score_metadata": {
+        "disclosure": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "message": "공시 없음"
+        },
+        "news": {
+          "value": 22.666666666666668,
+          "status": "success",
+          "count": 12,
+          "positive": 6,
+          "negative": 0,
+          "message": "12건 (긍정 6)"
+        },
+        "theme_keywords": {
+          "value": 12,
+          "status": "success",
+          "matched_themes": [
+            "AI",
+            "반도체"
+          ],
+          "message": "AI, 반도체"
+        },
+        "investor": {
+          "value": 5,
+          "status": "success",
+          "foreign_buy": 0,
+          "institution_buy": 577919,
+          "message": "기관 순매수"
+        },
+        "trading_value": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "market_cap": {
+          "value": 10,
+          "status": "success",
+          "message": "OK"
+        },
+        "price_momentum": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "volume_surge": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "turnover_rate": {
+          "value": 0,
           "status": "success",
           "message": "OK"
         },
@@ -200,17 +320,17 @@
       "technical_indicators": {
         "code": "005930",
         "current_price": 196500,
-        "prev_close": 193100,
-        "prev_high": 194600,
-        "ma5": 188760,
-        "ma20": 188225,
-        "ma60": 174661,
+        "prev_close": 196500,
+        "prev_high": 202500,
+        "ma5": 190140,
+        "ma20": 188550,
+        "ma60": 175623,
         "above_ma5": true,
         "above_ma20": true,
         "above_ma60": true,
         "ma5_above_ma20": true,
-        "near_prev_high": true,
-        "above_prev_high": true,
+        "near_prev_high": false,
+        "above_prev_high": false,
         "high_20d": 209000,
         "near_high_20d": false,
         "above_high_20d": false,
@@ -218,48 +338,46 @@
         "low_52w": 56900,
         "pct_from_52w_high": -11.88,
         "near_52w_high": false,
-        "avg_volume_20d": 26358757,
-        "volume_ratio": 1.13
+        "avg_volume_20d": 25195828,
+        "volume_ratio": 0.0
       },
-      "technical_summary": "5일↑ / 20일↑ / 정배열 / 전일고가돌파"
+      "technical_summary": "5일↑ / 20일↑ / 정배열"
     },
     {
-      "code": "000250",
-      "name": "삼천당제약",
-      "market": "KOSDAQ",
-      "current_price": 519000.0,
+      "code": "034730",
+      "name": "SK",
+      "market": "KOSPI",
+      "current_price": 312500.0,
       "price_change": 0,
-      "price_change_percent": -16.02,
-      "volume": 1004575.0,
-      "trading_value": 121744000000.0,
-      "market_cap": 12174400000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 703202.5,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 0,
+      "market_cap": 22657100000000.0,
+      "avg_volume_20d": 0.0,
       "avg_volume_20d_actual": false,
       "disclosure_count": 0,
       "disclosures": [],
-      "news_mentions": 7,
-      "positive_news": 1,
+      "news_mentions": 8,
+      "positive_news": 4,
       "negative_news": 0,
       "matched_themes": [
-        "바이오",
         "AI",
         "반도체"
       ],
-      "foreign_buy": 135382,
+      "foreign_buy": 11045,
       "institution_buy": 0,
-      "selection_reason": "뉴스 7건 (긍정) / 바이오·AI 테마 / 외국인 순매수",
-      "total_score": 68.57142857142857,
+      "selection_reason": "뉴스 8건 (긍정) / AI·반도체 테마 / 외국인 순매수",
+      "total_score": 51.25,
       "score_detail": {
         "disclosure": 0,
-        "news": 20.571428571428573,
-        "theme_keywords": 15,
-        "investor": 5,
-        "trading_value": 10,
+        "news": 22.25,
+        "theme_keywords": 12,
+        "investor": 2,
+        "trading_value": 0,
         "market_cap": 10,
-        "price_momentum": 0,
-        "volume_surge": 3,
-        "turnover_rate": 2,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 0,
         "material_overlap": 3,
         "news_timing": 0
       },
@@ -273,22 +391,290 @@
           "message": "공시 없음"
         },
         "news": {
-          "value": 20.571428571428573,
+          "value": 22.25,
           "status": "success",
-          "count": 7,
-          "positive": 1,
+          "count": 8,
+          "positive": 4,
           "negative": 0,
-          "message": "7건 (긍정 1)"
+          "message": "8건 (긍정 4)"
         },
         "theme_keywords": {
-          "value": 15,
+          "value": 12,
           "status": "success",
           "matched_themes": [
-            "바이오",
             "AI",
             "반도체"
           ],
-          "message": "바이오, AI, 반도체"
+          "message": "AI, 반도체"
+        },
+        "investor": {
+          "value": 2,
+          "status": "success",
+          "foreign_buy": 11045,
+          "institution_buy": 0,
+          "message": "외국인 순매수"
+        },
+        "trading_value": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "market_cap": {
+          "value": 10,
+          "status": "success",
+          "message": "OK"
+        },
+        "price_momentum": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "volume_surge": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "turnover_rate": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "material_overlap": {
+          "value": 3,
+          "status": "success",
+          "message": "OK"
+        },
+        "news_timing": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        }
+      },
+      "strategy_id": "theme",
+      "strategy_name": "테마/AI",
+      "technical_indicators": {
+        "code": "034730",
+        "current_price": 312500,
+        "prev_close": 312500,
+        "prev_high": 323500,
+        "ma5": 311900,
+        "ma20": 329550,
+        "ma60": 330858,
+        "above_ma5": true,
+        "above_ma20": false,
+        "above_ma60": false,
+        "ma5_above_ma20": false,
+        "near_prev_high": false,
+        "above_prev_high": false,
+        "high_20d": 365000,
+        "near_high_20d": false,
+        "above_high_20d": false,
+        "high_52w": 424000,
+        "low_52w": 176900,
+        "pct_from_52w_high": -26.3,
+        "near_52w_high": false,
+        "avg_volume_20d": 189694,
+        "volume_ratio": 0.0
+      },
+      "technical_summary": "5일↑"
+    },
+    {
+      "code": "003550",
+      "name": "LG",
+      "market": "KOSPI",
+      "current_price": 87600.0,
+      "price_change": 0,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 0,
+      "market_cap": 13509800000000.0,
+      "avg_volume_20d": 0.0,
+      "avg_volume_20d_actual": false,
+      "disclosure_count": 0,
+      "disclosures": [],
+      "news_mentions": 5,
+      "positive_news": 0,
+      "negative_news": 1,
+      "matched_themes": [
+        "2차전지",
+        "AI"
+      ],
+      "foreign_buy": 0,
+      "institution_buy": 0,
+      "selection_reason": "뉴스 5건 (중립) / 2차전지·AI 테마",
+      "total_score": 42,
+      "score_detail": {
+        "disclosure": 0,
+        "news": 15,
+        "theme_keywords": 12,
+        "investor": 0,
+        "trading_value": 0,
+        "market_cap": 10,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 0,
+        "material_overlap": 3,
+        "news_timing": 0
+      },
+      "is_leading": false,
+      "cap_tier": "large",
+      "score_metadata": {
+        "disclosure": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "message": "공시 없음"
+        },
+        "news": {
+          "value": 15,
+          "status": "success",
+          "count": 5,
+          "positive": 0,
+          "negative": 1,
+          "message": "5건 (긍정 0)"
+        },
+        "theme_keywords": {
+          "value": 12,
+          "status": "success",
+          "matched_themes": [
+            "2차전지",
+            "AI"
+          ],
+          "message": "2차전지, AI"
+        },
+        "investor": {
+          "value": 0,
+          "status": "no_data",
+          "foreign_buy": 0,
+          "institution_buy": 0,
+          "message": "순매수 없음"
+        },
+        "trading_value": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "market_cap": {
+          "value": 10,
+          "status": "success",
+          "message": "OK"
+        },
+        "price_momentum": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "volume_surge": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "turnover_rate": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "material_overlap": {
+          "value": 3,
+          "status": "success",
+          "message": "OK"
+        },
+        "news_timing": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        }
+      },
+      "strategy_id": "theme",
+      "strategy_name": "테마/2차전지",
+      "technical_indicators": {
+        "code": "003550",
+        "current_price": 87600,
+        "prev_close": 87600,
+        "prev_high": 89400,
+        "ma5": 86980,
+        "ma20": 88545,
+        "ma60": 91135,
+        "above_ma5": true,
+        "above_ma20": false,
+        "above_ma60": false,
+        "ma5_above_ma20": false,
+        "near_prev_high": false,
+        "above_prev_high": false,
+        "high_20d": 95500,
+        "near_high_20d": false,
+        "above_high_20d": false,
+        "high_52w": 107800,
+        "low_52w": 70100,
+        "pct_from_52w_high": -18.74,
+        "near_52w_high": false,
+        "avg_volume_20d": 256517,
+        "volume_ratio": 0.0
+      },
+      "technical_summary": "5일↑"
+    },
+    {
+      "code": "000250",
+      "name": "삼천당제약",
+      "market": "KOSDAQ",
+      "current_price": 519000.0,
+      "price_change": 0,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 121744000000.0,
+      "market_cap": 12174400000000.0,
+      "using_prev_day_data": true,
+      "avg_volume_20d": 0.0,
+      "avg_volume_20d_actual": false,
+      "disclosure_count": 0,
+      "disclosures": [],
+      "news_mentions": 0,
+      "positive_news": 0,
+      "negative_news": 0,
+      "matched_themes": [
+        "바이오"
+      ],
+      "foreign_buy": 135382,
+      "institution_buy": 0,
+      "selection_reason": "바이오 테마 / 외국인 순매수",
+      "total_score": 42,
+      "score_detail": {
+        "disclosure": 0,
+        "news": 0,
+        "theme_keywords": 8,
+        "investor": 5,
+        "trading_value": 10,
+        "market_cap": 10,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 2,
+        "material_overlap": 0,
+        "news_timing": 0
+      },
+      "is_leading": true,
+      "cap_tier": "large",
+      "score_metadata": {
+        "disclosure": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "message": "공시 없음"
+        },
+        "news": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "positive": 0,
+          "negative": 0,
+          "message": "뉴스 없음"
+        },
+        "theme_keywords": {
+          "value": 8,
+          "status": "success",
+          "matched_themes": [
+            "바이오"
+          ],
+          "message": "바이오"
         },
         "investor": {
           "value": 5,
@@ -308,12 +694,554 @@
           "message": "OK"
         },
         "price_momentum": {
-          "value": 0,
+          "value": 2,
           "status": "success",
           "message": "OK"
         },
         "volume_surge": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "turnover_rate": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "material_overlap": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "news_timing": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        }
+      },
+      "strategy_id": "mixed",
+      "strategy_name": "복합",
+      "technical_indicators": {
+        "code": "000250",
+        "current_price": 519000,
+        "prev_close": 519000,
+        "prev_high": 585000,
+        "ma5": 582600,
+        "ma20": 822250,
+        "ma60": 613941,
+        "above_ma5": false,
+        "above_ma20": false,
+        "above_ma60": false,
+        "ma5_above_ma20": false,
+        "near_prev_high": false,
+        "above_prev_high": false,
+        "high_20d": 1233000,
+        "near_high_20d": false,
+        "above_high_20d": false,
+        "high_52w": 1233000,
+        "low_52w": 140000,
+        "pct_from_52w_high": -57.91,
+        "near_52w_high": false,
+        "avg_volume_20d": 447903,
+        "volume_ratio": 0.0
+      },
+      "technical_summary": "기술적 약세"
+    },
+    {
+      "code": "095610",
+      "name": "테스",
+      "market": "KOSDAQ",
+      "current_price": 62400.0,
+      "price_change": 0,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 12081000000.0,
+      "market_cap": 1208100000000.0,
+      "using_prev_day_data": true,
+      "avg_volume_20d": 0.0,
+      "avg_volume_20d_actual": false,
+      "disclosure_count": 0,
+      "disclosures": [],
+      "news_mentions": 1,
+      "positive_news": 0,
+      "negative_news": 0,
+      "matched_themes": [
+        "우주항공",
+        "반도체"
+      ],
+      "foreign_buy": 0,
+      "institution_buy": 0,
+      "selection_reason": "뉴스 1건 (중립) / 우주항공·반도체 테마",
+      "total_score": 38.0,
+      "score_detail": {
+        "disclosure": 0,
+        "news": 8.0,
+        "theme_keywords": 12,
+        "investor": 0,
+        "trading_value": 3,
+        "market_cap": 8,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 2,
+        "material_overlap": 3,
+        "news_timing": 0
+      },
+      "is_leading": false,
+      "cap_tier": "mid",
+      "added_by_cap_tier": true,
+      "score_metadata": {
+        "disclosure": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "message": "공시 없음"
+        },
+        "news": {
+          "value": 8.0,
+          "status": "success",
+          "count": 1,
+          "positive": 0,
+          "negative": 0,
+          "message": "1건 (긍정 0)"
+        },
+        "theme_keywords": {
+          "value": 12,
+          "status": "success",
+          "matched_themes": [
+            "우주항공",
+            "반도체"
+          ],
+          "message": "우주항공, 반도체"
+        },
+        "investor": {
+          "value": 0,
+          "status": "no_data",
+          "foreign_buy": 0,
+          "institution_buy": 0,
+          "message": "순매수 없음"
+        },
+        "trading_value": {
           "value": 3,
+          "status": "success",
+          "message": "OK"
+        },
+        "market_cap": {
+          "value": 8,
+          "status": "success",
+          "message": "OK"
+        },
+        "price_momentum": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "volume_surge": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "turnover_rate": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "material_overlap": {
+          "value": 3,
+          "status": "success",
+          "message": "OK"
+        },
+        "news_timing": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        }
+      },
+      "strategy_id": "theme",
+      "strategy_name": "테마/우주항공",
+      "technical_indicators": {
+        "code": "095610",
+        "current_price": 62400,
+        "prev_close": 62400,
+        "prev_high": 64500,
+        "ma5": 61080,
+        "ma20": 62795,
+        "ma60": 63102,
+        "above_ma5": true,
+        "above_ma20": false,
+        "above_ma60": false,
+        "ma5_above_ma20": false,
+        "near_prev_high": false,
+        "above_prev_high": false,
+        "high_20d": 69100,
+        "near_high_20d": false,
+        "above_high_20d": false,
+        "high_52w": 81900,
+        "low_52w": 23250,
+        "pct_from_52w_high": -23.81,
+        "near_52w_high": false,
+        "avg_volume_20d": 243359,
+        "volume_ratio": 0.0
+      },
+      "technical_summary": "5일↑"
+    },
+    {
+      "code": "078930",
+      "name": "GS",
+      "market": "KOSPI",
+      "current_price": 64600.0,
+      "price_change": 0,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 60023000000.0,
+      "market_cap": 6002300000000.0,
+      "using_prev_day_data": true,
+      "avg_volume_20d": 0.0,
+      "avg_volume_20d_actual": false,
+      "disclosure_count": 0,
+      "disclosures": [],
+      "news_mentions": 1,
+      "positive_news": 1,
+      "negative_news": 0,
+      "matched_themes": [],
+      "foreign_buy": 0,
+      "institution_buy": 0,
+      "selection_reason": "뉴스 1건 (긍정)",
+      "total_score": 37.0,
+      "score_detail": {
+        "disclosure": 0,
+        "news": 16.0,
+        "theme_keywords": 3,
+        "investor": 0,
+        "trading_value": 6,
+        "market_cap": 8,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 2,
+        "material_overlap": 0,
+        "news_timing": 0
+      },
+      "is_leading": false,
+      "cap_tier": "mid",
+      "added_by_cap_tier": true,
+      "score_metadata": {
+        "disclosure": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "message": "공시 없음"
+        },
+        "news": {
+          "value": 16.0,
+          "status": "success",
+          "count": 1,
+          "positive": 1,
+          "negative": 0,
+          "message": "1건 (긍정 1)"
+        },
+        "theme_keywords": {
+          "value": 3,
+          "status": "no_match",
+          "matched_themes": [],
+          "message": "테마 매칭 없음"
+        },
+        "investor": {
+          "value": 0,
+          "status": "no_data",
+          "foreign_buy": 0,
+          "institution_buy": 0,
+          "message": "순매수 없음"
+        },
+        "trading_value": {
+          "value": 6,
+          "status": "success",
+          "message": "OK"
+        },
+        "market_cap": {
+          "value": 8,
+          "status": "success",
+          "message": "OK"
+        },
+        "price_momentum": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "volume_surge": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "turnover_rate": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "material_overlap": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "news_timing": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        }
+      },
+      "strategy_id": "mixed",
+      "strategy_name": "복합",
+      "technical_indicators": {
+        "code": "078930",
+        "current_price": 64600,
+        "prev_close": 64600,
+        "prev_high": 65700,
+        "ma5": 64180,
+        "ma20": 65710,
+        "ma60": 65933,
+        "above_ma5": true,
+        "above_ma20": false,
+        "above_ma60": false,
+        "ma5_above_ma20": false,
+        "near_prev_high": true,
+        "above_prev_high": false,
+        "high_20d": 70200,
+        "near_high_20d": false,
+        "above_high_20d": false,
+        "high_52w": 81000,
+        "low_52w": 42800,
+        "pct_from_52w_high": -20.25,
+        "near_52w_high": false,
+        "avg_volume_20d": 236195,
+        "volume_ratio": 0.0
+      },
+      "technical_summary": "5일↑ / 전일고가근접"
+    },
+    {
+      "code": "001510",
+      "name": "SK증권",
+      "market": "KOSPI",
+      "current_price": 1863.0,
+      "price_change": 0,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 8618000000.0,
+      "market_cap": 861800000000.0,
+      "using_prev_day_data": true,
+      "avg_volume_20d": 0.0,
+      "avg_volume_20d_actual": false,
+      "disclosure_count": 0,
+      "disclosures": [],
+      "news_mentions": 1,
+      "positive_news": 1,
+      "negative_news": 0,
+      "matched_themes": [
+        "AI",
+        "반도체"
+      ],
+      "foreign_buy": 0,
+      "institution_buy": 0,
+      "selection_reason": "뉴스 1건 (긍정) / AI·반도체 테마",
+      "total_score": 37.0,
+      "score_detail": {
+        "disclosure": 0,
+        "news": 12.0,
+        "theme_keywords": 12,
+        "investor": 0,
+        "trading_value": 0,
+        "market_cap": 6,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 2,
+        "material_overlap": 3,
+        "news_timing": 0
+      },
+      "is_leading": false,
+      "cap_tier": "small",
+      "added_by_cap_tier": true,
+      "score_metadata": {
+        "disclosure": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "message": "공시 없음"
+        },
+        "news": {
+          "value": 12.0,
+          "status": "success",
+          "count": 1,
+          "positive": 1,
+          "negative": 0,
+          "message": "1건 (긍정 1)"
+        },
+        "theme_keywords": {
+          "value": 12,
+          "status": "success",
+          "matched_themes": [
+            "AI",
+            "반도체"
+          ],
+          "message": "AI, 반도체"
+        },
+        "investor": {
+          "value": 0,
+          "status": "no_data",
+          "foreign_buy": 0,
+          "institution_buy": 0,
+          "message": "순매수 없음"
+        },
+        "trading_value": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "market_cap": {
+          "value": 6,
+          "status": "success",
+          "message": "OK"
+        },
+        "price_momentum": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "volume_surge": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "turnover_rate": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "material_overlap": {
+          "value": 3,
+          "status": "success",
+          "message": "OK"
+        },
+        "news_timing": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        }
+      },
+      "strategy_id": "theme",
+      "strategy_name": "테마/AI",
+      "technical_indicators": {
+        "code": "001510",
+        "current_price": 1863,
+        "prev_close": 1863,
+        "prev_high": 0,
+        "ma5": 1895,
+        "ma20": 2013,
+        "ma60": 1440,
+        "above_ma5": false,
+        "above_ma20": false,
+        "above_ma60": true,
+        "ma5_above_ma20": false,
+        "near_prev_high": true,
+        "above_prev_high": true,
+        "high_20d": 2825,
+        "near_high_20d": false,
+        "above_high_20d": false,
+        "high_52w": 2825,
+        "low_52w": 0,
+        "pct_from_52w_high": -34.05,
+        "near_52w_high": false,
+        "avg_volume_20d": 97835159,
+        "volume_ratio": 0.0
+      },
+      "technical_summary": "전일고가돌파"
+    },
+    {
+      "code": "001680",
+      "name": "대상",
+      "market": "KOSPI",
+      "current_price": 19720.0,
+      "price_change": 0,
+      "price_change_percent": 0.0,
+      "volume": 0.0,
+      "trading_value": 6833000000.0,
+      "market_cap": 683300000000.0,
+      "using_prev_day_data": true,
+      "avg_volume_20d": 0.0,
+      "avg_volume_20d_actual": false,
+      "disclosure_count": 0,
+      "disclosures": [],
+      "news_mentions": 2,
+      "positive_news": 0,
+      "negative_news": 0,
+      "matched_themes": [
+        "바이오",
+        "AI"
+      ],
+      "foreign_buy": 0,
+      "institution_buy": 0,
+      "selection_reason": "뉴스 2건 (중립) / 바이오·AI 테마",
+      "total_score": 37.0,
+      "score_detail": {
+        "disclosure": 0,
+        "news": 12.0,
+        "theme_keywords": 12,
+        "investor": 0,
+        "trading_value": 0,
+        "market_cap": 6,
+        "price_momentum": 2,
+        "volume_surge": 0,
+        "turnover_rate": 2,
+        "material_overlap": 3,
+        "news_timing": 0
+      },
+      "is_leading": false,
+      "cap_tier": "small",
+      "added_by_cap_tier": true,
+      "score_metadata": {
+        "disclosure": {
+          "value": 0,
+          "status": "no_data",
+          "count": 0,
+          "message": "공시 없음"
+        },
+        "news": {
+          "value": 12.0,
+          "status": "success",
+          "count": 2,
+          "positive": 0,
+          "negative": 0,
+          "message": "2건 (긍정 0)"
+        },
+        "theme_keywords": {
+          "value": 12,
+          "status": "success",
+          "matched_themes": [
+            "바이오",
+            "AI"
+          ],
+          "message": "바이오, AI"
+        },
+        "investor": {
+          "value": 0,
+          "status": "no_data",
+          "foreign_buy": 0,
+          "institution_buy": 0,
+          "message": "순매수 없음"
+        },
+        "trading_value": {
+          "value": 0,
+          "status": "success",
+          "message": "OK"
+        },
+        "market_cap": {
+          "value": 6,
+          "status": "success",
+          "message": "OK"
+        },
+        "price_momentum": {
+          "value": 2,
+          "status": "success",
+          "message": "OK"
+        },
+        "volume_surge": {
+          "value": 0,
           "status": "success",
           "message": "OK"
         },
@@ -336,941 +1264,30 @@
       "strategy_id": "theme",
       "strategy_name": "테마/바이오",
       "technical_indicators": {
-        "code": "000250",
-        "current_price": 519000,
-        "prev_close": 618000,
-        "prev_high": 692000,
-        "ma5": 627600,
-        "ma20": 835000,
-        "ma60": 609375,
-        "above_ma5": false,
+        "code": "001680",
+        "current_price": 19720,
+        "prev_close": 19720,
+        "prev_high": 19930,
+        "ma5": 19620,
+        "ma20": 20302,
+        "ma60": 21480,
+        "above_ma5": true,
         "above_ma20": false,
         "above_ma60": false,
         "ma5_above_ma20": false,
-        "near_prev_high": false,
-        "above_prev_high": false,
-        "high_20d": 1233000,
-        "near_high_20d": false,
-        "above_high_20d": false,
-        "high_52w": 1233000,
-        "low_52w": 140000,
-        "pct_from_52w_high": -57.91,
-        "near_52w_high": false,
-        "avg_volume_20d": 455923,
-        "volume_ratio": 2.2
-      },
-      "technical_summary": "기술적 약세"
-    },
-    {
-      "code": "000660",
-      "name": "SK하이닉스",
-      "market": "KOSPI",
-      "current_price": 916000.0,
-      "price_change": 0,
-      "price_change_percent": 3.39,
-      "volume": 3301429.0,
-      "trading_value": 3024108964000.0,
-      "market_cap": 652835400000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 4243255.7,
-      "avg_volume_20d_actual": true,
-      "disclosure_count": 0,
-      "disclosures": [],
-      "news_mentions": 2,
-      "positive_news": 0,
-      "negative_news": 0,
-      "matched_themes": [
-        "반도체"
-      ],
-      "foreign_buy": 582600,
-      "institution_buy": 0,
-      "selection_reason": "뉴스 2건 (중립) / 반도체 테마 / 외국인 순매수",
-      "total_score": 63.0,
-      "score_detail": {
-        "disclosure": 0,
-        "news": 12.0,
-        "theme_keywords": 8,
-        "investor": 7,
-        "trading_value": 20,
-        "market_cap": 10,
-        "price_momentum": 3,
-        "volume_surge": 0,
-        "turnover_rate": 0,
-        "material_overlap": 3,
-        "news_timing": 0
-      },
-      "is_leading": false,
-      "cap_tier": "large",
-      "score_metadata": {
-        "disclosure": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "message": "공시 없음"
-        },
-        "news": {
-          "value": 12.0,
-          "status": "success",
-          "count": 2,
-          "positive": 0,
-          "negative": 0,
-          "message": "2건 (긍정 0)"
-        },
-        "theme_keywords": {
-          "value": 8,
-          "status": "success",
-          "matched_themes": [
-            "반도체"
-          ],
-          "message": "반도체"
-        },
-        "investor": {
-          "value": 7,
-          "status": "success",
-          "foreign_buy": 582600,
-          "institution_buy": 0,
-          "message": "외국인 순매수"
-        },
-        "trading_value": {
-          "value": 20,
-          "status": "success",
-          "message": "OK"
-        },
-        "market_cap": {
-          "value": 10,
-          "status": "success",
-          "message": "OK"
-        },
-        "price_momentum": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "volume_surge": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        },
-        "turnover_rate": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        },
-        "material_overlap": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "news_timing": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        }
-      },
-      "strategy_id": "momentum",
-      "strategy_name": "모멘텀",
-      "technical_indicators": {
-        "code": "000660",
-        "current_price": 916000,
-        "prev_close": 886000,
-        "prev_high": 901500,
-        "ma5": 880200,
-        "ma20": 933250,
-        "ma60": 882133,
-        "above_ma5": true,
-        "above_ma20": false,
-        "above_ma60": true,
-        "ma5_above_ma20": false,
-        "near_prev_high": true,
-        "above_prev_high": true,
-        "high_20d": 1060000,
-        "near_high_20d": false,
-        "above_high_20d": false,
-        "high_52w": 1099000,
-        "low_52w": 233750,
-        "pct_from_52w_high": -16.65,
-        "near_52w_high": false,
-        "avg_volume_20d": 4243255,
-        "volume_ratio": 0.78
-      },
-      "technical_summary": "5일↑ / 전일고가돌파"
-    },
-    {
-      "code": "396500",
-      "name": "TIGER 반도체TOP10",
-      "market": "KOSPI",
-      "current_price": 31480.0,
-      "price_change": 0,
-      "price_change_percent": 1.94,
-      "volume": 14554411.0,
-      "trading_value": 458172858280.0,
-      "market_cap": 10216800000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 10188087.7,
-      "avg_volume_20d_actual": false,
-      "disclosure_count": 0,
-      "disclosures": [],
-      "news_mentions": 1,
-      "positive_news": 0,
-      "negative_news": 0,
-      "matched_themes": [
-        "반도체"
-      ],
-      "foreign_buy": 0,
-      "institution_buy": 0,
-      "selection_reason": "뉴스 1건 (중립) / 반도체 테마",
-      "total_score": 50.0,
-      "score_detail": {
-        "disclosure": 0,
-        "news": 8.0,
-        "theme_keywords": 8,
-        "investor": 0,
-        "trading_value": 13,
-        "market_cap": 10,
-        "price_momentum": 2,
-        "volume_surge": 3,
-        "turnover_rate": 3,
-        "material_overlap": 3,
-        "news_timing": 0
-      },
-      "is_leading": false,
-      "cap_tier": "large",
-      "score_metadata": {
-        "disclosure": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "message": "공시 없음"
-        },
-        "news": {
-          "value": 8.0,
-          "status": "success",
-          "count": 1,
-          "positive": 0,
-          "negative": 0,
-          "message": "1건 (긍정 0)"
-        },
-        "theme_keywords": {
-          "value": 8,
-          "status": "success",
-          "matched_themes": [
-            "반도체"
-          ],
-          "message": "반도체"
-        },
-        "investor": {
-          "value": 0,
-          "status": "no_data",
-          "foreign_buy": 0,
-          "institution_buy": 0,
-          "message": "순매수 없음"
-        },
-        "trading_value": {
-          "value": 13,
-          "status": "success",
-          "message": "OK"
-        },
-        "market_cap": {
-          "value": 10,
-          "status": "success",
-          "message": "OK"
-        },
-        "price_momentum": {
-          "value": 2,
-          "status": "success",
-          "message": "OK"
-        },
-        "volume_surge": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "turnover_rate": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "material_overlap": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "news_timing": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        }
-      },
-      "strategy_id": "mixed",
-      "strategy_name": "복합",
-      "technical_indicators": {
-        "code": "396500",
-        "current_price": 31480,
-        "prev_close": 30880,
-        "prev_high": 31550,
-        "ma5": 30862,
-        "ma20": 32190,
-        "ma60": 29571,
-        "above_ma5": true,
-        "above_ma20": false,
-        "above_ma60": true,
-        "ma5_above_ma20": false,
         "near_prev_high": true,
         "above_prev_high": false,
-        "high_20d": 35220,
+        "high_20d": 21250,
         "near_high_20d": false,
         "above_high_20d": false,
-        "high_52w": 36570,
-        "low_52w": 10565,
-        "pct_from_52w_high": -13.92,
+        "high_52w": 24700,
+        "low_52w": 19360,
+        "pct_from_52w_high": -20.16,
         "near_52w_high": false,
-        "avg_volume_20d": 18299172,
-        "volume_ratio": 0.8
+        "avg_volume_20d": 110163,
+        "volume_ratio": 0.0
       },
       "technical_summary": "5일↑ / 전일고가근접"
-    },
-    {
-      "code": "069500",
-      "name": "KODEX 200",
-      "market": "KOSPI",
-      "current_price": 82770.0,
-      "price_change": 0,
-      "price_change_percent": 1.25,
-      "volume": 15521838.0,
-      "trading_value": 1284742531260.0,
-      "market_cap": 18573600000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 10865286.6,
-      "avg_volume_20d_actual": false,
-      "disclosure_count": 0,
-      "disclosures": [],
-      "news_mentions": 0,
-      "positive_news": 0,
-      "negative_news": 0,
-      "matched_themes": [],
-      "foreign_buy": 0,
-      "institution_buy": 323734,
-      "selection_reason": "기관 순매수",
-      "total_score": 46,
-      "score_detail": {
-        "disclosure": 0,
-        "news": 0,
-        "theme_keywords": 3,
-        "investor": 4,
-        "trading_value": 20,
-        "market_cap": 10,
-        "price_momentum": 2,
-        "volume_surge": 3,
-        "turnover_rate": 4,
-        "material_overlap": 0,
-        "news_timing": 0
-      },
-      "is_leading": false,
-      "cap_tier": "large",
-      "score_metadata": {
-        "disclosure": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "message": "공시 없음"
-        },
-        "news": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "positive": 0,
-          "negative": 0,
-          "message": "뉴스 없음"
-        },
-        "theme_keywords": {
-          "value": 3,
-          "status": "no_match",
-          "matched_themes": [],
-          "message": "테마 매칭 없음"
-        },
-        "investor": {
-          "value": 4,
-          "status": "success",
-          "foreign_buy": 0,
-          "institution_buy": 323734,
-          "message": "기관 순매수"
-        },
-        "trading_value": {
-          "value": 20,
-          "status": "success",
-          "message": "OK"
-        },
-        "market_cap": {
-          "value": 10,
-          "status": "success",
-          "message": "OK"
-        },
-        "price_momentum": {
-          "value": 2,
-          "status": "success",
-          "message": "OK"
-        },
-        "volume_surge": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "turnover_rate": {
-          "value": 4,
-          "status": "success",
-          "message": "OK"
-        },
-        "material_overlap": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        },
-        "news_timing": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        }
-      },
-      "strategy_id": "mixed",
-      "strategy_name": "복합",
-      "technical_indicators": {
-        "code": "069500",
-        "current_price": 82770,
-        "prev_close": 81750,
-        "prev_high": 82855,
-        "ma5": 81091,
-        "ma20": 82519,
-        "ma60": 79444,
-        "above_ma5": true,
-        "above_ma20": true,
-        "above_ma60": true,
-        "ma5_above_ma20": false,
-        "near_prev_high": true,
-        "above_prev_high": false,
-        "high_20d": 89580,
-        "near_high_20d": false,
-        "above_high_20d": false,
-        "high_52w": 95720,
-        "low_52w": 38660,
-        "pct_from_52w_high": -13.53,
-        "near_52w_high": false,
-        "avg_volume_20d": 19467463,
-        "volume_ratio": 0.8
-      },
-      "technical_summary": "5일↑ / 20일↑ / 전일고가근접"
-    },
-    {
-      "code": "016360",
-      "name": "삼성증권",
-      "market": "KOSPI",
-      "current_price": 95200.0,
-      "price_change": 0,
-      "price_change_percent": -1.04,
-      "volume": 259078.0,
-      "trading_value": 24664225600.0,
-      "market_cap": 8501400000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 181354.59999999998,
-      "avg_volume_20d_actual": false,
-      "disclosure_count": 0,
-      "disclosures": [],
-      "news_mentions": 2,
-      "positive_news": 0,
-      "negative_news": 0,
-      "matched_themes": [
-        "반도체"
-      ],
-      "foreign_buy": 0,
-      "institution_buy": 0,
-      "selection_reason": "뉴스 2건 (중립) / 반도체 테마",
-      "total_score": 38.0,
-      "score_detail": {
-        "disclosure": 0,
-        "news": 12.0,
-        "theme_keywords": 8,
-        "investor": 0,
-        "trading_value": 3,
-        "market_cap": 8,
-        "price_momentum": 1,
-        "volume_surge": 3,
-        "turnover_rate": 0,
-        "material_overlap": 3,
-        "news_timing": 0
-      },
-      "is_leading": false,
-      "cap_tier": "mid",
-      "added_by_cap_tier": true,
-      "score_metadata": {
-        "disclosure": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "message": "공시 없음"
-        },
-        "news": {
-          "value": 12.0,
-          "status": "success",
-          "count": 2,
-          "positive": 0,
-          "negative": 0,
-          "message": "2건 (긍정 0)"
-        },
-        "theme_keywords": {
-          "value": 8,
-          "status": "success",
-          "matched_themes": [
-            "반도체"
-          ],
-          "message": "반도체"
-        },
-        "investor": {
-          "value": 0,
-          "status": "no_data",
-          "foreign_buy": 0,
-          "institution_buy": 0,
-          "message": "순매수 없음"
-        },
-        "trading_value": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "market_cap": {
-          "value": 8,
-          "status": "success",
-          "message": "OK"
-        },
-        "price_momentum": {
-          "value": 1,
-          "status": "success",
-          "message": "OK"
-        },
-        "volume_surge": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "turnover_rate": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        },
-        "material_overlap": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "news_timing": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        }
-      },
-      "strategy_id": "largecap_contrarian",
-      "strategy_name": "대형주 역추세",
-      "technical_indicators": {
-        "code": "016360",
-        "current_price": 95200,
-        "prev_close": 96200,
-        "prev_high": 97900,
-        "ma5": 95160,
-        "ma20": 96355,
-        "ma60": 93430,
-        "above_ma5": true,
-        "above_ma20": false,
-        "above_ma60": true,
-        "ma5_above_ma20": false,
-        "near_prev_high": false,
-        "above_prev_high": false,
-        "high_20d": 103100,
-        "near_high_20d": false,
-        "above_high_20d": false,
-        "high_52w": 119400,
-        "low_52w": 63700,
-        "pct_from_52w_high": -20.27,
-        "near_52w_high": false,
-        "avg_volume_20d": 439897,
-        "volume_ratio": 0.59
-      },
-      "technical_summary": "5일↑"
-    },
-    {
-      "code": "028050",
-      "name": "삼성E&A",
-      "market": "KOSPI",
-      "current_price": 47800.0,
-      "price_change": 0,
-      "price_change_percent": 4.71,
-      "volume": 10975635.0,
-      "trading_value": 524635353000.0,
-      "market_cap": 9368800000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 7682944.499999999,
-      "avg_volume_20d_actual": false,
-      "disclosure_count": 0,
-      "disclosures": [],
-      "news_mentions": 0,
-      "positive_news": 0,
-      "negative_news": 0,
-      "matched_themes": [],
-      "foreign_buy": 0,
-      "institution_buy": 0,
-      "selection_reason": "-",
-      "total_score": 37,
-      "score_detail": {
-        "disclosure": 0,
-        "news": 0,
-        "theme_keywords": 3,
-        "investor": 0,
-        "trading_value": 16,
-        "market_cap": 8,
-        "price_momentum": 3,
-        "volume_surge": 3,
-        "turnover_rate": 4,
-        "material_overlap": 0,
-        "news_timing": 0
-      },
-      "is_leading": false,
-      "cap_tier": "mid",
-      "added_by_cap_tier": true,
-      "score_metadata": {
-        "disclosure": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "message": "공시 없음"
-        },
-        "news": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "positive": 0,
-          "negative": 0,
-          "message": "뉴스 없음"
-        },
-        "theme_keywords": {
-          "value": 3,
-          "status": "no_match",
-          "matched_themes": [],
-          "message": "테마 매칭 없음"
-        },
-        "investor": {
-          "value": 0,
-          "status": "no_data",
-          "foreign_buy": 0,
-          "institution_buy": 0,
-          "message": "순매수 없음"
-        },
-        "trading_value": {
-          "value": 16,
-          "status": "success",
-          "message": "OK"
-        },
-        "market_cap": {
-          "value": 8,
-          "status": "success",
-          "message": "OK"
-        },
-        "price_momentum": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "volume_surge": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "turnover_rate": {
-          "value": 4,
-          "status": "success",
-          "message": "OK"
-        },
-        "material_overlap": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        },
-        "news_timing": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        }
-      },
-      "strategy_id": "momentum",
-      "strategy_name": "모멘텀",
-      "technical_indicators": {
-        "code": "028050",
-        "current_price": 47800,
-        "prev_close": 45650,
-        "prev_high": 47700,
-        "ma5": 41400,
-        "ma20": 35302,
-        "ma60": 32352,
-        "above_ma5": true,
-        "above_ma20": true,
-        "above_ma60": true,
-        "ma5_above_ma20": true,
-        "near_prev_high": true,
-        "above_prev_high": true,
-        "high_20d": 52000,
-        "near_high_20d": false,
-        "above_high_20d": false,
-        "high_52w": 52000,
-        "low_52w": 21750,
-        "pct_from_52w_high": -8.08,
-        "near_52w_high": false,
-        "avg_volume_20d": 3676052,
-        "volume_ratio": 2.99
-      },
-      "technical_summary": "5일↑ / 20일↑ / 정배열 / 전일고가돌파"
-    },
-    {
-      "code": "091230",
-      "name": "TIGER 반도체",
-      "market": "KOSPI",
-      "current_price": 99720.0,
-      "price_change": 0,
-      "price_change_percent": 1.39,
-      "volume": 298659.0,
-      "trading_value": 8815000000.0,
-      "market_cap": 881500000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 209061.3,
-      "avg_volume_20d_actual": false,
-      "disclosure_count": 0,
-      "disclosures": [],
-      "news_mentions": 1,
-      "positive_news": 0,
-      "negative_news": 0,
-      "matched_themes": [
-        "반도체"
-      ],
-      "foreign_buy": 0,
-      "institution_buy": 0,
-      "selection_reason": "뉴스 1건 (중립) / 반도체 테마",
-      "total_score": 32.0,
-      "score_detail": {
-        "disclosure": 0,
-        "news": 8.0,
-        "theme_keywords": 8,
-        "investor": 0,
-        "trading_value": 0,
-        "market_cap": 6,
-        "price_momentum": 2,
-        "volume_surge": 3,
-        "turnover_rate": 2,
-        "material_overlap": 3,
-        "news_timing": 0
-      },
-      "is_leading": false,
-      "cap_tier": "small",
-      "added_by_cap_tier": true,
-      "score_metadata": {
-        "disclosure": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "message": "공시 없음"
-        },
-        "news": {
-          "value": 8.0,
-          "status": "success",
-          "count": 1,
-          "positive": 0,
-          "negative": 0,
-          "message": "1건 (긍정 0)"
-        },
-        "theme_keywords": {
-          "value": 8,
-          "status": "success",
-          "matched_themes": [
-            "반도체"
-          ],
-          "message": "반도체"
-        },
-        "investor": {
-          "value": 0,
-          "status": "no_data",
-          "foreign_buy": 0,
-          "institution_buy": 0,
-          "message": "순매수 없음"
-        },
-        "trading_value": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        },
-        "market_cap": {
-          "value": 6,
-          "status": "success",
-          "message": "OK"
-        },
-        "price_momentum": {
-          "value": 2,
-          "status": "success",
-          "message": "OK"
-        },
-        "volume_surge": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "turnover_rate": {
-          "value": 2,
-          "status": "success",
-          "message": "OK"
-        },
-        "material_overlap": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "news_timing": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        }
-      },
-      "strategy_id": "mixed",
-      "strategy_name": "복합",
-      "technical_indicators": {
-        "code": "091230",
-        "current_price": 99720,
-        "prev_close": 98350,
-        "prev_high": 100015,
-        "ma5": 98162,
-        "ma20": 102095,
-        "ma60": 93223,
-        "above_ma5": true,
-        "above_ma20": false,
-        "above_ma60": true,
-        "ma5_above_ma20": false,
-        "near_prev_high": true,
-        "above_prev_high": false,
-        "high_20d": 110730,
-        "near_high_20d": false,
-        "above_high_20d": false,
-        "high_52w": 112900,
-        "low_52w": 34755,
-        "pct_from_52w_high": -11.67,
-        "near_52w_high": false,
-        "avg_volume_20d": 429171,
-        "volume_ratio": 0.7
-      },
-      "technical_summary": "5일↑ / 전일고가근접"
-    },
-    {
-      "code": "0162",
-      "name": "RISE 삼성전자SK하이닉스채권혼합50",
-      "market": "KOSPI",
-      "current_price": 10095.0,
-      "price_change": 0,
-      "price_change_percent": 1.3,
-      "volume": 6468809.0,
-      "trading_value": 7793000000.0,
-      "market_cap": 779300000000.0,
-      "using_prev_day_data": true,
-      "avg_volume_20d": 4528166.3,
-      "avg_volume_20d_actual": false,
-      "disclosure_count": 0,
-      "disclosures": [],
-      "news_mentions": 1,
-      "positive_news": 0,
-      "negative_news": 0,
-      "matched_themes": [
-        "반도체"
-      ],
-      "foreign_buy": 0,
-      "institution_buy": 0,
-      "selection_reason": "뉴스 1건 (중립) / 반도체 테마",
-      "total_score": 32.0,
-      "score_detail": {
-        "disclosure": 0,
-        "news": 8.0,
-        "theme_keywords": 8,
-        "investor": 0,
-        "trading_value": 0,
-        "market_cap": 6,
-        "price_momentum": 2,
-        "volume_surge": 3,
-        "turnover_rate": 2,
-        "material_overlap": 3,
-        "news_timing": 0
-      },
-      "is_leading": false,
-      "cap_tier": "small",
-      "added_by_cap_tier": true,
-      "score_metadata": {
-        "disclosure": {
-          "value": 0,
-          "status": "no_data",
-          "count": 0,
-          "message": "공시 없음"
-        },
-        "news": {
-          "value": 8.0,
-          "status": "success",
-          "count": 1,
-          "positive": 0,
-          "negative": 0,
-          "message": "1건 (긍정 0)"
-        },
-        "theme_keywords": {
-          "value": 8,
-          "status": "success",
-          "matched_themes": [
-            "반도체"
-          ],
-          "message": "반도체"
-        },
-        "investor": {
-          "value": 0,
-          "status": "no_data",
-          "foreign_buy": 0,
-          "institution_buy": 0,
-          "message": "순매수 없음"
-        },
-        "trading_value": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        },
-        "market_cap": {
-          "value": 6,
-          "status": "success",
-          "message": "OK"
-        },
-        "price_momentum": {
-          "value": 2,
-          "status": "success",
-          "message": "OK"
-        },
-        "volume_surge": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "turnover_rate": {
-          "value": 2,
-          "status": "success",
-          "message": "OK"
-        },
-        "material_overlap": {
-          "value": 3,
-          "status": "success",
-          "message": "OK"
-        },
-        "news_timing": {
-          "value": 0,
-          "status": "success",
-          "message": "OK"
-        }
-      },
-      "strategy_id": "mixed",
-      "strategy_name": "복합",
-      "technical_indicators": null,
-      "technical_summary": "-"
     }
   ]
 }
