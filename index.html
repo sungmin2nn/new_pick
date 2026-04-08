@@ -62,6 +62,7 @@
         .card {
             background: #FFFFFF; border-radius: 12px; padding: 20px; margin-bottom: 16px;
             border: 1px solid #E5E7EB; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow-x: auto;
         }
         .card h2 { font-size: 1.15em; margin-bottom: 14px; color: #1A1A2E; }
         .card h3 { font-size: 1em; margin: 14px 0 8px; color: #1A1A2E; }
@@ -91,10 +92,14 @@
         .neutral { color: #6B7280; }
 
         /* Table */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #F3F4F6; font-size: 0.85em; }
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #F3F4F6; font-size: 0.85em;
+                 white-space: nowrap; }
+        td.wrap { white-space: normal; word-break: break-word; }
         th { color: #6B7280; font-weight: 600; font-size: 0.8em; text-transform: uppercase; background: #F8FAFB; }
         tr:hover { background: #F8FAFB; }
+        code { font-size: 0.85em; background: #F3F4F6; padding: 2px 6px; border-radius: 4px; }
 
         /* Timeline */
         .timeline { position: relative; padding-left: 30px; }
@@ -301,6 +306,16 @@ function getToday() {
     return kst.toISOString().slice(0, 10).replace(/-/g, '');
 }
 
+function getRecentDates(n) {
+    const dates = [];
+    const now = new Date();
+    for (let i = 0; i < n; i++) {
+        const d = new Date(now.getTime() + (9 * 60 - now.getTimezoneOffset()) * 60000 - i * 86400000);
+        dates.push(d.toISOString().slice(0, 10).replace(/-/g, ''));
+    }
+    return dates;
+}
+
 // ======================== RENDER ALL ========================
 function renderAll() {
     renderLeaderboard();
@@ -338,13 +353,25 @@ function renderLeaderboard() {
         const retClass = returnPct > 0 ? 'positive' : returnPct < 0 ? 'negative' : 'neutral';
         const winRate = pf.total_trades > 0 ? (pf.total_wins / pf.total_trades * 100).toFixed(1) : '0.0';
 
+        // 오늘 일일 수익률 (leaderboard history 최신에서)
+        const todayHistory = leaderboardData?.daily_history?.slice(-1)[0];
+        const todayRank = todayHistory?.ranking?.find(r => r.team_id === tid);
+        const todayReturn = todayRank?.total_return || 0;
+        const todayRetClass = todayReturn > 0 ? 'positive' : todayReturn < 0 ? 'negative' : 'neutral';
+        const returnAmt = pf.total_return_amount || 0;
+        const returnAmtClass = returnAmt > 0 ? 'positive' : returnAmt < 0 ? 'negative' : 'neutral';
+
         cardsHtml += `
         <div class="team-card ${rankClass}">
             <div class="rank-badge">${MEDALS[Math.min(i, 3)]}</div>
             <div class="team-name">${t.emoji || meta.emoji} ${t.team_name || meta.name}</div>
             <div class="team-desc">${meta.desc || ''}</div>
             <div class="team-stat"><span class="label">ELO</span><span class="value">${t.elo || 1000}</span></div>
+            <div class="team-stat" style="background:${todayReturn > 0 ? 'rgba(16,185,129,0.05)' : todayReturn < 0 ? 'rgba(239,68,68,0.05)' : 'transparent'}; border-radius:4px;">
+                <span class="label">오늘 수익률</span><span class="value ${todayRetClass}">${todayReturn >= 0 ? '+' : ''}${todayReturn.toFixed(2)}%</span>
+            </div>
             <div class="team-stat"><span class="label">누적 수익률</span><span class="value ${retClass}">${returnPct >= 0 ? '+' : ''}${returnPct.toFixed(2)}%</span></div>
+            <div class="team-stat"><span class="label">누적 손익</span><span class="value ${returnAmtClass}">${returnAmt >= 0 ? '+' : ''}${returnAmt.toLocaleString()}원</span></div>
             <div class="team-stat"><span class="label">현재 자금</span><span class="value">${(pf.current_capital || pf.initial_capital || 10000000).toLocaleString()}원</span></div>
             <div class="team-stat"><span class="label">승/패</span><span class="value">${pf.total_wins || 0}/${pf.total_losses || 0}</span></div>
             <div class="team-stat"><span class="label">승률</span><span class="value">${winRate}%</span></div>
@@ -378,11 +405,22 @@ function renderTeams() {
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:10px; margin-bottom:14px;">
                 ${statMini('현재 자금', `${(pf.current_capital || 10000000).toLocaleString()}원`)}
                 ${statMini('누적 수익률', `${(pf.total_return_pct || 0) >= 0 ? '+' : ''}${(pf.total_return_pct || 0).toFixed(2)}%`, pf.total_return_pct)}
+                ${statMini('누적 손익', `${(pf.total_return_amount || 0) >= 0 ? '+' : ''}${(pf.total_return_amount || 0).toLocaleString()}원`, pf.total_return_amount)}
                 ${statMini('거래일', `${pf.trading_days || 0}일`)}
+                ${statMini('승/패', `${pf.total_wins || 0}/${pf.total_losses || 0}`)}
                 ${statMini('승률', pf.total_trades > 0 ? `${(pf.total_wins/pf.total_trades*100).toFixed(1)}%` : '-')}
                 ${statMini('연승', `${pf.win_streak || 0} (최대 ${pf.max_win_streak || 0})`)}
                 ${statMini('MDD', `${(pf.max_drawdown_pct || 0).toFixed(1)}%`, -(pf.max_drawdown_pct || 0))}
             </div>
+
+            <h3>🎯 오늘 선정 종목</h3>
+            <div id="todaySelection_${tid}"><span style="color:#9CA3AF; font-size:0.85em;">로딩 중...</span></div>
+
+            <h3>📈 누적 수익률 차트</h3>
+            <div class="chart-container"><canvas id="teamChart_${tid}"></canvas></div>
+
+            <h3>📋 일별 매매 기록</h3>
+            <div id="dailyRecords_${tid}"><span style="color:#9CA3AF; font-size:0.85em;">로딩 중...</span></div>
 
             <h3>📝 학습 노트</h3>
             <div class="journal-box" id="journal_${tid}">로딩 중...</div>
@@ -394,10 +432,12 @@ function renderTeams() {
 
     container.innerHTML = html;
 
-    // Load journals and param histories
+    // Load team details
     for (const tid of Object.keys(TEAM_META)) {
         loadTeamJournal(tid);
         loadTeamParams(tid);
+        loadTeamDailyRecords(tid);
+        loadTodaySelection(tid);
     }
 }
 
@@ -430,10 +470,214 @@ async function loadTeamParams(tid) {
         }
         let rows = data.slice(-5).map(p => `
             <tr><td>${p.date || ''}</td><td>${p.parameter || ''}</td>
-            <td>${p.old_value || ''} → ${p.new_value || ''}</td><td>${p.reason || ''}</td></tr>`).join('');
-        el.innerHTML = `<table><thead><tr><th>날짜</th><th>파라미터</th><th>변경</th><th>사유</th></tr></thead>
-            <tbody>${rows}</tbody></table>`;
+            <td class="wrap">${p.old_value || ''} → ${p.new_value || ''}</td><td class="wrap">${p.reason || ''}</td></tr>`).join('');
+        el.innerHTML = `<div class="table-wrap"><table><thead><tr><th>날짜</th><th>파라미터</th><th>변경</th><th>사유</th></tr></thead>
+            <tbody>${rows}</tbody></table></div>`;
     } catch { document.getElementById(`params_${tid}`).innerHTML = '<span style="color:#9CA3AF; font-size:0.85em;">변경 이력 없음</span>'; }
+}
+
+async function loadTodaySelection(tid) {
+    const el = document.getElementById(`todaySelection_${tid}`);
+    const strategyId = TEAM_META[tid].strategy;
+    const today = getToday();
+
+    // 오늘 또는 가장 최근 날짜의 candidates 파일 로드
+    let data = await fetchJSON(`data/paper_trading/candidates_${today}_${strategyId}.json`);
+
+    // 오늘 없으면 leaderboard history에서 최근 날짜 시도
+    if (!data) {
+        const history = leaderboardData?.daily_history || [];
+        for (let i = history.length - 1; i >= 0; i--) {
+            const d = history[i].date;
+            data = await fetchJSON(`data/paper_trading/candidates_${d}_${strategyId}.json`);
+            if (data) break;
+        }
+    }
+
+    if (!data) {
+        // arena daily에서 selection 시도
+        const history = leaderboardData?.daily_history || [];
+        for (let i = history.length - 1; i >= 0; i--) {
+            const d = history[i].date;
+            const sel = await fetchJSON(`${DATA_BASE}/${tid}/daily/${d}/selection.json`);
+            if (sel && sel.candidates) { data = sel; break; }
+        }
+    }
+
+    if (!data || !data.candidates || data.candidates.length === 0) {
+        el.innerHTML = '<span style="color:#9CA3AF; font-size:0.85em;">선정 종목 없음</span>';
+        return;
+    }
+
+    const candidates = data.candidates;
+    const selDate = data.date || today;
+    let rows = candidates.map((c, i) => {
+        const changeCls = (c.change_pct || 0) > 0 ? 'positive' : (c.change_pct || 0) < 0 ? 'negative' : '';
+        const scoreDetail = c.score_detail ? Object.entries(c.score_detail).map(([k,v]) => `${k}:${typeof v === 'number' ? v.toFixed(1) : v}`).join(', ') : '';
+        return `<tr>
+            <td>${c.rank || i+1}</td>
+            <td><strong>${c.name || ''}</strong> <span style="color:#9CA3AF">(${c.code || ''})</span></td>
+            <td>${(c.price || 0).toLocaleString()}원</td>
+            <td class="${changeCls}">${(c.change_pct || 0) >= 0 ? '+' : ''}${(c.change_pct || 0).toFixed(2)}%</td>
+            <td>${(c.trading_value || 0) >= 100000000 ? ((c.trading_value/100000000).toFixed(0) + '억') : (c.trading_value || 0).toLocaleString()}</td>
+            <td><strong>${(c.score || 0).toFixed(1)}</strong></td>
+            <td class="wrap" style="font-size:0.8em;color:#6B7280;">${scoreDetail}</td>
+        </tr>`;
+    }).join('');
+
+    el.innerHTML = `
+        <div style="font-size:0.8em; color:#6B7280; margin-bottom:6px;">날짜: ${selDate} | ${candidates.length}개 선정</div>
+        <div class="table-wrap"><table>
+            <thead><tr><th>#</th><th>종목</th><th>가격</th><th>등락</th><th>거래대금</th><th>점수</th><th>점수 상세</th></tr></thead>
+            <tbody>${rows}</tbody>
+        </table></div>`;
+}
+
+async function loadTeamDailyRecords(tid) {
+    const el = document.getElementById(`dailyRecords_${tid}`);
+    try {
+        // daily 디렉토리의 날짜 목록은 직접 탐색 불가 → leaderboard history에서 날짜 추출
+        const history = leaderboardData?.daily_history || [];
+        const dates = history.map(h => h.date).reverse().slice(0, 20);
+
+        if (dates.length === 0) {
+            el.innerHTML = '<span style="color:#9CA3AF; font-size:0.85em;">매매 기록 없음 - 첫 실행 후 표시됩니다</span>';
+            return;
+        }
+
+        let allRecords = [];
+        let cumReturn = 0;
+        let cumAmount = 0;
+        let chartLabels = [];
+        let chartData = [];
+
+        // 날짜 순서로 (오래된 것부터)
+        const sortedDates = [...dates].reverse();
+
+        for (const date of sortedDates) {
+            const summary = await fetchJSON(`${DATA_BASE}/${tid}/daily/${date}/summary.json`);
+            const trades = await fetchJSON(`${DATA_BASE}/${tid}/daily/${date}/trades.json`);
+
+            if (!summary) continue;
+
+            const sim = summary.simulation || {};
+            const dayReturn = sim.total_return || 0;
+            const dayAmount = sim.total_return_amount || 0;
+            cumReturn += dayReturn;
+            cumAmount += dayAmount;
+
+            chartLabels.push(date);
+            chartData.push(Math.round(cumReturn * 100) / 100);
+
+            // 매매 상세
+            const tradeResults = trades?.results || [];
+            allRecords.push({ date, sim, trades: tradeResults, cumReturn, cumAmount });
+        }
+
+        // 최신순으로 뒤집기
+        allRecords.reverse();
+
+        // 일별 접이식 매매 기록 렌더링
+        let recordsHtml = '';
+        for (const rec of allRecords) {
+            const dayRet = rec.sim.total_return || 0;
+            const dayAmt = rec.sim.total_return_amount || 0;
+            const retClass = dayRet > 0 ? 'positive' : dayRet < 0 ? 'negative' : 'neutral';
+            const wins = rec.sim.wins || 0;
+            const total = rec.sim.total_trades || 0;
+            const wr = total > 0 ? (wins / total * 100).toFixed(0) : '-';
+
+            let tradeRows = '';
+            if (rec.trades.length > 0) {
+                tradeRows = rec.trades.map(t => {
+                    const tRetClass = t.return_pct > 0 ? 'positive' : t.return_pct < 0 ? 'negative' : '';
+                    const exitIcon = t.exit_type === 'profit' ? '✅' : t.exit_type === 'loss' ? '❌' : '⏹️';
+                    return `<tr>
+                        <td>${t.name || ''}</td>
+                        <td>${(t.entry_price || 0).toLocaleString()}</td>
+                        <td>${(t.exit_price || 0).toLocaleString()}</td>
+                        <td class="${tRetClass}">${t.return_pct >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(2)}%</td>
+                        <td>${(t.return_amount || 0).toLocaleString()}원</td>
+                        <td>${exitIcon} ${t.exit_type || ''}</td>
+                        <td>${t.entry_time || ''} → ${t.exit_time || ''}</td>
+                    </tr>`;
+                }).join('');
+            } else {
+                tradeRows = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF">매매 없음</td></tr>';
+            }
+
+            recordsHtml += `
+            <details style="margin-bottom:8px; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden;">
+                <summary style="padding:10px 14px; background:#F8FAFB; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:0.9em;">
+                    <span><strong>${rec.date}</strong> &nbsp; ${total}건 매매 (승률 ${wr}%)</span>
+                    <span>
+                        <span class="${retClass}" style="font-weight:600;">${dayRet >= 0 ? '+' : ''}${dayRet.toFixed(2)}%</span>
+                        <span style="color:#6B7280; margin-left:8px;">(${dayAmt >= 0 ? '+' : ''}${dayAmt.toLocaleString()}원)</span>
+                        <span style="color:#9CA3AF; margin-left:8px;">누적 ${rec.cumReturn >= 0 ? '+' : ''}${rec.cumReturn.toFixed(2)}%</span>
+                    </span>
+                </summary>
+                <div style="padding:10px;">
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>종목</th><th>매입가</th><th>청산가</th><th>수익률</th><th>손익</th><th>청산유형</th><th>시간</th></tr></thead>
+                        <tbody>${tradeRows}</tbody>
+                    </table></div>
+                </div>
+            </details>`;
+        }
+
+        if (recordsHtml) {
+            el.innerHTML = recordsHtml;
+        } else {
+            el.innerHTML = '<span style="color:#9CA3AF; font-size:0.85em;">매매 기록 없음</span>';
+        }
+
+        // 누적 수익률 차트
+        drawTeamChart(tid, chartLabels, chartData);
+
+    } catch (e) {
+        console.log(`Team ${tid} records error:`, e);
+        el.innerHTML = '<span style="color:#9CA3AF; font-size:0.85em;">매매 기록 없음</span>';
+    }
+}
+
+function drawTeamChart(tid, labels, data) {
+    const ctx = document.getElementById(`teamChart_${tid}`);
+    if (!ctx || labels.length === 0) return;
+
+    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B' };
+    const color = colors[tid] || '#00C6BE';
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '누적 수익률 (%)',
+                data: data,
+                borderColor: color,
+                backgroundColor: color + '20',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%` } }
+            },
+            scales: {
+                y: {
+                    title: { display: true, text: '누적 수익률 (%)' },
+                    grid: { color: '#F3F4F6' },
+                    ticks: { callback: v => `${v >= 0 ? '+' : ''}${v}%` }
+                },
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } }
+            }
+        }
+    });
 }
 
 // ======================== 3. HISTORY ========================
@@ -476,7 +720,7 @@ function renderHistory() {
         </div>
         <div class="card">
             <h2>📋 일일 랭킹 기록</h2>
-            <table><thead><tr>${headerCells}</tr></thead><tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#9CA3AF">기록 없음</td></tr>'}</tbody></table>
+            <div class="table-wrap"><table><thead><tr>${headerCells}</tr></thead><tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#9CA3AF">기록 없음</td></tr>'}</tbody></table></div>
         </div>`;
 
     // Draw chart
@@ -565,16 +809,16 @@ function renderSystem() {
             else badge = '<span class="badge badge-danger"><span class="badge-dot red"></span>에러</span>';
 
             const issues = (log.issues || []).map(i => i.details || i.description || '').join('; ');
-            return `<tr><td>${log.checked_at || ''}</td><td>${badge}</td><td>${(log.issues||[]).length}건</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;">${issues || '-'}</td></tr>`;
+            return `<tr><td>${log.checked_at || ''}</td><td>${badge}</td><td>${(log.issues||[]).length}건</td><td class="wrap">${issues || '-'}</td></tr>`;
         }).join('');
 
         healthHtml = `
         <div class="card">
             <h2>🏥 오늘 헬스체크 로그</h2>
-            <table>
+            <div class="table-wrap"><table>
                 <thead><tr><th>시간</th><th>상태</th><th>이슈</th><th>상세</th></tr></thead>
                 <tbody>${rows}</tbody>
-            </table>
+            </table></div>
         </div>`;
     } else {
         healthHtml = `<div class="card"><div class="empty-state"><div class="icon">🏥</div>오늘 헬스체크 로그 없음</div></div>`;
@@ -589,7 +833,7 @@ function renderSystem() {
         { name: 'bnf-selection.yml', desc: 'BNF 종목 선정', schedule: '수동 / 장후' },
     ];
 
-    let wfRows = workflows.map(w => `<tr><td><code>${w.name}</code></td><td>${w.desc}</td><td>${w.schedule}</td></tr>`).join('');
+    let wfRows = workflows.map(w => `<tr><td><code>${w.name}</code></td><td class="wrap">${w.desc}</td><td class="wrap">${w.schedule}</td></tr>`).join('');
 
     container.innerHTML = `
         <div class="card">
@@ -598,12 +842,66 @@ function renderSystem() {
         </div>
         ${healthHtml}
         <div class="card">
+            <h2>📜 최근 7일 헬스체크 히스토리</h2>
+            <div id="healthHistory"><span style="color:#9CA3AF; font-size:0.85em;">로딩 중...</span></div>
+        </div>
+        <div class="card">
             <h2>📋 워크플로우 목록</h2>
-            <table>
+            <div class="table-wrap"><table>
                 <thead><tr><th>워크플로우</th><th>설명</th><th>스케줄</th></tr></thead>
                 <tbody>${wfRows}</tbody>
-            </table>
+            </table></div>
         </div>`;
+
+    // 최근 7일 헬스체크 히스토리 비동기 로드
+    loadHealthHistory();
+}
+
+async function loadHealthHistory() {
+    const el = document.getElementById('healthHistory');
+    if (!el) return;
+
+    const dates = getRecentDates(7);
+    let allLogs = [];
+
+    for (const date of dates) {
+        const logs = await fetchJSON(`${DATA_BASE}/healthcheck/health_${date}.json`);
+        if (logs) {
+            const logList = Array.isArray(logs) ? logs : [logs];
+            for (const log of logList) {
+                log._date = date;
+                allLogs.push(log);
+            }
+        }
+    }
+
+    if (allLogs.length === 0) {
+        el.innerHTML = '<span style="color:#9CA3AF; font-size:0.85em;">최근 7일 헬스체크 기록 없음</span>';
+        return;
+    }
+
+    let rows = allLogs.map(log => {
+        const status = log.status || 'unknown';
+        let badge;
+        if (status === 'healthy') badge = '<span class="badge badge-success"><span class="badge-dot green"></span>정상</span>';
+        else if (status === 'warning') badge = '<span class="badge badge-warning"><span class="badge-dot yellow"></span>경고</span>';
+        else badge = '<span class="badge badge-danger"><span class="badge-dot red"></span>에러</span>';
+
+        const issues = (log.issues || []).map(i => `${i.description || ''}: ${i.details || ''}`).join('; ');
+        return `<tr>
+            <td>${log._date || ''}</td>
+            <td>${log.checked_at || ''}</td>
+            <td>${badge}</td>
+            <td>${(log.checks || []).length}</td>
+            <td>${(log.issues || []).length}</td>
+            <td class="wrap">${issues || '-'}</td>
+        </tr>`;
+    }).join('');
+
+    el.innerHTML = `<div class="table-wrap"><table>
+        <thead><tr><th>날짜</th><th>시간</th><th>상태</th><th>체크</th><th>이슈</th><th>상세</th></tr></thead>
+        <tbody>${rows}</tbody>
+    </table></div>`;
 }
 
 // ======================== 5. BNF ========================
@@ -625,7 +923,7 @@ function renderBNF() {
                 const cls = pnl > 0 ? 'positive' : pnl < 0 ? 'negative' : '';
                 return `<tr><td>${name} (${code})</td><td>${entry.toLocaleString()}</td><td>${current.toLocaleString()}</td><td class="${cls}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</td><td>${p.status || 'holding'}</td></tr>`;
             }).join('');
-            posHtml = `<table><thead><tr><th>종목</th><th>매입가</th><th>현재가</th><th>수익률</th><th>상태</th></tr></thead><tbody>${rows}</tbody></table>`;
+            posHtml = `<div class="table-wrap"><table><thead><tr><th>종목</th><th>매입가</th><th>현재가</th><th>수익률</th><th>상태</th></tr></thead><tbody>${rows}</tbody></table></div>`;
         } else {
             posHtml = '<div class="empty-state" style="padding:20px">포지션 없음</div>';
         }
@@ -644,8 +942,8 @@ function renderBNF() {
                 <td>${t.action || t.type || ''}</td><td>${(t.price || 0).toLocaleString()}</td>
                 <td>${t.reason || ''}</td></tr>`).join('');
             histHtml = `<h3>📋 최근 매매 이력</h3>
-                <table><thead><tr><th>날짜</th><th>종목</th><th>매매</th><th>가격</th><th>사유</th></tr></thead>
-                <tbody>${rows}</tbody></table>`;
+                <div class="table-wrap"><table><thead><tr><th>날짜</th><th>종목</th><th>매매</th><th>가격</th><th>사유</th></tr></thead>
+                <tbody>${rows}</tbody></table></div>`;
         }
     }
 
