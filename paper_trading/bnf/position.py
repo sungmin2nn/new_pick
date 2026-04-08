@@ -1,13 +1,13 @@
 """
 BNF Position Manager
 
-Multi-day position tracking system with state management, risk controls,
-and JSON persistence for BNF (Breakthrough News Factor) trading.
+positions.json / trade_history.json 을 관리하는 단일 모듈.
+워크플로우, 대시보드, 텔레그램 스크립트가 모두 이 모듈을 통해 데이터에 접근한다.
 """
 
 import json
 import os
-from dataclasses import dataclass, field
+from copy import deepcopy
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -15,725 +15,325 @@ from typing import List, Dict, Optional, Any
 
 
 class PositionState(Enum):
-    """Position lifecycle states"""
-    PENDING = "pending"           # Selected but not entered
-    PARTIAL = "partial"           # Partially filled (split entry in progress)
-    FULL = "full"                 # Fully entered
-    EXITING = "exiting"           # Split exit in progress
-    CLOSED = "closed"             # Fully exited
+    PENDING = "PENDING"
+    PARTIAL = "PARTIAL"
+    FULL = "FULL"
+    EXITING = "EXITING"
+    CLOSED = "CLOSED"
 
 
-@dataclass
-class Position:
-    """
-    Represents a trading position with multi-day tracking capability.
-
-    Attributes:
-        code: Stock code (e.g., '005930')
-        name: Stock name (e.g., '삼성전자')
-        state: Current position state
-        entries: List of entry transactions
-        exits: List of exit transactions
-        current_price: Latest price for P&L calculation
-        unrealized_pnl: Current unrealized profit/loss
-        created_at: Position creation timestamp
-        updated_at: Last update timestamp
-    """
-    code: str
-    name: str
-    state: PositionState
-    entries: List[Dict[str, Any]] = field(default_factory=list)
-    exits: List[Dict[str, Any]] = field(default_factory=list)
-    current_price: float = 0.0
-    unrealized_pnl: float = 0.0
-    created_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    updated_at: str = field(default_factory=lambda: datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
-    def get_total_entry_quantity(self) -> int:
-        """Calculate total entered quantity"""
-        return sum(entry['quantity'] for entry in self.entries)
-
-    def get_total_exit_quantity(self) -> int:
-        """Calculate total exited quantity"""
-        return sum(exit_trade['quantity'] for exit_trade in self.exits)
-
-    def get_remaining_quantity(self) -> int:
-        """Calculate remaining open quantity"""
-        return self.get_total_entry_quantity() - self.get_total_exit_quantity()
-
-    def get_average_entry_price(self) -> float:
-        """Calculate weighted average entry price"""
-        if not self.entries:
-            return 0.0
-
-        total_cost = sum(entry['price'] * entry['quantity'] for entry in self.entries)
-        total_quantity = self.get_total_entry_quantity()
-
-        if total_quantity == 0:
-            return 0.0
-
-        return total_cost / total_quantity
-
-    def get_total_invested(self) -> float:
-        """Calculate total capital invested (entries - exits)"""
-        entry_cost = sum(entry['price'] * entry['quantity'] for entry in self.entries)
-        exit_revenue = sum(exit_trade['price'] * exit_trade['quantity'] for exit_trade in self.exits)
-        return entry_cost - exit_revenue
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert Position to dictionary for JSON serialization"""
-        return {
-            'code': self.code,
-            'name': self.name,
-            'state': self.state.value,
-            'entries': self.entries,
-            'exits': self.exits,
-            'current_price': self.current_price,
-            'unrealized_pnl': self.unrealized_pnl,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
-        }
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'Position':
-        """Create Position from dictionary"""
-        return cls(
-            code=data['code'],
-            name=data['name'],
-            state=PositionState(data['state']),
-            entries=data.get('entries', []),
-            exits=data.get('exits', []),
-            current_price=data.get('current_price', 0.0),
-            unrealized_pnl=data.get('unrealized_pnl', 0.0),
-            created_at=data.get('created_at', datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
-            updated_at=data.get('updated_at', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        )
+# ---------- 기본 설정 ----------
+DEFAULT_TOTAL_CAPITAL = 3_000_000
+MAX_POSITIONS = 5
+POSITION_RATIO = 0.20          # 종목당 최대 20%
+STOP_LOSS_PCT = -3.0           # 손절 기준
+TAKE_PROFIT_PCT = 10.0         # 익절 기준
 
 
 class BNFPositionManager:
     """
-    Manages BNF trading positions with multi-day tracking and risk controls.
+    positions.json 과 trade_history.json 을 읽고/쓰고/정합성을 유지하는 매니저.
 
-    Features:
-    - Multi-day position tracking
-    - Position state management
-    - JSON persistence
-    - Risk management checks
-    - P&L calculation
+    JSON 구조 (positions.json):
+    {
+      "updated_at": "...",
+      "positions": [ { position dict }, ... ],   # 활성 포지션만
+      "stats": { ... }
+    }
+
+    JSON 구조 (trade_history.json):
+    {
+      "updated_at": "...",
+      "trades": [ { trade dict }, ... ],
+      "stats": { ... }
+    }
     """
 
-    def __init__(self, data_dir: str = "data/bnf", total_capital: float = 10000000.0):
-        """
-        Initialize BNF Position Manager
-
-        Args:
-            data_dir: Directory for storing position data
-            total_capital: Total trading capital for risk calculations
-        """
+    def __init__(self, data_dir: str = "data/bnf",
+                 total_capital: float = DEFAULT_TOTAL_CAPITAL):
         self.data_dir = Path(data_dir)
         self.positions_file = self.data_dir / "positions.json"
+        self.history_file = self.data_dir / "trade_history.json"
         self.total_capital = total_capital
-        self.positions: Dict[str, Position] = {}
 
-        # Risk management parameters
-        self.max_positions = 5
-        self.max_position_ratio = 0.20  # 20% per position
-
-        # Ensure data directory exists
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
-        # Load existing positions
-        self.load_positions()
-
-    def add_position(
-        self,
-        code: str,
-        name: str,
-        state: PositionState = PositionState.PENDING
-    ) -> Optional[Position]:
-        """
-        Add a new position
-
-        Args:
-            code: Stock code
-            name: Stock name
-            state: Initial position state
-
-        Returns:
-            Created Position or None if cannot add
-        """
-        # Check if position already exists
-        if code in self.positions:
-            print(f"Position for {code} already exists")
-            return None
-
-        # Check if can add new position
-        if not self.can_add_position():
-            print(f"Cannot add position: Max positions ({self.max_positions}) reached")
-            return None
-
-        # Create new position
-        position = Position(
-            code=code,
-            name=name,
-            state=state
-        )
-
-        self.positions[code] = position
-        self.save_positions()
-
-        return position
-
-    def update_position(
-        self,
-        code: str,
-        current_price: Optional[float] = None,
-        state: Optional[PositionState] = None
-    ) -> Optional[Position]:
-        """
-        Update position details
-
-        Args:
-            code: Stock code
-            current_price: Updated current price
-            state: Updated state
-
-        Returns:
-            Updated Position or None if not found
-        """
-        if code not in self.positions:
-            print(f"Position {code} not found")
-            return None
-
-        position = self.positions[code]
-
-        if current_price is not None:
-            position.current_price = current_price
-            position.unrealized_pnl = self.calculate_pnl(position)
-
-        if state is not None:
-            position.state = state
-
-        position.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        self.save_positions()
-
-        return position
-
-    def partial_entry(
-        self,
-        code: str,
-        price: float,
-        quantity: int,
-        date: Optional[str] = None,
-        time: Optional[str] = None
-    ) -> Optional[Position]:
-        """
-        Record a partial entry (split entry)
-
-        Args:
-            code: Stock code
-            price: Entry price
-            quantity: Entry quantity
-            date: Entry date (YYYY-MM-DD)
-            time: Entry time (HH:MM:SS)
-
-        Returns:
-            Updated Position or None if not found
-        """
-        if code not in self.positions:
-            print(f"Position {code} not found")
-            return None
-
-        position = self.positions[code]
-
-        # Set timestamps
-        if date is None:
-            date = datetime.now().strftime("%Y-%m-%d")
-        if time is None:
-            time = datetime.now().strftime("%H:%M:%S")
-
-        # Add entry
-        entry = {
-            'price': price,
-            'quantity': quantity,
-            'date': date,
-            'time': time
-        }
-        position.entries.append(entry)
-
-        # Update state
-        if position.state == PositionState.PENDING:
-            position.state = PositionState.PARTIAL
-
-        position.current_price = price
-        position.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        self.save_positions()
-
-        return position
-
-    def complete_entry(self, code: str) -> Optional[Position]:
-        """
-        Mark position as fully entered
-
-        Args:
-            code: Stock code
-
-        Returns:
-            Updated Position or None if not found
-        """
-        if code not in self.positions:
-            print(f"Position {code} not found")
-            return None
-
-        position = self.positions[code]
-        position.state = PositionState.FULL
-        position.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        self.save_positions()
-
-        return position
-
-    def partial_exit(
-        self,
-        code: str,
-        price: float,
-        quantity: int,
-        date: Optional[str] = None,
-        time: Optional[str] = None
-    ) -> Optional[Position]:
-        """
-        Record a partial exit (split exit)
-
-        Args:
-            code: Stock code
-            price: Exit price
-            quantity: Exit quantity
-            date: Exit date (YYYY-MM-DD)
-            time: Exit time (HH:MM:SS)
-
-        Returns:
-            Updated Position or None if not found
-        """
-        if code not in self.positions:
-            print(f"Position {code} not found")
-            return None
-
-        position = self.positions[code]
-
-        # Check if enough quantity to exit
-        remaining = position.get_remaining_quantity()
-        if quantity > remaining:
-            print(f"Cannot exit {quantity} shares, only {remaining} remaining")
-            return None
-
-        # Set timestamps
-        if date is None:
-            date = datetime.now().strftime("%Y-%m-%d")
-        if time is None:
-            time = datetime.now().strftime("%H:%M:%S")
-
-        # Add exit
-        exit_trade = {
-            'price': price,
-            'quantity': quantity,
-            'date': date,
-            'time': time
-        }
-        position.exits.append(exit_trade)
-
-        # Update state
-        if position.state == PositionState.FULL:
-            position.state = PositionState.EXITING
-
-        position.current_price = price
-        position.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        self.save_positions()
-
-        return position
-
-    def close_position(self, code: str) -> Optional[Position]:
-        """
-        Mark position as fully closed
-
-        Args:
-            code: Stock code
-
-        Returns:
-            Closed Position or None if not found
-        """
-        if code not in self.positions:
-            print(f"Position {code} not found")
-            return None
-
-        position = self.positions[code]
-
-        # Verify all quantity is exited
-        remaining = position.get_remaining_quantity()
-        if remaining > 0:
-            print(f"Cannot close position: {remaining} shares still open")
-            return None
-
-        position.state = PositionState.CLOSED
-        position.unrealized_pnl = 0.0  # No unrealized P&L when closed
-        position.updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        self.save_positions()
-
-        return position
-
-    def get_position(self, code: str) -> Optional[Position]:
-        """
-        Get position by code
-
-        Args:
-            code: Stock code
-
-        Returns:
-            Position or None if not found
-        """
-        return self.positions.get(code)
-
-    def get_open_positions(self) -> List[Position]:
-        """
-        Get all open positions (not closed)
-
-        Returns:
-            List of open positions
-        """
-        return [
-            pos for pos in self.positions.values()
-            if pos.state != PositionState.CLOSED
-        ]
-
-    def get_all_positions(self) -> List[Position]:
-        """
-        Get all positions including closed ones
-
-        Returns:
-            List of all positions
-        """
-        return list(self.positions.values())
-
-    def get_total_exposure(self) -> float:
-        """
-        Calculate total capital exposure across all open positions
-
-        Returns:
-            Total invested capital
-        """
-        total = 0.0
-        for position in self.get_open_positions():
-            total += position.get_total_invested()
-        return total
-
-    def can_add_position(self) -> bool:
-        """
-        Check if can add a new position based on risk limits
-
-        Returns:
-            True if can add position, False otherwise
-        """
-        open_positions = self.get_open_positions()
-        return len(open_positions) < self.max_positions
-
-    def can_enter_position(self, code: str, capital: float) -> bool:
-        """
-        Check if can enter position with given capital
-
-        Args:
-            code: Stock code
-            capital: Capital to invest
-
-        Returns:
-            True if within risk limits, False otherwise
-        """
-        # Check if position exists
-        if code not in self.positions:
-            return False
-
-        # Check max capital per position
-        max_per_position = self.total_capital * self.max_position_ratio
-        if capital > max_per_position:
-            print(f"Capital {capital:,.0f} exceeds max per position {max_per_position:,.0f}")
-            return False
-
-        return True
-
-    def calculate_pnl(self, position: Position) -> float:
-        """
-        Calculate unrealized P&L for a position
-
-        Args:
-            position: Position to calculate P&L for
-
-        Returns:
-            Unrealized P&L
-        """
-        if position.state == PositionState.CLOSED:
-            return 0.0
-
-        if position.state == PositionState.PENDING:
-            return 0.0
-
-        remaining_quantity = position.get_remaining_quantity()
-        if remaining_quantity == 0:
-            return 0.0
-
-        avg_entry_price = position.get_average_entry_price()
-        if avg_entry_price == 0 or position.current_price == 0:
-            return 0.0
-
-        # Calculate unrealized P&L on remaining quantity
-        unrealized_pnl = (position.current_price - avg_entry_price) * remaining_quantity
-
-        return unrealized_pnl
-
-    def calculate_realized_pnl(self, position: Position) -> float:
-        """
-        Calculate realized P&L from exits
-
-        Args:
-            position: Position to calculate P&L for
-
-        Returns:
-            Realized P&L
-        """
-        if not position.exits:
-            return 0.0
-
-        avg_entry_price = position.get_average_entry_price()
-        if avg_entry_price == 0:
-            return 0.0
-
-        # Calculate realized P&L from all exits
-        realized_pnl = 0.0
-        for exit_trade in position.exits:
-            exit_price = exit_trade['price']
-            exit_quantity = exit_trade['quantity']
-            realized_pnl += (exit_price - avg_entry_price) * exit_quantity
-
-        return realized_pnl
-
-    def get_position_summary(self, code: str) -> Optional[Dict[str, Any]]:
-        """
-        Get detailed summary of a position
-
-        Args:
-            code: Stock code
-
-        Returns:
-            Position summary dictionary or None if not found
-        """
-        position = self.get_position(code)
-        if not position:
-            return None
-
-        return {
-            'code': position.code,
-            'name': position.name,
-            'state': position.state.value,
-            'total_entries': len(position.entries),
-            'total_exits': len(position.exits),
-            'entry_quantity': position.get_total_entry_quantity(),
-            'exit_quantity': position.get_total_exit_quantity(),
-            'remaining_quantity': position.get_remaining_quantity(),
-            'avg_entry_price': position.get_average_entry_price(),
-            'current_price': position.current_price,
-            'total_invested': position.get_total_invested(),
-            'unrealized_pnl': position.unrealized_pnl,
-            'realized_pnl': self.calculate_realized_pnl(position),
-            'created_at': position.created_at,
-            'updated_at': position.updated_at
-        }
-
-    def save_positions(self) -> None:
-        """Save positions to JSON file"""
-        try:
-            data = {
-                'positions': {
-                    code: position.to_dict()
-                    for code, position in self.positions.items()
-                },
-                'metadata': {
-                    'total_capital': self.total_capital,
-                    'max_positions': self.max_positions,
-                    'max_position_ratio': self.max_position_ratio,
-                    'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
-            }
-
-            with open(self.positions_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-
-        except Exception as e:
-            print(f"Error saving positions: {e}")
-
-    def load_positions(self) -> None:
-        """Load positions from JSON file"""
-        try:
-            if not self.positions_file.exists():
-                print(f"No existing positions file found at {self.positions_file}")
-                return
-
-            with open(self.positions_file, 'r', encoding='utf-8') as f:
+        # 활성 포지션 목록 (CLOSED 제외)
+        self.positions: List[Dict[str, Any]] = []
+        # 완료된 거래 목록
+        self.trades: List[Dict[str, Any]] = []
+
+        self.load()
+
+    # ========== I/O ==========
+
+    def load(self) -> None:
+        """positions.json + trade_history.json 로드"""
+        # positions
+        if self.positions_file.exists():
+            with open(self.positions_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
+            all_positions = data.get("positions", [])
+            if isinstance(all_positions, dict):
+                all_positions = list(all_positions.values())
+            # CLOSED 는 무시 — trade_history 에만 존재해야 한다
+            self.positions = [p for p in all_positions if p.get("state") != "CLOSED"]
+            self.total_capital = data.get("stats", {}).get("total_capital", self.total_capital)
+        else:
+            self.positions = []
 
-            # Load positions
-            positions_data = data.get('positions', {})
-            self.positions = {
-                code: Position.from_dict(pos_data)
-                for code, pos_data in positions_data.items()
-            }
+        # trade history
+        if self.history_file.exists():
+            with open(self.history_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.trades = data.get("trades", [])
+        else:
+            self.trades = []
 
-            # Load metadata if available
-            metadata = data.get('metadata', {})
-            if 'total_capital' in metadata:
-                self.total_capital = metadata['total_capital']
-            if 'max_positions' in metadata:
-                self.max_positions = metadata['max_positions']
-            if 'max_position_ratio' in metadata:
-                self.max_position_ratio = metadata['max_position_ratio']
+    def save(self, timestamp: Optional[str] = None) -> None:
+        """positions.json + trade_history.json 저장"""
+        ts = timestamp or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            print(f"Loaded {len(self.positions)} positions from {self.positions_file}")
+        # --- positions.json (활성 포지션만) ---
+        pos_stats = self._calc_position_stats()
+        pos_data = {
+            "updated_at": ts,
+            "positions": self.positions,
+            "stats": pos_stats,
+        }
+        with open(self.positions_file, "w", encoding="utf-8") as f:
+            json.dump(pos_data, f, indent=2, ensure_ascii=False)
 
-        except Exception as e:
-            print(f"Error loading positions: {e}")
+        # --- trade_history.json ---
+        trade_stats = self._calc_trade_stats()
+        hist_data = {
+            "updated_at": ts,
+            "trades": self.trades,
+            "stats": trade_stats,
+        }
+        with open(self.history_file, "w", encoding="utf-8") as f:
+            json.dump(hist_data, f, indent=2, ensure_ascii=False)
 
-    def remove_closed_positions(self) -> int:
+    # ========== 포지션 조회 ==========
+
+    def get_open_positions(self) -> List[Dict[str, Any]]:
+        return [p for p in self.positions if p.get("state") != "CLOSED"]
+
+    def find_position(self, code: str) -> Optional[Dict[str, Any]]:
+        """활성 포지션 중 code 로 검색"""
+        for p in self.positions:
+            if p["code"] == code and p.get("state") != "CLOSED":
+                return p
+        return None
+
+    def has_open_position(self, code: str) -> bool:
+        return self.find_position(code) is not None
+
+    def open_slots(self) -> int:
+        return MAX_POSITIONS - len(self.get_open_positions())
+
+    # ========== 신규 진입 ==========
+
+    def enter_position(self, code: str, name: str, price: int, quantity: int,
+                       date: str, time: str,
+                       selection_reason: str = "") -> Optional[Dict[str, Any]]:
         """
-        Remove closed positions from tracking
-
-        Returns:
-            Number of positions removed
+        신규 포지션 진입 (FULL 상태로 즉시 등록).
+        이미 동일 종목을 보유 중이면 None 반환.
         """
-        closed_codes = [
-            code for code, pos in self.positions.items()
-            if pos.state == PositionState.CLOSED
-        ]
+        if self.has_open_position(code):
+            print(f"이미 보유 중: {code}")
+            return None
 
-        for code in closed_codes:
-            del self.positions[code]
+        if self.open_slots() <= 0:
+            print(f"슬롯 부족 (최대 {MAX_POSITIONS})")
+            return None
 
-        if closed_codes:
-            self.save_positions()
+        position = {
+            "code": code,
+            "name": name,
+            "state": PositionState.FULL.value,
+            "avg_price": price,
+            "current_price": price,
+            "total_quantity": quantity,
+            "entry_date": date,
+            "entry_price": price,
+            "unrealized_pnl": 0,
+            "unrealized_pnl_pct": 0.0,
+            "selection_reason": selection_reason,
+            "entries": [
+                {"price": price, "quantity": quantity, "date": date, "time": time}
+            ],
+            "exits": [],
+        }
+        self.positions.append(position)
+        return position
 
-        return len(closed_codes)
+    # ========== 가격 업데이트 ==========
 
-    def get_statistics(self) -> Dict[str, Any]:
+    def update_price(self, code: str, current_price: int) -> Optional[Dict[str, Any]]:
+        """현재가 갱신 + 미실현 손익 재계산"""
+        pos = self.find_position(code)
+        if pos is None:
+            return None
+
+        pos["current_price"] = current_price
+        avg = pos.get("avg_price", current_price)
+        qty = pos.get("total_quantity", 0)
+        pos["unrealized_pnl"] = (current_price - avg) * qty
+        pos["unrealized_pnl_pct"] = ((current_price / avg) - 1) * 100 if avg > 0 else 0
+        return pos
+
+    # ========== 청산 ==========
+
+    def close_position(self, code: str, exit_price: int, exit_date: str,
+                       exit_reason: str, exit_time: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
-        Get overall statistics
-
-        Returns:
-            Statistics dictionary
+        포지션 청산:
+        1. exits 배열에 기록
+        2. trade_history 로 이동
+        3. positions 에서 제거
+        반환: 생성된 trade dict (또는 None)
         """
+        pos = self.find_position(code)
+        if pos is None:
+            print(f"포지션 없음: {code}")
+            return None
+
+        qty = pos.get("total_quantity", 0)
+        avg_price = pos.get("avg_price", 0)
+
+        # exits 배열에 청산 기록 추가
+        exit_record = {
+            "price": exit_price,
+            "quantity": qty,
+            "date": exit_date,
+            "time": exit_time or datetime.now().strftime("%H:%M:%S"),
+            "reason": exit_reason,
+        }
+        pos["exits"].append(exit_record)
+
+        # trade_history 용 레코드 생성
+        return_pct = ((exit_price / avg_price) - 1) * 100 if avg_price > 0 else 0
+        profit = int((exit_price - avg_price) * qty)
+
+        trade = {
+            "code": pos["code"],
+            "name": pos["name"],
+            "entry_date": pos.get("entry_date"),
+            "entry_price": avg_price,
+            "exit_date": exit_date,
+            "exit_price": exit_price,
+            "quantity": qty,
+            "return_pct": round(return_pct, 2),
+            "profit": profit,
+            "exit_reason": exit_reason,
+        }
+        self.trades.append(trade)
+
+        # positions 에서 제거
+        self.positions = [p for p in self.positions
+                          if not (p["code"] == code and p is pos)]
+        return trade
+
+    # ========== 자동 청산 (손절/익절 판정) ==========
+
+    def check_auto_close(self, today: str) -> List[Dict[str, Any]]:
+        """
+        모든 활성 포지션의 손절/익절 조건을 확인하고 자동 청산.
+        반환: 청산된 trade 목록
+        """
+        closed_trades = []
+        # 복사본으로 순회 (순회 중 제거 방지)
+        for pos in list(self.positions):
+            code = pos["code"]
+            avg_price = pos.get("avg_price", 0)
+            current_price = pos.get("current_price", 0)
+            if avg_price <= 0 or current_price <= 0:
+                continue
+
+            gain_pct = ((current_price / avg_price) - 1) * 100
+
+            if gain_pct <= STOP_LOSS_PCT:
+                trade = self.close_position(
+                    code, current_price, today,
+                    exit_reason="손절 (-3%)"
+                )
+                if trade:
+                    closed_trades.append(trade)
+                    print(f"  손절: {pos['name']} ({gain_pct:.1f}%)")
+
+            elif gain_pct >= TAKE_PROFIT_PCT:
+                trade = self.close_position(
+                    code, current_price, today,
+                    exit_reason="익절 (+10%)"
+                )
+                if trade:
+                    closed_trades.append(trade)
+                    print(f"  익절: {pos['name']} ({gain_pct:.1f}%)")
+
+        return closed_trades
+
+    # ========== 통계 계산 ==========
+
+    def _calc_position_stats(self) -> Dict[str, Any]:
         open_positions = self.get_open_positions()
+        used_capital = sum(
+            p.get("avg_price", 0) * p.get("total_quantity", 0)
+            for p in open_positions
+        )
+        unrealized_pnl = sum(p.get("unrealized_pnl", 0) for p in open_positions)
 
-        total_unrealized_pnl = sum(pos.unrealized_pnl for pos in open_positions)
-        total_exposure = self.get_total_exposure()
+        total_trades = len(self.trades)
+        win_count = len([t for t in self.trades if t.get("return_pct", 0) > 0])
+        win_rate = (win_count / total_trades * 100) if total_trades > 0 else 0
+        total_return = sum(t.get("return_pct", 0) for t in self.trades)
+        avg_return = (total_return / total_trades) if total_trades > 0 else 0
 
         return {
-            'total_positions': len(self.positions),
-            'open_positions': len(open_positions),
-            'closed_positions': len([p for p in self.positions.values() if p.state == PositionState.CLOSED]),
-            'total_exposure': total_exposure,
-            'total_unrealized_pnl': total_unrealized_pnl,
-            'exposure_ratio': total_exposure / self.total_capital if self.total_capital > 0 else 0,
-            'available_slots': self.max_positions - len(open_positions),
-            'max_positions': self.max_positions,
-            'total_capital': self.total_capital
+            "total_capital": self.total_capital,
+            "used_capital": used_capital,
+            "open_positions": len(open_positions),
+            "total_trades": total_trades,
+            "win_rate": round(win_rate, 1),
+            "total_return": round(total_return, 2),
+            "avg_return": round(avg_return, 2),
+            "unrealized_pnl": unrealized_pnl,
         }
 
+    def _calc_trade_stats(self) -> Dict[str, Any]:
+        total_trades = len(self.trades)
+        win_count = len([t for t in self.trades if t.get("return_pct", 0) > 0])
+        total_return = sum(t.get("return_pct", 0) for t in self.trades)
+        avg_return = (total_return / total_trades) if total_trades > 0 else 0
+        total_profit = sum(t.get("profit", 0) for t in self.trades)
+
+        return {
+            "total_trades": total_trades,
+            "win_count": win_count,
+            "loss_count": total_trades - win_count,
+            "win_rate": round((win_count / total_trades * 100) if total_trades > 0 else 0, 1),
+            "total_profit": total_profit,
+            "total_return": round(total_return, 2),
+            "avg_return": round(avg_return, 2),
+        }
+
+
+# ========== CLI 테스트 ==========
 
 if __name__ == "__main__":
-    # Example usage
-    print("BNF Position Manager - Example Usage\n")
+    print("BNF Position Manager - 상태 확인\n")
 
-    # Initialize manager
-    manager = BNFPositionManager(
-        data_dir="data/bnf",
-        total_capital=10000000.0
-    )
+    mgr = BNFPositionManager()
+    open_pos = mgr.get_open_positions()
+    print(f"활성 포지션: {len(open_pos)}개")
+    for p in open_pos:
+        pnl = p.get("unrealized_pnl", 0)
+        pnl_pct = p.get("unrealized_pnl_pct", 0)
+        print(f"  {p['name']}({p['code']}) "
+              f"avg={p.get('avg_price', 0):,} "
+              f"cur={p.get('current_price', 0):,} "
+              f"pnl={pnl:+,} ({pnl_pct:+.1f}%)")
 
-    # Add a new position
-    print("1. Adding new position...")
-    position = manager.add_position(
-        code="005930",
-        name="삼성전자",
-        state=PositionState.PENDING
-    )
-    if position:
-        print(f"   Added: {position.name} ({position.code}) - State: {position.state.value}")
-
-    # Partial entry
-    print("\n2. Recording partial entry...")
-    position = manager.partial_entry(
-        code="005930",
-        price=70000,
-        quantity=10
-    )
-    if position:
-        print(f"   Entry: {position.get_total_entry_quantity()} shares @ {position.get_average_entry_price():,.0f}")
-
-    # Another partial entry
-    print("\n3. Recording another partial entry...")
-    position = manager.partial_entry(
-        code="005930",
-        price=69000,
-        quantity=5
-    )
-    if position:
-        print(f"   Total: {position.get_total_entry_quantity()} shares @ {position.get_average_entry_price():,.0f}")
-
-    # Complete entry
-    print("\n4. Completing entry...")
-    position = manager.complete_entry("005930")
-    if position:
-        print(f"   State: {position.state.value}")
-
-    # Update price and calculate P&L
-    print("\n5. Updating current price...")
-    position = manager.update_position(
-        code="005930",
-        current_price=72000
-    )
-    if position:
-        print(f"   Price: {position.current_price:,.0f}")
-        print(f"   Unrealized P&L: {position.unrealized_pnl:+,.0f}")
-
-    # Partial exit
-    print("\n6. Recording partial exit...")
-    position = manager.partial_exit(
-        code="005930",
-        price=73000,
-        quantity=8
-    )
-    if position:
-        print(f"   Exited: 8 shares @ 73,000")
-        print(f"   Remaining: {position.get_remaining_quantity()} shares")
-        print(f"   Realized P&L: {manager.calculate_realized_pnl(position):+,.0f}")
-
-    # Get summary
-    print("\n7. Position Summary:")
-    summary = manager.get_position_summary("005930")
-    if summary:
-        for key, value in summary.items():
-            if isinstance(value, float):
-                print(f"   {key}: {value:,.2f}")
-            else:
-                print(f"   {key}: {value}")
-
-    # Get statistics
-    print("\n8. Overall Statistics:")
-    stats = manager.get_statistics()
-    for key, value in stats.items():
-        if isinstance(value, float):
-            print(f"   {key}: {value:,.2f}")
-        else:
-            print(f"   {key}: {value}")
-
-    print("\n" + "="*60)
-    print(f"Positions saved to: {manager.positions_file}")
-    print("="*60)
+    print(f"\n완료 거래: {len(mgr.trades)}건")
+    print(f"슬롯 여유: {mgr.open_slots()}개")

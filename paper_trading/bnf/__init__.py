@@ -15,7 +15,7 @@ from .simulator import (
     EntryPoint,
     ExitPoint
 )
-from .position import BNFPositionManager, Position, PositionState
+from .position import BNFPositionManager, PositionState
 
 __all__ = [
     # Selector
@@ -28,6 +28,5 @@ __all__ = [
     'ExitPoint',
     # Position
     'BNFPositionManager',
-    'Position',
     'PositionState',
 ]
