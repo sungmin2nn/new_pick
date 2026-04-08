@@ -75,10 +75,12 @@ class TradingSimulator:
     INITIAL_CAPITAL = 1_000_000  # 초기 자본 100만원
     MAX_STOCKS = 5          # 최대 종목 수
 
-    def __init__(self, capital: int = None):
+    def __init__(self, capital: int = None, strategy_id: str = None, strategy_name: str = None):
         self.capital = capital or self.INITIAL_CAPITAL
         self.results: List[TradeResult] = []
         self.trade_date: str = ""
+        self.strategy_id: str = strategy_id or ""
+        self.strategy_name: str = strategy_name or ""
 
         # 분봉 수집기 초기화
         if INTRADAY_AVAILABLE:
@@ -124,8 +126,9 @@ class TradingSimulator:
         num_stocks = min(len(candidates), self.MAX_STOCKS)
         amount_per_stock = self.capital // num_stocks
 
+        strategy_label = f" [{self.strategy_name}]" if self.strategy_name else ""
         print(f"\n{'='*50}")
-        print(f"[Simulator] 매매 시뮬레이션 시작 ({self.trade_date})")
+        print(f"[Simulator]{strategy_label} 매매 시뮬레이션 시작 ({self.trade_date})")
         print(f"  자본금: {self.capital:,}원")
         print(f"  종목수: {num_stocks}개")
         print(f"  종목당: {amount_per_stock:,}원")
@@ -394,9 +397,15 @@ class TradingSimulator:
 
     def get_daily_summary(self) -> dict:
         """일일 결과 요약 반환"""
+        base = {
+            'date': self.trade_date,
+            'strategy_id': self.strategy_id,
+            'strategy_name': self.strategy_name,
+        }
+
         if not self.results:
             return {
-                'date': self.trade_date,
+                **base,
                 'total_trades': 0,
                 'wins': 0,
                 'losses': 0,
@@ -411,13 +420,14 @@ class TradingSimulator:
         total_return = sum(r.return_pct for r in self.results)
 
         return {
-            'date': self.trade_date,
+            **base,
             'total_trades': total_trades,
             'wins': wins,
             'losses': total_trades - wins,
             'win_rate': round(wins / total_trades * 100, 1) if total_trades > 0 else 0,
             'total_return': round(total_return, 2),
             'avg_return': round(total_return / total_trades, 2) if total_trades > 0 else 0,
+            'total_return_amount': sum(r.return_amount for r in self.results),
             'profit_exits': len([r for r in self.results if r.exit_type == 'profit']),
             'loss_exits': len([r for r in self.results if r.exit_type == 'loss']),
             'close_exits': len([r for r in self.results if r.exit_type == 'close']),
