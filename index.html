@@ -385,7 +385,115 @@ function renderLeaderboard() {
         <div class="card">
             <h2>🏆 ELO 랭킹</h2>
             <div class="team-grid">${cardsHtml}</div>
+        </div>
+        <div class="card">
+            <h2>📈 4팀 누적 수익률 비교</h2>
+            <div class="chart-container" style="height:250px;"><canvas id="lbReturnChart"></canvas></div>
+        </div>
+        <div class="card">
+            <h2>🏅 ELO 레이팅 추이</h2>
+            <div class="chart-container" style="height:250px;"><canvas id="lbEloChart"></canvas></div>
         </div>`;
+
+    drawLeaderboardCharts();
+}
+
+function drawLeaderboardCharts() {
+    const history = leaderboardData?.daily_history || [];
+    if (history.length === 0) return;
+
+    const teamIds = Object.keys(TEAM_META);
+    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B' };
+    const labels = history.map(h => h.date);
+
+    // 1. 누적 수익률 비교 차트
+    const returnCtx = document.getElementById('lbReturnChart');
+    if (returnCtx) {
+        const returnDatasets = teamIds.map(tid => {
+            let cum = 0;
+            const data = history.map(entry => {
+                const r = (entry.ranking || []).find(r => r.team_id === tid);
+                cum += r ? (r.total_return || 0) : 0;
+                return Math.round(cum * 100) / 100;
+            });
+            return {
+                label: `${TEAM_META[tid].emoji} ${TEAM_META[tid].name}`,
+                data,
+                borderColor: colors[tid],
+                backgroundColor: 'transparent',
+                tension: 0.3,
+                pointRadius: 2,
+                borderWidth: 2,
+            };
+        });
+
+        new Chart(returnCtx, {
+            type: 'line',
+            data: { labels, datasets: returnDatasets },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true } } },
+                scales: {
+                    y: { title: { display: true, text: '누적 수익률 (%)' }, grid: { color: '#F3F4F6' },
+                         ticks: { callback: v => `${v >= 0 ? '+' : ''}${v}%` } },
+                    x: { grid: { display: false }, ticks: { maxTicksLimit: 15 } }
+                }
+            }
+        });
+    }
+
+    // 2. ELO 레이팅 추이 차트
+    const eloCtx = document.getElementById('lbEloChart');
+    if (eloCtx) {
+        // ELO는 leaderboard에 daily history로 저장 안 되므로 시뮬레이션 계산
+        const eloHistory = {};
+        teamIds.forEach(tid => { eloHistory[tid] = [1000]; });
+
+        for (const entry of history) {
+            const ranked = (entry.ranking || []).sort((a, b) => (b.total_return || 0) - (a.total_return || 0));
+            const n = ranked.length;
+            const currentElo = {};
+            teamIds.forEach(tid => { currentElo[tid] = eloHistory[tid][eloHistory[tid].length - 1]; });
+
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const tidA = ranked[i].team_id;
+                    const tidB = ranked[j].team_id;
+                    const eloA = currentElo[tidA];
+                    const eloB = currentElo[tidB];
+                    const expA = 1 / (1 + Math.pow(10, (eloB - eloA) / 400));
+                    const k = (j - i >= 3) ? 32 : 16;
+                    currentElo[tidA] = Math.round(eloA + k * (1 - expA));
+                    currentElo[tidB] = Math.round(eloB + k * (0 - (1 - expA)));
+                }
+            }
+            teamIds.forEach(tid => { eloHistory[tid].push(currentElo[tid]); });
+        }
+
+        const eloLabels = ['시작', ...labels];
+        const eloDatasets = teamIds.map(tid => ({
+            label: `${TEAM_META[tid].emoji} ${TEAM_META[tid].name}`,
+            data: eloHistory[tid],
+            borderColor: colors[tid],
+            backgroundColor: 'transparent',
+            tension: 0.3,
+            pointRadius: 2,
+            borderWidth: 2,
+        }));
+
+        new Chart(eloCtx, {
+            type: 'line',
+            data: { labels: eloLabels, datasets: eloDatasets },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true } } },
+                scales: {
+                    y: { title: { display: true, text: 'ELO Rating' }, grid: { color: '#F3F4F6' } },
+                    x: { grid: { display: false }, ticks: { maxTicksLimit: 15 } }
+                }
+            }
+        });
+    }
 }
 
 // ======================== 2. TEAMS DETAIL ========================
