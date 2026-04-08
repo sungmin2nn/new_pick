@@ -520,6 +520,10 @@ class NaverStock:
             return pd.DataFrame([{'시가총액': info['market_cap']}])
         return pd.DataFrame()
 
+    def get_market_cap(self, start, end, code):
+        """pykrx 호환: 개별 종목 시가총액 (get_market_cap_by_date 별칭)"""
+        return self.get_market_cap_by_date(start, end, code)
+
 
 # 전역 인스턴스
 stock = NaverStock()
