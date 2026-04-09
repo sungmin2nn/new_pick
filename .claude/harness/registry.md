@@ -9,6 +9,7 @@
 | **arena-orchestrator** | `/arena` | 4팀 경쟁 총괄 - git pull → 팀 분석 → 심판 평가 → 결과 반영 | arena-team-analyzer, arena-judge |
 | **arena-team-analyzer** | `/arena-team-analyze {team_id}` | 팀별 성과 분석, 패턴 발견, 파라미터 개선 제안, journal 업데이트 | data/arena/{team_id}/ |
 | **arena-judge** | `/arena-judge` | 4팀 비교 평가, 등급 부여, 전략 간 상관관계, 종합 인사이트 | data/arena/ 전체 |
+| **arena-ops-checker** | `/arena-ops-check {date}` | 일일 운영 점검 - Actions/종목선정/매매/정산/텔레그램/대시보드 | gh CLI, data/ 전체 |
 
 ### Arena 실행 흐름
 ```
@@ -68,6 +69,8 @@ git pull → 상태 파악
 /arena-team-analyze team_c     # Team C 분석
 /arena-team-analyze team_d     # Team D 분석
 /arena-judge                   # 심판 평가 (4팀 비교)
+/arena-ops-check               # 운영 점검 (Actions/선정/매매/정산/텔레그램/대시보드)
+/arena-ops-check 20260409      # 특정 날짜 점검
 
 # Core (L1)
 /core-orchestrator             # 작업 조율

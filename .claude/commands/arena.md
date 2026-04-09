@@ -11,7 +11,13 @@ git pull origin master
 ```
 최신 결과를 가져옵니다.
 
-### Step 2: 현재 상태 파악
+### Step 2: 운영 점검
+`/arena-ops-check`를 먼저 실행하여:
+- GitHub Actions 실행 상태
+- 종목 선정 / 매매 / 정산 / 텔레그램 / 대시보드 전체 확인
+- 이상이 있으면 보고 후 분석 진행 여부 확인
+
+### Step 3: 현재 상태 파악
 - `data/arena/leaderboard.json` → ELO 랭킹
 - `data/arena/team_*/portfolio.json` → 각 팀 포트폴리오
 - `data/arena/daily/최신날짜/arena_report.json` → 최근 결과
@@ -19,7 +25,7 @@ git pull origin master
 
 현재 전체 상황을 요약합니다.
 
-### Step 3: 4팀 병렬 분석 (Agent 4개 동시 실행)
+### Step 4: 4팀 병렬 분석 (Agent 4개 동시 실행)
 각 팀 에이전트에게 분석을 시킵니다:
 
 **Team A (Alpha Momentum)** → `/arena-team-analyze` team_a
@@ -33,7 +39,7 @@ git pull origin master
 - 파라미터 개선 제안
 - 학습 노트 업데이트
 
-### Step 4: 전체 평가 (심판 에이전트)
+### Step 5: 전체 평가 (심판 에이전트)
 `/arena-judge` 를 호출하여:
 - 4팀 비교 평가
 - 전략 간 상관관계 분석
@@ -41,12 +47,12 @@ git pull origin master
 - 전체 인사이트 도출
 - 개선 권고안 작성
 
-### Step 5: 결과 반영
+### Step 6: 결과 반영
 - 각 팀 journal.md 업데이트
 - 파라미터 변경 이력 기록 (승인된 것만)
 - git commit & push
 
-### Step 6: 사용자 보고
+### Step 7: 사용자 보고
 최종 결과를 보기 좋게 정리하여 보고합니다:
 - 4팀 현황 요약
 - 각 팀 분석 결과
