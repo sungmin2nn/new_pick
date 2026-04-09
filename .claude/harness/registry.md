@@ -2,6 +2,30 @@
 
 에이전트 등록소 - 모든 에이전트의 메타데이터 및 관계 정의
 
+## Layer 0: Arena (4팀 경쟁 시스템)
+
+| Agent | Skill Command | Role | Dependencies |
+|-------|---------------|------|--------------|
+| **arena-orchestrator** | `/arena` | 4팀 경쟁 총괄 - git pull → 팀 분석 → 심판 평가 → 결과 반영 | arena-team-analyzer, arena-judge |
+| **arena-team-analyzer** | `/arena-team-analyze {team_id}` | 팀별 성과 분석, 패턴 발견, 파라미터 개선 제안, journal 업데이트 | data/arena/{team_id}/ |
+| **arena-judge** | `/arena-judge` | 4팀 비교 평가, 등급 부여, 전략 간 상관관계, 종합 인사이트 | data/arena/ 전체 |
+
+### Arena 실행 흐름
+```
+/arena (사용자 호출)
+    ↓
+git pull → 상태 파악
+    ↓
+/arena-team-analyze team_a ─┐
+/arena-team-analyze team_b ─┤ 4팀 병렬 분석
+/arena-team-analyze team_c ─┤
+/arena-team-analyze team_d ─┘
+    ↓
+/arena-judge (심판 평가)
+    ↓
+결과 반영 → git commit → 사용자 보고
+```
+
 ## Layer 1: Core (핵심)
 
 | Agent | Skill Command | Role | Dependencies |
@@ -37,6 +61,14 @@
 ## Quick Reference
 
 ```
+# Arena (L0) - 4팀 경쟁 시스템
+/arena                         # 전체 오케스트레이션 (git pull → 분석 → 평가 → 반영)
+/arena-team-analyze team_a     # Team A 분석
+/arena-team-analyze team_b     # Team B 분석
+/arena-team-analyze team_c     # Team C 분석
+/arena-team-analyze team_d     # Team D 분석
+/arena-judge                   # 심판 평가 (4팀 비교)
+
 # Core (L1)
 /core-orchestrator             # 작업 조율
 /core-audit-agent              # 품질 감사
@@ -214,6 +246,7 @@ state-manager 기록 (.context/ 갱신)
 
 | Date | Change | Author |
 |------|--------|--------|
+| 2026-04-09 | Arena L0 레이어 추가 (arena, arena-team-analyze, arena-judge) | System |
 | 2026-04-03 | 자동 라우팅, 이슈 트래킹, 품질 검증 재전달 시스템 추가 | System |
 | 2026-04-02 | dashboard-agent 추가, 하네스 대시보드 시스템 도입 | System |
 | 2026-04-02 | test-agent, cicd-agent 추가, 프로젝트 라우터 및 에러 복구 전략 추가 | System |
