@@ -156,7 +156,7 @@ jobs:
         git add logs/ 2>/dev/null || true
 
         git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "🏟️ Arena 일일 결과 - $(date +'%Y-%m-%d')" && git push) || true
+          (git commit -m "🏟️ Arena 일일 결과 - $(date +'%Y-%m-%d')" && git pull --rebase && git push) || true
 
     - name: Send Telegram Alert (Arena 결과)
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'

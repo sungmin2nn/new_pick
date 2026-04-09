@@ -166,6 +166,7 @@ class DartDisclosureStrategy(BaseStrategy):
                 })
 
             except Exception as e:
+                print(f"     [DART] 시장 데이터 수집 실패 ({stock_code}): {e}")
                 continue
 
         return stocks

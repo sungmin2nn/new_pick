@@ -34,7 +34,7 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add data/bnf/
-        git diff --quiet && git diff --staged --quiet || (git commit -m "📊 BNF 시뮬레이션 업데이트 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
+        git diff --quiet && git diff --staged --quiet || (git commit -m "📊 BNF 시뮬레이션 업데이트 - $(date +'%Y-%m-%d %H:%M')" && git pull --rebase && git push) || true
 
     - name: Send Telegram Alert (BNF 매매)
       env:

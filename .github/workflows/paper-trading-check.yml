@@ -81,7 +81,7 @@ jobs:
         git add data/arena/healthcheck/ 2>/dev/null || true
 
         git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "🏥 Arena 헬스체크 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
+          (git commit -m "🏥 Arena 헬스체크 - $(date +'%Y-%m-%d %H:%M')" && git pull --rebase && git push) || true
 
     - name: Send alerts (issues only)
       if: always()

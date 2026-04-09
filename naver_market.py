@@ -497,8 +497,16 @@ class NaverStock:
         """pykrx 호환: 종목명"""
         return self._naver.get_ticker_name(code)
 
-    def get_market_ohlcv_by_date(self, start, end, code):
-        """pykrx 호환: 종목 OHLCV"""
+    def get_market_ohlcv_by_date(self, start=None, end=None, code=None, *,
+                                   fromdate=None, todate=None, ticker=None):
+        """pykrx 호환: 종목 OHLCV
+
+        pykrx 스타일 키워드도 지원:
+            fromdate -> start, todate -> end, ticker -> code
+        """
+        start = start or fromdate
+        end = end or todate
+        code = code or ticker
         return self._naver.get_ohlcv(code, start, end)
 
     def get_market_ohlcv_by_ticker(self, date, market='KOSPI'):
@@ -509,20 +517,36 @@ class NaverStock:
         """pykrx 호환: 전체 종목 시가총액"""
         return self._naver.get_market_cap_by_ticker(date, market)
 
-    def get_market_ohlcv(self, start, end, code):
+    def get_market_ohlcv(self, start=None, end=None, code=None, *,
+                          fromdate=None, todate=None, ticker=None):
         """pykrx 호환: 종목 OHLCV (다른 형식)"""
+        start = start or fromdate
+        end = end or todate
+        code = code or ticker
         return self._naver.get_ohlcv(code, start, end)
 
-    def get_market_cap_by_date(self, start, end, code):
-        """pykrx 호환: 종목 시가총액"""
+    def get_market_cap_by_date(self, start=None, end=None, code=None, *,
+                                fromdate=None, todate=None, ticker=None):
+        """pykrx 호환: 종목 시가총액
+
+        pykrx 스타일 키워드도 지원:
+            fromdate -> start, todate -> end, ticker -> code
+        """
+        start = start or fromdate
+        end = end or todate
+        code = code or ticker
         info = self._naver.get_stock_info(code)
         if info and 'market_cap' in info:
             return pd.DataFrame([{'시가총액': info['market_cap']}])
         return pd.DataFrame()
 
-    def get_market_cap(self, start, end, code):
+    def get_market_cap(self, start=None, end=None, code=None, *,
+                        fromdate=None, todate=None, ticker=None):
         """pykrx 호환: 개별 종목 시가총액 (get_market_cap_by_date 별칭)"""
-        return self.get_market_cap_by_date(start, end, code)
+        return self.get_market_cap_by_date(
+            start=start, end=end, code=code,
+            fromdate=fromdate, todate=todate, ticker=ticker
+        )
 
 
 # 전역 인스턴스

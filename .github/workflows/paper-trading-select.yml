@@ -71,7 +71,7 @@ jobs:
         git add data/paper_trading/candidates_*.json 2>/dev/null || true
 
         git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "🎯 다중전략 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
+          (git commit -m "🎯 다중전략 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git pull --rebase && git push) || true
 
     - name: Send Telegram Alert (종목 선정 완료)
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'

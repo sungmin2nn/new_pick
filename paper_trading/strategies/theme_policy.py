@@ -201,6 +201,7 @@ class ThemePolicyStrategy(BaseStrategy):
                 })
 
             except Exception as e:
+                print(f"[WARNING] {code} 스킵: {e}")
                 continue
 
         return stocks

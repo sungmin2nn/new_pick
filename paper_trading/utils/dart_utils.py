@@ -154,39 +154,33 @@ class DartFilter:
             return []
 
     def _filter_by_time(self, disclosures: List[Dict]) -> List[Dict]:
-        """시간 필터링 (전일 18:00 ~ 당일 08:30)"""
+        """
+        날짜 기반 필터링 (전일 + 당일 공시 포함)
+
+        NOTE: DART rcept_no의 끝 6자리는 시간(HHMMSS)이 아니라 일련번호(serial)임.
+        DART API는 공시 시각을 별도로 제공하지 않으므로, rcept_dt(날짜)만으로
+        필터링한다. 전일~당일 공시를 모두 포함하여 누락을 방지.
+        """
         now = datetime.now()
-        yesterday_18 = (now - timedelta(days=1)).replace(hour=18, minute=0, second=0)
-        today_0830 = now.replace(hour=8, minute=30, second=0)
+        yesterday = (now - timedelta(days=1)).date()
 
         filtered = []
 
         for disc in disclosures:
             try:
                 rcept_dt = disc.get('rcept_dt', '')
-                rcept_no = disc.get('rcept_no', '')
 
                 if not rcept_dt:
                     continue
 
-                # 접수번호에서 시간 추출 (rcept_no 끝 6자리가 시간)
-                if len(rcept_no) >= 14:
-                    time_str = rcept_no[-6:]
-                    hour = int(time_str[:2])
-                    minute = int(time_str[2:4])
+                disc_date = datetime.strptime(rcept_dt, '%Y%m%d').date()
 
-                    disc_date = datetime.strptime(rcept_dt, '%Y%m%d')
-                    disc_datetime = disc_date.replace(hour=hour, minute=minute)
+                # 전일 또는 당일 공시만 포함
+                if disc_date >= yesterday:
+                    filtered.append(disc)
 
-                    if yesterday_18 <= disc_datetime <= today_0830:
-                        filtered.append(disc)
-                else:
-                    # 시간 정보 없으면 날짜만으로 판단
-                    disc_date = datetime.strptime(rcept_dt, '%Y%m%d')
-                    if disc_date.date() >= (now - timedelta(days=1)).date():
-                        filtered.append(disc)
-
-            except Exception:
+            except Exception as e:
+                print(f"  [DART] 공시 시간 필터링 오류 (rcept_dt={disc.get('rcept_dt', '?')}): {e}")
                 continue
 
         return filtered
@@ -246,7 +240,8 @@ class DartFilter:
                         return int(amount_str)
 
             return 0
-        except Exception:
+        except Exception as e:
+            print(f"  [DART] 금액 추출 오류: {e}")
             return 0
 
     def check_negative_disclosure(self, stock_code: str, days_back: int = 7) -> bool:
@@ -300,7 +295,8 @@ class DartFilter:
                 return data.get('list', [])
             return []
 
-        except Exception:
+        except Exception as e:
+            print(f"  [DART] 회사 공시 조회 실패 ({stock_code}): {e}")
             return []
 
     def _get_corp_code(self, stock_code: str) -> Optional[str]:

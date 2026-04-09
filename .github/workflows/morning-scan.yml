@@ -136,4 +136,4 @@ jobs:
         git add data/morning_candidates.json morning_candidates.json data/history.json history.json
         # DB 파일이 존재하면 추가
         [ -f data/morning_candidates.db ] && git add data/morning_candidates.db || true
-        git diff --quiet && git diff --staged --quiet || (git commit -m "🔮 장전 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git push) || true
+        git diff --quiet && git diff --staged --quiet || (git commit -m "🔮 장전 종목 선정 - $(date +'%Y-%m-%d %H:%M')" && git pull --rebase && git push) || true

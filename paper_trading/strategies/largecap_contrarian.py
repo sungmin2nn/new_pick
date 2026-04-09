@@ -5,15 +5,18 @@
 """
 
 import sys
+import logging
 from pathlib import Path
 from typing import List, Dict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from .base import BaseStrategy, Candidate
 from .registry import StrategyRegistry
 from utils import format_kst_time
+
+logger = logging.getLogger(__name__)
 
 # 네이버 금융 우선, pykrx 폴백
 try:
@@ -24,6 +27,12 @@ except ImportError:
         from pykrx import stock as pykrx_stock
     except ImportError:
         pykrx_stock = None
+
+# KOSPI 지수 조회용 (pykrx 직접 사용)
+try:
+    from pykrx import stock as _pykrx_raw
+except ImportError:
+    _pykrx_raw = None
 
 
 @StrategyRegistry.register
@@ -38,6 +47,8 @@ class LargecapContrarianStrategy(BaseStrategy):
     MIN_PRICE = 5000          # 최소 가격
     MAX_CHANGE = -1.5         # 최대 등락률 (하락만)
     MIN_TRADING_VALUE = 50    # 최소 거래대금 (억)
+    MIN_MARKET_CAP = 1_000_000_000_000  # 최소 시가총액 (1조원)
+    KOSPI_DROP_THRESHOLD = -2.0  # KOSPI 급락 경고 기준 (%)
 
     # 점수 가중치
     WEIGHTS = {
@@ -58,6 +69,16 @@ class LargecapContrarianStrategy(BaseStrategy):
 
         self.selection_date = date
         print(f"\n[{self.STRATEGY_NAME}] 종목 선정 시작 ({date})")
+
+        # 0. KOSPI 시장 상태 확인
+        kospi_change = self._get_kospi_change(date)
+        if kospi_change is not None and kospi_change <= self.KOSPI_DROP_THRESHOLD:
+            logger.warning(
+                f"[{self.STRATEGY_NAME}] KOSPI 급락 감지 ({kospi_change:+.2f}%). "
+                f"역추세 전략 위험 구간 - 선정 종목 수 축소"
+            )
+            print(f"  ⚠ KOSPI {kospi_change:+.2f}% 급락 - 종목 수 축소")
+            top_n = max(1, top_n // 2)
 
         # 1. 전체 종목 데이터 수집
         all_stocks = self._fetch_market_data(date)
@@ -128,7 +149,8 @@ class LargecapContrarianStrategy(BaseStrategy):
                             'market_cap': market_cap,
                             'market': market
                         })
-                    except:
+                    except Exception as e:
+                        logger.debug(f"종목 {code} 데이터 처리 오류: {e}")
                         continue
 
         except Exception as e:
@@ -136,11 +158,37 @@ class LargecapContrarianStrategy(BaseStrategy):
 
         return stocks
 
+    def _get_kospi_change(self, date: str) -> float | None:
+        """전일 KOSPI 등락률 조회"""
+        if _pykrx_raw is None:
+            logger.debug("pykrx 미설치 - KOSPI 지수 조회 불가")
+            return None
+
+        try:
+            end_dt = datetime.strptime(date, "%Y%m%d")
+            start_dt = end_dt - timedelta(days=10)
+            df = _pykrx_raw.get_index_ohlcv(
+                start_dt.strftime("%Y%m%d"), date, "1001"
+            )
+            if df is not None and len(df) >= 2:
+                prev_close = df['종가'].iloc[-2]
+                curr_close = df['종가'].iloc[-1]
+                if prev_close > 0:
+                    return round((curr_close - prev_close) / prev_close * 100, 2)
+        except Exception as e:
+            logger.warning(f"KOSPI 지수 조회 오류: {e}")
+
+        return None
+
     def _filter_stocks(self, stocks: List[Dict]) -> List[Dict]:
         """필터링"""
         filtered = []
 
         for s in stocks:
+            # 시가총액 조건 (대형주만)
+            if s['market_cap'] < self.MIN_MARKET_CAP:
+                continue
+
             # 가격 조건
             if s['price'] < self.MIN_PRICE:
                 continue
@@ -215,5 +263,7 @@ class LargecapContrarianStrategy(BaseStrategy):
             'min_price': self.MIN_PRICE,
             'max_change': self.MAX_CHANGE,
             'min_trading_value': self.MIN_TRADING_VALUE,
+            'min_market_cap': self.MIN_MARKET_CAP,
+            'kospi_drop_threshold': self.KOSPI_DROP_THRESHOLD,
             'weights': self.WEIGHTS
         }
