@@ -295,15 +295,23 @@
 
     <!-- Tabs -->
     <div class="tab-bar">
-        <button class="tab-item active" onclick="showTab('leaderboard')">🏆 리더보드</button>
+        <button class="tab-item active" onclick="showTab('today')">📊 Today</button>
+        <button class="tab-item" onclick="showTab('leaderboard')">🏆 리더보드</button>
         <button class="tab-item" onclick="showTab('teams')">👥 팀별 상세</button>
         <button class="tab-item" onclick="showTab('history')">📈 히스토리</button>
         <button class="tab-item" onclick="showTab('system')">⚙️ 시스템 운영</button>
         <button class="tab-item" onclick="showTab('bnf')">🎯 BNF</button>
     </div>
 
+    <!-- ==================== Today 탭 (NEW) ==================== -->
+    <div id="today" class="tab-pane active">
+        <div id="todayContent">
+            <div class="empty-state"><div class="icon">📊</div>데이터 로딩 중...</div>
+        </div>
+    </div>
+
     <!-- ==================== 리더보드 탭 ==================== -->
-    <div id="leaderboard" class="tab-pane active">
+    <div id="leaderboard" class="tab-pane">
         <div id="leaderboardContent">
             <div class="empty-state"><div class="icon">🏆</div>데이터 로딩 중...</div>
         </div>
@@ -342,14 +350,14 @@
 <!-- Pearl: Bottom Mobile Tab Bar -->
 <nav class="bottom-nav">
     <div class="bottom-nav-inner">
-        <button class="bottom-tab active" data-tab="leaderboard" onclick="showTab('leaderboard')">
+        <button class="bottom-tab active" data-tab="today" onclick="showTab('today')">
+            <span class="icon">📊</span><span>Today</span>
+        </button>
+        <button class="bottom-tab" data-tab="leaderboard" onclick="showTab('leaderboard')">
             <span class="icon">🏆</span><span>리더보드</span>
         </button>
         <button class="bottom-tab" data-tab="teams" onclick="showTab('teams')">
-            <span class="icon">👥</span><span>팀 상세</span>
-        </button>
-        <button class="bottom-tab" data-tab="history" onclick="showTab('history')">
-            <span class="icon">📈</span><span>히스토리</span>
+            <span class="icon">👥</span><span>팀</span>
         </button>
         <button class="bottom-tab" data-tab="system" onclick="showTab('system')">
             <span class="icon">⚙️</span><span>시스템</span>
@@ -456,11 +464,156 @@ function getRecentDates(n) {
 
 // ======================== RENDER ALL ========================
 function renderAll() {
+    renderToday();
     renderLeaderboard();
     renderTeams();
     renderHistory();
     renderSystem();
     renderBNF();
+}
+
+// ======================== 0. TODAY (Pearl KPI 요약) ========================
+function renderToday() {
+    const container = document.getElementById('todayContent');
+    if (!container) return;
+
+    const today = getToday();
+    const todayPretty = `${today.slice(0,4)}-${today.slice(4,6)}-${today.slice(6,8)}`;
+
+    // 5팀 데이터 정리
+    const teamRows = Object.keys(TEAM_META).map(tid => {
+        const meta = TEAM_META[tid];
+        const pf = portfolios[tid] || {};
+        const lbTeam = leaderboardData?.teams?.[tid] || {};
+        const todayHist = leaderboardData?.daily_history?.slice(-1)[0];
+        const todayRank = todayHist?.ranking?.find(r => r.team_id === tid);
+        return {
+            tid, name: meta.name, color: meta.color, desc: meta.desc,
+            today_pct: todayRank?.total_return ?? 0,
+            cum_pct: pf.total_return_pct ?? 0,
+            capital: pf.current_capital ?? 10000000,
+            elo: lbTeam.elo ?? 1000,
+            wins: pf.total_wins ?? 0, trades: pf.total_trades ?? 0,
+        };
+    }).sort((a, b) => b.today_pct - a.today_pct);
+
+    // KPI: 5팀 평균/최고/최저
+    const dailyRets = teamRows.map(t => t.today_pct);
+    const avgDaily = dailyRets.reduce((a, b) => a + b, 0) / Math.max(dailyRets.length, 1);
+    const maxDaily = Math.max(...dailyRets, 0);
+    const minDaily = Math.min(...dailyRets, 0);
+    const totalCapital = teamRows.reduce((s, t) => s + t.capital, 0);
+    const initialTotal = 10000000 * teamRows.length;
+    const totalCumPct = ((totalCapital - initialTotal) / initialTotal) * 100;
+
+    // 헬스체크 상태
+    const hcStatus = healthLogs?.status || 'unknown';
+    const hcIcon = hcStatus === 'healthy' ? '✅' : hcStatus === 'warning' ? '⚠️' : hcStatus === 'unknown' ? '❓' : '❌';
+    const hcColor = hcStatus === 'healthy' ? '#10B981' : hcStatus === 'warning' ? '#F59E0B' : '#EF4444';
+
+    // 일별 카운트 (Day N)
+    const dayN = leaderboardData?.daily_history?.length ?? 0;
+
+    // KPI 카드 4개
+    const kpiHtml = `
+    <div class="card">
+        <h2 style="display:flex; align-items:center; justify-content:space-between;">
+            <span class="display">📊 Today · <span class="num">${todayPretty}</span></span>
+            <span style="font-size:0.65em; color:#6B7280;">Day <span class="num">${dayN}</span></span>
+        </h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; margin-top:14px;">
+            <div style="background:#F8FAFB; border-radius:10px; padding:14px; border:1px solid #E5E7EB;">
+                <div style="font-size:0.7em; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em;">5팀 평균</div>
+                <div class="num display" style="font-size:1.8em; font-weight:800; margin-top:6px; color:${avgDaily >= 0 ? '#EF4444' : '#3B82F6'};">
+                    ${avgDaily >= 0 ? '▲ +' : '▼ '}${avgDaily.toFixed(2)}%
+                </div>
+            </div>
+            <div style="background:#F8FAFB; border-radius:10px; padding:14px; border:1px solid #E5E7EB;">
+                <div style="font-size:0.7em; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em;">최고</div>
+                <div class="num display" style="font-size:1.8em; font-weight:800; margin-top:6px; color:#EF4444;">
+                    ▲ +${maxDaily.toFixed(2)}%
+                </div>
+                <div style="font-size:0.7em; color:#6B7280; margin-top:4px;">${teamRows[0]?.name || ''}</div>
+            </div>
+            <div style="background:#F8FAFB; border-radius:10px; padding:14px; border:1px solid #E5E7EB;">
+                <div style="font-size:0.7em; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em;">최저</div>
+                <div class="num display" style="font-size:1.8em; font-weight:800; margin-top:6px; color:#3B82F6;">
+                    ${minDaily >= 0 ? '+' : ''}${minDaily.toFixed(2)}%
+                </div>
+                <div style="font-size:0.7em; color:#6B7280; margin-top:4px;">${teamRows[teamRows.length-1]?.name || ''}</div>
+            </div>
+            <div style="background:#F8FAFB; border-radius:10px; padding:14px; border:1px solid #E5E7EB;">
+                <div style="font-size:0.7em; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em;">총 자산</div>
+                <div class="num display" style="font-size:1.4em; font-weight:800; margin-top:6px;">
+                    ${totalCapital.toLocaleString()}원
+                </div>
+                <div class="num" style="font-size:0.75em; color:${totalCumPct >= 0 ? '#EF4444' : '#3B82F6'}; margin-top:4px;">
+                    누적 ${totalCumPct >= 0 ? '+' : ''}${totalCumPct.toFixed(2)}%
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+    // 5팀 컴팩트 리스트 (오늘 순위)
+    const teamListHtml = `
+    <div class="card">
+        <h2 class="display">🏆 오늘 순위</h2>
+        ${teamRows.map((t, i) => {
+            const arrow = t.today_pct > 0 ? '▲' : t.today_pct < 0 ? '▼' : '─';
+            const cls = t.today_pct > 0 ? 'positive' : t.today_pct < 0 ? 'negative' : 'neutral';
+            const medal = MEDALS[Math.min(i, 4)];
+            return `
+            <div style="display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid #F0F2F5;">
+                <div style="font-size:1.4em; min-width:32px; text-align:center;">${medal}</div>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:700; display:flex; align-items:center; gap:8px;">
+                        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${t.color};"></span>
+                        ${t.name}
+                    </div>
+                    <div style="font-size:0.75em; color:#6B7280; margin-top:2px;">${t.desc}</div>
+                </div>
+                <div style="text-align:right; min-width:90px;">
+                    <div class="num ${cls}" style="font-size:1.1em; font-weight:800;">
+                        ${arrow} ${t.today_pct >= 0 ? '+' : ''}${t.today_pct.toFixed(2)}%
+                    </div>
+                    <div class="num" style="font-size:0.7em; color:#6B7280; margin-top:2px;">
+                        ELO ${t.elo}
+                    </div>
+                </div>
+            </div>`;
+        }).join('')}
+    </div>`;
+
+    // 시스템 상태
+    const sysHtml = `
+    <div class="card">
+        <h2 class="display">⚙️ 시스템 상태</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+            <div style="background:rgba(${hcStatus === 'healthy' ? '16,185,129' : hcStatus === 'warning' ? '245,158,11' : '239,68,68'},0.05); border-radius:10px; padding:14px; border:1px solid ${hcColor}40;">
+                <div style="font-size:0.7em; color:#6B7280; text-transform:uppercase;">헬스체크</div>
+                <div style="font-size:1.2em; font-weight:700; margin-top:6px; color:${hcColor};">
+                    ${hcIcon} ${hcStatus}
+                </div>
+                <div style="font-size:0.7em; color:#6B7280; margin-top:4px;">
+                    ${(healthLogs?.checks?.length ?? 0)}개 체크 · ${(healthLogs?.issues?.length ?? 0)}개 이슈
+                </div>
+            </div>
+            <div style="background:#F8FAFB; border-radius:10px; padding:14px; border:1px solid #E5E7EB;">
+                <div style="font-size:0.7em; color:#6B7280; text-transform:uppercase;">활성 팀</div>
+                <div class="num display" style="font-size:1.8em; font-weight:800; margin-top:6px;">
+                    ${teamRows.length}<span style="font-size:0.5em; color:#6B7280;"> / 5</span>
+                </div>
+            </div>
+            <div style="background:#F8FAFB; border-radius:10px; padding:14px; border:1px solid #E5E7EB;">
+                <div style="font-size:0.7em; color:#6B7280; text-transform:uppercase;">총 매매</div>
+                <div class="num display" style="font-size:1.8em; font-weight:800; margin-top:6px;">
+                    ${teamRows.reduce((s, t) => s + t.trades, 0)}<span style="font-size:0.5em; color:#6B7280;">건</span>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+    container.innerHTML = kpiHtml + teamListHtml + sysHtml;
 }
 
 // ======================== 1. LEADERBOARD ========================
