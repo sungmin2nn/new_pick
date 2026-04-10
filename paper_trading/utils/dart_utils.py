@@ -136,12 +136,15 @@ class DartFilter:
         """API 사용 가능 여부"""
         return bool(self.api_key)
 
-    def get_recent_disclosures(self, hours_back: int = 14) -> List[DisclosureInfo]:
+    def get_recent_disclosures(self, hours_back: int = 14,
+                                target_date: str = None) -> List[DisclosureInfo]:
         """
         최근 공시 수집 (기본: 전일 18:00 ~ 당일 08:30, 약 14시간)
 
         Args:
             hours_back: 몇 시간 전까지 수집할지
+            target_date: 기준일 (YYYYMMDD). None이면 오늘.
+                        backtest 시 과거 날짜 지정 가능 (Phase 7G fix)
 
         Returns:
             공시 리스트
@@ -149,19 +152,24 @@ class DartFilter:
         if not self.is_available():
             return []
 
-        now = datetime.now()
-        yesterday = (now - timedelta(days=1)).strftime('%Y%m%d')
-        today = now.strftime('%Y%m%d')
+        # 기준일 (target_date 우선, 없으면 오늘)
+        if target_date:
+            target_dt = datetime.strptime(target_date, '%Y%m%d')
+        else:
+            target_dt = datetime.now()
+
+        yesterday = (target_dt - timedelta(days=1)).strftime('%Y%m%d')
+        today = target_dt.strftime('%Y%m%d')
 
         all_disclosures = []
 
-        # 어제 + 오늘 공시 수집
+        # 어제 + 오늘(기준일) 공시 수집
         for date in [yesterday, today]:
             disclosures = self._fetch_disclosures(date)
             all_disclosures.extend(disclosures)
 
         # 시간 필터링 (전일 18:00 ~ 당일 08:30)
-        filtered = self._filter_by_time(all_disclosures)
+        filtered = self._filter_by_time(all_disclosures, target_date=target_date)
 
         # 긍정적 공시만 선별
         positive = self._filter_positive(filtered)
@@ -197,16 +205,23 @@ class DartFilter:
             print(f"  [DART] 공시 조회 실패 ({date}): {e}")
             return []
 
-    def _filter_by_time(self, disclosures: List[Dict]) -> List[Dict]:
+    def _filter_by_time(self, disclosures: List[Dict], target_date: str = None) -> List[Dict]:
         """
         날짜 기반 필터링 (전일 + 당일 공시 포함)
+
+        Args:
+            disclosures: raw 공시 리스트
+            target_date: 기준일 (YYYYMMDD). None이면 오늘.
 
         NOTE: DART rcept_no의 끝 6자리는 시간(HHMMSS)이 아니라 일련번호(serial)임.
         DART API는 공시 시각을 별도로 제공하지 않으므로, rcept_dt(날짜)만으로
         필터링한다. 전일~당일 공시를 모두 포함하여 누락을 방지.
         """
-        now = datetime.now()
-        yesterday = (now - timedelta(days=1)).date()
+        if target_date:
+            target_dt = datetime.strptime(target_date, '%Y%m%d')
+        else:
+            target_dt = datetime.now()
+        yesterday = (target_dt - timedelta(days=1)).date()
 
         filtered = []
 
@@ -474,9 +489,12 @@ class DartFilter:
 
         return filtered
 
-    def get_positive_stocks(self) -> List[Tuple[str, DartScore]]:
+    def get_positive_stocks(self, target_date: str = None) -> List[Tuple[str, DartScore]]:
         """
         긍정적 공시가 있는 종목 리스트 반환
+
+        Args:
+            target_date: 기준일 (YYYYMMDD). None이면 오늘. (Phase 7G backtest 지원)
 
         Returns:
             [(stock_code, DartScore), ...] 리스트
@@ -484,7 +502,7 @@ class DartFilter:
         if not self.is_available():
             return []
 
-        disclosures = self.get_recent_disclosures()
+        disclosures = self.get_recent_disclosures(target_date=target_date)
 
         # 종목별로 그룹핑
         stock_scores = {}

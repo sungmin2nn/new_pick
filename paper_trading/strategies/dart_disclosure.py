@@ -1,5 +1,5 @@
 """
-DART 공시 기반 전략
+DART 공시 기반 전략 (Phase 7G: backtest 지원)
 - 전일 18:00 ~ 당일 08:30 긍정적 공시 종목 선정
 - 실적, 계약, 투자, 기술, 배당 등 카테고리별 점수화
 - 시초가 매매에 활용
@@ -7,6 +7,7 @@ DART 공시 기반 전략
 
 import sys
 import os
+import logging
 from pathlib import Path
 from typing import List, Dict, Optional
 from datetime import datetime
@@ -17,7 +18,25 @@ from .base import BaseStrategy, Candidate
 from .registry import StrategyRegistry
 from paper_trading.utils.dart_utils import DartFilter, get_dart_filter
 
-# 네이버 금융 우선, pykrx 폴백
+logger = logging.getLogger(__name__)
+
+# KRX OpenAPI (당일 + backtest historical)
+try:
+    from paper_trading.utils.krx_api import KRXClient
+    _krx_client = None
+    def _get_krx():
+        global _krx_client
+        if _krx_client is None:
+            try:
+                _krx_client = KRXClient()
+            except Exception as e:
+                logger.warning(f"KRX OpenAPI 초기화 실패: {e}")
+                _krx_client = False
+        return _krx_client if _krx_client else None
+except ImportError:
+    _get_krx = lambda: None
+
+# 네이버 금융 폴백
 try:
     from naver_market import stock as naver_stock
     pykrx_stock = naver_stock
@@ -68,9 +87,9 @@ class DartDisclosureStrategy(BaseStrategy):
             self.candidates = []
             return self.candidates
 
-        # 1. 긍정적 공시 종목 수집
+        # 1. 긍정적 공시 종목 수집 (Phase 7G: target_date 전달)
         print("  1. 긍정적 공시 수집 중...")
-        positive_stocks = self.dart_filter.get_positive_stocks()
+        positive_stocks = self.dart_filter.get_positive_stocks(target_date=date)
         print(f"     → {len(positive_stocks)}개 종목 발견")
 
         if not positive_stocks:
@@ -106,36 +125,86 @@ class DartDisclosureStrategy(BaseStrategy):
         return self.candidates
 
     def _fetch_market_data(self, positive_stocks: List, date: str) -> List[Dict]:
-        """시장 데이터 수집"""
+        """시장 데이터 수집 (Phase 7G: KRX OpenAPI 우선 - backtest 지원)
+
+        - KRX historical 지원으로 과거 날짜 backtest 가능
+        - 시장 단위 1번 fetch 후 매핑 (효율 ↑)
+        - Naver 폴백 (당일만)
+        """
         stocks = []
 
-        if pykrx_stock is None:
-            print("     [경고] pykrx 라이브러리 없음")
+        # 종목코드 set
+        valid_codes = {sc for sc, _ in positive_stocks if sc and len(sc) == 6}
+        score_map = {sc: ds for sc, ds in positive_stocks if sc and len(sc) == 6}
+        if not valid_codes:
             return stocks
 
+        # 1차: KRX OpenAPI (당일 + 과거)
+        krx = _get_krx() if callable(_get_krx) else None
+        if krx:
+            try:
+                market_data = {}
+                for market in ['KOSPI', 'KOSDAQ']:
+                    df = krx.get_stock_ohlcv(date, market=market)
+                    if df.empty:
+                        continue
+                    for code in df.index:
+                        if code in valid_codes:
+                            market_data[code] = (df.loc[code], market)
+
+                for code in valid_codes:
+                    item = market_data.get(code)
+                    if item is None:
+                        continue
+                    row, mkt = item
+                    try:
+                        close = int(row.get('종가', 0))
+                        if close == 0:
+                            continue
+                        dart_score = score_map[code]
+                        disc_summary = [{
+                            'category': d.category,
+                            'report_nm': d.report_nm[:50],
+                            'amount': d.amount,
+                        } for d in dart_score.disclosures]
+                        stocks.append({
+                            'code': code,
+                            'name': str(row.get('종목명', code)),
+                            'price': close,
+                            'change_pct': float(row.get('등락률', 0)),
+                            'volume': int(row.get('거래량', 0)),
+                            'trading_value': int(row.get('거래대금', 0)),
+                            'market_cap': int(row.get('시가총액', 0)),
+                            'dart_score': dart_score.disclosure_score,
+                            'disclosures': disc_summary,
+                        })
+                    except Exception as e:
+                        logger.debug(f"  KRX 매핑 실패 {code}: {e}")
+                        continue
+
+                if stocks:
+                    return stocks
+            except Exception as e:
+                logger.warning(f"  KRX fetch 실패, naver 폴백: {e}")
+
+        # 2차: Naver 폴백 (당일만)
+        if pykrx_stock is None:
+            return stocks
         for stock_code, dart_score in positive_stocks:
             if not stock_code or len(stock_code) != 6:
                 continue
-
             try:
-                # 개별 종목 데이터 가져오기 (Naver API 사용)
                 df = pykrx_stock.get_market_ohlcv_by_date(
                     fromdate=date, todate=date, ticker=stock_code
                 )
-
                 if df.empty:
                     continue
-
                 row = df.iloc[0]
                 close = int(row['종가'])
                 change = float(row['등락률']) if '등락률' in row else 0
                 volume = int(row['거래량'])
                 trading_value = int(row.get('거래대금', 0))
-
-                # 종목명
                 name = pykrx_stock.get_market_ticker_name(stock_code)
-
-                # 시가총액 (기본 데이터에 없을 수 있음)
                 try:
                     cap_df = pykrx_stock.get_market_cap_by_date(
                         fromdate=date, todate=date, ticker=stock_code
@@ -143,16 +212,11 @@ class DartDisclosureStrategy(BaseStrategy):
                     market_cap = int(cap_df.iloc[0]['시가총액']) if not cap_df.empty else 0
                 except Exception:
                     market_cap = 0
-
-                # 공시 정보 요약
-                disc_summary = []
-                for disc in dart_score.disclosures:
-                    disc_summary.append({
-                        'category': disc.category,
-                        'report_nm': disc.report_nm[:50],
-                        'amount': disc.amount
-                    })
-
+                disc_summary = [{
+                    'category': d.category,
+                    'report_nm': d.report_nm[:50],
+                    'amount': d.amount,
+                } for d in dart_score.disclosures]
                 stocks.append({
                     'code': stock_code,
                     'name': name or '알수없음',
@@ -162,11 +226,10 @@ class DartDisclosureStrategy(BaseStrategy):
                     'trading_value': trading_value,
                     'market_cap': market_cap,
                     'dart_score': dart_score.disclosure_score,
-                    'disclosures': disc_summary
+                    'disclosures': disc_summary,
                 })
-
             except Exception as e:
-                print(f"     [DART] 시장 데이터 수집 실패 ({stock_code}): {e}")
+                logger.debug(f"     [DART] naver 폴백 실패 ({stock_code}): {e}")
                 continue
 
         return stocks
