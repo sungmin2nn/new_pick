@@ -287,8 +287,8 @@
     <!-- Header -->
     <header class="header">
         <div>
-            <h1>🏟️ Arena - 4팀 경쟁 트레이딩</h1>
-            <div class="subtitle">전략별 독립 팀 경쟁 시스템 | <span id="currentTime">-</span></div>
+            <h1>🏟️ Arena - 5팀 경쟁 트레이딩</h1>
+            <div class="subtitle">5팀 경쟁 + Pearl 디자인 | <span id="currentTime">-</span></div>
         </div>
         <button class="nav-btn" onclick="loadAllData()">🔄 새로고침</button>
     </header>
@@ -423,9 +423,17 @@ async function loadAllData() {
             portfolios[tid] = await fetchJSON(`${DATA_BASE}/${tid}/portfolio.json`);
         }
 
-        // Load health logs
+        // Load health logs (오늘 + fallback 최근 7일)
         const today = getToday();
-        healthLogs = await fetchJSON(`${DATA_BASE}/healthcheck/health_${today}.json`) || [];
+        healthLogs = await fetchJSON(`${DATA_BASE}/healthcheck/health_${today}.json`);
+        if (!healthLogs) {
+            // 토/일/공휴일 fallback: 최근 7일 중 가장 최근
+            for (const d of getRecentDates(7).slice(1)) {
+                const log = await fetchJSON(`${DATA_BASE}/healthcheck/health_${d}.json`);
+                if (log) { healthLogs = log; break; }
+            }
+        }
+        if (!healthLogs) healthLogs = {};
 
         // Load BNF
         bnfData.positions = await fetchJSON(`${BNF_BASE}/positions.json`);
