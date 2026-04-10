@@ -43,16 +43,28 @@ class DartScore:
 
 
 class DartFilter:
-    """DART 기반 필터 및 점수 계산"""
+    """DART 기반 필터 및 점수 계산 (Phase 2C 정제)
 
-    # 긍정적 공시 키워드 (시초가 상승 요인)
+    개선 (2026-04-10):
+    - 회사명 boilerplate 제외 (증권사/리츠/자산운용 등)
+    - 공시 종류(corp_cls) Y(유가)/K(코스닥)만 허용 - ETF/펀드 제외
+    - 보고서명 패턴 정제 (정기보고서/수익률공시 등 제외)
+    - 카테고리별 최소 금액 임계값 적용
+    """
+
+    # 긍정적 공시 키워드 (시초가 상승 요인) - Phase 2C 구체화
     POSITIVE_KEYWORDS = {
-        '실적': ['매출', '영업이익', '순이익', '실적', '어닝', '턴어라운드', '흑자전환'],
-        '계약': ['계약체결', '수주', '공급계약', 'MOU', '협약', '납품'],
-        '투자': ['투자', '출자', '지분취득', '인수', '증자'],
-        '기술': ['특허', '기술이전', '개발완료', '상용화', '허가'],
-        '배당': ['배당', '주주환원', '자사주', '소각'],
-        '대형': ['대규모', '역대최대', '신기록']
+        '실적': ['매출액또는손익구조', '영업(잠정)실적', '잠정실적', '확정실적',
+                '영업이익증가', '흑자전환', '턴어라운드'],
+        '계약': ['단일판매ㆍ공급계약', '단일판매·공급계약', '단일판매', '공급계약체결',
+                '수주공시', 'MOU체결', '판매계약'],
+        '투자': ['타법인주식및출자증권취득', '주식등의대량보유', '유상증자결정',
+                '제3자배정', '신규시설투자', '자기주식매수'],
+        '기술': ['신규특허', '기술이전계약', '개발완료', '품목허가', '임상승인',
+                '신약허가', '제품승인'],
+        '배당': ['현금ㆍ현물배당결정', '현금배당', '주식배당결정',
+                '자기주식취득결정', '자기주식소각결정', '주주환원'],
+        '대형': ['대규모기업집단', '대규모투자', '역대최대'],
     }
 
     # 부정적 공시 키워드 (필터링 대상)
@@ -63,6 +75,38 @@ class DartFilter:
         '불성실', '투자주의', '매매거래정지', '계약해지',
         '투자경고', '투자위험', '사임', '해임', '담보제공'
     ]
+
+    # ===== Phase 2C: 회사명 boilerplate 제외 패턴 =====
+    # 이런 회사들은 정기적으로 수익률/거래실적 등을 공시 → 단타 매매와 무관
+    EXCLUDE_CORP_PATTERNS = [
+        '증권', '자산운용', '투자신탁', '인베스트먼트', '인베스트',
+        '리츠', '리얼티', 'REITs', 'REIT',
+        'KODEX', 'TIGER', 'KBSTAR', 'ARIRANG', 'KOSEF', 'SOL', 'HANARO',
+        '스팩', 'SPAC', '제X호', '코아',
+        '신탁', '캐피탈', '저축은행',
+    ]
+
+    # ===== Phase 2C: 보고서명 boilerplate 제외 패턴 =====
+    EXCLUDE_REPORT_PATTERNS = [
+        '거래실적', '수익률공시', '월간운용보고', '분기영업실적',
+        '주식등의대량보유상황보고서',  # 5% 보고는 시세 영향 약함
+        '특수관계인',
+        '임원ㆍ주요주주특정증권등소유상황보고서',
+        '최대주주변경', '대주주변경',
+        '의결권', '주주총회',
+        '정정', '취소', '연기',
+    ]
+
+    # ===== Phase 2C: 카테고리별 최소 금액 임계값 (억원) =====
+    # 너무 작은 계약/투자는 시세 영향 미미 → 배제
+    MIN_AMOUNT_BY_CATEGORY = {
+        '계약': 50,    # 단일 공급계약 50억 이상만
+        '투자': 100,   # 투자/지분취득 100억 이상만
+        '실적': 0,     # 실적은 금액 무관 (별도 분석)
+        '기술': 0,     # 기술/특허는 금액 무관
+        '배당': 0,     # 배당은 금액 무관
+        '대형': 500,   # 대형 카테고리는 500억 이상
+    }
 
     # 카테고리별 기본 점수
     CATEGORY_SCORES = {
@@ -186,37 +230,73 @@ class DartFilter:
         return filtered
 
     def _filter_positive(self, disclosures: List[Dict]) -> List[DisclosureInfo]:
-        """긍정적 공시만 필터링하고 DisclosureInfo로 변환"""
+        """긍정적 공시만 필터링하고 DisclosureInfo로 변환 (Phase 2C 정제)
+
+        필터 순서:
+        1. corp_cls 검증 (Y/K만 - 유가증권/코스닥)
+        2. 회사명 boilerplate 제외 (증권사/리츠/ETF 등)
+        3. 보고서명 boilerplate 제외 (거래실적/수익률공시 등)
+        4. 부정적 키워드 제외
+        5. 긍정적 키워드 매칭
+        6. 카테고리별 최소 금액 임계값 검증
+        """
         positive = []
 
         for disc in disclosures:
+            corp_cls = disc.get('corp_cls', '')
+            corp_name = disc.get('corp_name', '')
+            stock_code = disc.get('stock_code', '').replace('A', '')
             report_nm = disc.get('report_nm', '')
 
-            # 부정적 키워드 체크 (제외)
-            is_negative = any(neg in report_nm for neg in self.NEGATIVE_KEYWORDS)
-            if is_negative:
+            # 1. corp_cls 검증: Y(유가증권) or K(코스닥)만 통과
+            #    N(코넥스), E(기타) 제외
+            if corp_cls and corp_cls not in ('Y', 'K'):
                 continue
 
-            # 긍정적 키워드 체크
+            # 단축코드 없는 종목 제외 (펀드/REITs 등은 단축코드가 없거나 비표준)
+            if not stock_code or len(stock_code) != 6:
+                continue
+
+            # 2. 회사명 boilerplate 제외
+            if any(pat in corp_name for pat in self.EXCLUDE_CORP_PATTERNS):
+                continue
+
+            # 3. 보고서명 boilerplate 제외
+            if any(pat in report_nm for pat in self.EXCLUDE_REPORT_PATTERNS):
+                continue
+
+            # 4. 부정적 키워드 체크
+            if any(neg in report_nm for neg in self.NEGATIVE_KEYWORDS):
+                continue
+
+            # 5. 긍정적 키워드 매칭
             matched_category = None
             for category, keywords in self.POSITIVE_KEYWORDS.items():
                 if any(kw in report_nm for kw in keywords):
                     matched_category = category
                     break
 
-            if matched_category:
-                info = DisclosureInfo(
-                    corp_code=disc.get('corp_code', ''),
-                    corp_name=disc.get('corp_name', ''),
-                    stock_code=disc.get('stock_code', '').replace('A', ''),
-                    report_nm=report_nm,
-                    rcept_dt=disc.get('rcept_dt', ''),
-                    rcept_no=disc.get('rcept_no', ''),
-                    category=matched_category,
-                    amount=self._extract_amount(report_nm),
-                    is_positive=True
-                )
-                positive.append(info)
+            if not matched_category:
+                continue
+
+            # 6. 카테고리별 최소 금액 임계값
+            amount = self._extract_amount(report_nm)
+            min_amount = self.MIN_AMOUNT_BY_CATEGORY.get(matched_category, 0)
+            if min_amount > 0 and amount > 0 and amount < min_amount:
+                continue
+
+            info = DisclosureInfo(
+                corp_code=disc.get('corp_code', ''),
+                corp_name=corp_name,
+                stock_code=stock_code,
+                report_nm=report_nm,
+                rcept_dt=disc.get('rcept_dt', ''),
+                rcept_no=disc.get('rcept_no', ''),
+                category=matched_category,
+                amount=amount,
+                is_positive=True
+            )
+            positive.append(info)
 
         return positive
 
