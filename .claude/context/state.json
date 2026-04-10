@@ -1,8 +1,8 @@
 {
-  "current_phase": "ready_for_monday_validation",
-  "last_updated": "2026-04-10T19:00:00+09:00",
+  "current_phase": "ready_for_monday_validation_v2",
+  "last_updated": "2026-04-11T01:00:00+09:00",
   "project": "news-trading-bot",
-  "task": "Arena 5팀 체제 완성 + Pearl 디자인 + 데이터 소스 전체 검증",
+  "task": "Arena 5팀 + Pearl + KRX 통합 + 3주 backtest + Team C fix",
   "active_systems": {
     "arena": {
       "status": "정상 운영 (5팀)",
@@ -71,18 +71,41 @@
   },
   "completed_phases": [
     "Phase 1: 레거시 1세대 모닝스캔 시스템 폐지 (16개 파일 삭제)",
-    "Phase 2A: Team A 보강 (MA5 + 거래량 3배) - 백테스트 +6.3%/100% 승률",
+    "Phase 2A: Team A 보강 (MA5 + 거래량 3배)",
     "Phase 2B: Team B 손실 방지 (RSI≤35 + KOSPI -2% 차단)",
     "Phase 2C: DART 키워드 정제 (97% 노이즈 제거)",
     "Phase 2.5a: 테마 스냅샷 cron (7일 누적 시작)",
     "Phase 2.5b: 수급 데이터 소스 (Naver 스크래핑으로 해결)",
-    "Phase 3F: Team F 신규 Frontier Gap - 백테스트 +5.3%/88% 승률",
+    "Phase 3F: Team F 신규 Frontier Gap (team_e)",
     "Phase 7A: Frontend 5팀 + 한국식 색상 + 이모지 정리",
     "Phase 7B-lite: H2H Hero + JetBrains Mono + 하단 탭바",
     "Phase 7C: Today 탭 신규 (Pearl KPI 첫 화면)",
+    "Phase 7D: 5팀 KRX 통합 + 3주 backtest 인프라 + 실측 검증",
+    "Phase 7E: Beta Contrarian 강화 시도 → 폐기 (uncommitted)",
+    "Phase 7F: Echo Flow 신규 시도 → 중단 (사용자 결정)",
+    "Phase 7G: Team C DART target_date fix (매핑률 0%→100%)",
+    "Phase 7H: Team C 카테고리 가중치 조정 (단타 framework)",
     "theme_policy 0종목 fix (시장 단위 fetch)",
-    "Telegram 메시지 디자인 (Premium Minimal - 이모지 충돌 해결)"
+    "Telegram 메시지 디자인 (Premium Minimal)"
   ],
+  "backtest_3week_results": {
+    "period": "2026-03-23 ~ 2026-04-10",
+    "trading_days": 14,
+    "initial_capital": 10000000,
+    "results": {
+      "team_a_alpha_momentum": "+27.45% (44/70 win, 63%) ✅ 검증됨",
+      "team_e_echo_frontier": "+23.80% (41/68 win, 60%) ✅ 검증됨",
+      "team_d_delta_theme": "-0.62% (35/70 win, 50%) ⚠ break-even",
+      "team_c_gamma_disclosure": "Phase 7G/7H 후 -3.20% (2/7 win) ⚠ 신호 약",
+      "team_b_beta_contrarian": "-24.74% (1/33 win, 3%) ❌ Critical - Monday 결정"
+    },
+    "key_findings": [
+      "Phase 2A Alpha + Phase 3F Echo가 단타 framework winning combo",
+      "Phase 2B 손실 방지(KOSPI 차단) 03-23(-6.49%), 04-02(-3.22%) 작동 확인",
+      "Beta Contrarian: RSI 단독으로 단타 mean reversion 신호 부족",
+      "DART 호재 공시: 단독으로는 단타 신호 약함 (multi-signal 필요)"
+    ]
+  },
   "pending_phases": {
     "Phase 2D": {
       "description": "Team D 대장주 + 수급 가산 보강",
@@ -103,17 +126,21 @@
     "9. 테마 스냅샷 cron 16:30 실행 (data/theme_snapshots/themes_20260413.json)"
   ],
   "git_commits_today": [
-    "cadbe6f - Arena 운영 정상화 4팀 동시 리셋",
+    "cadbe6f - Arena 정상화 4팀 동시 리셋",
     "4f482ac - Phase 1 레거시 폐지 16개 파일",
     "4c0188b - Phase 2A/2B/3F/2.5a 일괄 적용",
-    "eed84ef - 텔레그램 디자인 개선 (Premium Minimal)",
+    "eed84ef - 텔레그램 디자인 (Premium Minimal)",
     "007de4f - theme_policy 0종목 fix",
     "889ec46 - Phase 2C DART 키워드 정제",
-    "23efcb6 - Phase 7A 5팀 + 한국식 색상 + 이모지 정리",
+    "23efcb6 - Phase 7A 5팀 + 한국식 색상",
     "5801350 - Phase 7B-lite H2H Hero + 하단 탭바",
     "e778681 - Phase 7C Today 탭 신규",
-    "4622850 - Today 탭 헬스체크 fallback + 5팀 헤더",
-    "dacd4c3 - Naver 수급 유틸 (KIS 대안)"
+    "4622850 - Today 탭 fallback + 5팀 헤더",
+    "dacd4c3 - Naver 수급 유틸",
+    "ad71233 - 세션 1차 마무리 state.json",
+    "d0a9eb5 - Phase 7D 5팀 KRX 통합 + 3주 backtest",
+    "6b01f8a - Phase 7G DART target_date fix",
+    "6d3c287 - Phase 7H DART 가중치 조정"
   ],
   "project_phase": {
     "current": "운영 검증 단계 (5팀 체제 완성, Monday 자동 실행 대기)",
