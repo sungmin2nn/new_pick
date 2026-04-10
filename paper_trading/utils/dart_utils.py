@@ -108,16 +108,24 @@ class DartFilter:
         '대형': 500,   # 대형 카테고리는 500억 이상
     }
 
-    # 카테고리별 기본 점수
+    # 카테고리별 기본 점수 (Phase 7H: 단타 framework 재조정)
+    # 단타 영향도 기반:
+    # - 계약/실적/대형: 강 (즉각 갭상승 가능)
+    # - 투자/기술: 중 (양면, 장기 호재)
+    # - 배당/기타: 약 (밸류주 효과, 단타 무관)
     CATEGORY_SCORES = {
-        '실적': 20,
-        '계약': 15,
-        '투자': 12,
-        '기술': 10,
-        '배당': 8,
-        '대형': 18,
-        '기타': 5
+        '계약': 30,    # 대형 수주/공급계약 (단타 #1 호재)
+        '실적': 25,    # 잠정/확정실적 서프라이즈
+        '대형': 25,    # 역대최대/대규모 (강 호재)
+        '투자': 10,    # M&A, 증자 (희석 위험 양면)
+        '기술': 8,     # 특허, 임상 (장기 호재, 단타 약)
+        '배당': 3,     # 배당 (밸류주 매수, 단타 무관)
+        '기타': 0
     }
+
+    # Phase 7H: 시점 가산 (전일 18시 이후 = 신선한 호재)
+    # rcept_dt가 어제(전일)면 1.5x — 시초가 매수 가능 시간대
+    FRESHNESS_BONUS_MULT = 1.5
 
     def __init__(self, api_key: str = None):
         """
@@ -504,6 +512,13 @@ class DartFilter:
 
         disclosures = self.get_recent_disclosures(target_date=target_date)
 
+        # Phase 7H: 시점 가산용 기준일 계산 (전일 = "신선한" 호재)
+        if target_date:
+            target_dt = datetime.strptime(target_date, '%Y%m%d')
+        else:
+            target_dt = datetime.now()
+        yesterday_str = (target_dt - timedelta(days=1)).strftime('%Y%m%d')
+
         # 종목별로 그룹핑
         stock_scores = {}
         for disc in disclosures:
@@ -516,13 +531,17 @@ class DartFilter:
 
             stock_scores[code].disclosures.append(disc)
 
-        # 점수 계산
+        # 점수 계산 (Phase 7H: 카테고리 가중치 + 시점 가산)
         results = []
         for code, score in stock_scores.items():
-            score.disclosure_score = sum(
-                self.CATEGORY_SCORES.get(d.category, 5) for d in score.disclosures
-            )
-            score.disclosure_score = min(score.disclosure_score, 40)
+            total = 0
+            for d in score.disclosures:
+                base = self.CATEGORY_SCORES.get(d.category, 0)
+                # 시점 가산: 전일(어제) 공시 = 신선 = 1.5x
+                if d.rcept_dt == yesterday_str:
+                    base *= self.FRESHNESS_BONUS_MULT
+                total += base
+            score.disclosure_score = min(total, 40)
             score.total_score = score.disclosure_score
             results.append((code, score))
 
