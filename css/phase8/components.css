@@ -1,0 +1,916 @@
+/* ============================================================
+   Phase 8 Components (Pearl-style)
+   ============================================================ */
+
+/* ========================================================
+   1. CARDS
+   ======================================================== */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--duration-default) var(--easing-spring);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.card-subtitle {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+/* Double-Bezel Card (Premium - soft-skill) */
+.card-bezel {
+  border-radius: var(--radius-2xl);
+  padding: 6px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-bezel-outer);
+}
+
+.card-bezel-inner {
+  border-radius: calc(var(--radius-2xl) - 6px);
+  background: var(--bg-surface);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-bezel-inset);
+}
+
+/* ========================================================
+   2. KPI TILE
+   ======================================================== */
+.kpi {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.kpi-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.kpi-value.up { color: var(--up); }
+.kpi-value.down { color: var(--down); }
+
+.kpi-meta {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kpi-meta .num {
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+}
+
+.kpi-icon {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9em;
+  background: var(--accent-bg);
+  color: var(--accent-deep);
+}
+
+/* ========================================================
+   3. KPI GRID
+   ======================================================== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+/* ========================================================
+   4. TABLES (Sticky header)
+   ======================================================== */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+}
+
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+
+.tbl thead {
+  position: sticky;
+  top: 0;
+  background: var(--bg-overlay);
+  z-index: var(--z-elevated);
+}
+
+.tbl th {
+  text-align: left;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.tbl th.right { text-align: right; }
+.tbl th.center { text-align: center; }
+
+.tbl td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.tbl td.right { text-align: right; }
+.tbl td.center { text-align: center; }
+.tbl td.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.tbl tbody tr {
+  transition: background var(--duration-fast);
+}
+
+.tbl tbody tr:hover {
+  background: var(--bg-overlay);
+}
+
+.tbl tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Table cell semantic colors */
+.tbl td.cell-up {
+  color: var(--up);
+  font-weight: var(--fw-semibold);
+}
+.tbl td.cell-down {
+  color: var(--down);
+  font-weight: var(--fw-semibold);
+}
+
+/* ========================================================
+   5. STATUS PILL (Semantic)
+   ======================================================== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.pill-success {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: var(--success-border);
+}
+
+.pill-warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-color: var(--warning-border);
+}
+
+.pill-critical {
+  background: var(--critical-bg);
+  color: var(--critical);
+  border-color: var(--critical-border);
+}
+
+.pill-up {
+  background: var(--up-bg);
+  color: var(--up);
+  border-color: var(--up-border);
+}
+
+.pill-down {
+  background: var(--down-bg);
+  color: var(--down);
+  border-color: var(--down-border);
+}
+
+.pill-accent {
+  background: var(--accent-bg);
+  color: var(--accent-deep);
+  border-color: var(--accent-border);
+}
+
+.pill-neutral {
+  background: var(--neutral-bg);
+  color: var(--text-tertiary);
+  border-color: var(--border-default);
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+}
+
+/* ========================================================
+   6. STATUS BAR (Sticky Top)
+   ======================================================== */
+.status-bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-default);
+  padding: var(--space-3) var(--space-4);
+}
+
+.status-bar-inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.status-bar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--fs-sm);
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.status-bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.status-bar .num {
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+
+.status-bar .divider {
+  color: var(--text-muted);
+  margin: 0 var(--space-1);
+}
+
+/* ========================================================
+   7. H2H HERO CARD (Top 2 Head-to-Head)
+   ======================================================== */
+.h2h {
+  background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-overlay) 100%);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: var(--space-5);
+}
+
+.h2h-header {
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--border-default);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  background: var(--bg-overlay);
+}
+
+.h2h-body {
+  padding: var(--space-6) var(--space-5);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.h2h-team {
+  text-align: center;
+}
+
+.h2h-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-2xl);
+  margin: 0 auto var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.6em;
+  font-weight: var(--fw-extrabold);
+  border: 1px solid currentColor;
+}
+
+.h2h-name {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  margin-bottom: var(--space-1);
+  color: var(--text-primary);
+}
+
+.h2h-desc {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.h2h-return {
+  font-family: var(--font-mono);
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-extrabold);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2);
+  line-height: 1;
+}
+
+.h2h-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+.h2h-vs {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  color: var(--text-muted);
+}
+
+.h2h-gap {
+  text-align: center;
+  padding: var(--space-3) var(--space-5) var(--space-4);
+  border-top: 1px solid var(--border-default);
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+.h2h-gap-pill {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--accent-bg);
+  color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-weight: var(--fw-bold);
+}
+
+@media (max-width: 640px) {
+  .h2h-body {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  .h2h-vs {
+    display: none;
+  }
+  .h2h-badge {
+    width: 52px;
+    height: 52px;
+    font-size: 1.4em;
+  }
+  .h2h-return {
+    font-size: var(--fs-2xl);
+  }
+}
+
+/* ========================================================
+   8. TEAM CARD GRID
+   ======================================================== */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.team-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-left: 4px solid var(--text-muted);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+  transition: all var(--duration-default) var(--easing-spring);
+  position: relative;
+}
+
+.team-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
+}
+
+.team-card[data-rank="1"] { border-left-color: var(--team-a); }
+.team-card[data-rank="2"] { border-left-color: var(--team-b); }
+.team-card[data-rank="3"] { border-left-color: var(--team-c); }
+.team-card[data-rank="4"] { border-left-color: var(--team-d); }
+.team-card[data-rank="5"] { border-left-color: var(--team-e); }
+
+.team-medal {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-4);
+  font-size: var(--fs-xl);
+}
+
+.team-card .name {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  margin-bottom: var(--space-1);
+}
+
+.team-card .desc {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.team-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.team-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.team-stat-label {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+.team-stat-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+/* ========================================================
+   9. SUB TABS (Inside main tab)
+   ======================================================== */
+.sub-tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 2px solid var(--border-default);
+  margin-bottom: var(--space-5);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sub-tab {
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-family: inherit;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-medium);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-spring);
+  white-space: nowrap;
+}
+
+.sub-tab:hover {
+  color: var(--accent-deep);
+}
+
+.sub-tab.active {
+  color: var(--accent-deep);
+  border-bottom-color: var(--accent);
+  font-weight: var(--fw-semibold);
+}
+
+.sub-pane {
+  display: none;
+  animation: fadeInUp var(--duration-default) var(--easing-spring) both;
+}
+
+.sub-pane.active {
+  display: block;
+}
+
+/* ========================================================
+   10. MAIN TABS (Arena | BNF) - Top Navigation
+   ======================================================== */
+.main-tabs {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.main-tab {
+  flex: 1;
+  max-width: 200px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-base);
+  color: var(--text-tertiary);
+  font-family: inherit;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: all var(--duration-default) var(--easing-spring);
+}
+
+.main-tab:hover {
+  border-color: var(--accent);
+  color: var(--accent-deep);
+}
+
+.main-tab.active {
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-card);
+}
+
+.main-pane {
+  display: none;
+}
+
+.main-pane.active {
+  display: block;
+}
+
+/* ========================================================
+   11. BOTTOM NAV (Mobile, 2 tabs)
+   ======================================================== */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-bottom-nav);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-default);
+  padding: var(--space-2) 0 calc(var(--space-2) + env(safe-area-inset-bottom, 0));
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.bottom-nav-inner {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.bottom-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: color var(--duration-fast) var(--easing-spring);
+}
+
+.bottom-tab .icon {
+  font-size: 1.4em;
+  line-height: 1;
+}
+
+.bottom-tab.active {
+  color: var(--accent-deep);
+}
+
+.bottom-tab.active .icon {
+  transform: scale(1.05);
+}
+
+/* ========================================================
+   12. RIGHT DRAWER (Detail panel, NOT modal)
+   ======================================================== */
+.drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: var(--z-drawer);
+  backdrop-filter: blur(2px);
+}
+
+.drawer-backdrop.open {
+  display: block;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-default);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.1);
+  z-index: calc(var(--z-drawer) + 1);
+  transform: translateX(100%);
+  transition: transform var(--duration-slow) var(--easing-spring);
+  overflow-y: auto;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: var(--z-elevated);
+}
+
+.drawer-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--bg-overlay);
+  color: var(--text-secondary);
+  font-size: 1.2em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration-fast);
+}
+
+.drawer-close:hover {
+  background: var(--border-default);
+}
+
+.drawer-body {
+  padding: var(--space-5);
+}
+
+/* ========================================================
+   13. FILTER CHIPS
+   ======================================================== */
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--space-1);
+}
+
+.chip {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--easing-spring);
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent-deep);
+}
+
+.chip.active {
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  border-color: var(--text-primary);
+}
+
+/* ========================================================
+   14. SECTIONS
+   ======================================================== */
+.section {
+  margin-bottom: var(--space-6);
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+}
+
+.section-subtitle {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+
+/* ========================================================
+   15. EMPTY STATE
+   ======================================================== */
+.empty {
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  font-size: 2em;
+  margin-bottom: var(--space-3);
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: var(--fs-sm);
+}
+
+/* ========================================================
+   16. LOADING SKELETON
+   ======================================================== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-overlay) 25%,
+    var(--border-subtle) 50%,
+    var(--bg-overlay) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-text { height: 1em; }
+.skeleton-num  { height: 2em; }
+.skeleton-card { height: 120px; }
+
+/* ========================================================
+   17. SPARKLINE (inline SVG)
+   ======================================================== */
+.sparkline {
+  width: 100%;
+  height: 32px;
+  display: block;
+}
+
+.sparkline-up { stroke: var(--up); }
+.sparkline-down { stroke: var(--down); }
+.sparkline-accent { stroke: var(--accent); }
+
+/* ========================================================
+   18. BUTTONS
+   ======================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-spring);
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-deep);
+  box-shadow: var(--shadow-card);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-inverse);
+}
+
+.btn-primary:hover {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+  color: var(--text-inverse);
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+}

@@ -1,0 +1,176 @@
+/* ============================================================
+   Phase 8 Base (Reset + Typography)
+   ============================================================ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  color: var(--text-primary);
+  background: var(--bg-base);
+  min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  word-break: keep-all;  /* 한국어 자연 줄바꿈 */
+}
+
+/* ========== Typography Helpers ========== */
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  font-feature-settings: 'ss01';
+}
+
+.label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+/* ========== Semantic Color Helpers ========== */
+.up { color: var(--up); }
+.down { color: var(--down); }
+.neutral { color: var(--neutral); }
+.success { color: var(--success); }
+.warning { color: var(--warning); }
+.critical { color: var(--critical); }
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent); }
+
+/* ========== Korean Typography Refinements ========== */
+h1, h2, h3, h4, h5, h6 {
+  word-break: keep-all;
+  line-height: 1.3;
+}
+
+h1 {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+}
+
+h2 {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+}
+
+h3 {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+}
+
+p {
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+/* ========== Links ========== */
+a {
+  color: var(--accent-deep);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--easing-spring);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+/* ========== Code ========== */
+code, pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+code {
+  background: var(--bg-overlay);
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+/* ========== Scrollbar (Pearl 스타일) ========== */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========== Pulse Animation (Live Indicator) ========== */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+.pulse-dot {
+  animation: pulse-soft 2s var(--easing-smooth) infinite;
+}
+
+/* ========== Fade In Up (Page Load) ========== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--easing-spring) both;
+}
+
+/* ========== Container ========== */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--space-6);
+  }
+}
+
+/* ========== Selection ========== */
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+/* ========== Focus ring (접근성) ========== */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

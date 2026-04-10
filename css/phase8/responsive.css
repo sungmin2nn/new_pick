@@ -1,0 +1,109 @@
+/* ============================================================
+   Phase 8 Responsive (Mobile First)
+   ============================================================ */
+
+/* ========== Mobile (≤768px) ========== */
+@media (max-width: 768px) {
+  body {
+    font-size: 13px;
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0) + var(--space-4));
+  }
+
+  .page-content {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .card {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  /* KPI grid: 2 cols on mobile */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .kpi-value {
+    font-size: var(--fs-2xl);
+  }
+
+  /* Sub tabs: scroll */
+  .sub-tabs {
+    margin-left: calc(-1 * var(--space-3));
+    margin-right: calc(-1 * var(--space-3));
+    padding: 0 var(--space-3);
+  }
+
+  .sub-tab {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--fs-sm);
+  }
+
+  /* Main tabs (Arena | BNF) - hide on mobile, use bottom nav */
+  .main-tabs {
+    display: none;
+  }
+
+  /* Bottom nav: show on mobile */
+  .bottom-nav {
+    display: block;
+  }
+
+  /* Status bar: tighter */
+  .status-bar {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .status-bar-left {
+    font-size: var(--fs-xs);
+  }
+
+  /* Section padding */
+  .section {
+    margin-bottom: var(--space-5);
+  }
+
+  .section-title {
+    font-size: var(--fs-lg);
+  }
+
+  /* Tables: keep horizontal scroll */
+  .tbl {
+    font-size: var(--fs-xs);
+  }
+  .tbl th, .tbl td {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* ========== Tablet (769px ~ 1024px) ========== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ========== Desktop (≥1025px) ========== */
+@media (min-width: 1025px) {
+  .kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* ========== Reduce motion ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

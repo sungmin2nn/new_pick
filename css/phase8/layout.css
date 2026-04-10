@@ -1,0 +1,90 @@
+/* ============================================================
+   Phase 8 Layout (Bento Grid + Common Layouts)
+   ============================================================ */
+
+/* ========== Page Layout ========== */
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-base);
+  padding-bottom: var(--space-8);
+}
+
+.page-content {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .page-content {
+    padding: var(--space-6);
+  }
+}
+
+/* ========== Bento Grid Patterns ========== */
+
+/* Bento 12-column */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-4);
+}
+
+.bento .span-3 { grid-column: span 3; }
+.bento .span-4 { grid-column: span 4; }
+.bento .span-5 { grid-column: span 5; }
+.bento .span-6 { grid-column: span 6; }
+.bento .span-7 { grid-column: span 7; }
+.bento .span-8 { grid-column: span 8; }
+.bento .span-9 { grid-column: span 9; }
+.bento .span-12 { grid-column: span 12; }
+
+/* Bento mobile collapse */
+@media (max-width: 768px) {
+  .bento {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+  .bento .span-3,
+  .bento .span-4,
+  .bento .span-5,
+  .bento .span-6,
+  .bento .span-7,
+  .bento .span-8,
+  .bento .span-9,
+  .bento .span-12 {
+    grid-column: span 1;
+  }
+}
+
+/* ========== Stack ========== */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stack-sm { gap: var(--space-2); }
+.stack-md { gap: var(--space-4); }
+.stack-lg { gap: var(--space-6); }
+
+/* ========== Inline ========== */
+.inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.inline-sm { gap: var(--space-1); }
+.inline-md { gap: var(--space-3); }
+.inline-lg { gap: var(--space-4); }
+
+/* ========== Justify ========== */
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+
+/* ========== Flex helpers ========== */
+.flex-1 { flex: 1; min-width: 0; }
+.flex-wrap { flex-wrap: wrap; }
