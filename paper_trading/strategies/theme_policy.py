@@ -158,7 +158,12 @@ class ThemePolicyStrategy(BaseStrategy):
             return []
 
     def _fetch_stock_data(self, codes: List[str], date: str, code_to_themes: Dict = None) -> List[Dict]:
-        """종목 데이터 수집"""
+        """종목 데이터 수집
+
+        Fix (Phase 7C): 종목별 1회 호출 대신 시장 전체 1회 fetch + 매핑.
+        - 기존: get_market_ohlcv_by_date(date,date,ticker) × N → 미래 날짜에 빈 결과
+        - 신규: get_market_ohlcv_by_ticker(date, market) × 2 → 현재 snapshot에서 추출
+        """
         stocks = []
 
         if pykrx_stock is None:
@@ -167,24 +172,44 @@ class ThemePolicyStrategy(BaseStrategy):
         if code_to_themes is None:
             code_to_themes = {}
 
-        for code in codes:
+        if not codes:
+            return stocks
+
+        codes_set = set(codes)
+
+        # KOSPI + KOSDAQ 시장 1회 fetch
+        market_data = {}  # code -> row
+        for market in ['KOSPI', 'KOSDAQ']:
             try:
-                df = pykrx_stock.get_market_ohlcv_by_date(
-                    fromdate=date, todate=date, ticker=code
-                )
-
-                if df.empty:
+                df = pykrx_stock.get_market_ohlcv_by_ticker(date, market=market)
+                if df is None or df.empty:
                     continue
+                # df.index가 종목코드, columns에 종목명/종가/등락률/거래량/거래대금
+                for code in df.index:
+                    if code in codes_set:
+                        market_data[code] = df.loc[code]
+            except Exception as e:
+                print(f"[WARNING] {market} fetch 실패: {e}")
+                continue
 
-                row = df.iloc[0]
+        for code in codes:
+            row = market_data.get(code)
+            if row is None:
+                continue
+            try:
                 close = int(row['종가'])
+                if close == 0:
+                    continue
                 change = float(row['등락률']) if '등락률' in row else 0
-                volume = int(row['거래량'])
+                volume = int(row['거래량']) if '거래량' in row else 0
                 trading_value = int(row['거래대금']) if '거래대금' in row else 0
+                name = row.get('종목명', '') if hasattr(row, 'get') else (row['종목명'] if '종목명' in row else '')
+                if not name:
+                    try:
+                        name = pykrx_stock.get_market_ticker_name(code)
+                    except Exception:
+                        name = code
 
-                name = pykrx_stock.get_market_ticker_name(code)
-
-                # 소속 테마 정보
                 themes_info = code_to_themes.get(code, [])
                 theme_names = [t['name'] for t in themes_info] if themes_info else []
                 max_theme_change = max([t['change_pct'] for t in themes_info], default=0) if themes_info else 0
@@ -197,9 +222,8 @@ class ThemePolicyStrategy(BaseStrategy):
                     'volume': volume,
                     'trading_value': trading_value,
                     'themes': theme_names,
-                    'theme_strength': max_theme_change  # 소속 테마 중 최고 상승률
+                    'theme_strength': max_theme_change
                 })
-
             except Exception as e:
                 print(f"[WARNING] {code} 스킵: {e}")
                 continue
