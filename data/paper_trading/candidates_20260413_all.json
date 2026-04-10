@@ -1,12 +1,12 @@
 {
   "date": "20260413",
-  "generated_at": "2026-04-10 17:56:13",
+  "generated_at": "2026-04-10 19:02:39",
   "strategies": {
     "largecap_contrarian": {
       "strategy_id": "largecap_contrarian",
       "strategy_name": "대형주 역추세",
       "date": "20260413",
-      "selected_at": "2026-04-10 17:54:59",
+      "selected_at": "2026-04-10 19:01:31",
       "count": 5,
       "candidates": [
         {
@@ -115,7 +115,7 @@
       "strategy_id": "momentum",
       "strategy_name": "모멘텀 추세",
       "date": "20260413",
-      "selected_at": "2026-04-10 17:55:44",
+      "selected_at": "2026-04-10 19:02:12",
       "count": 5,
       "candidates": [
         {
@@ -222,54 +222,54 @@
       "strategy_id": "theme_policy",
       "strategy_name": "테마/정책",
       "date": "20260413",
-      "selected_at": "2026-04-10 17:56:07",
+      "selected_at": "2026-04-10 19:02:35",
       "count": 0,
       "candidates": [],
       "params": {
         "active_themes": [
           {
-            "name": "탈 플라스틱(친환경/생분해성 등)",
-            "change_pct": 2.18
-          },
-          {
-            "name": "비철금속",
-            "change_pct": 1.74
-          },
-          {
-            "name": "윤활유",
-            "change_pct": 1.73
-          },
-          {
-            "name": "2차전지(생산)",
-            "change_pct": 1.53
-          },
-          {
-            "name": "스마트그리드(지능형전력망)",
-            "change_pct": 1.37
-          },
-          {
             "name": "마이크로 LED",
-            "change_pct": 1.21
+            "change_pct": 4.03
           },
           {
-            "name": "LPG(액화석유가스)",
-            "change_pct": 0.99
+            "name": "소캠(SOCAMM)",
+            "change_pct": 3.97
           },
           {
-            "name": "주류업(주정, 에탄올 등)",
-            "change_pct": 0.95
+            "name": "CXL(컴퓨트익스프레스링크)",
+            "change_pct": 3.51
           },
           {
-            "name": "반도체 대표주(생산)",
-            "change_pct": 0.93
+            "name": "건설기계",
+            "change_pct": 3.44
           },
           {
-            "name": "2026 상반기 신규상장",
-            "change_pct": 0.82
+            "name": "건설 중소형",
+            "change_pct": 3.02
+          },
+          {
+            "name": "우크라이나 재건",
+            "change_pct": 2.84
+          },
+          {
+            "name": "아이폰",
+            "change_pct": 2.7
+          },
+          {
+            "name": "냉각시스템(액침냉각 등)",
+            "change_pct": 2.68
+          },
+          {
+            "name": "유심(USIM)",
+            "change_pct": 2.63
+          },
+          {
+            "name": "수자원(양적/질적 개선)",
+            "change_pct": 2.63
           }
         ],
         "theme_count": 10,
-        "total_stocks": 117,
+        "total_stocks": 174,
         "weights": {
           "theme_relevance": 40,
           "change_pct": 25,
@@ -283,7 +283,7 @@
       "strategy_id": "dart_disclosure",
       "strategy_name": "DART 공시",
       "date": "20260413",
-      "selected_at": "2026-04-10 17:56:13",
+      "selected_at": "2026-04-10 19:02:39",
       "count": 0,
       "candidates": [],
       "params": {
@@ -296,6 +296,28 @@
         "min_market_cap": 100000000000,
         "max_market_cap": 10000000000000,
         "min_trading_value": 1000000000
+      },
+      "simulation": null
+    },
+    "frontier_gap": {
+      "strategy_id": "frontier_gap",
+      "strategy_name": "프론티어 갭",
+      "date": "20260413",
+      "selected_at": "2026-04-10 19:02:39",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "gap_min": 2.0,
+        "gap_max": 5.0,
+        "min_price": 3000,
+        "min_trading_value": 50,
+        "volume_surge_mult": 2.0,
+        "weights": {
+          "gap_pct": 40,
+          "volume_surge": 35,
+          "trading_value": 15,
+          "price_level": 10
+        }
       },
       "simulation": null
     }
