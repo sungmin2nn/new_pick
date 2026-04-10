@@ -161,111 +161,10 @@
         /* Chart */
         .chart-container { height: 200px; margin: 10px 0; }
 
-        /* Pearl: JetBrains Mono for numbers */
-        .num {
-            font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -0.02em;
-        }
-        .display {
-            font-family: 'Geist', 'Pretendard', sans-serif;
-            letter-spacing: -0.01em;
-        }
-
-        /* Pearl: H2H Hero Card (Top 2 head-to-head) */
-        .h2h-card {
-            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFB 100%);
-            border-radius: 16px;
-            border: 1px solid #E5E7EB;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-        .h2h-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid #E5E7EB;
-            font-size: 0.7em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            color: #6B7280;
-            text-transform: uppercase;
-        }
-        .h2h-body {
-            padding: 28px 20px;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 16px;
-        }
-        .h2h-team { text-align: center; }
-        .h2h-team .badge-circle {
-            width: 64px; height: 64px; border-radius: 18px;
-            margin: 0 auto 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4em; font-weight: 800;
-            font-family: 'Geist', sans-serif;
-        }
-        .h2h-team .name {
-            font-size: 1.05em; font-weight: 700; margin-bottom: 4px;
-        }
-        .h2h-team .desc {
-            font-size: 0.7em; color: #6B7280; margin-bottom: 12px;
-        }
-        .h2h-team .return {
-            font-size: 1.8em; font-weight: 800;
-        }
-        .h2h-team .meta {
-            font-size: 0.7em; color: #6B7280; margin-top: 8px;
-        }
-        .h2h-vs {
-            font-size: 1.4em; font-weight: 800; color: #9CA3AF;
-            font-family: 'Geist', sans-serif;
-        }
-        .h2h-gap {
-            text-align: center; padding-top: 16px; border-top: 1px solid #E5E7EB;
-            font-size: 0.75em; color: #6B7280;
-        }
-        .h2h-gap .pill {
-            display: inline-block; padding: 4px 12px; border-radius: 999px;
-            background: rgba(0,198,190,0.1); color: #00A39C;
-            font-weight: 700; margin-left: 8px;
-        }
-
-        /* Pearl: Bottom Mobile Tab Bar */
-        .bottom-nav {
-            display: none;
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: #FFFFFF;
-            border-top: 1px solid #E5E7EB;
-            padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0));
-            z-index: 100;
-            box-shadow: 0 -2px 12px rgba(0,0,0,0.05);
-        }
-        .bottom-nav-inner {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            max-width: 600px; margin: 0 auto;
-        }
-        .bottom-tab {
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-            padding: 6px 4px; border: none; background: transparent;
-            font-size: 0.65em; color: #9CA3AF; cursor: pointer;
-            font-family: inherit; transition: color 0.2s;
-        }
-        .bottom-tab .icon { font-size: 1.2em; }
-        .bottom-tab.active { color: #00C6BE; font-weight: 700; }
-        .bottom-tab.active .icon { transform: scale(1.1); }
-
         @media (max-width: 768px) {
             .team-grid { grid-template-columns: 1fr; }
             .tab-bar { gap: 0; }
             .tab-item { padding: 8px 12px; font-size: 0.8em; }
-            .h2h-body { grid-template-columns: 1fr; gap: 24px; }
-            .h2h-vs { display: none; }
-            .h2h-team .badge-circle { width: 52px; height: 52px; font-size: 1.2em; }
-            .bottom-nav { display: block; }
-            body { padding-bottom: 80px; }
         }
     </style>
     <link rel="stylesheet" href="css/supanova-theme.css">
@@ -339,27 +238,6 @@
 
 </div>
 
-<!-- Pearl: Bottom Mobile Tab Bar -->
-<nav class="bottom-nav">
-    <div class="bottom-nav-inner">
-        <button class="bottom-tab active" data-tab="leaderboard" onclick="showTab('leaderboard')">
-            <span class="icon">🏆</span><span>리더보드</span>
-        </button>
-        <button class="bottom-tab" data-tab="teams" onclick="showTab('teams')">
-            <span class="icon">👥</span><span>팀 상세</span>
-        </button>
-        <button class="bottom-tab" data-tab="history" onclick="showTab('history')">
-            <span class="icon">📈</span><span>히스토리</span>
-        </button>
-        <button class="bottom-tab" data-tab="system" onclick="showTab('system')">
-            <span class="icon">⚙️</span><span>시스템</span>
-        </button>
-        <button class="bottom-tab" data-tab="bnf" onclick="showTab('bnf')">
-            <span class="icon">🎯</span><span>BNF</span>
-        </button>
-    </div>
-</nav>
-
 <script>
 // ======================== CONFIG ========================
 const TEAM_META = {
@@ -396,12 +274,8 @@ function updateTime() {
 function showTab(tabId) {
     document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.bottom-tab').forEach(el => el.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
-    // 상단 탭과 하단 탭 모두 active 표시
-    document.querySelectorAll(`.tab-item[onclick*="${tabId}"]`).forEach(el => el.classList.add('active'));
-    document.querySelectorAll(`.bottom-tab[data-tab="${tabId}"]`).forEach(el => el.classList.add('active'));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    event.target.classList.add('active');
 }
 
 // ======================== DATA LOADING ========================
@@ -519,53 +393,7 @@ function renderLeaderboard() {
         </div>`;
     });
 
-    // H2H Top 2 Hero card
-    const top1 = teams[0], top2 = teams[1];
-    let h2hHtml = '';
-    if (top1 && top2) {
-        const meta1 = TEAM_META[top1.team_id] || {};
-        const meta2 = TEAM_META[top2.team_id] || {};
-        const pf1 = portfolios[top1.team_id] || {};
-        const pf2 = portfolios[top2.team_id] || {};
-        const today1 = leaderboardData?.daily_history?.slice(-1)[0]?.ranking?.find(r => r.team_id === top1.team_id);
-        const today2 = leaderboardData?.daily_history?.slice(-1)[0]?.ranking?.find(r => r.team_id === top2.team_id);
-        const ret1 = today1?.total_return ?? pf1.total_return_pct ?? 0;
-        const ret2 = today2?.total_return ?? pf2.total_return_pct ?? 0;
-        const arrow1 = ret1 > 0 ? '▲' : ret1 < 0 ? '▼' : '─';
-        const arrow2 = ret2 > 0 ? '▲' : ret2 < 0 ? '▼' : '─';
-        const cls1 = ret1 > 0 ? 'positive' : ret1 < 0 ? 'negative' : 'neutral';
-        const cls2 = ret2 > 0 ? 'positive' : ret2 < 0 ? 'negative' : 'neutral';
-        const wr1 = pf1.total_trades > 0 ? Math.round(pf1.total_wins / pf1.total_trades * 100) : 0;
-        const wr2 = pf2.total_trades > 0 ? Math.round(pf2.total_wins / pf2.total_trades * 100) : 0;
-        const gap = Math.abs(ret1 - ret2).toFixed(2);
-        h2hHtml = `
-        <div class="h2h-card">
-            <div class="h2h-header">🏆 TOP 2 HEAD-TO-HEAD</div>
-            <div class="h2h-body">
-                <div class="h2h-team">
-                    <div class="badge-circle" style="background:${meta1.color}15; color:${meta1.color}; border:1px solid ${meta1.color}40;">1</div>
-                    <div class="name">${top1.team_name || meta1.name}</div>
-                    <div class="desc">${meta1.desc || ''}</div>
-                    <div class="num return ${cls1}">${arrow1} ${ret1 >= 0 ? '+' : ''}${ret1.toFixed(2)}%</div>
-                    <div class="num meta">ELO <b>${top1.elo || 1000}</b> · 승률 <b>${wr1}%</b></div>
-                </div>
-                <div class="h2h-vs">VS</div>
-                <div class="h2h-team">
-                    <div class="badge-circle" style="background:${meta2.color}15; color:${meta2.color}; border:1px solid ${meta2.color}40;">2</div>
-                    <div class="name">${top2.team_name || meta2.name}</div>
-                    <div class="desc">${meta2.desc || ''}</div>
-                    <div class="num return ${cls2}">${arrow2} ${ret2 >= 0 ? '+' : ''}${ret2.toFixed(2)}%</div>
-                    <div class="num meta">ELO <b>${top2.elo || 1000}</b> · 승률 <b>${wr2}%</b></div>
-                </div>
-            </div>
-            <div class="h2h-gap" style="padding:0 20px 16px;">
-                리드 격차 <span class="num pill">${gap}%p</span>
-            </div>
-        </div>`;
-    }
-
     container.innerHTML = `
-        ${h2hHtml}
         <div class="card">
             <h2>🏆 ELO 랭킹 (5팀)</h2>
             <div class="team-grid">${cardsHtml}</div>
