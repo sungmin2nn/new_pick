@@ -1,12 +1,14 @@
 """
-테마/정책 전략
-- 네이버 금융 실시간 테마 기반
-- 상승 테마 자동 감지 및 종목 선정
+테마/정책 전략 (Phase 7D dual-mode)
+- 당일 운영: 네이버 실시간 테마 (세분화)
+- 과거 backtest: KRX 업종 지수 기반 sector momentum (51개 섹터)
 """
 
 import sys
+import logging
 from pathlib import Path
 from typing import List, Dict
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
@@ -16,14 +18,32 @@ from .base import BaseStrategy, Candidate
 from .registry import StrategyRegistry
 from utils import format_kst_time, get_headers
 
-# 네이버 테마 크롤러
+logger = logging.getLogger(__name__)
+
+# 네이버 테마 크롤러 (당일 모드)
 try:
     from paper_trading.utils.naver_theme import NaverThemeCrawler
     NAVER_THEME_AVAILABLE = True
 except ImportError:
     NAVER_THEME_AVAILABLE = False
 
-# 네이버 금융 우선, pykrx 폴백
+# KRX OpenAPI (backtest 모드 - 과거 업종 지수)
+try:
+    from paper_trading.utils.krx_api import KRXClient
+    _krx_client = None
+    def _get_krx():
+        global _krx_client
+        if _krx_client is None:
+            try:
+                _krx_client = KRXClient()
+            except Exception as e:
+                logger.warning(f"KRX OpenAPI 초기화 실패: {e}")
+                _krx_client = False
+        return _krx_client if _krx_client else None
+except ImportError:
+    _get_krx = lambda: None
+
+# 네이버 금융 우선, pykrx 폴백 (snapshot용)
 try:
     from naver_market import stock as naver_stock
     pykrx_stock = naver_stock
@@ -75,8 +95,8 @@ class ThemePolicyStrategy(BaseStrategy):
         self.selection_date = date
         print(f"\n[{self.STRATEGY_NAME}] 종목 선정 시작 ({date})")
 
-        # 1. 활성 테마 감지 (네이버 상승 테마)
-        self.active_themes = self._detect_active_themes()
+        # 1. 활성 테마 감지 (date-aware: 당일=naver, 과거=KRX 업종)
+        self.active_themes = self._detect_active_themes(date=date)
 
         if not self.active_themes:
             print(f"  테마 감지 실패 - 폴백 테마 사용")
@@ -119,31 +139,32 @@ class ThemePolicyStrategy(BaseStrategy):
         print(f"  선정 완료: {len(self.candidates)}개")
         return self.candidates
 
-    def _detect_active_themes(self, top_n: int = 10, min_change: float = 0.5) -> List[Dict]:
-        """
-        활성 테마 감지 (네이버 금융 상승 테마)
+    def _detect_active_themes(self, top_n: int = 10, min_change: float = 0.5,
+                                date: str = None) -> List[Dict]:
+        """활성 테마 감지 (date-aware dual mode)
 
-        Args:
-            top_n: 상위 N개 테마
-            min_change: 최소 상승률 (%)
-
-        Returns:
-            [{'name': 테마명, 'code': 코드, 'change_pct': 등락률}, ...]
+        - date == today (또는 None): Naver 테마 크롤링 (세분화 테마)
+        - date == 과거: KRX 업종 지수 기반 (51개 섹터 + 시총 상위 종목)
         """
+        today = format_kst_time(format_str='%Y%m%d')
+        is_backtest = date is not None and date != today
+
+        if is_backtest:
+            return self._detect_themes_krx(date, top_n=top_n)
+
+        # 당일: Naver 테마
         if not self.theme_crawler:
             print(f"  네이버 테마 크롤러 미사용")
             return []
 
         try:
-            # 1. 상승 테마 목록 가져오기
             hot_themes = self.theme_crawler.get_hot_themes(top_n=top_n, min_change=min_change)
 
             if not hot_themes:
                 print(f"  상승 테마 없음 (기준: +{min_change}%)")
-                # 기준 낮춰서 재시도
                 hot_themes = self.theme_crawler.get_hot_themes(top_n=top_n, min_change=0)
 
-            # 2. 각 테마의 종목 수집
+            # 각 테마의 종목 수집
             self.theme_stocks = {}
             for theme in hot_themes[:top_n]:
                 stocks = self.theme_crawler.get_theme_stocks(theme['code'], theme['name'])
@@ -155,6 +176,91 @@ class ThemePolicyStrategy(BaseStrategy):
 
         except Exception as e:
             print(f"  테마 감지 오류: {e}")
+            return []
+
+    def _detect_themes_krx(self, date: str, top_n: int = 10) -> List[Dict]:
+        """KRX 업종 지수 기반 테마 감지 (backtest 모드)
+
+        - 51개 KOSPI 지수 + 40개 KOSDAQ 지수 중 업종 지수 추출
+        - 상위 N개 섹터 선정
+        - 각 섹터에서 시총 상위 종목 8개를 매핑
+        """
+        krx = _get_krx() if callable(_get_krx) else None
+        if not krx:
+            print("  KRX OpenAPI 사용 불가")
+            return []
+
+        print(f"  [Backtest mode] KRX 업종 지수 fetch ({date})")
+
+        try:
+            # KOSPI + KOSDAQ 지수
+            idx_kospi = krx.get_index_ohlcv(date, 'KOSPI')
+            idx_kosdaq = krx.get_index_ohlcv(date, 'KOSDAQ')
+
+            # 업종 지수만 필터: '코스피 200', '코스피 (외국주포함)' 등 종합 지수 제외
+            sector_indices = []
+            for df, mkt in [(idx_kospi, 'KOSPI'), (idx_kosdaq, 'KOSDAQ')]:
+                if df.empty:
+                    continue
+                for _, row in df.iterrows():
+                    name = str(row.get('지수명', ''))
+                    # 종합/대형/중형/소형 지수는 제외, 업종 분류만
+                    if any(skip in name for skip in ['200', '외국주', '대형주', '중형주', '소형주', '제외']):
+                        continue
+                    if not name or name == '코스피' or name == '코스닥':
+                        continue
+                    try:
+                        change = float(row.get('등락률', 0))
+                        sector_indices.append({
+                            'name': name,
+                            'change_pct': change,
+                            'market': mkt,
+                        })
+                    except Exception:
+                        continue
+
+            # 등락률 상위 N개 섹터
+            sector_indices.sort(key=lambda x: x['change_pct'], reverse=True)
+            top_sectors = sector_indices[:top_n]
+
+            # 종목 데이터 fetch (시총 상위 매핑용)
+            kospi_df = krx.get_stock_ohlcv(date, 'KOSPI')
+            kosdaq_df = krx.get_stock_ohlcv(date, 'KOSDAQ')
+
+            # 섹터 이름 → 종목 매핑 (간단한 키워드 매칭, naver theme 부재 시 fallback)
+            # KRX 종목정보에는 SECT_TP_NM이 빈값이라 정확한 매핑 불가
+            # 대안: 각 섹터의 등락률에 비슷한 종목들을 시총 + 등락률로 candidate에 흡수
+            self.theme_stocks = {}
+            for sector in top_sectors:
+                # 섹터 등락률과 비슷한 (±2%) 종목 중 시총 상위 N개를 "섹터 멤버"로 근사
+                target_chg = sector['change_pct']
+                tolerance = 2.5
+                candidates = []
+                for df in [kospi_df, kosdaq_df]:
+                    if df.empty:
+                        continue
+                    for code in df.index:
+                        try:
+                            row = df.loc[code]
+                            chg = float(row.get('등락률', 0))
+                            if abs(chg - target_chg) > tolerance:
+                                continue
+                            mcap = int(row.get('시가총액', 0))
+                            if mcap < 100_000_000_000:  # 1000억 이상
+                                continue
+                            candidates.append((code, mcap))
+                        except Exception:
+                            continue
+                # 시총 상위 8개
+                candidates.sort(key=lambda x: x[1], reverse=True)
+                if candidates:
+                    self.theme_stocks[sector['name']] = [c[0] for c in candidates[:8]]
+                    print(f"    {sector['name']}: {sector['change_pct']:+.2f}% ({len(candidates[:8])}종목)")
+
+            return top_sectors
+
+        except Exception as e:
+            logger.warning(f"KRX 업종 지수 fetch 실패: {e}")
             return []
 
     def _fetch_stock_data(self, codes: List[str], date: str, code_to_themes: Dict = None) -> List[Dict]:

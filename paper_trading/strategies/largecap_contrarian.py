@@ -132,39 +132,68 @@ class LargecapContrarianStrategy(BaseStrategy):
         return self.candidates
 
     def _fetch_market_data(self, date: str) -> List[Dict]:
-        """시장 데이터 수집"""
+        """시장 데이터 수집 (Phase 7D: KRX OpenAPI 우선)
+
+        - KRX는 OHLCV + 시가총액(MKTCAP)을 1번 호출에 모두 포함 → 효율
+        - Historical 지원으로 backtest 가능
+        - Naver 폴백 (당일만)
+        """
+        # 1차: KRX OpenAPI
+        krx = _get_krx() if callable(_get_krx) else None
+        if krx:
+            stocks = []
+            try:
+                for market in ['KOSPI', 'KOSDAQ']:
+                    df = krx.get_stock_ohlcv(date, market=market)
+                    if df.empty:
+                        continue
+                    for code in df.index:
+                        try:
+                            row = df.loc[code]
+                            close = int(row['종가'])
+                            if close == 0:
+                                continue
+                            stocks.append({
+                                'code': code,
+                                'name': str(row.get('종목명', code)),
+                                'price': close,
+                                'change_pct': float(row.get('등락률', 0)),
+                                'volume': int(row.get('거래량', 0)),
+                                'trading_value': int(row.get('거래대금', 0)),
+                                'market_cap': int(row.get('시가총액', 0)),
+                                'market': market,
+                            })
+                        except Exception:
+                            continue
+                if stocks:
+                    return stocks
+            except Exception as e:
+                logger.warning(f"  KRX OpenAPI fetch 실패, naver 폴백: {e}")
+
+        # 2차: Naver 폴백
         if pykrx_stock is None:
             print("  pykrx 없음")
             return []
 
         stocks = []
-
         try:
-            # 코스피 + 코스닥
             for market in ['KOSPI', 'KOSDAQ']:
                 df = pykrx_stock.get_market_ohlcv_by_ticker(date, market=market)
                 cap_df = pykrx_stock.get_market_cap_by_ticker(date, market=market)
-
                 if df.empty:
                     continue
-
                 for code in df.index:
                     try:
                         row = df.loc[code]
                         cap_row = cap_df.loc[code] if code in cap_df.index else None
-
                         close = int(row['종가'])
                         if close == 0:
                             continue
-
                         change = float(row['등락률']) if '등락률' in row else 0
                         volume = int(row['거래량'])
                         trading_value = int(row['거래대금']) if '거래대금' in row else 0
-
                         market_cap = int(cap_row['시가총액']) if cap_row is not None else 0
-
                         name = pykrx_stock.get_market_ticker_name(code)
-
                         stocks.append({
                             'code': code,
                             'name': name,

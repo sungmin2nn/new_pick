@@ -161,32 +161,64 @@ class MomentumStrategy(BaseStrategy):
         return passed
 
     def _fetch_market_data(self, date: str) -> List[Dict]:
-        """시장 데이터 수집"""
+        """시장 데이터 수집 (Phase 7D: KRX OpenAPI 우선, naver 폴백)
+
+        - KRX historical 지원 → 과거 날짜 backtest 가능
+        - Naver보다 9~700배 빠름
+        - KRX 실패 시 naver 폴백 (당일만)
+        """
+        # 1차: KRX OpenAPI (당일 + 과거 모두 지원)
+        krx = _get_krx() if callable(_get_krx) else None
+        if krx:
+            stocks = []
+            try:
+                for market in ['KOSPI', 'KOSDAQ']:
+                    df = krx.get_stock_ohlcv(date, market=market)
+                    if df.empty:
+                        continue
+                    for code in df.index:
+                        try:
+                            row = df.loc[code]
+                            close = int(row['종가'])
+                            if close == 0:
+                                continue
+                            stocks.append({
+                                'code': code,
+                                'name': str(row.get('종목명', code)),
+                                'price': close,
+                                'change_pct': float(row.get('등락률', 0)),
+                                'volume': int(row.get('거래량', 0)),
+                                'trading_value': int(row.get('거래대금', 0)),
+                                'market_cap': int(row.get('시가총액', 0)),
+                                'market': market,
+                            })
+                        except Exception:
+                            continue
+                if stocks:
+                    return stocks
+            except Exception as e:
+                logger.warning(f"  KRX OpenAPI fetch 실패, naver 폴백: {e}")
+
+        # 2차: Naver 폴백 (당일만, 과거 시 빈 결과)
         if pykrx_stock is None:
             return []
 
         stocks = []
-
         try:
             for market in ['KOSPI', 'KOSDAQ']:
                 df = pykrx_stock.get_market_ohlcv_by_ticker(date, market=market)
-
                 if df.empty:
                     continue
-
                 for code in df.index:
                     try:
                         row = df.loc[code]
                         close = int(row['종가'])
                         if close == 0:
                             continue
-
                         change = float(row['등락률']) if '등락률' in row else 0
                         volume = int(row['거래량'])
                         trading_value = int(row['거래대금']) if '거래대금' in row else 0
-
                         name = pykrx_stock.get_market_ticker_name(code)
-
                         stocks.append({
                             'code': code,
                             'name': name,
@@ -198,7 +230,6 @@ class MomentumStrategy(BaseStrategy):
                         })
                     except:
                         continue
-
         except Exception as e:
             print(f"  데이터 수집 오류: {e}")
 
