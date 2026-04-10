@@ -86,14 +86,31 @@ class StatusChecker:
 
     def _load_candidates(self, date: str) -> List[Dict]:
         """선정 종목 로드"""
-        # candidates 파일 먼저 확인
+        # 1) 레거시 단일 전략 파일
         candidates_file = DATA_DIR / f"candidates_{date}.json"
         if candidates_file.exists():
             with open(candidates_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 return data.get('candidates', [])
 
-        # result 파일에서 selection 확인
+        # 2) 다중 전략 통합 파일 (현재 구조)
+        all_file = DATA_DIR / f"candidates_{date}_all.json"
+        if all_file.exists():
+            with open(all_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            merged: List[Dict] = []
+            seen = set()
+            strategies = data.get('strategies', {}) if isinstance(data, dict) else {}
+            for sid, result in strategies.items():
+                for c in result.get('candidates', []):
+                    code = c.get('code')
+                    if code and code not in seen:
+                        seen.add(code)
+                        merged.append(c)
+            if merged:
+                return merged
+
+        # 3) result 파일에서 selection 확인
         result_file = DATA_DIR / f"result_{date}.json"
         if result_file.exists():
             with open(result_file, 'r', encoding='utf-8') as f:

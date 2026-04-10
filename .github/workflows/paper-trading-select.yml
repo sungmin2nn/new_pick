@@ -3,8 +3,9 @@ name: Paper Trading - Morning Select (Multi-Strategy)
 
 on:
   schedule:
-    # 매일 08:00 KST (23:00 UTC 전날) - 장 시작 전 종목 선정
-    - cron: '0 23 * * 0-4'
+    # 매일 16:30 KST (07:30 UTC) - 장 마감 후 다음 거래일용 종목 선정
+    # 장 마감(15:30) 후 30분 버퍼 → naver 최종 종가/등락률 안정화
+    - cron: '30 7 * * 1-5'
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
@@ -46,6 +47,7 @@ jobs:
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       env:
         TZ: Asia/Seoul
+        DART_API_KEY: ${{ secrets.DART_API_KEY }}
       run: |
         python -c "
         from paper_trading.multi_strategy_runner import run_all_strategies
