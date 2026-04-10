@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arena - 4팀 경쟁 트레이딩</title>
+    <title>Arena - 5팀 경쟁 트레이딩</title>
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/adriel-theme.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
@@ -88,10 +88,18 @@
         .team-stat .label { color: #6B7280; font-size: 0.85em; }
         .team-stat .value { font-weight: 600; font-size: 0.9em; }
 
-        /* Colors */
-        .positive { color: #10B981; }
-        .negative { color: #EF4444; }
+        /* Colors - 한국식 상승 빨강 / 하락 파랑 (Pearl Design Guide) */
+        .positive { color: #EF4444; }  /* 상승/익절/양수 = 빨강 */
+        .negative { color: #3B82F6; }  /* 하락/손절/음수 = 파랑 */
         .neutral { color: #6B7280; }
+        /* 5팀 색상 토큰 */
+        :root {
+            --team-a: #EF4444;  /* Alpha - 빨강 */
+            --team-b: #3B82F6;  /* Beta - 파랑 */
+            --team-c: #10B981;  /* Gamma - 초록 */
+            --team-d: #F59E0B;  /* Delta - 노랑 */
+            --team-e: #8B5CF6;  /* Echo - 보라 */
+        }
 
         /* Table */
         .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -233,12 +241,13 @@
 <script>
 // ======================== CONFIG ========================
 const TEAM_META = {
-    team_a: { name: 'Alpha Momentum', emoji: '🔴', strategy: 'momentum', desc: '모멘텀 추세 추종' },
-    team_b: { name: 'Beta Contrarian', emoji: '🔵', strategy: 'largecap_contrarian', desc: '대형주 역발상' },
-    team_c: { name: 'Gamma Disclosure', emoji: '🟢', strategy: 'dart_disclosure', desc: 'DART 공시 기반' },
-    team_d: { name: 'Delta Theme', emoji: '🟡', strategy: 'theme_policy', desc: '테마/정책 수혜' },
+    team_a: { name: 'Alpha Momentum',   strategy: 'momentum',           desc: '모멘텀 추세 추종 (MA5 + 거래량 급증)', color: '#EF4444' },
+    team_b: { name: 'Beta Contrarian',  strategy: 'largecap_contrarian', desc: '대형주 역발상 (RSI + 시장모드)',     color: '#3B82F6' },
+    team_c: { name: 'Gamma Disclosure', strategy: 'dart_disclosure',     desc: 'DART 공시 기반 호재 (Phase 2C 정제)', color: '#10B981' },
+    team_d: { name: 'Delta Theme',      strategy: 'theme_policy',        desc: '테마/정책 수혜 종목',                color: '#F59E0B' },
+    team_e: { name: 'Echo Frontier',    strategy: 'frontier_gap',        desc: '시초가 갭 + 거래량 surge (단타 골든타임)', color: '#8B5CF6' },
 };
-const MEDALS = ['🥇','🥈','🥉','4️⃣'];
+const MEDALS = ['🥇','🥈','🥉','4','5'];
 const DATA_BASE = 'data/arena';
 const BNF_BASE = 'data/bnf';
 
@@ -340,7 +349,6 @@ function renderLeaderboard() {
         teams = Object.keys(TEAM_META).map(tid => ({
             team_id: tid,
             team_name: TEAM_META[tid].name,
-            emoji: TEAM_META[tid].emoji,
             elo: 1000,
         }));
     }
@@ -364,14 +372,15 @@ function renderLeaderboard() {
         const returnAmt = pf.total_return_amount || 0;
         const returnAmtClass = returnAmt > 0 ? 'positive' : returnAmt < 0 ? 'negative' : 'neutral';
 
+        const teamColor = meta.color || '#6B7280';
         cardsHtml += `
-        <div class="team-card ${rankClass}">
+        <div class="team-card ${rankClass}" style="border-left: 4px solid ${teamColor};">
             <div class="rank-badge">${MEDALS[Math.min(i, 3)]}</div>
-            <div class="team-name">${t.emoji || meta.emoji} ${t.team_name || meta.name}</div>
+            <div class="team-name">${t.team_name || meta.name}</div>
             <div class="team-desc">${meta.desc || ''}</div>
             <div class="team-stat"><span class="label">ELO</span><span class="value">${t.elo || 1000}</span></div>
-            <div class="team-stat" style="background:${todayReturn > 0 ? 'rgba(16,185,129,0.05)' : todayReturn < 0 ? 'rgba(239,68,68,0.05)' : 'transparent'}; border-radius:4px;">
-                <span class="label">오늘 수익률</span><span class="value ${todayRetClass}">${todayReturn >= 0 ? '+' : ''}${todayReturn.toFixed(2)}%</span>
+            <div class="team-stat" style="background:${todayReturn > 0 ? 'rgba(239,68,68,0.05)' : todayReturn < 0 ? 'rgba(59,130,246,0.05)' : 'transparent'}; border-radius:4px;">
+                <span class="label">오늘 수익률</span><span class="value ${todayRetClass}">${todayReturn >= 0 ? '▲ +' : '▼ '}${todayReturn.toFixed(2)}%</span>
             </div>
             <div class="team-stat"><span class="label">누적 수익률</span><span class="value ${retClass}">${returnPct >= 0 ? '+' : ''}${returnPct.toFixed(2)}%</span></div>
             <div class="team-stat"><span class="label">누적 손익</span><span class="value ${returnAmtClass}">${returnAmt >= 0 ? '+' : ''}${returnAmt.toLocaleString()}원</span></div>
@@ -386,11 +395,11 @@ function renderLeaderboard() {
 
     container.innerHTML = `
         <div class="card">
-            <h2>🏆 ELO 랭킹</h2>
+            <h2>🏆 ELO 랭킹 (5팀)</h2>
             <div class="team-grid">${cardsHtml}</div>
         </div>
         <div class="card">
-            <h2>📈 4팀 누적 수익률 비교</h2>
+            <h2>📈 5팀 누적 수익률 비교</h2>
             <div class="chart-container" style="height:250px;"><canvas id="lbReturnChart"></canvas></div>
         </div>
         <div class="card">
@@ -406,7 +415,7 @@ function drawLeaderboardCharts() {
     if (history.length === 0) return;
 
     const teamIds = Object.keys(TEAM_META);
-    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B' };
+    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B', team_e: '#8B5CF6' };
     const labels = history.map(h => h.date);
 
     // 1. 누적 수익률 비교 차트
@@ -420,7 +429,7 @@ function drawLeaderboardCharts() {
                 return Math.round(cum * 100) / 100;
             });
             return {
-                label: `${TEAM_META[tid].emoji} ${TEAM_META[tid].name}`,
+                label: TEAM_META[tid].name,
                 data,
                 borderColor: colors[tid],
                 backgroundColor: 'transparent',
@@ -475,7 +484,7 @@ function drawLeaderboardCharts() {
 
         const eloLabels = ['시작', ...labels];
         const eloDatasets = teamIds.map(tid => ({
-            label: `${TEAM_META[tid].emoji} ${TEAM_META[tid].name}`,
+            label: TEAM_META[tid].name,
             data: eloHistory[tid],
             borderColor: colors[tid],
             backgroundColor: 'transparent',
@@ -509,7 +518,7 @@ function renderTeams() {
 
         html += `
         <div class="card">
-            <h2>${meta.emoji} ${meta.name}</h2>
+            <h2 style="border-left: 4px solid ${meta.color || '#6B7280'}; padding-left: 10px;">${meta.name}</h2>
             <p style="color:#6B7280; margin-bottom:12px; font-size:0.85em;">${meta.desc}</p>
 
             <h3>📊 포트폴리오 현황</h3>
@@ -755,7 +764,7 @@ function drawTeamChart(tid, labels, data) {
     const ctx = document.getElementById(`teamChart_${tid}`);
     if (!ctx || labels.length === 0) return;
 
-    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B' };
+    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B', team_e: '#8B5CF6' };
     const color = colors[tid] || '#00C6BE';
 
     new Chart(ctx, {
@@ -803,7 +812,7 @@ function renderHistory() {
 
     // Table
     const teamIds = history[0]?.ranking?.map(r => r.team_id) || Object.keys(TEAM_META);
-    let headerCells = '<th>날짜</th>' + teamIds.map(tid => `<th>${TEAM_META[tid]?.emoji || ''} ${TEAM_META[tid]?.name || tid}</th>`).join('');
+    let headerCells = '<th>날짜</th>' + teamIds.map(tid => `<th>${TEAM_META[tid]?.name || tid}</th>`).join('');
 
     let rows = '';
     for (const entry of [...history].reverse().slice(0, 30)) {
@@ -842,7 +851,7 @@ function drawHistoryChart(history, teamIds) {
     const ctx = document.getElementById('historyChart');
     if (!ctx) return;
 
-    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B' };
+    const colors = { team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B', team_e: '#8B5CF6' };
     const datasets = teamIds.map(tid => {
         let cum = 0;
         const data = history.map(entry => {
