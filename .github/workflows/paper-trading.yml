@@ -105,20 +105,8 @@ jobs:
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
         python -c "
-        # Arena 대시보드
         from paper_trading.arena.dashboard import generate_arena_dashboard
         generate_arena_dashboard()
-
-        # 기존 리포트도 생성
-        try:
-            from auto_reporter import AutoReporter
-            reporter = AutoReporter()
-            reporter.generate_daily_report()
-            reporter.update_knowledge_base()
-            reporter.generate_html_dashboard()
-            reporter.aggregate_paper_trading_results()
-        except Exception as e:
-            print(f'기존 리포트 생성 오류 (무시): {e}')
         print('대시보드 생성 완료')
         "
 

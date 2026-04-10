@@ -1,57 +1,104 @@
 {
-  "current_phase": "completed",
-  "last_updated": "2026-04-06T15:00:00+09:00",
+  "current_phase": "in_progress",
+  "last_updated": "2026-04-10T14:35:00+09:00",
   "project": "news-trading-bot",
-  "task": "프로젝트 정리 및 문서화 업데이트",
-  "agent_results": [
+  "task": "Arena 정상화 + 레거시 폐지 + 6팀 확장 (검증 단계)",
+  "active_systems": {
+    "arena": {
+      "status": "정상화 진행 중",
+      "teams": 4,
+      "planned_teams": 6,
+      "workflows": ["paper-trading.yml", "paper-trading-check.yml", "paper-trading-select.yml(폐지 검토)"],
+      "data_dir": "data/arena/",
+      "dashboard": "index.html",
+      "reset_date": "2026-04-10"
+    },
+    "bnf": {
+      "status": "정상 운영",
+      "workflows": ["bnf-selection.yml", "bnf-simulation.yml"],
+      "data_dir": "data/bnf/",
+      "dashboard": "bnf_dashboard.html"
+    }
+  },
+  "deprecated_systems": {
+    "morning_scan": {
+      "status": "폐지 예정 (Agent 검증 중)",
+      "reason": "1세대 레거시, 사용자 미인지 운영, 중복 작업",
+      "files_to_delete": [
+        ".github/workflows/morning-scan.yml",
+        ".github/workflows/afternoon-collect.yml",
+        "stock_screener.py",
+        "database.py",
+        "disclosure_collector.py",
+        "investor_collector.py",
+        "market_data.py",
+        "market_sentiment.py",
+        "naver_investor.py",
+        "news_collector.py",
+        "technical_analysis.py",
+        "export_history.py",
+        "auto_reporter.py",
+        "paper_trading/scheduler.py",
+        "system_guide.html",
+        "data/dashboard_report.html"
+      ]
+    }
+  },
+  "in_progress_validations": [
     {
-      "request_id": "req-cleanup-001",
-      "agent": "dev-agent-cleanup",
-      "status": "success",
-      "summary": "백테스트 대시보드 및 관련 파일 삭제 (18개 파일)"
+      "agent_role": "audit-agent (L1 Core)",
+      "task": "삭제 안전성 검증 - 의존성 추적 + mv 시뮬레이션",
+      "status": "running"
     },
     {
-      "request_id": "req-docs-001",
-      "agent": "dev-agent-docs",
-      "status": "success",
-      "summary": "README.md, PROJECT_KNOWLEDGE_BASE.md, IMPLEMENTATION_SUMMARY.md 전면 개편"
+      "agent_role": "backtest-agent (L2 Domain)",
+      "task": "보강 4 + 신규 2 전략 백테스트 (pykrx 04-01~04-10)",
+      "status": "running"
+    },
+    {
+      "agent_role": "test+cicd (L3 Utility)",
+      "task": "GitHub end-to-end 체크리스트 작성",
+      "status": "running"
     }
   ],
-  "artifacts": [
-    "README.md",
-    "IMPLEMENTATION_SUMMARY.md",
-    "docs/PROJECT_KNOWLEDGE_BASE.md",
-    "index.html",
-    "bnf_dashboard.html",
-    "system_guide.html"
+  "today_resolved_issues": [
+    "ISSUE-004: paper-trading-select 만성 0종목 - cron 16:30 이동 + DART_API_KEY 추가",
+    "ISSUE-005: team_c/d portfolio 부재 - 4팀 1천만원 동시 리셋",
+    "ISSUE-006: status_*.json 미생성 - checker.py 폴백 추가"
   ],
-  "git_commits": [
-    "5d309a6 - Remove backtest dashboard and related files",
-    "50b7df2 - Update project documentation"
+  "today_open_issues": [
+    "ISSUE-007: 1세대 모닝스캔 백그라운드 운영 - Agent 검증 후 일괄 삭제 예정"
+  ],
+  "git_commits_today": [
+    "cadbe6f - Arena 운영 정상화 - 4팀 동시 시작 + 선정 파이프라인 수정"
   ],
   "current_structure": {
     "dashboards": [
-      "index.html (페이퍼 트레이딩)",
-      "bnf_dashboard.html (BNF 낙폭과대)",
-      "system_guide.html (가이드)"
+      "index.html (Arena 메인)",
+      "bnf_dashboard.html (BNF)"
     ],
     "strategies": {
-      "paper_trading": ["모멘텀", "대형주 역추세", "DART 공시", "테마/정책"],
+      "arena": ["Alpha Momentum", "Beta Contrarian", "Gamma Disclosure", "Delta Theme"],
+      "arena_planned": ["Echo Flow (외국인+기관 수급)", "Frontier Gap (시초가 갭+골든타임)"],
       "bnf": ["낙폭과대 분할매수", "트레일링 스탑", "분할매도"]
     },
     "automation": {
-      "morning_scan": "08:30 종목 선정",
-      "intraday_collect": "16:30 결과 수집"
+      "arena_main": "16:10 KST - paper-trading.yml (매매 정산 + 다음날 종목 선정)",
+      "arena_check": "10/12/14/17 KST - paper-trading-check.yml (헬스체크)",
+      "bnf_sim": "09:30 + 15:30 KST - bnf-simulation.yml",
+      "bnf_select": "16:30 KST - bnf-selection.yml"
     }
   },
   "project_phase": {
-    "current": "Phase 1 - 백테스팅 (전략 검증)",
-    "next": "Phase 2 - 모의투자",
+    "current": "Phase 1 - 정상화 + 검증 (Agent 진행 중)",
+    "next": "Phase 2 - 4팀 보강 (MA5/RSI/시점가산/대장주)",
+    "after": "Phase 3 - 신규 2팀 추가 (Echo Flow + Frontier Gap)",
     "roadmap": [
-      "Phase 1: 전략 수립 및 백테스팅 (진행 중)",
-      "Phase 2: 모의투자 (HTS)",
-      "Phase 3: 소액 실매매 (10~50만원)",
-      "Phase 4: 본격 자동매매"
+      "Phase 1: Arena 정상화 + 레거시 폐지 + 검증",
+      "Phase 2: 기존 4팀 보강 (전문 단타 framework 적용)",
+      "Phase 3: 신규 2팀 추가 (총 6팀 체제)",
+      "Phase 4: 1~2주 운영 후 ELO 변별력 평가",
+      "Phase 5: 모의투자 → 소액 실매매"
     ]
   }
 }

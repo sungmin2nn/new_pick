@@ -1,5 +1,105 @@
 # 프로젝트 의사결정 기록
 
+## Arena 정상화 + 레거시 폐지 결정 (2026-04-10)
+
+### 1. 4팀 1,000만원 동시 리셋
+
+**결정**: team_a, team_b, team_c, team_d 모두 portfolio.json을 1,000만원으로 동시 리셋. leaderboard ELO 1000 초기화, daily_history 비움.
+
+**배경**:
+- ISSUE-004로 momentum/contrarian/dart는 만성 0종목 → team_a/b만 매매하던 불공정 상태
+- team_c/d는 portfolio.json 자체가 없었음 (ISSUE-005)
+- 04-09 1일치 결과(team_a +24%, team_b -12%)는 team_c/d 부재 환경의 산물 → 통계적 의미 없음
+
+**대안**: team_a/b 결과 보존 + team_c/d만 신규 초기화. 기각 — 시작 시점 불공정.
+
+**근거**: ELO 시스템은 동일 시작 조건에서 통계 의미. 정상화된 파이프라인 위에서 처음부터 공정 경쟁.
+
+---
+
+### 2. paper-trading-select cron 16:30 KST로 이동 (장 마감 후)
+
+**결정**: cron `0 23 * * 0-4` (08:00 KST) → `30 7 * * 1-5` (16:30 KST)
+
+**배경**:
+- 08:00 KST는 KOSPI 개장(09:00) 이전 — naver finance pre-market 데이터는 등락률 0 또는 stale
+- 04-08, 04-09, 04-10 연속 0종목 선정 (momentum/contrarian/dart)
+- 사용자 의도: "장시작 전 종목 선정" — 의미상 "다음 거래일 시초가 매매용 후보 선정"
+- 16:30 (장 마감 15:30 + 30분 버퍼)는 naver 종가 안정화 + 다음 거래일 매매까지 17시간 분석 여유
+
+**대안**: 09:30 KST (개장 후 30분). 기각 — 이미 매매가 시작된 후라 장전 종목 선정 의미 상실.
+
+---
+
+### 3. 레거시 1세대 모닝스캔 시스템 폐지 (Phase 1)
+
+**결정**: morning-scan.yml + afternoon-collect.yml + 14개 Python 모듈 + auto_reporter 산출물 삭제 예정 (검증 후)
+
+**삭제 대상**:
+- 워크플로우: morning-scan.yml, afternoon-collect.yml
+- Python: stock_screener, database, disclosure_collector, investor_collector, market_data, market_sentiment, naver_investor, news_collector, technical_analysis, export_history, auto_reporter, paper_trading/scheduler.py
+- HTML: system_guide.html
+- 산출물: data/dashboard_report.html (stale), data/project_report.html (없음), data/knowledge_base.json (없음)
+
+**유지 대상**:
+- Arena 전체 (`paper_trading/arena/`, `strategies/`, `multi_strategy_runner.py`, `simulator.py`, `selector.py`, `checker.py`)
+- BNF 전체 (`paper_trading/bnf/`)
+- 공통: naver_market.py, intraday_collector.py, telegram_notifier.py, error_logger.py, utils.py, project_logger.py, config.py
+- 대시보드: index.html (Arena), bnf_dashboard.html
+
+**배경**:
+- 1세대(모닝스캔) → 2세대(BNF) → 3세대(Arena) 진화 과정에서 1세대 비활성화 누락
+- 사용자가 1세대 운영 중인 사실을 모르고 있었음 (ISSUE-007)
+- 매일 6+회 미인지 워크플로우 실행 → GitHub Actions 부하, git log 오염
+
+**검증 절차** (실행 중):
+- Agent A (audit-agent, L1): 의존성 추적 + mv 시뮬레이션
+- Agent B (backtest-agent, L2): pykrx 04-01~04-10 보강+신규 전략 백테스트
+- Agent C (test+cicd, L3): GitHub end-to-end 체크리스트 작성
+
+**리스크**: paper-trading.yml의 try/except로 감싼 AutoReporter 호출 1곳. 삭제 전 제거 필요.
+
+---
+
+### 4. Arena 6팀 확장 로드맵 (Phase 2 + Phase 3)
+
+**결정**: 단타 framework 직교성 분석 후 신규 2팀 추가 (총 6팀). Team G(변동성 돌파)는 보류.
+
+**6팀 구성**:
+| # | 팀 | 분류 | 보강/신규 |
+|---|---|---|---|
+| 1 | Alpha Momentum | Trend | 보강 (MA5, 거래량 배수) |
+| 2 | Beta Contrarian | Mean Reversion | 보강 (RSI, 시장모드) |
+| 3 | Gamma Disclosure | Catalyst | 보강 (시점가산, 시너지) |
+| 4 | Delta Theme | Sector | 보강 (대장주, 수급) |
+| 5 | **Echo Flow** | **Order Flow** | **신규** (외국인+기관 동반 순매수) |
+| 6 | **Frontier Gap** | **Gap Trading** | **신규** (시초가 갭 + 골든타임) |
+
+**근거**:
+- 단타 framework 8개 카테고리 중 1~7번 실현 가능, 5(Order Flow)/6(Gap)/7(Volatility)이 빠진 영역
+- ELO 안정성: 6팀 = 15쌍 매칭 (충분한 통계, 너무 복잡하지 않음)
+- 신호 직교성: Echo Flow와 Frontier Gap은 기존 4팀과 신호 거의 안 겹침
+- 전문 자료 (Andrew Aziz, Linda Raschke, Market Wizards): Gap-up + High Relative Volume이 단타 #1 setup, 외국인 매수 동반이 한국 시장 가장 안정적
+
+**보류**: Team G(Volatility Breakout, Larry Williams) — Team A momentum과 부분 상관, Phase 2 결과 보고 변별력 부족 시 추가.
+
+**기각**: News Momentum (Team C와 신호 겹침 → Team C 보강으로 흡수), VWAP (분봉 정밀도 한계), Pair Trading (단타 부적합), Scalping (시뮬레이션 한계).
+
+---
+
+### 5. 검증 우선 원칙
+
+**결정**: 모든 작업 전 1차(local agent) + 2차(GitHub end-to-end) 검증 필수
+
+**배경**: 사용자 명시 — "삭제작업을 해도 문제없는 지 돌려본다", "전략을 4월1일부터의 네이버 데이터를 파악해서 검증". 사용자 요청 — "에이전트를 통해서 해줘", "하네스 프로세스도 활용하고"
+
+**프로세스**:
+1. 1차: Agent A/B/C 병렬 실행, local에서 수행
+2. 2차: GitHub Actions 실제 실행 + 사용자가 체크리스트 따라 수동 검증 (트리거→데이터→대시보드→텔레그램)
+3. 양 단계 통과 후 작업 진행
+
+---
+
 ## 대시보드 개선 (2026-04-05)
 
 ### 1. 리스크 지표 선정
