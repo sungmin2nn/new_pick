@@ -350,29 +350,89 @@ class ArenaManager:
         return None
 
     def format_telegram_daily(self, date: str) -> str:
-        """텔레그램 일일 결과 메시지"""
-        lines = [f"<b>\U0001f3df Arena 일일 결과 ({date})</b>", ""]
+        """텔레그램 일일 결과 메시지 (Design C: 정보 풍부)
 
+        - 팀 색깔 이모지 미사용 (방향 ▲▼─와 의미 충돌 방지)
+        - 4섹션 → 1섹션 통합 (오늘 수익률 기준 정렬)
+        - 1팀 = 5줄 (이름 / 금일 / 잔고 / 매매 / ELO)
+        - ELO 등급 텍스트로 직관적 해석
+        """
+        # 날짜 포맷: 20260410 -> 2026-04-10
+        date_str = f"{date[:4]}-{date[4:6]}-{date[6:8]}" if len(date) == 8 and date.isdigit() else date
+
+        # ELO 매핑
+        elo_map = {tid: tdata.get('elo', 1000)
+                   for tid, tdata in self.leaderboard.data.get('teams', {}).items()}
+
+        # ELO 등급 분류
+        def elo_tier(elo):
+            if elo >= 1100: return "강팀"
+            if elo >= 1050: return "우수"
+            if elo >= 950: return "평균"
+            if elo >= 900: return "약체"
+            return "부진"
+
+        # Day N 계산 (운영 일수 = leaderboard daily_history 길이)
+        day_n = len(self.leaderboard.data.get('daily_history', []))
+
+        # 팀 데이터 수집
+        team_rows = []
         for team_id, team in self.teams.items():
             pf = team.portfolio
-            # 오늘 기록 로드
             records = team.get_daily_records(1)
-            if records and records[0].get("date") == date:
-                sim = records[0].get("simulation", {})
-                daily_ret = sim.get("total_return", 0)
-                icon = "\U0001f7e2" if daily_ret > 0 else "\U0001f534" if daily_ret < 0 else "\u26aa"
-                lines.append(
-                    f"{team.emoji} <b>{team.team_name}</b>\n"
-                    f"  {icon} 오늘: {daily_ret:+.2f}% | "
-                    f"누적: {pf.total_return_pct:+.2f}% | "
-                    f"자금: {pf.current_capital:,.0f}원"
-                )
-            else:
-                lines.append(f"{team.emoji} <b>{team.team_name}</b>: 오늘 결과 없음")
+            rec = records[0] if records and records[0].get("date") == date else None
+            sim = rec.get("simulation", {}) if rec else {}
+            team_rows.append({
+                'id': team_id,
+                'name': team.team_name,
+                'today_pct': sim.get('total_return', None) if rec else None,
+                'today_amt': sim.get('total_return_amount', 0),
+                'cum_pct': pf.total_return_pct,
+                'capital': pf.current_capital,
+                'wins': sim.get('wins', 0),
+                'trades': sim.get('total_trades', 0),
+                'win_rate': sim.get('win_rate', 0),
+                'elo': elo_map.get(team_id, 1000),
+            })
 
-        # ELO
-        lines.append("")
-        lines.append(self.leaderboard.format_telegram(date))
+        # 오늘 수익률 내림차순 정렬 (결과 없는 팀은 맨 뒤)
+        team_rows.sort(key=lambda r: (r['today_pct'] if r['today_pct'] is not None else float('-inf')),
+                       reverse=True)
+
+        medals = ["\U0001f947", "\U0001f948", "\U0001f949", " 4"]
+        lines = [f"<b>📊 ARENA REPORT</b>", f"<i>{date_str} · Day {day_n}</i>", ""]
+        lines.append("━━━━━━━━━━━━━━")
+
+        for i, t in enumerate(team_rows):
+            medal = medals[min(i, 3)]
+            lines.append("")
+
+            if t['today_pct'] is None:
+                lines.append(f"{medal}  <b>{t['name']}</b>")
+                lines.append(f"   금일  결과 없음")
+                lines.append(f"   잔고  {t['capital']:,.0f}원")
+                lines.append(f"   ELO   <b>{t['elo']}</b>  ·  {elo_tier(t['elo'])}")
+                continue
+
+            arrow = "▲" if t['today_pct'] > 0 else "▼" if t['today_pct'] < 0 else "─"
+            amt_sign = "+" if t['today_amt'] >= 0 else ""
+            pct_sign = "+" if t['today_pct'] >= 0 else ""
+            cum_sign = "+" if t['cum_pct'] >= 0 else ""
+            elo_diff = t['elo'] - 1000
+            elo_arrow = "▲" if elo_diff > 0 else "▼" if elo_diff < 0 else "─"
+            elo_diff_str = f"+{elo_diff}" if elo_diff > 0 else f"{elo_diff}" if elo_diff < 0 else "±0"
+            losses = t['trades'] - t['wins']
+
+            lines.append(f"{medal}  <b>{t['name']}</b>")
+            lines.append(
+                f"   금일  {arrow} <b>{amt_sign}{t['today_amt']:,}원</b>  "
+                f"({pct_sign}{t['today_pct']:.2f}%)"
+            )
+            lines.append(f"   잔고  {t['capital']:,.0f}원  ({cum_sign}{t['cum_pct']:.2f}%)")
+            lines.append(f"   매매  {t['wins']}승 {losses}패  ({t['win_rate']:.0f}%)")
+            lines.append(
+                f"   ELO   <b>{t['elo']}</b> {elo_arrow}{elo_diff_str}  ·  {elo_tier(t['elo'])}"
+            )
 
         return "\n".join(lines)
 

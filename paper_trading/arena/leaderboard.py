@@ -167,36 +167,47 @@ class Leaderboard:
         }
 
     def format_telegram(self, date: str) -> str:
-        """텔레그램 알림용 포맷"""
+        """텔레그램 알림용 포맷 (Compact Premium Minimal)
+
+        - 팀 색깔 이모지 미사용 (방향 표시와 의미 충돌 방지)
+        - 메달 🥇🥈🥉 만 사용 (순위 1회용)
+        - 1팀 = 1줄
+        """
         ranking = self.get_ranking()
         history = self.data["daily_history"]
 
-        # 오늘 결과 찾기
         today_entry = None
         for entry in reversed(history):
             if entry["date"] == date:
                 today_entry = entry
                 break
 
-        lines = [f"<b>\U0001f3c6 Arena Leaderboard ({date})</b>", ""]
+        lines = []
 
+        # 오늘 순위 (1팀 = 1줄)
         if today_entry:
-            lines.append("<b>[오늘 결과]</b>")
-            medals = ["\U0001f947", "\U0001f948", "\U0001f949", "4\ufe0f\u20e3"]
+            lines.append("<b>━ 오늘 순위 ━</b>")
+            lines.append("")
+            medals = ["\U0001f947", "\U0001f948", "\U0001f949", " 4"]
             for r in today_entry["ranking"]:
                 medal = medals[min(r["rank"] - 1, 3)]
                 tid = r["team_id"]
                 team = self.data["teams"].get(tid, {})
-                emoji = team.get("emoji", "")
                 name = team.get("team_name", tid)
                 ret = r["total_return"]
-                icon = "\U0001f7e2" if ret > 0 else "\U0001f534" if ret < 0 else "\u26aa"
-                lines.append(f"{medal} {emoji} {name}: {icon} {ret:+.2f}%")
+                arrow = "▲" if ret > 0 else "▼" if ret < 0 else "─"
+                sign = "+" if ret >= 0 else ""
+                lines.append(f"{medal}  {name}  {arrow} <b>{sign}{ret:.2f}%</b>")
             lines.append("")
 
-        lines.append("<b>[ELO 랭킹]</b>")
+        # ELO 누적 (1팀 = 1줄)
+        lines.append("<b>━ ELO 랭킹 ━</b>")
+        lines.append("")
         for t in ranking:
-            emoji = t.get("emoji", "")
-            lines.append(f"  {t['elo_rank']}. {emoji} {t['team_name']}: ELO {t['elo']}")
+            elo = t['elo']
+            diff = elo - 1000
+            arrow = "▲" if diff > 0 else "▼" if diff < 0 else "─"
+            diff_str = f"+{diff}" if diff > 0 else f"{diff}" if diff < 0 else "±0"
+            lines.append(f"{t['elo_rank']}. {t['team_name']}  <b>{elo}</b>  {arrow}{diff_str}")
 
         return "\n".join(lines)
