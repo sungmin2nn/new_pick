@@ -66,17 +66,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 사용 가능한 명령어:
 
 📊 <b>조회</b>
-/status - 현재 포트폴리오 상태
-/today - 오늘 선정 종목
-/pnl - 수익률 현황
+/status (/s) - 현재 포트폴리오 상태
+/today (/t) - 오늘 선정 종목
+/pnl (/p) - 수익률 현황
 
 📈 <b>분석</b>
-/top - 상위 종목 (점수순)
-/signals - 최근 매매 신호
+/top (/tp) - 상위 종목 (점수순)
+/signals (/sg) - 최근 매매 신호
+/strategies (/st) - 전략 4종 설명
 
 ⚙️ <b>기타</b>
-/help - 도움말
-/ping - 봇 상태 확인
+/help (/h) - 도움말
+/ping (/pi) - 봇 상태 확인
 
 아무 텍스트나 입력하면 자연어로 질문할 수 있어요!
 """
@@ -103,8 +104,15 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 <b>/signals</b>
 최근 익절/손절 신호
 
+<b>/strategies</b>
+다중 전략 4종(대형주역추세/모멘텀/테마/DART공시) 설명
+
 <b>/ping</b>
 봇 응답 확인
+
+⚡ <b>단축키</b>
+/s=status, /t=today, /p=pnl, /tp=top
+/sg=signals, /st=strategies, /h=help, /pi=ping
 
 💡 자연어 질문도 가능해요:
 "삼성전자 어때?" "오늘 뭐 살까?"
@@ -285,6 +293,54 @@ async def signals(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(message.strip(), parse_mode='HTML')
 
 
+async def strategies(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """전략 설명"""
+    message = """
+📚 <b>다중 전략 시스템 (4개)</b>
+
+━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ <b>대형주 역추세</b>
+시총 상위 대형주 중 전일 하락 종목에서 반등 기회 포착
+
+• 조건: 시총 1조↑, 전일 -1.5%↓, 거래대금 50억↑
+• 배점: 시총 30 + 하락폭 25 + 거래대금 20 + 가격대 15 + 변동성 10
+• 원리: 대형주는 급락 후 기관/외국인 저가매수로 반등 확률 높음
+
+━━━━━━━━━━━━━━━━━━━━
+
+2️⃣ <b>모멘텀 추세</b>
+전일 급등 종목 중 거래대금 상위 - 추세 추종
+
+• 조건: 전일 +3%~+15%, 거래대금 30억↑
+• 배점: 상승률 35 + 거래대금 30 + 거래량급증 20 + 가격대 15
+• 원리: 강한 상승 추세에 편승, 거래량 수반 시 추가 상승 기대
+
+━━━━━━━━━━━━━━━━━━━━
+
+3️⃣ <b>테마/정책</b>
+네이버 금융 상승 테마 기반 종목 선정
+
+• 조건: 당일 상승 테마 감지 → 테마 내 종목 자동 선정
+• 배점: 테마관련도 40 + 등락률 25 + 거래대금 20 + 테마강도 15
+• 원리: 방산·반도체·바이오 등 시장 테마 흐름에 올라탐
+
+━━━━━━━━━━━━━━━━━━━━
+
+4️⃣ <b>DART 공시</b>
+전일 18:00~당일 08:30 긍정 공시 종목 - 시초가 매매
+
+• 조건: 시총 1000억~10조, 거래대금 10억↑
+• 배점: 공시점수 40 + 등락률 25 + 거래대금 20 + 시총 15
+• 원리: 실적·계약·투자 등 긍정 공시 발표 후 시초가 갭업 노림
+
+━━━━━━━━━━━━━━━━━━━━
+
+💡 4개 전략이 매일 아침 동시 실행되어 종합 점수순으로 종목 선정
+"""
+    await update.message.reply_text(message.strip(), parse_mode='HTML')
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """일반 텍스트 메시지 처리"""
     text = update.message.text.lower()
@@ -300,6 +356,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await top(update, context)
     elif '신호' in text or '매매' in text:
         await signals(update, context)
+    elif '전략' in text or 'strategy' in text:
+        await strategies(update, context)
     else:
         await update.message.reply_text(
             "🤔 무슨 말씀이신지 잘 모르겠어요.\n"
@@ -315,6 +373,7 @@ async def post_init(application: Application):
         BotCommand("pnl", "수익률 현황"),
         BotCommand("top", "점수 상위 종목"),
         BotCommand("signals", "최근 매매 신호"),
+        BotCommand("strategies", "전략 4종 설명"),
         BotCommand("help", "도움말"),
         BotCommand("ping", "봇 상태 확인"),
     ]
@@ -331,15 +390,16 @@ def main():
     # 애플리케이션 생성
     application = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
 
-    # 핸들러 등록
+    # 핸들러 등록 (정식명 + 단축 alias)
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("ping", ping))
-    application.add_handler(CommandHandler("status", status))
-    application.add_handler(CommandHandler("today", today))
-    application.add_handler(CommandHandler("pnl", pnl))
-    application.add_handler(CommandHandler("top", top))
-    application.add_handler(CommandHandler("signals", signals))
+    application.add_handler(CommandHandler(["help", "h"], help_command))
+    application.add_handler(CommandHandler(["ping", "pi"], ping))
+    application.add_handler(CommandHandler(["status", "s"], status))
+    application.add_handler(CommandHandler(["today", "t"], today))
+    application.add_handler(CommandHandler(["pnl", "p"], pnl))
+    application.add_handler(CommandHandler(["top", "tp"], top))
+    application.add_handler(CommandHandler(["signals", "sg"], signals))
+    application.add_handler(CommandHandler(["strategies", "st"], strategies))
 
     # 일반 메시지 핸들러
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

@@ -12,21 +12,22 @@ KST = timezone(timedelta(hours=9))
 
 ARENA_DIR = Path(__file__).parent.parent.parent / "data" / "arena"
 
-# 팀 정의 (4팀 고정)
+# 팀 정의 (5팀: 4 base + Phase 3F neighbor)
+# 텔레그램 표시는 메달만 사용 (이모지 의미 충돌 방지) — emoji 필드는 대시보드/내부 식별용
 TEAM_CONFIGS = {
     "team_a": {
         "team_id": "team_a",
         "team_name": "Alpha Momentum",
         "strategy_id": "momentum",
         "emoji": "\U0001f534",  # 🔴
-        "description": "모멘텀 추세 추종 - 전일 급등주 추격 매수",
+        "description": "모멘텀 추세 추종 - MA5↑ + 거래량 급증 (Phase 2A)",
     },
     "team_b": {
         "team_id": "team_b",
         "team_name": "Beta Contrarian",
         "strategy_id": "largecap_contrarian",
         "emoji": "\U0001f535",  # 🔵
-        "description": "대형주 역발상 - 낙폭과대 대형주 반등 매매",
+        "description": "대형주 역발상 - RSI≤35 + KOSPI 모드 필터 (Phase 2B)",
     },
     "team_c": {
         "team_id": "team_c",
@@ -41,6 +42,13 @@ TEAM_CONFIGS = {
         "strategy_id": "theme_policy",
         "emoji": "\U0001f7e1",  # 🟡
         "description": "테마/정책 수혜 - 시장 테마 선도주 매매",
+    },
+    "team_e": {
+        "team_id": "team_e",
+        "team_name": "Echo Frontier",
+        "strategy_id": "frontier_gap",
+        "emoji": "\U0001f7e3",  # 🟣
+        "description": "Frontier Gap - 시초가 갭 +2~5% + 거래량 surge (Phase 3F)",
     },
 }
 

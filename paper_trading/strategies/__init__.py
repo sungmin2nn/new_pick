@@ -11,6 +11,7 @@ from .largecap_contrarian import LargecapContrarianStrategy
 from .momentum import MomentumStrategy
 from .theme_policy import ThemePolicyStrategy
 from .dart_disclosure import DartDisclosureStrategy
+from .frontier_gap import FrontierGapStrategy
 
 __all__ = [
     'BaseStrategy',
@@ -21,4 +22,5 @@ __all__ = [
     'MomentumStrategy',
     'ThemePolicyStrategy',
     'DartDisclosureStrategy',
+    'FrontierGapStrategy',
 ]

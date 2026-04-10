@@ -28,7 +28,23 @@ except ImportError:
     except ImportError:
         pykrx_stock = None
 
-# KOSPI 지수 조회용 (pykrx 직접 사용)
+# KOSPI 지수 + RSI용 historical 데이터: KRX OpenAPI (pykrx 우회)
+try:
+    from paper_trading.utils.krx_api import KRXClient
+    _krx_client = None
+    def _get_krx() -> "KRXClient | None":
+        global _krx_client
+        if _krx_client is None:
+            try:
+                _krx_client = KRXClient()
+            except Exception as e:
+                logger.warning(f"KRX OpenAPI 초기화 실패: {e}")
+                _krx_client = False
+        return _krx_client if _krx_client else None
+except ImportError:
+    _get_krx = lambda: None
+
+# pykrx fallback (KRX OpenAPI 실패 시)
 try:
     from pykrx import stock as _pykrx_raw
 except ImportError:
@@ -48,7 +64,10 @@ class LargecapContrarianStrategy(BaseStrategy):
     MAX_CHANGE = -1.5         # 최대 등락률 (하락만)
     MIN_TRADING_VALUE = 50    # 최소 거래대금 (억)
     MIN_MARKET_CAP = 1_000_000_000_000  # 최소 시가총액 (1조원)
-    KOSPI_DROP_THRESHOLD = -2.0  # KOSPI 급락 경고 기준 (%)
+    KOSPI_DROP_THRESHOLD = -2.0  # KOSPI 급락 시 매수 차단 (%)
+    RSI_PERIOD = 14           # RSI 계산 기간
+    RSI_OVERSOLD = 35         # RSI 과매도 임계 (≤이면 진입 후보)
+    RSI_LOOKBACK_DAYS = 20    # RSI 계산용 과거 데이터 일수
 
     # 점수 가중치
     WEIGHTS = {
@@ -70,15 +89,18 @@ class LargecapContrarianStrategy(BaseStrategy):
         self.selection_date = date
         print(f"\n[{self.STRATEGY_NAME}] 종목 선정 시작 ({date})")
 
-        # 0. KOSPI 시장 상태 확인
+        # 0. KOSPI 시장 상태 확인 (위험 차단)
         kospi_change = self._get_kospi_change(date)
         if kospi_change is not None and kospi_change <= self.KOSPI_DROP_THRESHOLD:
             logger.warning(
-                f"[{self.STRATEGY_NAME}] KOSPI 급락 감지 ({kospi_change:+.2f}%). "
-                f"역추세 전략 위험 구간 - 선정 종목 수 축소"
+                f"[{self.STRATEGY_NAME}] KOSPI 급락 ({kospi_change:+.2f}%) "
+                f"≤ {self.KOSPI_DROP_THRESHOLD}% → 매수 차단"
             )
-            print(f"  ⚠ KOSPI {kospi_change:+.2f}% 급락 - 종목 수 축소")
-            top_n = max(1, top_n // 2)
+            print(f"  ⛔ KOSPI {kospi_change:+.2f}% 급락 → 진입 차단 (Phase 2B 손실 방지)")
+            return []
+
+        if kospi_change is not None:
+            print(f"  KOSPI: {kospi_change:+.2f}% (정상)")
 
         # 1. 전체 종목 데이터 수집
         all_stocks = self._fetch_market_data(date)
@@ -88,14 +110,18 @@ class LargecapContrarianStrategy(BaseStrategy):
 
         print(f"  전체 종목: {len(all_stocks)}개")
 
-        # 2. 필터링
+        # 2. 1차 필터링 (가격/시총/거래대금/하락률)
         filtered = self._filter_stocks(all_stocks)
-        print(f"  필터 통과: {len(filtered)}개")
+        print(f"  1차 필터 통과: {len(filtered)}개")
 
-        # 3. 점수 계산
-        scored = self._calculate_scores(filtered)
+        # 3. 2차 필터링 (RSI 과매도) - 비싸므로 1차 통과한 것만
+        rsi_filtered = self._filter_by_rsi(filtered, date)
+        print(f"  RSI 필터 통과: {len(rsi_filtered)}개 (RSI≤{self.RSI_OVERSOLD})")
 
-        # 4. 상위 N개 선정
+        # 4. 점수 계산
+        scored = self._calculate_scores(rsi_filtered)
+
+        # 5. 상위 N개 선정
         scored.sort(key=lambda x: x.score, reverse=True)
         self.candidates = scored[:top_n]
 
@@ -159,7 +185,15 @@ class LargecapContrarianStrategy(BaseStrategy):
         return stocks
 
     def _get_kospi_change(self, date: str) -> float | None:
-        """전일 KOSPI 등락률 조회"""
+        """KOSPI 종합지수 일일 등락률 (KRX OpenAPI 우선, pykrx 폴백)"""
+        # 1차: KRX OpenAPI (안정적)
+        krx = _get_krx() if callable(_get_krx) else None
+        if krx:
+            chg = krx.get_kospi_change(date)
+            if chg is not None:
+                return chg
+
+        # 2차: pykrx 폴백
         if _pykrx_raw is None:
             logger.debug("pykrx 미설치 - KOSPI 지수 조회 불가")
             return None
@@ -176,9 +210,80 @@ class LargecapContrarianStrategy(BaseStrategy):
                 if prev_close > 0:
                     return round((curr_close - prev_close) / prev_close * 100, 2)
         except Exception as e:
-            logger.warning(f"KOSPI 지수 조회 오류: {e}")
+            logger.warning(f"KOSPI 지수 조회 오류 (pykrx 폴백): {e}")
 
         return None
+
+    def _filter_by_rsi(self, stocks: List[Dict], date: str) -> List[Dict]:
+        """RSI(14) ≤ 임계값 필터 (과매도 종목만)
+
+        KRX OpenAPI로 최근 20거래일 종가 fetch → RSI 계산.
+        KRX 호출 실패 시 필터 통과(보수적).
+        """
+        krx = _get_krx() if callable(_get_krx) else None
+        if not krx:
+            logger.warning(f"[{self.STRATEGY_NAME}] KRX OpenAPI 사용 불가 - RSI 필터 skip")
+            return stocks
+
+        passed = []
+        for s in stocks:
+            try:
+                rsi = self._calc_rsi(s['code'], date, krx, market=s.get('market', 'KOSPI'))
+                if rsi is None:
+                    # 데이터 부족 시 보수적으로 통과
+                    passed.append(s)
+                    continue
+                if rsi <= self.RSI_OVERSOLD:
+                    s['rsi'] = round(rsi, 1)
+                    passed.append(s)
+            except Exception as e:
+                logger.debug(f"RSI 계산 실패 {s['code']}: {e}")
+                passed.append(s)  # 보수적
+        return passed
+
+    def _calc_rsi(self, code: str, date: str, krx, market: str = 'KOSPI') -> float | None:
+        """단일 종목 RSI(14) 계산 - KRX OpenAPI historical fetch
+
+        Args:
+            code: 종목코드
+            date: 기준 날짜 (YYYYMMDD) — 이 날짜의 종가 포함하여 RSI 계산
+            krx: KRXClient 인스턴스
+            market: 시장
+        """
+        end_dt = datetime.strptime(date, "%Y%m%d")
+        start_dt = end_dt - timedelta(days=self.RSI_LOOKBACK_DAYS + 7)  # 주말 여유
+
+        try:
+            df = krx.get_history(
+                code,
+                start_dt.strftime("%Y%m%d"),
+                end_dt.strftime("%Y%m%d"),
+                market=market
+            )
+        except Exception as e:
+            logger.debug(f"history fetch 실패 {code}: {e}")
+            return None
+
+        if df.empty or '종가' not in df.columns or len(df) < self.RSI_PERIOD + 1:
+            return None
+
+        closes = df['종가'].astype(float).values
+        deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+        gains = [d if d > 0 else 0 for d in deltas]
+        losses = [-d if d < 0 else 0 for d in deltas]
+
+        # 단순 평균 RSI (Wilder's smoothing은 과도)
+        period = self.RSI_PERIOD
+        if len(gains) < period:
+            return None
+        avg_gain = sum(gains[-period:]) / period
+        avg_loss = sum(losses[-period:]) / period
+
+        if avg_loss == 0:
+            return 100.0
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+        return rsi
 
     def _filter_stocks(self, stocks: List[Dict]) -> List[Dict]:
         """필터링"""
