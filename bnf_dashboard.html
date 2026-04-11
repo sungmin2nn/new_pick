@@ -465,15 +465,22 @@
     </style>
 </head>
 <body>
-    <!-- iframe 내부 감지: 부모 페이지(index.html)에서 열릴 때 상단 nav 숨김 -->
+    <!-- iframe 내부 감지: 부모 페이지(index.html)에서 열릴 때 상단 nav/새로고침 버튼 숨김 -->
     <script>
       if (window.self !== window.top) {
         document.documentElement.classList.add('in-iframe');
+        // JS 폴백: DOM 로드 후 nav와 새로고침 버튼 직접 제거
+        document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('.nav-buttons').forEach(el => el.remove());
+          document.querySelectorAll('button[onclick="loadBNFData()"]').forEach(el => el.remove());
+        });
       }
     </script>
     <style>
-      html.in-iframe .nav-buttons { display: none !important; }
-      html.in-iframe .header > button.nav-btn { display: none !important; }
+      html.in-iframe .nav-buttons,
+      html.in-iframe header.header > button,
+      html.in-iframe .header > .nav-btn,
+      html.in-iframe button[onclick="loadBNFData()"] { display: none !important; }
       html.in-iframe body { padding-top: 0 !important; }
     </style>
     <div class="container">
