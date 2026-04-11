@@ -287,26 +287,44 @@ class BNFPositionManager:
         total_trades = len(self.trades)
         win_count = len([t for t in self.trades if t.get("return_pct", 0) > 0])
         win_rate = (win_count / total_trades * 100) if total_trades > 0 else 0
-        total_return = sum(t.get("return_pct", 0) for t in self.trades)
-        avg_return = (total_return / total_trades) if total_trades > 0 else 0
+
+        # 실현 손익 (청산 거래의 profit 합)
+        realized_pnl = sum(t.get("profit", 0) for t in self.trades)
+        # 자본 대비 누적 수익률 (실현 + 미실현)
+        total_return_actual = (
+            (realized_pnl + unrealized_pnl) / self.total_capital * 100
+            if self.total_capital > 0 else 0
+        )
+        # 단순 % 합산 (백테스트 비교용 - 잘못된 값이지만 backward compat)
+        total_return_simple = sum(t.get("return_pct", 0) for t in self.trades)
+        avg_return = (total_return_simple / total_trades) if total_trades > 0 else 0
+        current_capital = self.total_capital + realized_pnl + unrealized_pnl
 
         return {
             "total_capital": self.total_capital,
+            "current_capital": int(current_capital),
             "used_capital": used_capital,
             "open_positions": len(open_positions),
             "total_trades": total_trades,
             "win_rate": round(win_rate, 1),
-            "total_return": round(total_return, 2),
-            "avg_return": round(avg_return, 2),
+            "total_return": round(total_return_actual, 2),  # 메인 표시 (자본 대비)
+            "total_return_simple": round(total_return_simple, 2),  # 단순 합 (backward compat)
+            "realized_pnl": realized_pnl,
             "unrealized_pnl": unrealized_pnl,
+            "avg_return": round(avg_return, 2),
         }
 
     def _calc_trade_stats(self) -> Dict[str, Any]:
         total_trades = len(self.trades)
         win_count = len([t for t in self.trades if t.get("return_pct", 0) > 0])
-        total_return = sum(t.get("return_pct", 0) for t in self.trades)
-        avg_return = (total_return / total_trades) if total_trades > 0 else 0
         total_profit = sum(t.get("profit", 0) for t in self.trades)
+        # 자본 대비 실현 수익률 (미실현 제외)
+        total_return_actual = (
+            total_profit / self.total_capital * 100
+            if self.total_capital > 0 else 0
+        )
+        total_return_simple = sum(t.get("return_pct", 0) for t in self.trades)
+        avg_return = (total_return_simple / total_trades) if total_trades > 0 else 0
 
         return {
             "total_trades": total_trades,
@@ -314,7 +332,8 @@ class BNFPositionManager:
             "loss_count": total_trades - win_count,
             "win_rate": round((win_count / total_trades * 100) if total_trades > 0 else 0, 1),
             "total_profit": total_profit,
-            "total_return": round(total_return, 2),
+            "total_return": round(total_return_actual, 2),  # 메인 (자본 대비 실현)
+            "total_return_simple": round(total_return_simple, 2),  # 단순 합
             "avg_return": round(avg_return, 2),
         }
 
