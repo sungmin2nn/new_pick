@@ -74,10 +74,12 @@ class BNFCandidate:
     rank: int = 0
 
     def to_dict(self) -> dict:
-        """딕셔너리로 변환"""
+        """딕셔너리로 변환 (dashboard 호환 별칭 포함)"""
         return {
             'code': self.code,
             'name': self.name,
+            # 두 키 모두 제공 (dashboard는 price/reasons 사용, 모듈은 current_price/selection_reason)
+            'price': self.current_price,
             'current_price': self.current_price,
             'market_cap': self.market_cap,
             'trading_value': self.trading_value,
@@ -89,6 +91,7 @@ class BNFCandidate:
             'volume': self.volume,
             'avg_volume_20d': self.avg_volume_20d,
             'selection_reason': self.selection_reason,
+            'reasons': self.selection_reason,
             'rank': self.rank
         }
 
