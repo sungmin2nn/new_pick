@@ -1,5 +1,5 @@
 /* Phase 8 - App Main (라우팅 + 탭 토글 + PTR + Swipe)
- * Note: BNF는 별도 페이지(bnf_dashboard.html)로 분리. 메인 페이지는 Arena만.
+ * Note: BNF 탭은 iframe으로 bnf_dashboard.html을 인페이지 렌더
  */
 
 import { $, $$, fmtTime, getTodayKST, fmtDate } from './ui.js';
@@ -7,7 +7,7 @@ import { initArena, refreshArena } from './arena.js';
 import { clearCache } from './cache.js';
 
 // ============ Tab management ============
-const TABS = ['arena'];  // BNF is external link
+const TABS = ['arena', 'bnf'];
 let currentTab = 'arena';
 
 function showMainTab(tab) {
@@ -16,6 +16,15 @@ function showMainTab(tab) {
   $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === `pane-${tab}`));
+
+  // BNF iframe lazy load (최초 활성화 시만)
+  if (tab === 'bnf') {
+    const iframe = $('#bnf-iframe');
+    if (iframe && !iframe.src && iframe.dataset.src) {
+      iframe.src = iframe.dataset.src;
+    }
+  }
+
   // URL hash 업데이트
   if (window.location.hash !== `#${tab}`) {
     history.replaceState(null, '', `#${tab}`);

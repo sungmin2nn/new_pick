@@ -51,9 +51,9 @@
       <button class="main-tab active" data-tab="arena">
         🏟 <span>Arena</span>
       </button>
-      <a href="bnf_dashboard.html" class="main-tab">
+      <button class="main-tab" data-tab="bnf">
         🎯 <span>BNF</span>
-      </a>
+      </button>
     </div>
   </div>
 
@@ -82,18 +82,30 @@
         <div class="sub-pane" id="arena-system"></div>
       </section>
 
+      <!-- ============ BNF Pane (iframe → bnf_dashboard.html) ============ -->
+      <section class="main-pane" id="pane-bnf">
+        <iframe
+          id="bnf-iframe"
+          src=""
+          data-src="bnf_dashboard.html"
+          title="BNF 낙폭과대 대시보드"
+          style="width:100%; height:calc(100vh - 160px); min-height:600px; border:none; border-radius:var(--radius-lg); background:var(--bg-surface); box-shadow:var(--shadow-card);"
+          loading="lazy"
+        ></iframe>
+      </section>
+
     </div>
   </main>
 
-  <!-- Bottom Mobile Nav (Arena + BNF link) -->
+  <!-- Bottom Mobile Nav (2 tabs) -->
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
       <button class="bottom-tab active" data-tab="arena">
         <span class="icon">🏟</span><span>Arena</span>
       </button>
-      <a class="bottom-tab" href="bnf_dashboard.html">
+      <button class="bottom-tab" data-tab="bnf">
         <span class="icon">🎯</span><span>BNF</span>
-      </a>
+      </button>
     </div>
   </nav>
 
