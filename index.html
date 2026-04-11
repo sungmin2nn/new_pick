@@ -62,25 +62,11 @@
   <main class="page">
     <div class="page-content">
 
-      <!-- ============ Arena Pane ============ -->
+      <!-- ============ Arena Pane (Single Scroll + 3-Depth Accordion) ============ -->
       <section class="main-pane active" id="pane-arena">
-        <!-- Sub-tabs -->
-        <nav class="sub-tabs" id="arena-subtabs" data-tab="arena">
-          <button class="sub-tab active" data-section="arena-today">📊 Today</button>
-          <button class="sub-tab" data-section="arena-leaderboard">🏆 리더보드</button>
-          <button class="sub-tab" data-section="arena-teams">👥 팀별 상세</button>
-          <button class="sub-tab" data-section="arena-strategies">📋 전략 후보</button>
-          <button class="sub-tab" data-section="arena-system">⚙️ 시스템</button>
-        </nav>
-
-        <!-- Sub-panes -->
-        <div class="sub-pane active" id="arena-today">
+        <div id="arena-content">
           <div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">데이터 로딩 중...</div></div>
         </div>
-        <div class="sub-pane" id="arena-leaderboard"></div>
-        <div class="sub-pane" id="arena-teams"></div>
-        <div class="sub-pane" id="arena-strategies"></div>
-        <div class="sub-pane" id="arena-system"></div>
       </section>
 
       <!-- ============ BNF Pane (iframe → bnf_dashboard.html) ============ -->

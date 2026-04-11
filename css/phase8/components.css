@@ -914,3 +914,252 @@
   padding: 0;
   justify-content: center;
 }
+
+/* ========================================================
+   16. 3-DEPTH ACCORDION (Strategy → Stocks → Detail)
+   ======================================================== */
+.acc-list { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.acc-strat {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--text-muted);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--duration-fast);
+}
+.acc-strat.open { box-shadow: var(--shadow-sm); }
+
+.acc-strat-head {
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--duration-fast);
+}
+.acc-strat-head:hover { background: var(--bg-overlay); }
+
+.acc-chev {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  transition: transform var(--duration-fast);
+  width: 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.acc-strat.open .acc-chev { transform: rotate(90deg); }
+
+.acc-info { flex: 1; min-width: 0; }
+.acc-name {
+  font-family: var(--font-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-base);
+  margin-bottom: 2px;
+}
+.acc-summary {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}
+.acc-summary .num {
+  color: var(--text-secondary);
+  font-weight: var(--fw-semibold);
+}
+
+.acc-count {
+  background: var(--bg-overlay);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.acc-strat-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--duration-default) var(--easing-spring);
+}
+.acc-strat.open .acc-strat-body { max-height: 5000px; }
+
+.acc-strat-body-inner {
+  border-top: 1px solid var(--border-subtle);
+  padding: 4px var(--space-4) var(--space-2);
+}
+
+/* Stock accordion (Depth 2 → 3) */
+.sacc { border-bottom: 1px solid var(--border-subtle); }
+.sacc:last-child { border-bottom: none; }
+
+.sacc-head {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: padding-left var(--duration-fast);
+}
+.sacc-head:hover { padding-left: var(--space-2); }
+
+.sacc-rank {
+  width: 20px;
+  height: 20px;
+  background: var(--bg-overlay);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  color: var(--text-tertiary);
+  margin-right: var(--space-3);
+  flex-shrink: 0;
+}
+.sacc-info { flex: 1; min-width: 0; }
+.sacc-info b {
+  font-size: var(--fs-sm);
+  display: block;
+  font-weight: var(--fw-semibold);
+}
+.sacc-code {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+.sacc-score {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  margin-right: var(--space-2);
+}
+.sacc-pct {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+}
+.sacc-chev {
+  color: var(--text-muted);
+  margin-left: var(--space-2);
+  font-size: var(--fs-base);
+  transition: transform var(--duration-default);
+  flex-shrink: 0;
+}
+.sacc.open .sacc-chev { transform: rotate(90deg); }
+
+.sacc-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--duration-default) var(--easing-spring);
+}
+.sacc.open .sacc-body { max-height: 1000px; }
+
+.sacc-detail {
+  background: var(--bg-overlay);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin: 4px 0 var(--space-3);
+}
+
+/* Mini KPI inside detail */
+.mini-kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.mini-kpi {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+.mini-kpi-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  font-weight: var(--fw-semibold);
+  margin-bottom: 2px;
+}
+.mini-kpi-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  letter-spacing: -0.02em;
+}
+.mini-kpi-meta {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.detail-h {
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+  margin-top: var(--space-2);
+}
+
+/* Score breakdown bar */
+.score-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 5px 0;
+  font-size: var(--fs-xs);
+}
+.score-bar-label {
+  width: 80px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.score-bar-track {
+  flex: 1;
+  height: 5px;
+  background: var(--bg-surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: 3px;
+}
+.score-bar-val {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-bold);
+  width: 36px;
+  text-align: right;
+  font-size: var(--fs-xs);
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.detail-row:last-child { border-bottom: none; }
+
+/* System mini card */
+.system-mini {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.system-mini-text {
+  flex: 1;
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+}

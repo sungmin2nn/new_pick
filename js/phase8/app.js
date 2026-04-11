@@ -24,16 +24,6 @@ function showMainTab(tab) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showSubTab(tab, sectionId) {
-  // tab: 'arena' or 'bnf', sectionId: target sub-pane id
-  const tabsContainer = document.getElementById(`${tab}-subtabs`);
-  if (!tabsContainer) return;
-  $$('.sub-tab', tabsContainer).forEach(b => b.classList.toggle('active', b.dataset.section === sectionId));
-  const pane = document.getElementById(`pane-${tab}`);
-  if (!pane) return;
-  $$('.sub-pane', pane).forEach(p => p.classList.toggle('active', p.id === sectionId));
-}
-
 // ============ Status bar update ============
 function updateStatusBar() {
   const lastEl = $('#status-last-refresh');
@@ -135,17 +125,6 @@ async function init() {
   });
   $$('.bottom-tab').forEach(btn => {
     btn.addEventListener('click', () => showMainTab(btn.dataset.tab));
-  });
-
-  // Sub-tab listeners (delegated)
-  document.addEventListener('click', (e) => {
-    const subBtn = e.target.closest('.sub-tab');
-    if (!subBtn) return;
-    const tabsContainer = subBtn.closest('.sub-tabs');
-    if (!tabsContainer) return;
-    const tab = tabsContainer.dataset.tab;
-    const section = subBtn.dataset.section;
-    if (tab && section) showSubTab(tab, section);
   });
 
   // Refresh button
