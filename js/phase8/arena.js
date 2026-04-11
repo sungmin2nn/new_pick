@@ -157,45 +157,89 @@ function renderH2H(rows) {
   `;
 }
 
-function renderRanking(rows) {
+function renderTeamsAccordion(rows) {
+  // 5팀 순위 + 매매 이력 통합 (B안)
   const sorted = [...rows].sort((a, b) => b.today_pct - a.today_pct);
-  const cards = sorted.map((t, i) => `
-    <div class="team-card" style="border-left-color:${t.color};">
-      <div class="team-medal">${MEDALS[Math.min(i, 4)]}</div>
-      <div class="name">${t.name}</div>
-      <div class="desc">${t.desc}</div>
-      <div class="team-card-side">
-        <div class="ret ${colorClass(t.today_pct)}">${fmtPctSigned(t.today_pct)}</div>
-        <div class="cum">누적 ${fmtPct(t.cum_pct)} · ELO ${t.elo}</div>
+
+  const cards = sorted.map((t, i) => {
+    const hist = state.history[t.tid] || [];
+    const histDays = hist.length;
+    const totalTrades = hist.reduce((s, h) => s + (h.summary?.simulation?.total_trades || 0), 0);
+    const totalWins = hist.reduce((s, h) => s + (h.summary?.simulation?.wins || 0), 0);
+    const winRate = totalTrades > 0 ? Math.round(totalWins / totalTrades * 100) : 0;
+
+    const dayRows = hist.map(h => {
+      const sim = h.summary?.simulation || {};
+      const ret = sim.total_return ?? 0;
+      const trades = sim.total_trades ?? 0;
+      const wins = sim.wins ?? 0;
+      const dateStr = h.date ? `${h.date.slice(4,6)}/${h.date.slice(6,8)}` : '-';
+      const tradeResults = h.trades?.results || [];
+      return `
+        <div class="sacc">
+          <div class="sacc-head">
+            <div class="sacc-rank">${dateStr}</div>
+            <div class="sacc-info">
+              <b>${trades}건</b>
+              <div class="sacc-code">${wins}승 ${trades - wins}패</div>
+            </div>
+            <div class="sacc-pct ${colorClass(ret)}">${fmtPctSigned(ret)}</div>
+            <span class="sacc-chev">›</span>
+          </div>
+          <div class="sacc-body">
+            ${renderTradeDetail(tradeResults, h.summary)}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const historyBody = histDays > 0 ? `
+      <div class="detail-h">매매 이력 (${histDays}일 · ${totalTrades}건 · 승률 ${winRate}%)</div>
+      ${dayRows}
+    ` : `<div class="detail-h">매매 이력 없음</div>`;
+
+    return `
+      <div class="acc-strat" style="border-left-color:${t.color};">
+        <div class="acc-strat-head">
+          <span class="acc-chev">▶</span>
+          <div class="team-medal-inline">${MEDALS[Math.min(i, 4)]}</div>
+          <div class="acc-info">
+            <div class="acc-name">${t.name}</div>
+            <div class="acc-summary">${t.desc} · ELO ${t.elo}</div>
+          </div>
+          <div class="team-ret-block">
+            <div class="ret ${colorClass(t.today_pct)}">${fmtPctSigned(t.today_pct)}</div>
+            <div class="cum">누적 ${fmtPct(t.cum_pct)}</div>
+          </div>
+        </div>
+        <div class="acc-strat-body">
+          <div class="acc-strat-body-inner">
+            <div class="team-detail-grid">
+              <div class="mini-kpi">
+                <div class="mini-kpi-label">잔고</div>
+                <div class="mini-kpi-value">${fmtMoney(t.capital)}</div>
+                <div class="mini-kpi-meta ${colorClass(t.cum_pct)}">${fmtPct(t.cum_pct)}</div>
+              </div>
+              <div class="mini-kpi">
+                <div class="mini-kpi-label">매매</div>
+                <div class="mini-kpi-value">${t.wins}/${t.trades}</div>
+                <div class="mini-kpi-meta">승률 ${t.win_rate}%</div>
+              </div>
+            </div>
+            ${historyBody}
+          </div>
+        </div>
       </div>
-      <div class="team-stats">
-        <div class="team-stat">
-          <span class="team-stat-label">금일</span>
-          <span class="team-stat-value ${colorClass(t.today_pct)}">${fmtPctSigned(t.today_pct)}</span>
-        </div>
-        <div class="team-stat">
-          <span class="team-stat-label">누적</span>
-          <span class="team-stat-value ${colorClass(t.cum_pct)}">${fmtPct(t.cum_pct)}</span>
-        </div>
-        <div class="team-stat">
-          <span class="team-stat-label">잔고</span>
-          <span class="team-stat-value">${fmtMoney(t.capital)}</span>
-        </div>
-        <div class="team-stat">
-          <span class="team-stat-label">ELO</span>
-          <span class="team-stat-value">${t.elo}</span>
-        </div>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   return `
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title display">🏆 오늘 순위</h2>
-        <span class="section-subtitle">5팀 일일 수익률</span>
+        <h2 class="section-title display">🏆 5팀</h2>
+        <span class="section-subtitle">순위 · 매매 이력</span>
       </div>
-      <div class="team-grid">${cards}</div>
+      <div class="acc-list">${cards}</div>
     </div>
   `;
 }
@@ -258,82 +302,106 @@ function renderStockDetail(c, totalCount) {
   `;
 }
 
-function renderStrategiesAccordion(rows) {
-  // ELO 1위 전략을 기본 펼침
-  const sortedRows = [...rows].sort((a, b) => b.today_pct - a.today_pct);
-  const topTid = sortedRows[0]?.tid;
-
-  let totalStocks = 0;
-  const accs = TEAM_IDS.map((tid) => {
+function renderCandidatesTable() {
+  // 5전략 후보 통합 테이블 (전략 컬럼 포함)
+  const allRows = [];
+  for (const tid of TEAM_IDS) {
     const meta = TEAM_META[tid];
     const cands = state.candidates[meta.strategy];
     const candList = cands?.candidates || (Array.isArray(cands) ? cands : []) || [];
-    const count = candList.length;
-    totalStocks += count;
-
-    if (count === 0) {
-      return `
-        <div class="acc-strat" style="border-left-color:${meta.color};">
-          <div class="acc-strat-head">
-            <span class="acc-chev">▶</span>
-            <div class="acc-info">
-              <div class="acc-name">${meta.name}</div>
-              <div class="acc-summary">${meta.desc} · 후보 없음</div>
-            </div>
-            <span class="acc-count">0</span>
-          </div>
-        </div>
-      `;
+    for (const c of candList) {
+      allRows.push({ ...c, _tid: tid, _team: meta.name, _color: meta.color });
     }
+  }
 
-    const avgScore = candList.reduce((s, c) => s + (+c.score || 0), 0) / count;
-    const avgPct = candList.reduce((s, c) => s + (+c.change_pct || 0), 0) / count;
-    const isOpen = tid === topTid;
+  // 점수 내림차순 정렬
+  allRows.sort((a, b) => (+b.score || 0) - (+a.score || 0));
 
-    const stockRows = candList.map((c, idx) => `
-      <div class="sacc">
-        <div class="sacc-head">
-          <div class="sacc-rank">${idx + 1}</div>
-          <div class="sacc-info">
-            <b>${c.name || '-'}</b>
-            <div class="sacc-code">${c.code || '-'}</div>
-          </div>
-          <div class="sacc-score">${(+c.score).toFixed(1)}</div>
-          <div class="sacc-pct ${colorClass(c.change_pct)}">${fmtPctSigned(c.change_pct)}</div>
-          <span class="sacc-chev">›</span>
-        </div>
-        <div class="sacc-body">
-          ${renderStockDetail(c, count)}
-        </div>
-      </div>
-    `).join('');
-
+  if (allRows.length === 0) {
     return `
-      <div class="acc-strat${isOpen ? ' open' : ''}" style="border-left-color:${meta.color};">
-        <div class="acc-strat-head">
-          <span class="acc-chev">▶</span>
-          <div class="acc-info">
-            <div class="acc-name">${meta.name}</div>
-            <div class="acc-summary">
-              평균점수 <span class="num">${avgScore.toFixed(1)}</span> · 평균 <span class="num ${colorClass(avgPct)}">${fmtPctSigned(avgPct)}</span>
-            </div>
-          </div>
-          <span class="acc-count">${count}개</span>
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title display">📋 내일 후보</h2>
+          <span class="section-subtitle">0종목</span>
         </div>
-        <div class="acc-strat-body">
-          <div class="acc-strat-body-inner">${stockRows}</div>
-        </div>
+        <div class="empty"><div class="empty-icon">📭</div><div class="empty-text">후보 없음</div></div>
       </div>
     `;
-  }).join('');
+  }
+
+  const trs = allRows.map((c, i) => `
+    <tr class="cand-row" data-idx="${i}">
+      <td class="num right">${i + 1}</td>
+      <td>
+        <b>${c.name || '-'}</b>
+        <div class="cand-code">${c.code || '-'}</div>
+      </td>
+      <td>
+        <span class="team-pill" style="background:${c._color}15;color:${c._color};border-color:${c._color}40;">
+          ${c._team.split(' ')[0]}
+        </span>
+      </td>
+      <td class="num right">${(+c.score).toFixed(1)}</td>
+      <td class="num right ${colorClass(c.change_pct)}">${fmtPctSigned(c.change_pct)}</td>
+      <td class="num right">${fmtMoney(c.price)}</td>
+    </tr>
+    <tr class="cand-detail-row" data-idx="${i}" style="display:none;">
+      <td colspan="6">${renderCandDetail(c)}</td>
+    </tr>
+  `).join('');
 
   return `
     <div class="section">
       <div class="section-header">
         <h2 class="section-title display">📋 내일 후보</h2>
-        <span class="section-subtitle">5전략 · ${totalStocks}종목</span>
+        <span class="section-subtitle">5전략 · ${allRows.length}종목 (점수순)</span>
       </div>
-      <div class="acc-list">${accs}</div>
+      <div class="table-wrap">
+        <table class="tbl cand-tbl">
+          <thead>
+            <tr>
+              <th class="right">#</th>
+              <th>종목</th>
+              <th>전략</th>
+              <th class="right">점수</th>
+              <th class="right">등락률</th>
+              <th class="right">가격</th>
+            </tr>
+          </thead>
+          <tbody>${trs}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderCandDetail(c) {
+  const sd = c.score_detail || {};
+  const bars = Object.entries(sd).map(([key, val]) => {
+    const meta = SCORE_KEY_META[key] || { label: key, max: 30 };
+    return renderScoreBar(meta.label, +val || 0, meta.max);
+  }).join('');
+
+  return `
+    <div class="sacc-detail">
+      <div class="mini-kpi-grid">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">현재가</div>
+          <div class="mini-kpi-value">${fmtMoney(c.price)}</div>
+          <div class="mini-kpi-meta ${colorClass(c.change_pct)}">${c.change_pct >= 0 ? '▲ ' : '▼ '}${fmtPctSigned(c.change_pct)}</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">종합 점수</div>
+          <div class="mini-kpi-value">${(+c.score).toFixed(1)}</div>
+          <div class="mini-kpi-meta">${c._team}</div>
+        </div>
+      </div>
+      ${bars ? `<div class="detail-h">점수 분해</div>${bars}` : ''}
+      ${c.trading_value ? `
+      <div class="detail-h">거래 정보</div>
+      <div class="detail-row"><span>거래대금</span><span class="num">${fmtMoney(c.trading_value)}</span></div>
+      ${c.volume ? `<div class="detail-row"><span>거래량</span><span class="num">${fmtNum(c.volume)}</span></div>` : ''}
+      ` : ''}
     </div>
   `;
 }
@@ -509,13 +577,31 @@ export function renderArena() {
   container.innerHTML = `
     ${renderKPI(rows)}
     ${renderH2H(rows)}
-    ${renderRanking(rows)}
-    ${renderStrategiesAccordion(rows)}
-    ${renderHistorySection()}
+    ${renderCandidatesTable()}
+    ${renderTeamsAccordion(rows)}
     ${renderSystemMini()}
   `;
 
   bindAccordion();
+  bindCandidateTable();
+}
+
+function bindCandidateTable() {
+  $$('.cand-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const idx = row.dataset.idx;
+      const detail = document.querySelector(`.cand-detail-row[data-idx="${idx}"]`);
+      if (!detail) return;
+      const isOpen = detail.style.display !== 'none';
+      // 다른 펼침 닫기
+      $$('.cand-detail-row').forEach(d => d.style.display = 'none');
+      $$('.cand-row').forEach(r => r.classList.remove('open'));
+      if (!isOpen) {
+        detail.style.display = '';
+        row.classList.add('open');
+      }
+    });
+  });
 }
 
 // ============ Accordion event binding ============
