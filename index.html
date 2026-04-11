@@ -90,6 +90,13 @@
           title="BNF 낙폭과대 대시보드"
           style="width:100%; height:calc(100vh - 160px); min-height:700px; border:none; border-radius:var(--radius-lg); background:var(--bg-surface); box-shadow:var(--shadow-card); display:block;"
         ></iframe>
+        <script>
+          // iframe 캐시 무효화 (매 로드마다 fresh)
+          (function() {
+            var f = document.getElementById('bnf-iframe');
+            if (f) f.src = 'bnf_dashboard.html?v=' + Date.now();
+          })();
+        </script>
       </section>
 
     </div>
