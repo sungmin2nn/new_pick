@@ -9,7 +9,7 @@ import sys
 import json
 import argparse
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -17,9 +17,26 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from paper_trading.strategies import StrategyRegistry
 from paper_trading.simulator import TradingSimulator
 from paper_trading.selector import StockCandidate
-from utils import format_kst_time
+from utils import format_kst_time, is_market_day
 
 DATA_DIR = Path(__file__).parent.parent / "data" / "paper_trading"
+
+
+def _resolve_fetch_date(date_str: str) -> str:
+    """주어진 날짜가 비거래일이면 가장 가까운 과거 거래일로 거슬러 올라감.
+
+    Args:
+        date_str: YYYYMMDD
+
+    Returns:
+        가장 최근 거래일 (YYYYMMDD)
+    """
+    dt = datetime.strptime(date_str, '%Y%m%d')
+    for _ in range(10):  # 최대 10일 거슬러 올라가기
+        if is_market_day(dt):
+            return dt.strftime('%Y%m%d')
+        dt -= timedelta(days=1)
+    return date_str
 
 
 def run_all_strategies(date: str = None, top_n: int = 5, simulate: bool = False) -> Dict:
@@ -28,18 +45,29 @@ def run_all_strategies(date: str = None, top_n: int = 5, simulate: bool = False)
 
     Args:
         date: 날짜 (YYYYMMDD)
+              - 과거: 백테스트
+              - 오늘: 라이브
+              - 미래: 다음 거래일 후보 선정 (실제 데이터 fetch는 today 사용)
         top_n: 전략당 선정 종목 수
         simulate: 시뮬레이션 실행 여부
 
     Returns:
         전략별 결과
     """
+    today = format_kst_time(format_str='%Y%m%d')
     if date is None:
-        date = format_kst_time(format_str='%Y%m%d')
+        date = today
+
+    # 미래 날짜 → 가장 최근 거래일로 fetch (DART/KRX/naver 모두 미래/주말 데이터 미보유)
+    # 단, save 시에는 원래 target_date 유지하여 next-trading-day 라우팅 호환
+    target_date = date
+    fetch_date = _resolve_fetch_date(min(date, today))
 
     print(f"\n{'='*60}")
     print(f"[Multi-Strategy Runner] 다중 전략 실행")
-    print(f"  날짜: {date}")
+    print(f"  Target date: {target_date}")
+    if fetch_date != target_date:
+        print(f"  Fetch date:  {fetch_date} (미래 날짜 → 오늘 데이터로 선정)")
     print(f"  종목 수: 전략당 {top_n}개")
     print(f"{'='*60}")
 
@@ -49,11 +77,12 @@ def run_all_strategies(date: str = None, top_n: int = 5, simulate: bool = False)
     for s in strategies:
         print(f"  - {s['name']} ({s['id']}): {s['description']}")
 
-    # 모든 전략 실행
-    results = StrategyRegistry.run_all(date=date, top_n=top_n)
+    # 모든 전략 실행 (fetch_date 사용 - 미래일이면 오늘 데이터)
+    results = StrategyRegistry.run_all(date=fetch_date, top_n=top_n)
 
-    # 결과 저장
-    StrategyRegistry.save_results(results, date)
+    # 저장은 target_date로 (paper-trading.yml 라우팅 호환)
+    StrategyRegistry.save_results(results, target_date)
+    date = target_date  # downstream simulate/print 호환
 
     # 전략별 독립 시뮬레이션
     if simulate:
