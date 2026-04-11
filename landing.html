@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignalDesk — 뉴스·공시 기반 종목 선정 엔진</title>
+  <meta name="description" content="DART 공시와 뉴스, 11개 지표를 145점 시스템으로 정량화해 매일 아침 후보 종목을 자동 선정합니다.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'system-ui', 'sans-serif'],
+            display: ['Geist', 'Pretendard', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            ink: {
+              950: '#050608',
+              900: '#0a0c10',
+              800: '#11141a',
+              700: '#1a1e26',
+              600: '#272c37',
+            },
+            signal: {
+              DEFAULT: '#34d39c',
+              soft: '#1f8a66',
+              deep: '#0f3a2c',
+            },
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'SF Mono', 'Menlo', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', 'Geist', system-ui, sans-serif;
+      background: #050608;
+      color: #e6e8ec;
+      -webkit-font-smoothing: antialiased;
+    }
+    .keep-all { word-break: keep-all; }
+    .num { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+    /* Supanova motion signature */
+    .ease-supa { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+    /* Mesh gradient background orbs */
+    .mesh-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+    }
+    .orb {
+      position: absolute; border-radius: 9999px; filter: blur(120px); opacity: 0.35;
+      animation: float 14s ease-in-out infinite;
+    }
+    .orb-1 { width: 520px; height: 520px; top: -120px; left: -80px; background: radial-gradient(circle, #1f8a66 0%, transparent 70%); }
+    .orb-2 { width: 620px; height: 620px; top: 30%; right: -160px; background: radial-gradient(circle, #1a3a8a 0%, transparent 70%); animation-delay: -4s; }
+    .orb-3 { width: 480px; height: 480px; bottom: -100px; left: 30%; background: radial-gradient(circle, #34d39c 0%, transparent 70%); opacity: 0.18; animation-delay: -8s; }
+    @keyframes float { 0%, 100% { transform: translateY(0) translateX(0); } 50% { transform: translateY(-30px) translateX(20px); } }
+
+    /* Grain noise overlay */
+    .noise {
+      position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0.05; mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    /* Double-bezel card */
+    .bezel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 6px;
+      border-radius: 28px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .bezel-inner {
+      background: linear-gradient(180deg, rgba(20,24,32,0.9) 0%, rgba(10,12,16,0.95) 100%);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 22px;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
+      height: 100%;
+    }
+
+    /* Glass nav */
+    .glass {
+      backdrop-filter: blur(20px) saturate(140%);
+      -webkit-backdrop-filter: blur(20px) saturate(140%);
+      background: rgba(10, 12, 16, 0.55);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* CTA pill */
+    .cta {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cta:hover { transform: scale(1.02); box-shadow: 0 0 40px rgba(52, 211, 156, 0.25); }
+    .cta:active { transform: scale(0.98); }
+    .cta .arrow-wrap {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cta:hover .arrow-wrap { transform: translateX(4px); }
+
+    /* Eyebrow tag */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 9999px;
+      background: rgba(52, 211, 156, 0.1);
+      border: 1px solid rgba(52, 211, 156, 0.2);
+      color: #34d39c;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500;
+    }
+
+    /* Reveal animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(2rem); filter: blur(6px); }
+      to { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: fadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* Marquee */
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .marquee-track { animation: marquee 40s linear infinite; }
+
+    /* Score bar fill */
+    @keyframes growBar {
+      from { width: 0; }
+    }
+    .score-bar.in { animation: growBar 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* Subtle grid overlay for hero */
+    .grid-lines {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    }
+
+    /* Status dot pulse */
+    @keyframes pulseDot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 156, 0.6); }
+      70% { box-shadow: 0 0 0 8px rgba(52, 211, 156, 0); }
+    }
+    .pulse-dot { animation: pulseDot 2.4s ease-out infinite; }
+
+    /* Sparkline path stroke animation */
+    @keyframes drawLine { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+    .sparkline { stroke-dasharray: 600; stroke-dashoffset: 600; }
+    .sparkline.in { animation: drawLine 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  </style>
+</head>
+<body class="min-h-[100dvh] keep-all">
+
+  <!-- Background mesh -->
+  <div class="mesh-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="noise"></div>
+
+  <!-- ===================== NAV ===================== -->
+  <nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] max-w-3xl">
+    <div class="glass rounded-full px-3 py-2 flex items-center justify-between">
+      <a href="#top" class="flex items-center gap-2 pl-3">
+        <span class="w-7 h-7 rounded-lg bg-signal/20 border border-signal/30 flex items-center justify-center">
+          <iconify-icon icon="solar:graph-up-bold" class="text-signal text-base"></iconify-icon>
+        </span>
+        <span class="text-sm font-semibold tracking-tight">SignalDesk</span>
+      </a>
+      <div class="hidden md:flex items-center gap-1 text-[13px] text-white/70">
+        <a href="#engine" class="px-3 py-1.5 rounded-full hover:bg-white/5 ease-supa">엔진</a>
+        <a href="#score" class="px-3 py-1.5 rounded-full hover:bg-white/5 ease-supa">점수 시스템</a>
+        <a href="#bnf" class="px-3 py-1.5 rounded-full hover:bg-white/5 ease-supa">BNF 전략</a>
+        <a href="#roadmap" class="px-3 py-1.5 rounded-full hover:bg-white/5 ease-supa">로드맵</a>
+      </div>
+      <a href="#cta" class="cta inline-flex items-center gap-2 bg-white text-ink-950 text-[13px] font-semibold pl-4 pr-1 py-1 rounded-full">
+        대시보드 열기
+        <span class="arrow-wrap w-7 h-7 rounded-full bg-ink-950/10 flex items-center justify-center">
+          <iconify-icon icon="solar:arrow-right-linear" class="text-base"></iconify-icon>
+        </span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <section id="top" class="relative z-10 min-h-[100dvh] pt-32 pb-24 md:pt-40 md:pb-32">
+    <div class="absolute inset-0 grid-lines pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+
+        <!-- Left: Editorial copy -->
+        <div class="lg:col-span-7 reveal" style="animation-delay:0ms">
+          <div class="eyebrow mb-8">
+            <span class="w-1.5 h-1.5 rounded-full bg-signal pulse-dot"></span>
+            매일 08:30 자동 실행
+          </div>
+          <h1 class="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-white mb-8">
+            감으로 고르지<br>
+            않습니다.<br>
+            <span class="text-signal">데이터로</span> 좁힙니다.
+          </h1>
+          <p class="text-lg md:text-xl text-white/60 leading-relaxed max-w-[58ch] mb-10">
+            DART 공시, 네이버 뉴스, 거래량, 투자자 동향까지
+            11개 지표를 145점 시스템으로 정량화합니다.
+            장 시작 전 후보 종목이 대시보드에 올라옵니다.
+          </p>
+          <div class="flex flex-wrap items-center gap-4">
+            <a href="#cta" class="cta inline-flex items-center gap-2 bg-signal text-ink-950 font-semibold pl-7 pr-2 py-2 rounded-full text-base">
+              오늘의 후보 보기
+              <span class="arrow-wrap w-10 h-10 rounded-full bg-ink-950/15 flex items-center justify-center">
+                <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
+              </span>
+            </a>
+            <a href="#engine" class="cta inline-flex items-center gap-2 text-white/80 hover:text-white px-6 py-4 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium">
+              <iconify-icon icon="solar:play-circle-linear" class="text-lg"></iconify-icon>
+              엔진 작동 방식
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Asymmetric metric stack -->
+        <div class="lg:col-span-5 reveal" style="animation-delay:200ms">
+          <div class="bezel">
+            <div class="bezel-inner p-6 md:p-8">
+              <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-2 text-xs text-white/50">
+                  <span class="w-1.5 h-1.5 rounded-full bg-signal pulse-dot"></span>
+                  LIVE — 2026.04.10 08:32
+                </div>
+                <iconify-icon icon="solar:menu-dots-bold" class="text-white/30"></iconify-icon>
+              </div>
+
+              <div class="text-xs text-white/40 uppercase tracking-[0.2em] mb-2">오늘의 후보</div>
+              <div class="flex items-baseline gap-3 mb-1">
+                <span class="num text-6xl md:text-7xl font-semibold text-white">14</span>
+                <span class="text-sm text-white/50">/ 145점 시스템</span>
+              </div>
+              <div class="text-sm text-white/50 mb-8">평균 스코어 <span class="num text-signal">87.3</span></div>
+
+              <!-- Mini sparkline -->
+              <svg viewBox="0 0 300 80" class="w-full h-20 mb-6">
+                <defs>
+                  <linearGradient id="sparkFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#34d39c" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#34d39c" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path class="sparkline" d="M0,55 L25,48 L50,52 L75,40 L100,42 L125,30 L150,35 L175,22 L200,28 L225,18 L250,24 L275,12 L300,18"
+                      fill="none" stroke="#34d39c" stroke-width="2" stroke-linecap="round"/>
+                <path d="M0,55 L25,48 L50,52 L75,40 L100,42 L125,30 L150,35 L175,22 L200,28 L225,18 L250,24 L275,12 L300,18 L300,80 L0,80 Z"
+                      fill="url(#sparkFill)"/>
+              </svg>
+
+              <!-- Top 3 mini list -->
+              <div class="space-y-3">
+                <div class="flex items-center justify-between text-sm border-t border-white/5 pt-3">
+                  <div class="flex items-center gap-3">
+                    <span class="num text-white/30 text-xs w-4">01</span>
+                    <span class="text-white">에이비온</span>
+                    <span class="text-[11px] px-1.5 py-0.5 rounded bg-signal/10 text-signal border border-signal/20">바이오</span>
+                  </div>
+                  <span class="num text-signal font-medium">112</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <div class="flex items-center gap-3">
+                    <span class="num text-white/30 text-xs w-4">02</span>
+                    <span class="text-white">루닛</span>
+                    <span class="text-[11px] px-1.5 py-0.5 rounded bg-white/5 text-white/60 border border-white/10">AI</span>
+                  </div>
+                  <span class="num text-white/80 font-medium">98</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                  <div class="flex items-center gap-3">
+                    <span class="num text-white/30 text-xs w-4">03</span>
+                    <span class="text-white">한미반도체</span>
+                    <span class="text-[11px] px-1.5 py-0.5 rounded bg-white/5 text-white/60 border border-white/10">반도체</span>
+                  </div>
+                  <span class="num text-white/80 font-medium">94</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating mini-card overlap -->
+          <div class="bezel mt-4 ml-auto w-[80%] reveal" style="animation-delay:400ms">
+            <div class="bezel-inner p-5 flex items-center gap-4">
+              <div class="w-11 h-11 rounded-xl bg-signal/15 border border-signal/25 flex items-center justify-center shrink-0">
+                <iconify-icon icon="solar:bolt-circle-bold" class="text-signal text-2xl"></iconify-icon>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-xs text-white/40 mb-0.5">집계 시간</div>
+                <div class="num text-white text-lg">2.1<span class="text-xs text-white/40 ml-1">초</span></div>
+              </div>
+              <div class="w-px h-10 bg-white/10"></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-xs text-white/40 mb-0.5">데이터 소스</div>
+                <div class="num text-white text-lg">4<span class="text-xs text-white/40 ml-1">개</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TRUST / METRICS BAR ===================== -->
+  <section class="relative z-10 py-12 md:py-16 border-y border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <div class="text-xs text-white/40 uppercase tracking-[0.2em]">매일 자동 수집되는 시그널</div>
+      </div>
+      <div class="overflow-hidden relative" style="mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);">
+        <div class="marquee-track flex gap-12 w-max">
+          <!-- Set 1 -->
+          <div class="flex items-center gap-12 text-white/40 text-sm shrink-0">
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:document-text-linear" class="text-base"></iconify-icon>DART 공시</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:notebook-linear" class="text-base"></iconify-icon>네이버 금융 뉴스</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:chart-square-linear" class="text-base"></iconify-icon>거래량 급증</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:users-group-rounded-linear" class="text-base"></iconify-icon>외국인·기관 순매수</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:tag-linear" class="text-base"></iconify-icon>테마 매칭</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:wallet-money-linear" class="text-base"></iconify-icon>거래대금 Tier</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:refresh-linear" class="text-base"></iconify-icon>회전율</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:fire-linear" class="text-base"></iconify-icon>재료 중복도</span>
+          </div>
+          <!-- Set 2 (mirror for seamless loop) -->
+          <div class="flex items-center gap-12 text-white/40 text-sm shrink-0" aria-hidden="true">
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:document-text-linear" class="text-base"></iconify-icon>DART 공시</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:notebook-linear" class="text-base"></iconify-icon>네이버 금융 뉴스</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:chart-square-linear" class="text-base"></iconify-icon>거래량 급증</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:users-group-rounded-linear" class="text-base"></iconify-icon>외국인·기관 순매수</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:tag-linear" class="text-base"></iconify-icon>테마 매칭</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:wallet-money-linear" class="text-base"></iconify-icon>거래대금 Tier</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:refresh-linear" class="text-base"></iconify-icon>회전율</span>
+            <span class="flex items-center gap-2"><iconify-icon icon="solar:fire-linear" class="text-base"></iconify-icon>재료 중복도</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Numeric strip -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-px mt-12 bg-white/5 rounded-2xl overflow-hidden border border-white/5">
+        <div class="bg-ink-900 p-6 md:p-8 text-center reveal">
+          <div class="num text-3xl md:text-4xl font-semibold text-white mb-1">11</div>
+          <div class="text-xs text-white/50">평가 지표</div>
+        </div>
+        <div class="bg-ink-900 p-6 md:p-8 text-center reveal" style="animation-delay:80ms">
+          <div class="num text-3xl md:text-4xl font-semibold text-white mb-1">145</div>
+          <div class="text-xs text-white/50">총 배점</div>
+        </div>
+        <div class="bg-ink-900 p-6 md:p-8 text-center reveal" style="animation-delay:160ms">
+          <div class="num text-3xl md:text-4xl font-semibold text-white mb-1">08:30</div>
+          <div class="text-xs text-white/50">자동 스캔 시각</div>
+        </div>
+        <div class="bg-ink-900 p-6 md:p-8 text-center reveal" style="animation-delay:240ms">
+          <div class="num text-3xl md:text-4xl font-semibold text-white mb-1">2.1<span class="text-base text-white/40 ml-1">초</span></div>
+          <div class="text-xs text-white/50">집계 평균</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ENGINE / FEATURES (BENTO) ===================== -->
+  <section id="engine" class="relative z-10 py-24 md:py-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div class="max-w-3xl mb-16 reveal">
+        <div class="eyebrow mb-6">엔진 구조</div>
+        <h2 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-white mb-6">
+          종목 발굴부터 성과 측정까지<br>
+          하나의 파이프라인으로.
+        </h2>
+        <p class="text-lg text-white/55 leading-relaxed max-w-[60ch]">
+          공시 수집기, 뉴스 크롤러, 점수 엔진, 결과 추적기가
+          매일 두 번 GitHub Actions 위에서 자동 실행됩니다.
+        </p>
+      </div>
+
+      <!-- Bento grid: 2fr 1fr 1fr asymmetric -->
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-5">
+
+        <!-- Big card: Score Engine -->
+        <div class="md:col-span-4 md:row-span-2 bezel reveal">
+          <div class="bezel-inner p-8 md:p-10 flex flex-col justify-between min-h-[420px] relative overflow-hidden">
+            <div class="absolute inset-0 opacity-30 pointer-events-none">
+              <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-signal/10 blur-3xl"></div>
+            </div>
+            <div class="relative">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-signal/15 border border-signal/25 flex items-center justify-center">
+                  <iconify-icon icon="solar:cpu-bolt-linear" class="text-signal text-xl"></iconify-icon>
+                </div>
+                <span class="text-xs text-white/40 uppercase tracking-[0.18em]">CORE</span>
+              </div>
+              <h3 class="font-display text-3xl md:text-4xl font-semibold text-white mb-3 leading-tight">145점 점수 엔진</h3>
+              <p class="text-white/55 leading-relaxed max-w-md">
+                11개 항목을 가중치로 결합해 단일 스코어로 환산합니다.
+                공시·뉴스·거래대금이 핵심 축입니다.
+              </p>
+            </div>
+            <div class="relative grid grid-cols-2 gap-3 mt-8">
+              <div class="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs text-white/50">공시</span>
+                  <span class="num text-white text-sm">40</span>
+                </div>
+                <div class="h-1 rounded-full bg-white/5 overflow-hidden">
+                  <div class="score-bar h-full bg-signal" style="width: 100%"></div>
+                </div>
+              </div>
+              <div class="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs text-white/50">뉴스</span>
+                  <span class="num text-white text-sm">25</span>
+                </div>
+                <div class="h-1 rounded-full bg-white/5 overflow-hidden">
+                  <div class="score-bar h-full bg-signal" style="width: 62%"></div>
+                </div>
+              </div>
+              <div class="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs text-white/50">테마</span>
+                  <span class="num text-white text-sm">15</span>
+                </div>
+                <div class="h-1 rounded-full bg-white/5 overflow-hidden">
+                  <div class="score-bar h-full bg-signal/80" style="width: 38%"></div>
+                </div>
+              </div>
+              <div class="rounded-xl border border-white/8 bg-white/[0.02] p-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs text-white/50">거래대금</span>
+                  <span class="num text-white text-sm">15</span>
+                </div>
+                <div class="h-1 rounded-full bg-white/5 overflow-hidden">
+                  <div class="score-bar h-full bg-signal/80" style="width: 38%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DART -->
+        <div class="md:col-span-2 bezel reveal" style="animation-delay:100ms">
+          <div class="bezel-inner p-7">
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-5">
+              <iconify-icon icon="solar:document-text-linear" class="text-white text-xl"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">DART 공시 수집</h3>
+            <p class="text-sm text-white/50 leading-relaxed">실적·계약·투자 공시를 전일·당일 단위로 끌어옵니다.</p>
+          </div>
+        </div>
+
+        <!-- News -->
+        <div class="md:col-span-2 bezel reveal" style="animation-delay:160ms">
+          <div class="bezel-inner p-7">
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-5">
+              <iconify-icon icon="solar:notebook-bookmark-linear" class="text-white text-xl"></iconify-icon>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">뉴스 크롤링</h3>
+            <p class="text-sm text-white/50 leading-relaxed">네이버 금융 종목 뉴스의 언급 빈도와 시간대를 추적합니다.</p>
+          </div>
+        </div>
+
+        <!-- Automation -->
+        <div class="md:col-span-3 bezel reveal" style="animation-delay:220ms">
+          <div class="bezel-inner p-7 flex items-start gap-5">
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <iconify-icon icon="solar:calendar-mark-linear" class="text-white text-xl"></iconify-icon>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">GitHub Actions 자동화</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-3">08:30 종목 선정, 16:30 결과 수집. 서버 없이 매일 동일 시각에 실행됩니다.</p>
+              <div class="flex items-center gap-2 text-[11px]">
+                <span class="num px-2 py-0.5 rounded bg-signal/10 text-signal border border-signal/20">morning-scan.yml</span>
+                <span class="num px-2 py-0.5 rounded bg-white/5 text-white/60 border border-white/10">intraday.yml</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tracker -->
+        <div class="md:col-span-3 bezel reveal" style="animation-delay:280ms">
+          <div class="bezel-inner p-7 flex items-start gap-5">
+            <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <iconify-icon icon="solar:target-linear" class="text-white text-xl"></iconify-icon>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white mb-2">결과 추적기</h3>
+              <p class="text-sm text-white/50 leading-relaxed mb-3">시초가·고가·저가·종가를 수집해 익절/손절을 자동 판정합니다.</p>
+              <div class="flex items-center gap-3 text-xs text-white/50">
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-signal"></span>익절 +5%</span>
+                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>손절 -3%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SCORE BREAKDOWN ===================== -->
+  <section id="score" class="relative z-10 py-24 md:py-32 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+
+        <!-- Left intro -->
+        <div class="lg:col-span-5 lg:sticky lg:top-32 self-start reveal">
+          <div class="eyebrow mb-6">점수 시스템</div>
+          <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white mb-6">
+            가중치는<br>
+            <span class="text-signal">백테스트로</span><br>
+            검증합니다.
+          </h2>
+          <p class="text-white/55 leading-relaxed mb-8 max-w-md">
+            모든 항목의 배점은 임의로 정해진 값이 아닙니다.
+            과거 데이터 위에서 가중치를 조정하며,
+            상관관계가 약한 항목은 제거됩니다.
+          </p>
+          <div class="bezel inline-block">
+            <div class="bezel-inner px-5 py-4 flex items-center gap-3">
+              <iconify-icon icon="solar:lock-keyhole-minimalistic-linear" class="text-signal text-lg"></iconify-icon>
+              <span class="text-sm text-white/70">현재 단계: <span class="text-white font-medium">백테스팅</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: scoring table -->
+        <div class="lg:col-span-7">
+          <div class="space-y-2.5">
+            <!-- Row template -->
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:document-text-bold" class="text-signal text-lg"></iconify-icon>
+                <span class="text-white font-medium">공시</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal" style="width: 100%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">40<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:60ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:notebook-bookmark-bold" class="text-signal text-lg"></iconify-icon>
+                <span class="text-white font-medium">뉴스</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal" style="width: 62.5%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">25<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:120ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:tag-bold" class="text-white/70 text-lg"></iconify-icon>
+                <span class="text-white font-medium">테마</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/80" style="width: 37.5%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">15<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:180ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:wallet-money-bold" class="text-white/70 text-lg"></iconify-icon>
+                <span class="text-white font-medium">거래대금</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/80" style="width: 37.5%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">15<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:240ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:chart-square-bold" class="text-white/60 text-lg"></iconify-icon>
+                <span class="text-white font-medium">거래량 급증</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/60" style="width: 25%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">10<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:300ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:users-group-rounded-bold" class="text-white/60 text-lg"></iconify-icon>
+                <span class="text-white font-medium">외국인·기관</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/60" style="width: 25%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">10<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:360ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:diagram-up-bold" class="text-white/60 text-lg"></iconify-icon>
+                <span class="text-white font-medium">시가총액</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/60" style="width: 25%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">10<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:420ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:refresh-bold" class="text-white/50 text-lg"></iconify-icon>
+                <span class="text-white font-medium">회전율</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/40" style="width: 12.5%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">5<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:480ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:fire-bold" class="text-white/50 text-lg"></iconify-icon>
+                <span class="text-white font-medium">재료 중복도</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/40" style="width: 12.5%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">5<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4 border-b border-white/5" style="animation-delay:540ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:clock-circle-bold" class="text-white/50 text-lg"></iconify-icon>
+                <span class="text-white font-medium">뉴스 시간대</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/40" style="width: 12.5%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">5<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+            <div class="reveal grid grid-cols-12 items-center gap-4 py-4" style="animation-delay:600ms">
+              <div class="col-span-5 flex items-center gap-3">
+                <iconify-icon icon="solar:graph-up-bold" class="text-white/50 text-lg"></iconify-icon>
+                <span class="text-white font-medium">가격 모멘텀</span>
+              </div>
+              <div class="col-span-5 h-1.5 rounded-full bg-white/5 overflow-hidden">
+                <div class="score-bar h-full bg-signal/40" style="width: 12.5%"></div>
+              </div>
+              <div class="col-span-2 text-right num text-white">5<span class="text-white/30 text-xs ml-0.5">점</span></div>
+            </div>
+
+            <div class="grid grid-cols-12 items-center gap-4 pt-6 mt-4 border-t border-signal/30">
+              <div class="col-span-5 flex items-center gap-3">
+                <span class="text-signal text-xs uppercase tracking-[0.18em]">총합</span>
+              </div>
+              <div class="col-span-5"></div>
+              <div class="col-span-2 text-right num text-signal text-2xl font-semibold">145</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BNF STRATEGY (ZIG-ZAG) ===================== -->
+  <section id="bnf" class="relative z-10 py-24 md:py-32 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-3xl mx-auto mb-20 reveal">
+        <div class="eyebrow mb-6 mx-auto">BNF 낙폭과대 전략</div>
+        <h2 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-white">
+          급락 종목의 반등을<br>
+          분할로 잡습니다.
+        </h2>
+      </div>
+
+      <div class="space-y-20 md:space-y-28">
+
+        <!-- Step 1: text right, visual left -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center reveal">
+          <div class="bezel order-2 md:order-1">
+            <div class="bezel-inner p-8 relative overflow-hidden">
+              <div class="absolute top-4 right-4 text-[10px] text-white/30 num">DAY 0</div>
+              <svg viewBox="0 0 320 180" class="w-full">
+                <defs>
+                  <linearGradient id="dropFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#f43f5e" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="0" y1="60" x2="320" y2="60" stroke="rgba(255,255,255,0.05)" stroke-dasharray="2,4"/>
+                <path d="M0,55 L40,50 L80,58 L120,52 L160,65 L200,90 L240,130 L280,150 L320,148"
+                      fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M0,55 L40,50 L80,58 L120,52 L160,65 L200,90 L240,130 L280,150 L320,148 L320,180 L0,180 Z" fill="url(#dropFill)"/>
+                <circle cx="280" cy="150" r="5" fill="#f43f5e"/>
+                <circle cx="280" cy="150" r="10" fill="none" stroke="#f43f5e" stroke-opacity="0.4"/>
+              </svg>
+              <div class="mt-4 flex items-center justify-between text-xs">
+                <span class="text-white/40">전일 종가 대비</span>
+                <span class="num text-rose-400">-5.3%</span>
+              </div>
+            </div>
+          </div>
+          <div class="order-1 md:order-2">
+            <div class="num text-signal text-sm mb-3">STEP 01</div>
+            <h3 class="font-display text-3xl md:text-4xl font-semibold text-white mb-4 leading-tight">진입 트리거</h3>
+            <p class="text-white/55 leading-relaxed text-lg max-w-md">
+              전일 종가 대비 -5% 이상 급락한 종목을 후보 풀에 올립니다.
+              과매도 구간일수록 반등 폭이 크다는 BNF 원칙입니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2: text left, visual right -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center reveal">
+          <div>
+            <div class="num text-signal text-sm mb-3">STEP 02</div>
+            <h3 class="font-display text-3xl md:text-4xl font-semibold text-white mb-4 leading-tight">3회 분할 매수</h3>
+            <p class="text-white/55 leading-relaxed text-lg max-w-md">
+              최저점을 맞추려 하지 않습니다.
+              1차 진입 후 추가 하락 시 2차·3차로 평단가를 낮춥니다.
+              심리가 아닌 규칙으로 매수합니다.
+            </p>
+          </div>
+          <div class="bezel">
+            <div class="bezel-inner p-8 space-y-4">
+              <div class="flex items-center gap-4">
+                <div class="num w-9 h-9 rounded-full bg-signal/15 border border-signal/30 text-signal flex items-center justify-center text-sm font-semibold">1</div>
+                <div class="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div class="score-bar h-full bg-signal/80" style="width: 33%"></div>
+                </div>
+                <span class="num text-sm text-white/70">33%</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="num w-9 h-9 rounded-full bg-signal/15 border border-signal/30 text-signal flex items-center justify-center text-sm font-semibold">2</div>
+                <div class="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div class="score-bar h-full bg-signal/80" style="width: 66%"></div>
+                </div>
+                <span class="num text-sm text-white/70">33%</span>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="num w-9 h-9 rounded-full bg-signal/15 border border-signal/30 text-signal flex items-center justify-center text-sm font-semibold">3</div>
+                <div class="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div class="score-bar h-full bg-signal" style="width: 100%"></div>
+                </div>
+                <span class="num text-sm text-white/70">34%</span>
+              </div>
+              <div class="pt-4 border-t border-white/5 flex items-center justify-between text-xs">
+                <span class="text-white/40">평균 분할 간격</span>
+                <span class="num text-white">-1.5% / -3.0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: text right, visual left -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center reveal">
+          <div class="bezel order-2 md:order-1">
+            <div class="bezel-inner p-8 relative overflow-hidden">
+              <div class="absolute top-4 right-4 text-[10px] text-white/30 num">EXIT</div>
+              <svg viewBox="0 0 320 180" class="w-full">
+                <defs>
+                  <linearGradient id="riseFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#34d39c" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="#34d39c" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="0" y1="120" x2="320" y2="120" stroke="rgba(255,255,255,0.05)" stroke-dasharray="2,4"/>
+                <path d="M0,140 L30,135 L60,120 L90,100 L120,85 L150,55 L180,40 L210,30 L240,45 L270,55 L300,68 L320,72"
+                      fill="none" stroke="#34d39c" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M0,140 L30,135 L60,120 L90,100 L120,85 L150,55 L180,40 L210,30 L240,45 L270,55 L300,68 L320,72 L320,180 L0,180 Z" fill="url(#riseFill)"/>
+                <line x1="210" y1="0" x2="210" y2="180" stroke="#34d39c" stroke-opacity="0.3" stroke-dasharray="2,4"/>
+                <circle cx="210" cy="30" r="5" fill="#34d39c"/>
+                <text x="216" y="22" fill="#34d39c" font-size="10" font-family="JetBrains Mono">고점</text>
+              </svg>
+              <div class="mt-4 flex items-center justify-between text-xs">
+                <span class="text-white/40">트레일링 스탑</span>
+                <span class="num text-signal">고점 −2%</span>
+              </div>
+            </div>
+          </div>
+          <div class="order-1 md:order-2">
+            <div class="num text-signal text-sm mb-3">STEP 03</div>
+            <h3 class="font-display text-3xl md:text-4xl font-semibold text-white mb-4 leading-tight">분할 청산 + 트레일링</h3>
+            <p class="text-white/55 leading-relaxed text-lg max-w-md">
+              반등이 시작되면 3회에 걸쳐 분할 매도합니다.
+              마지막 물량은 고점 대비 -2% 이탈 시 자동 청산되어
+              상승분을 끝까지 따라갑니다.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ROADMAP ===================== -->
+  <section id="roadmap" class="relative z-10 py-24 md:py-32 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div class="lg:col-span-4 reveal">
+          <div class="eyebrow mb-6">로드맵</div>
+          <h2 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white mb-6">
+            검증부터<br>실매매까지<br>4단계.
+          </h2>
+          <p class="text-white/55 leading-relaxed max-w-sm">
+            각 단계는 다음 단계로 가기 위한 검증 게이트입니다.
+            지표가 충족되지 않으면 다음으로 넘어가지 않습니다.
+          </p>
+        </div>
+        <div class="lg:col-span-8">
+          <div class="space-y-3">
+            <!-- Phase 1 - active -->
+            <div class="bezel reveal">
+              <div class="bezel-inner p-6 md:p-7 flex items-center gap-5">
+                <div class="num text-3xl text-signal w-10">01</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-3 mb-1">
+                    <h3 class="text-lg font-semibold text-white">백테스팅</h3>
+                    <span class="text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 rounded-full bg-signal/15 text-signal border border-signal/30">현재 단계</span>
+                  </div>
+                  <p class="text-sm text-white/55">전략 검증, 가중치 튜닝, 지표 상관관계 분석.</p>
+                </div>
+                <div class="hidden md:flex items-center gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-signal pulse-dot"></div>
+                </div>
+              </div>
+            </div>
+            <div class="bezel reveal" style="animation-delay:80ms">
+              <div class="bezel-inner p-6 md:p-7 flex items-center gap-5">
+                <div class="num text-3xl text-white/30 w-10">02</div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg font-semibold text-white/80 mb-1">모의투자</h3>
+                  <p class="text-sm text-white/45">실시세 기반 페이퍼 트레이딩, 슬리피지·체결 지연 측정.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bezel reveal" style="animation-delay:160ms">
+              <div class="bezel-inner p-6 md:p-7 flex items-center gap-5">
+                <div class="num text-3xl text-white/30 w-10">03</div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg font-semibold text-white/80 mb-1">소액 실매매</h3>
+                  <p class="text-sm text-white/45">10~50만원 규모, 심리·체결·세금까지 포함한 실전 검증.</p>
+                </div>
+              </div>
+            </div>
+            <div class="bezel reveal" style="animation-delay:240ms">
+              <div class="bezel-inner p-6 md:p-7 flex items-center gap-5">
+                <div class="num text-3xl text-white/30 w-10">04</div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg font-semibold text-white/80 mb-1">본격 자동매매</h3>
+                  <p class="text-sm text-white/45">검증 완료된 시그널의 자동 주문 실행.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section id="cta" class="relative z-10 py-24 md:py-40">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bezel reveal">
+        <div class="bezel-inner p-10 md:p-16 lg:p-20 text-center relative overflow-hidden">
+          <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-signal/5 blur-3xl"></div>
+          </div>
+          <div class="relative">
+            <div class="eyebrow mx-auto mb-8">대시보드 공개</div>
+            <h2 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-white mb-6">
+              오늘의 시그널을<br>
+              <span class="text-signal">지금 확인하세요.</span>
+            </h2>
+            <p class="text-lg text-white/55 leading-relaxed max-w-xl mx-auto mb-10">
+              매일 갱신되는 후보 종목과 성과 추적 결과를
+              GitHub Pages에서 무료로 열람할 수 있습니다.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-4">
+              <a href="./index.html" class="cta inline-flex items-center gap-2 bg-signal text-ink-950 font-semibold pl-8 pr-2 py-2 rounded-full text-base">
+                페이퍼 트레이딩 대시보드
+                <span class="arrow-wrap w-11 h-11 rounded-full bg-ink-950/15 flex items-center justify-center">
+                  <iconify-icon icon="solar:arrow-right-linear" class="text-xl"></iconify-icon>
+                </span>
+              </a>
+              <a href="./bnf_dashboard.html" class="cta inline-flex items-center gap-2 text-white/80 hover:text-white px-7 py-4 rounded-full border border-white/10 hover:border-white/20 text-sm font-medium">
+                <iconify-icon icon="solar:chart-2-linear" class="text-lg"></iconify-icon>
+                BNF 대시보드
+              </a>
+            </div>
+            <div class="mt-12 flex items-center justify-center gap-6 text-xs text-white/40">
+              <span class="flex items-center gap-2"><iconify-icon icon="solar:shield-check-linear"></iconify-icon>참고용 도구</span>
+              <span class="flex items-center gap-2"><iconify-icon icon="solar:hand-money-linear"></iconify-icon>투자 책임 본인</span>
+              <span class="flex items-center gap-2"><iconify-icon icon="solar:code-linear"></iconify-icon>오픈소스 MIT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="relative z-10 border-t border-white/5 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <span class="w-7 h-7 rounded-lg bg-signal/20 border border-signal/30 flex items-center justify-center">
+            <iconify-icon icon="solar:graph-up-bold" class="text-signal text-base"></iconify-icon>
+          </span>
+          <span class="text-sm text-white/60">SignalDesk · News Trading Bot</span>
+        </div>
+        <div class="flex items-center gap-6 text-xs text-white/40">
+          <a href="./system_guide.html" class="hover:text-white ease-supa">시스템 가이드</a>
+          <a href="#engine" class="hover:text-white ease-supa">엔진</a>
+          <a href="#roadmap" class="hover:text-white ease-supa">로드맵</a>
+          <span class="num">v2026.04</span>
+        </div>
+      </div>
+      <div class="mt-8 pt-8 border-t border-white/5 text-[11px] text-white/30 leading-relaxed max-w-3xl">
+        본 시스템은 투자 자문이 아닌 참고용 분석 도구입니다.
+        과거 성과가 미래 수익을 보장하지 않으며, 모든 투자 판단과 손실 책임은 사용자 본인에게 있습니다.
+        반드시 소액으로 검증한 후 운용하세요.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver — reveal & score bars
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    document.querySelectorAll('.score-bar').forEach(el => io.observe(el));
+    document.querySelectorAll('.sparkline').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>

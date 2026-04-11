@@ -151,6 +151,10 @@ function renderRanking(rows) {
       <div class="team-medal">${MEDALS[Math.min(i, 4)]}</div>
       <div class="name">${t.name}</div>
       <div class="desc">${t.desc}</div>
+      <div class="team-card-side">
+        <div class="ret ${colorClass(t.today_pct)}">${fmtPctSigned(t.today_pct)}</div>
+        <div class="cum">누적 ${fmtPct(t.cum_pct)} · ELO ${t.elo}</div>
+      </div>
       <div class="team-stats">
         <div class="team-stat">
           <span class="team-stat-label">금일</span>
