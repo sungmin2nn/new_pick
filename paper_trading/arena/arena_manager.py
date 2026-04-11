@@ -103,10 +103,17 @@ class ArenaManager:
             from paper_trading.strategies import StrategyRegistry
             from paper_trading.simulator import TradingSimulator
             from paper_trading.selector import StockCandidate
+            from paper_trading.multi_strategy_runner import _resolve_fetch_date
+
+            # 비거래일/미래일 → 가장 최근 거래일로 fetch (target_date는 그대로)
+            today_str = datetime.now(KST).strftime("%Y%m%d")
+            fetch_date = _resolve_fetch_date(min(date, today_str))
+            if fetch_date != date:
+                print(f"[Arena] fetch_date={fetch_date} (target={date} 비거래일/미래)")
 
             # 1. 전략별 종목 선정
-            print("\n[Phase 1] 4팀 종목 선정")
-            strategy_results = StrategyRegistry.run_all(date=date, top_n=5)
+            print("\n[Phase 1] 5팀 종목 선정")
+            strategy_results = StrategyRegistry.run_all(date=fetch_date, top_n=5)
 
             # 2. 팀별 독립 시뮬레이션
             print("\n[Phase 2] 4팀 독립 시뮬레이션")
