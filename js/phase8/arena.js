@@ -188,8 +188,23 @@ function renderRanking(rows) {
 }
 
 // ============ Strategy Accordion (Depth 1 → 2 → 3) ============
+// 전략별 점수 분해 키 → 표시 라벨 + 만점
+const SCORE_KEY_META = {
+  change_pct: { label: '등락률', max: 35 },
+  trading_value: { label: '거래대금', max: 30 },
+  volume_surge: { label: '거래량 급증', max: 20 },
+  market_cap: { label: '시가총액', max: 30 },
+  price_level: { label: '가격대', max: 15 },
+  rsi: { label: 'RSI', max: 20 },
+  category: { label: '카테고리', max: 30 },
+  timing: { label: '시점', max: 20 },
+  theme_strength: { label: '테마 강도', max: 25 },
+  gap: { label: '시초가 갭', max: 25 },
+  volume: { label: '거래량', max: 20 },
+};
+
 function renderScoreBar(label, val, max) {
-  const w = Math.min(100, (val / max * 100)).toFixed(0);
+  const w = Math.min(100, Math.max(0, val / max * 100)).toFixed(0);
   return `
     <div class="score-bar">
       <span class="score-bar-label">${label}</span>
@@ -200,6 +215,12 @@ function renderScoreBar(label, val, max) {
 
 function renderStockDetail(c, totalCount) {
   const sd = c.score_detail || {};
+  // 실제 존재하는 키만 렌더 (전략마다 다름)
+  const bars = Object.entries(sd).map(([key, val]) => {
+    const meta = SCORE_KEY_META[key] || { label: key, max: 30 };
+    return renderScoreBar(meta.label, +val || 0, meta.max);
+  }).join('');
+
   return `
     <div class="sacc-detail">
       <div class="mini-kpi-grid">
@@ -214,11 +235,7 @@ function renderStockDetail(c, totalCount) {
           <div class="mini-kpi-meta">${totalCount}종목 중 ${c.rank}위</div>
         </div>
       </div>
-      <div class="detail-h">점수 분해</div>
-      ${renderScoreBar('등락률', sd.change_pct ?? 0, 35)}
-      ${renderScoreBar('거래대금', sd.trading_value ?? 0, 30)}
-      ${renderScoreBar('거래량 급증', sd.volume_surge ?? 0, 20)}
-      ${renderScoreBar('가격대', sd.price_level ?? 0, 15)}
+      ${bars ? `<div class="detail-h">점수 분해</div>${bars}` : ''}
       ${c.trading_value ? `
       <div class="detail-h">거래 정보</div>
       <div class="detail-row"><span>거래대금</span><span class="num">${fmtMoney(c.trading_value)}</span></div>
