@@ -142,6 +142,104 @@
         }
 
         /* Stats Grid */
+        /* === 매매 내역 카드 리스트 (Pearl Light + 한국 금융 컨벤션) === */
+        .trade-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .trade-empty {
+            text-align: center;
+            color: #9CA3AF;
+            font-size: 0.85em;
+            padding: 24px 12px;
+        }
+        .trade-card {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .tr-left { min-width: 0; }
+        .tr-right { text-align: right; flex-shrink: 0; }
+
+        .tr-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .tr-name b {
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #1A1A2E;
+        }
+        .tr-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 999px;
+            letter-spacing: 0.04em;
+        }
+        .tr-badge-buy {
+            background: rgba(0, 198, 190, 0.1);
+            color: #00A39C;
+            border: 1px solid rgba(0, 198, 190, 0.3);
+        }
+        .tr-badge-sell {
+            background: #F0F2F5;
+            color: #4a4a5e;
+            border: 1px solid #E5E7EB;
+        }
+
+        .tr-meta {
+            font-size: 11px;
+            color: #6B7280;
+            line-height: 1.5;
+        }
+        .tr-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            color: #4a4a5e;
+            font-weight: 500;
+        }
+        .tr-reason-line {
+            margin-top: 4px;
+        }
+        .tr-reason {
+            font-size: 10px;
+            color: #6B7280;
+            background: #F8FAFB;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .tr-big {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 1.05em;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        .tr-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 3px;
+            opacity: 0.85;
+        }
+        /* 한국 금융 컨벤션: 양수 빨강 / 음수 파랑 */
+        .tr-up { color: #EF4444; }
+        .tr-down { color: #3B82F6; }
+        .tr-neutral { color: #6B7280; font-size: 0.85em; font-weight: 600; }
+
         /* === A안: stats 테이블 카드 === */
         .stats-table-card {
             background: #FFFFFF;
@@ -387,10 +485,11 @@
             border-bottom: 1px solid #E5E7EB;
             white-space: nowrap;
         }
-        th { background: #F8FAFB; color: #00C6BE; font-weight: 600; font-size: 0.75em; }
+        th { background: #F8FAFB; color: #6B7280; font-weight: 600; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.04em; }
         tr:hover { background: rgba(0, 198, 190, 0.03); }
-        .positive { color: #10B981; }
-        .negative { color: #EF4444; }
+        /* 한국 금융 컨벤션: 양수=빨강(상승), 음수=파랑(하락) */
+        .positive { color: #EF4444; }
+        .negative { color: #3B82F6; }
 
         /* Candidates Table */
         #candidatesTable th:nth-child(1) { width: 30px; }
@@ -574,23 +673,14 @@
             </div>
         </div>
 
-        <!-- Capital Status -->
-        <div class="capital-status" id="capitalStatus">
-            <div class="capital-info">
-                <span class="capital-icon">💰</span>
-                <span class="capital-text">
-                    <strong>자금 현황:</strong>
-                    사용 <span id="usedCapital">0</span>원 / 총 <span id="totalCapital">3,000,000</span>원
-                    (<span id="capitalUsage">0</span>%)
-                </span>
-            </div>
-            <div class="capital-bar">
-                <div class="capital-bar-fill" id="capitalBarFill" style="width: 0%"></div>
-            </div>
-            <div class="capital-slots">
-                📊 포지션: <span id="positionSlots">0/5</span>개
-                <span class="slot-status" id="slotStatus">진입 가능</span>
-            </div>
+        <!-- (자금 현황 bar 제거 - stats 테이블에 정보 모두 있음) -->
+        <div style="display:none;">
+            <span id="usedCapital"></span>
+            <span id="totalCapital"></span>
+            <span id="capitalUsage"></span>
+            <span id="capitalBarFill"></span>
+            <span id="positionSlots"></span>
+            <span id="slotStatus"></span>
         </div>
 
         <!-- Stats Table (A안 - 한 카드, 2열 표) -->
@@ -690,31 +780,15 @@
             </div>
         </div>
 
-        <!-- Trade History -->
+        <!-- Trade History (카드 리스트 - Pearl Light 디자인) -->
         <div class="section">
             <h2>📋 매매 내역</h2>
-            <div class="table-wrapper">
-                <table id="tradeHistory">
-                    <thead>
-                        <tr>
-                            <th>매수일</th>
-                            <th>구분</th>
-                            <th>종목</th>
-                            <th>매수가</th>
-                            <th>수량</th>
-                            <th>금액</th>
-                            <th>분할</th>
-                            <th>매도가</th>
-                            <th>매도일</th>
-                            <th>손익률</th>
-                            <th>보유기간</th>
-                            <th>비고</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="12" class="no-data">매매 내역이 없습니다</td></tr>
-                    </tbody>
-                </table>
+            <div id="tradeList" class="trade-list">
+                <div class="trade-empty">매매 내역이 없습니다</div>
+            </div>
+            <!-- legacy hidden table (loadTradeHistory 호환용) -->
+            <div style="display:none;">
+                <table id="tradeHistory"><tbody></tbody></table>
             </div>
         </div>
     </div>
@@ -1164,38 +1238,78 @@
                 initEmptyChart();
                 updateUnrealizedChart();
 
+                // 신규 카드 리스트 렌더 (Pearl Light)
+                const tradeListEl = document.getElementById('tradeList');
+                if (!tradeListEl) return;
+
                 if (allTrades.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="12" class="no-data">매매 내역이 없습니다</td></tr>';
+                    tradeListEl.innerHTML = '<div class="trade-empty">매매 내역이 없습니다</div>';
                     return;
                 }
 
-                tbody.innerHTML = allTrades.slice(0, 30).map(t => {
-                    const isBuy = t.type === 'BUY';
-                    const typeClass = isBuy ? 'positive' : 'negative';
-                    const typeLabel = isBuy ? '매수' : '매도';
+                const fmtDate = (s) => {
+                    if (!s) return '-';
+                    const d = String(s).replace(/-/g, '');
+                    return d.length >= 8 ? `${d.slice(4,6)}/${d.slice(6,8)}` : s;
+                };
 
-                    // 손익률 표시
-                    let pnlDisplay = '-';
-                    if (!isBuy && t.return_pct !== undefined && t.return_pct !== null) {
-                        const pnlClass = t.return_pct >= 0 ? 'positive' : 'negative';
-                        pnlDisplay = `<span class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct.toFixed(1)}%</span>`;
+                tradeListEl.innerHTML = allTrades.slice(0, 30).map(t => {
+                    const isBuy = t.type === 'BUY';
+                    const isClosed = !isBuy && t.return_pct != null;
+                    const cls = (n) => n >= 0 ? 'tr-up' : 'tr-down';
+                    const sign = (n) => (n >= 0 ? '+' : '');
+                    const profit = t.profit;
+
+                    // 우측 큰 숫자: 청산은 손익률, 진입중은 "보유중"
+                    let bigNum = '';
+                    let bigClass = '';
+                    if (isClosed) {
+                        bigNum = `${sign(t.return_pct)}${t.return_pct.toFixed(2)}%`;
+                        bigClass = cls(t.return_pct);
+                    } else if (isBuy) {
+                        bigNum = '보유중';
+                        bigClass = 'tr-neutral';
                     }
 
+                    // 부가: profit 원
+                    let subProfit = '';
+                    if (isClosed && profit != null) {
+                        subProfit = `${sign(profit)}${profit.toLocaleString()}원`;
+                    }
+
+                    // badge: 매수/매도 + reason
+                    const badge = isBuy
+                        ? '<span class="tr-badge tr-badge-buy">매수</span>'
+                        : '<span class="tr-badge tr-badge-sell">청산</span>';
+                    const reason = t.reason
+                        ? `<span class="tr-reason">${t.reason}</span>`
+                        : '';
+
+                    // 가격/수량 행
+                    const priceLine = isClosed
+                        ? `${(t.buy_price || 0).toLocaleString()} → ${(t.sell_price || 0).toLocaleString()}`
+                        : `${(t.buy_price || 0).toLocaleString()}원`;
+
+                    const dateLine = isClosed
+                        ? `${fmtDate(t.buy_date)} → ${fmtDate(t.sell_date)}${t.holding_days && t.holding_days !== '-' ? ' · ' + t.holding_days : ''}`
+                        : `${fmtDate(t.buy_date)} 진입`;
+
                     return `
-                        <tr>
-                            <td>${t.buy_date || '-'}</td>
-                            <td><span class="${typeClass}" style="font-weight:600;">${typeLabel}</span></td>
-                            <td>${t.name}</td>
-                            <td>${(t.buy_price || 0).toLocaleString()}</td>
-                            <td>${t.quantity}주</td>
-                            <td>${(t.amount || 0).toLocaleString()}</td>
-                            <td>${t.partial || '-'}</td>
-                            <td>${isBuy ? '-' : (t.sell_price || 0).toLocaleString()}</td>
-                            <td>${isBuy ? '-' : (t.sell_date || '-')}</td>
-                            <td>${pnlDisplay}</td>
-                            <td>${isBuy ? '-' : (t.holding_days || '-')}</td>
-                            <td style="font-size:0.8em;">${t.reason || ''}</td>
-                        </tr>
+                        <div class="trade-card">
+                            <div class="tr-left">
+                                <div class="tr-name">
+                                    <b>${t.name || '-'}</b>
+                                    ${badge}
+                                </div>
+                                <div class="tr-meta">${dateLine}</div>
+                                <div class="tr-meta tr-num">${priceLine} · ${t.quantity || 0}주</div>
+                                ${reason ? `<div class="tr-reason-line">${reason}</div>` : ''}
+                            </div>
+                            <div class="tr-right">
+                                <div class="tr-big ${bigClass}">${bigNum}</div>
+                                ${subProfit ? `<div class="tr-sub ${bigClass}">${subProfit}</div>` : ''}
+                            </div>
+                        </div>
                     `;
                 }).join('');
 
