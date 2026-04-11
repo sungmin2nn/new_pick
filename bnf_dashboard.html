@@ -465,8 +465,18 @@
     </style>
 </head>
 <body>
+    <!-- iframe 내부 감지: 부모 페이지(index.html)에서 열릴 때 상단 nav 숨김 -->
+    <script>
+      if (window.self !== window.top) {
+        document.documentElement.classList.add('in-iframe');
+      }
+    </script>
+    <style>
+      html.in-iframe .nav-buttons { display: none !important; }
+      html.in-iframe body { padding-top: 0 !important; }
+    </style>
     <div class="container">
-        <!-- Navigation -->
+        <!-- Navigation (standalone only) -->
         <nav class="nav-buttons" aria-label="메인 네비게이션">
             <div class="nav-buttons-main" role="navigation">
                 <a href="index.html" class="nav-btn" aria-label="페이퍼 트레이딩 대시보드">📊 페이퍼 트레이딩</a>
