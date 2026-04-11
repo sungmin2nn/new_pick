@@ -142,6 +142,58 @@
         }
 
         /* Stats Grid */
+        /* === A안: stats 테이블 카드 === */
+        .stats-table-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stats-table-title {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: #6B7280;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #F0F2F5;
+        }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .stats-table th {
+            text-align: left;
+            font-weight: 500;
+            color: #6B7280;
+            padding: 8px 0;
+            font-size: 0.85em;
+            width: 40%;
+            border-bottom: 1px solid #F0F2F5;
+        }
+        .stats-table td {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: #1A1A2E;
+            padding: 8px 0;
+            font-size: 0.95em;
+            border-bottom: 1px solid #F0F2F5;
+        }
+        .stats-table tr:last-child th,
+        .stats-table tr:last-child td { border-bottom: none; }
+        .stats-table tr.row-emph th { color: #1A1A2E; font-weight: 700; }
+        .stats-table tr.row-emph td {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: #00A39C;
+        }
+        .stats-table td.positive { color: #EF4444; }
+        .stats-table td.negative { color: #3B82F6; }
+
+        /* (legacy - 호환용) */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -541,33 +593,33 @@
             </div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card kpi-primary">
-                <div class="stat-value" id="totalReturn">-</div>
-                <div class="stat-label">누적 수익률 (자본 대비)</div>
-            </div>
-            <div class="stat-card kpi-primary">
-                <div class="stat-value" id="winRate">-</div>
-                <div class="stat-label">승률</div>
-            </div>
-            <div class="stat-card kpi-primary">
-                <div class="stat-value" id="unrealizedPnl">-</div>
-                <div class="stat-label">총 손익</div>
-                <div class="stat-sub" id="pnlBreakdown" style="font-size:11px;color:#6B7280;margin-top:4px;">-</div>
-            </div>
-            <div class="stat-card kpi-secondary">
-                <div class="stat-value" id="totalTrades">-</div>
-                <div class="stat-label">누적 매매</div>
-            </div>
-            <div class="stat-card kpi-secondary">
-                <div class="stat-value" id="avgReturn">-</div>
-                <div class="stat-label">평균 수익률</div>
-            </div>
-            <div class="stat-card kpi-secondary">
-                <div class="stat-value" id="openPositions">-</div>
-                <div class="stat-label">보유 포지션</div>
-            </div>
+        <!-- Stats Table (A안 - 한 카드, 2열 표) -->
+        <div class="stats-table-card">
+            <div class="stats-table-title">💰 자본 / 통계</div>
+            <table class="stats-table">
+                <tbody>
+                    <tr><th>초기 자본</th><td id="stInitialCap">-</td></tr>
+                    <tr><th>현재 자본</th><td id="stCurrentCap">-</td></tr>
+                    <tr><th>사용 자본</th><td id="stUsedCap">-</td></tr>
+                    <tr><th>실현 손익</th><td id="stRealizedPnl">-</td></tr>
+                    <tr><th>미실현 손익</th><td id="stUnrealizedPnl">-</td></tr>
+                    <tr class="row-emph"><th>누적 수익률</th><td id="stTotalReturn">-</td></tr>
+                    <tr><th>총 매매</th><td id="stTotalTrades">-</td></tr>
+                    <tr><th>평균 수익률</th><td id="stAvgReturn">-</td></tr>
+                    <tr><th>보유 포지션</th><td id="stOpenPositions">-</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Hidden 호환 (기존 ID 유지 - 다른 코드가 참조 가능) -->
+        <div style="display:none;">
+            <span id="totalReturn"></span>
+            <span id="winRate"></span>
+            <span id="unrealizedPnl"></span>
+            <span id="totalTrades"></span>
+            <span id="avgReturn"></span>
+            <span id="openPositions"></span>
+            <span id="pnlBreakdown"></span>
         </div>
 
         <!-- Candidates -->
@@ -915,38 +967,43 @@
             const stats = data.stats || {};
             const positions = data.positions || [];
 
-            // 누적 매매 건수 (trade_history 기반)
-            const totalTrades = stats.total_trades || 0;
-            const winCount = Math.round((stats.win_rate || 0) / 100 * totalTrades);
-            const lossCount = totalTrades - winCount;
-            document.getElementById('totalTrades').textContent = totalTrades + '건 (' + winCount + '승 ' + lossCount + '패)';
-
-            document.getElementById('winRate').textContent = (stats.win_rate || 0).toFixed(1) + '%';
-
-            // 누적 수익률 (자본 대비, position.py에서 계산된 값)
-            const totalReturnPct = stats.total_return || 0;
-            const totalReturnEl = document.getElementById('totalReturn');
-            totalReturnEl.textContent = (totalReturnPct >= 0 ? '+' : '') + totalReturnPct.toFixed(2) + '%';
-            totalReturnEl.className = 'stat-value ' + (totalReturnPct >= 0 ? 'positive' : 'negative');
-
-            document.getElementById('avgReturn').textContent = (stats.avg_return || 0).toFixed(2) + '%';
-            document.getElementById('openPositions').textContent = (stats.open_positions || 0) + '개';
-
-            // 미실현 + 실현 같이 표시
-            const unrealizedPnl = stats.unrealized_pnl || 0;
+            const totalCapital = stats.total_capital || INITIAL_CAPITAL;
+            const currentCapital = stats.current_capital || totalCapital;
+            const usedCapital = stats.used_capital || 0;
+            const usagePercent = totalCapital > 0 ? (usedCapital / totalCapital * 100) : 0;
             const realizedPnl = stats.realized_pnl || 0;
-            const unrealizedEl = document.getElementById('unrealizedPnl');
-            const totalPnl = unrealizedPnl + realizedPnl;
-            unrealizedEl.textContent = (totalPnl >= 0 ? '+' : '') + totalPnl.toLocaleString() + '원';
-            unrealizedEl.className = 'stat-value ' + (totalPnl >= 0 ? 'positive' : 'negative');
-            // 실현/미실현 분리 부가 표시
-            const subEl = document.getElementById('pnlBreakdown');
-            if (subEl) {
-                subEl.textContent = '실현 ' + (realizedPnl >= 0 ? '+' : '') + realizedPnl.toLocaleString()
-                    + ' / 미실현 ' + (unrealizedPnl >= 0 ? '+' : '') + unrealizedPnl.toLocaleString();
-            }
+            const unrealizedPnl = stats.unrealized_pnl || 0;
+            const totalReturnPct = stats.total_return || 0;
+            const totalTrades = stats.total_trades || 0;
+            const winRate = stats.win_rate || 0;
+            const winCount = Math.round(winRate / 100 * totalTrades);
+            const lossCount = totalTrades - winCount;
+            const avgReturn = stats.avg_return || 0;
+            const openPositions = stats.open_positions || 0;
 
-            // 자금 현황 업데이트
+            const fmtMoney = (n) => n.toLocaleString() + '원';
+            const fmtSigned = (n) => (n >= 0 ? '+' : '') + n.toLocaleString() + '원';
+            const fmtPct = (n) => (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+            const cls = (n) => n >= 0 ? 'positive' : 'negative';
+
+            // === 신규 stats 테이블 ===
+            const setVal = (id, text, className) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.textContent = text;
+                if (className !== undefined) el.className = className;
+            };
+            setVal('stInitialCap', fmtMoney(totalCapital));
+            setVal('stCurrentCap', fmtMoney(currentCapital), cls(currentCapital - totalCapital));
+            setVal('stUsedCap', fmtMoney(usedCapital) + ' (' + usagePercent.toFixed(1) + '%)');
+            setVal('stRealizedPnl', fmtSigned(realizedPnl), cls(realizedPnl));
+            setVal('stUnrealizedPnl', fmtSigned(unrealizedPnl), cls(unrealizedPnl));
+            setVal('stTotalReturn', fmtPct(totalReturnPct), cls(totalReturnPct));
+            setVal('stTotalTrades', totalTrades + '건 (' + winCount + '승 ' + lossCount + '패, 승률 ' + winRate.toFixed(0) + '%)');
+            setVal('stAvgReturn', avgReturn.toFixed(2) + '%');
+            setVal('stOpenPositions', openPositions + ' / 5개');
+
+            // === 자금 현황 (capital-status bar) ===
             updateCapitalStatus(stats, positions);
         }
 
