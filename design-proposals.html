@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>D1 + A + B — 3뎁스 드릴다운 (인터랙티브 테스트)</title>
+<title>D1 + A 중첩 — 3뎁스 아코디언 (인터랙티브 테스트)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -113,9 +113,7 @@ html, body {
 .phone-screen::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
 
 /* Guide panel */
-.guide {
-  padding: 4px;
-}
+.guide { padding: 4px; }
 .guide h2 {
   font-family: var(--font-display);
   font-size: 1.1rem;
@@ -151,15 +149,10 @@ html, body {
   z-index: 5;
 }
 .sb .left { display: flex; align-items: center; gap: 6px; }
-.sb .dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--success);
-  animation: pulse 2s infinite;
-}
+.sb .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
 .sb .num { color: var(--text-primary); font-weight: 600; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-/* Content */
 .content { padding: 14px; padding-bottom: 30px; }
 .content h2 {
   font-family: var(--font-display);
@@ -202,11 +195,7 @@ html, body {
 .tc .medal { font-size: 1.1rem; }
 .tc .name { font-weight: 700; font-size: 0.85rem; flex: 1; min-width: 0; }
 .tc .name .desc { font-size: 9px; color: var(--text-tertiary); font-weight: 400; display: block; }
-.tc .ret {
-  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-  font-weight: 700; font-size: 0.9rem;
-  text-align: right; white-space: nowrap;
-}
+.tc .ret { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.9rem; text-align: right; white-space: nowrap; }
 .tc .elo { font-size: 9px; color: var(--text-tertiary); text-align: right; }
 
 /* H2H */
@@ -244,7 +233,7 @@ html, body {
   border-radius: 12px; padding: 12px; margin-bottom: 10px;
 }
 
-/* ============== Accordion (Depth 1 → 2) ============== */
+/* ============== Strategy Accordion (Depth 1 → 2) ============== */
 .acc {
   background: white;
   border: 1px solid var(--border);
@@ -292,25 +281,28 @@ html, body {
 .acc-body {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.acc.open .acc-body { max-height: 500px; }
+.acc.open .acc-body { max-height: 3000px; }
 .acc-body-inner {
   border-top: 1px solid var(--border-subtle);
-  padding: 6px 14px 10px;
+  padding: 4px 12px 8px;
 }
 
-/* Stock row */
-.srow {
-  display: flex; align-items: center;
-  padding: 10px 0;
+/* ============== Stock Accordion (Depth 2 → 3) ============== */
+.sacc {
   border-bottom: 1px solid var(--border-subtle);
+}
+.sacc:last-child { border-bottom: none; }
+.sacc-head {
+  display: flex; align-items: center;
+  padding: 10px 4px;
   cursor: pointer;
+  user-select: none;
   transition: padding-left 0.15s;
 }
-.srow:hover { padding-left: 4px; }
-.srow:last-child { border-bottom: none; }
-.srow .rank {
+.sacc-head:hover { padding-left: 8px; }
+.sacc-head .rank {
   width: 18px; height: 18px;
   background: var(--bg-overlay);
   border-radius: 50%;
@@ -318,84 +310,48 @@ html, body {
   font-size: 9px; font-weight: 700;
   color: var(--text-tertiary);
   margin-right: 10px;
+  flex-shrink: 0;
 }
-.srow .info { flex: 1; min-width: 0; }
-.srow .info b { font-size: 12px; display: block; }
-.srow .code { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); }
-.srow .score { font-size: 9px; color: var(--text-tertiary); }
-.srow .pct {
+.sacc-head .info { flex: 1; min-width: 0; }
+.sacc-head .info b { font-size: 12px; display: block; }
+.sacc-head .code { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); }
+.sacc-head .score { font-size: 9px; color: var(--text-tertiary); }
+.sacc-head .pct {
   font-family: var(--font-mono); font-weight: 700; font-size: 12px;
   white-space: nowrap; margin-left: 6px;
 }
-.srow .arr { color: var(--text-muted); margin-left: 6px; font-size: 12px; }
-
-/* ============== Drawer (Depth 3) ============== */
-.backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(3px);
-  z-index: 100;
-  display: none;
-  align-items: flex-end;
-  animation: fadeIn 0.2s;
+.sacc-head .chev2 {
+  color: var(--text-muted);
+  margin-left: 8px;
+  font-size: 10px;
+  transition: transform 0.25s;
+  width: 10px; text-align: center;
+  flex-shrink: 0;
 }
-.backdrop.open { display: flex; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-.drawer {
-  width: 100%;
-  max-height: 88%;
-  background: white;
-  border-radius: 24px 24px 0 0;
-  overflow-y: auto;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+.sacc.open .sacc-head .chev2 { transform: rotate(90deg); }
+.sacc-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-.drawer .handle {
-  width: 40px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 10px auto 4px;
-}
-.drawer .close {
-  position: absolute; top: 14px; right: 14px;
-  width: 30px; height: 30px; border-radius: 50%;
+.sacc.open .sacc-body { max-height: 800px; }
+.sacc-body-inner {
   background: var(--bg-overlay);
-  border: none;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  z-index: 2;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 4px 0 10px;
 }
-.drawer-content { padding: 12px 16px 24px; }
-.drawer-content h3 {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  margin-bottom: 2px;
-}
-.drawer-content .ticker-line {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  margin-bottom: 16px;
-}
-.drawer-content .ticker-line .num { color: var(--text-secondary); font-weight: 600; }
 
+/* Score bar */
 .score-bar {
   display: flex; align-items: center; gap: 10px;
-  padding: 6px 0;
-  font-size: 11px;
+  padding: 5px 0;
+  font-size: 10px;
 }
-.score-bar .label { width: 80px; color: var(--text-secondary); flex-shrink: 0; }
+.score-bar .label { width: 70px; color: var(--text-secondary); flex-shrink: 0; }
 .score-bar .track {
-  flex: 1; height: 6px;
-  background: var(--bg-overlay);
+  flex: 1; height: 5px;
+  background: white;
   border-radius: 3px;
   overflow: hidden;
 }
@@ -404,47 +360,77 @@ html, body {
   background: linear-gradient(90deg, var(--accent), var(--accent-deep));
   border-radius: 3px;
 }
-.score-bar .val { font-family: var(--font-mono); font-weight: 700; width: 36px; text-align: right; }
+.score-bar .val { font-family: var(--font-mono); font-weight: 700; width: 32px; text-align: right; font-size: 10px; }
 
 .daily-line {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 4px;
   text-align: center;
-  padding: 10px;
-  background: var(--bg-overlay);
-  border-radius: 10px;
+  padding: 8px;
+  background: white;
+  border-radius: 8px;
 }
-.daily-line .d { font-size: 9px; color: var(--text-tertiary); }
-.daily-line .v { font-family: var(--font-mono); font-weight: 700; font-size: 12px; margin-top: 2px; }
+.daily-line .d { font-size: 8px; color: var(--text-tertiary); }
+.daily-line .v { font-family: var(--font-mono); font-weight: 700; font-size: 11px; margin-top: 2px; }
 
-.act-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.mini-kpi {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  margin-bottom: 10px;
+}
+.mini-kpi .k {
+  background: white;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.mini-kpi .k .label {
+  font-size: 8px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-tertiary); font-weight: 600;
+  margin-bottom: 2px;
+}
+.mini-kpi .k .value {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: 1rem; font-weight: 700; letter-spacing: -0.02em;
+}
+.mini-kpi .k .meta { font-size: 9px; color: var(--text-tertiary); margin-top: 2px; }
+
+.detail-h {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+  margin-top: 8px;
+}
+
+.act-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
 .act-btns button {
-  padding: 11px;
-  border-radius: 10px;
+  padding: 9px;
+  border-radius: 8px;
   border: none;
   font-weight: 700;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 11px;
   cursor: pointer;
 }
 .act-btns .primary { background: var(--accent); color: white; }
-.act-btns .secondary { background: var(--bg-overlay); color: var(--text-primary); }
+.act-btns .secondary { background: white; color: var(--text-primary); border: 1px solid var(--border); }
 </style>
 </head>
 <body>
 <div class="page">
-  <h1 class="display">D1 + A + B — 3뎁스 드릴다운 인터랙티브 테스트</h1>
+  <h1 class="display">D1 + 중첩 Accordion — 3뎁스 인터랙티브 테스트</h1>
   <p class="intro">
-    Accordion으로 전략별 종목 리스트 → 종목 탭 시 Drawer로 상세 정보.<br>
-    <b>클릭해보세요</b>: 전략 헤더(▶ 아이콘) 클릭 → 접기/펼치기, 종목 탭 → 바텀시트 drawer 열기.
+    Depth 1·2·3 모두 accordion. 페이지 이동이나 모달 없이 모든 정보 인플레이스로 펼침.<br>
+    <b>클릭해보세요</b>: 전략 헤더(▶) → 종목 리스트, 종목 row(›) → 상세 패널.
   </p>
 
   <div class="test-layout">
 
     <!-- ============== Phone frame ============== -->
     <div class="phone">
-      <div class="phone-label">D1 + A + B</div>
+      <div class="phone-label">D1 + 중첩 ACCORDION</div>
       <div class="phone-screen" id="screen">
         <div class="sb">
           <div class="left"><span class="dot"></span><span>정상</span><span>·</span><span class="num">2026-04-13</span></div>
@@ -492,211 +478,10 @@ html, body {
             <div class="tc" style="border-left-color:var(--team-b);"><div class="medal">5</div><div class="name">Beta Contrarian<span class="desc">RSI 역추세</span></div><div><div class="ret down">-9.05%</div><div class="elo">ELO 906</div></div></div>
           </div>
 
-          <!-- 전략별 종목 (Accordion: Depth 1 → 2) -->
+          <!-- 전략별 종목 (3-Depth Accordion) -->
           <div class="section">
-            <h2>내일 후보 <span class="sub">5전략 · 23종목</span></h2>
-
-            <!-- Alpha: open 상태 -->
-            <div class="acc open" style="border-left-color:var(--team-a);">
-              <div class="acc-head" onclick="toggleAcc(this)">
-                <span class="chev">▶</span>
-                <div class="info">
-                  <div class="name">Alpha Momentum</div>
-                  <div class="summary">
-                    평균점수 <span class="num">61.2</span> · 평균 <span class="num up">+3.9%</span>
-                  </div>
-                </div>
-                <span class="count">5개</span>
-              </div>
-              <div class="acc-body">
-                <div class="acc-body-inner">
-                  <div class="srow" onclick="openStock('삼성전자','005930','Alpha Momentum','var(--team-a)',77.5,2.91)">
-                    <div class="rank">1</div>
-                    <div class="info"><b>삼성전자</b><div class="code">005930 · KOSPI</div></div>
-                    <div class="score">77.5</div>
-                    <div class="pct up">+2.91%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('SK하이닉스','000660','Alpha Momentum','var(--team-a)',64.1,1.85)">
-                    <div class="rank">2</div>
-                    <div class="info"><b>SK하이닉스</b><div class="code">000660 · KOSPI</div></div>
-                    <div class="score">64.1</div>
-                    <div class="pct up">+1.85%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('한화에어로스페이스','012450','Alpha Momentum','var(--team-a)',58.3,3.86)">
-                    <div class="rank">3</div>
-                    <div class="info"><b>한화에어로스페이스</b><div class="code">012450 · KOSPI</div></div>
-                    <div class="score">58.3</div>
-                    <div class="pct up">+3.86%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('삼성전기','009150','Alpha Momentum','var(--team-a)',54.2,9.50)">
-                    <div class="rank">4</div>
-                    <div class="info"><b>삼성전기</b><div class="code">009150 · KOSPI</div></div>
-                    <div class="score">54.2</div>
-                    <div class="pct up">+9.50%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('현대모비스','012330','Alpha Momentum','var(--team-a)',51.7,1.42)">
-                    <div class="rank">5</div>
-                    <div class="info"><b>현대모비스</b><div class="code">012330 · KOSPI</div></div>
-                    <div class="score">51.7</div>
-                    <div class="pct up">+1.42%</div>
-                    <span class="arr">›</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Beta -->
-            <div class="acc" style="border-left-color:var(--team-b);">
-              <div class="acc-head" onclick="toggleAcc(this)">
-                <span class="chev">▶</span>
-                <div class="info">
-                  <div class="name">Beta Contrarian</div>
-                  <div class="summary">
-                    평균점수 <span class="num">55.6</span> · 평균 <span class="num down">-1.9%</span>
-                  </div>
-                </div>
-                <span class="count">2개</span>
-              </div>
-              <div class="acc-body">
-                <div class="acc-body-inner">
-                  <div class="srow" onclick="openStock('LG에너지솔루션','373220','Beta Contrarian','var(--team-b)',62.4,-2.14)">
-                    <div class="rank">1</div>
-                    <div class="info"><b>LG에너지솔루션</b><div class="code">373220 · KOSPI</div></div>
-                    <div class="score">62.4</div>
-                    <div class="pct down">-2.14%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('미래에셋증권','006800','Beta Contrarian','var(--team-b)',48.7,-1.77)">
-                    <div class="rank">2</div>
-                    <div class="info"><b>미래에셋증권</b><div class="code">006800 · KOSPI</div></div>
-                    <div class="score">48.7</div>
-                    <div class="pct down">-1.77%</div>
-                    <span class="arr">›</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Gamma -->
-            <div class="acc" style="border-left-color:var(--team-c);">
-              <div class="acc-head" onclick="toggleAcc(this)">
-                <span class="chev">▶</span>
-                <div class="info">
-                  <div class="name">Gamma Disclosure</div>
-                  <div class="summary">
-                    평균점수 <span class="num">47.5</span> · 평균 <span class="num up">+1.2%</span>
-                  </div>
-                </div>
-                <span class="count">3개</span>
-              </div>
-              <div class="acc-body">
-                <div class="acc-body-inner">
-                  <div class="srow" onclick="openStock('EDGC','245620','Gamma Disclosure','var(--team-c)',47.5,3.12)">
-                    <div class="rank">1</div>
-                    <div class="info"><b>EDGC</b><div class="code">245620 · KOSDAQ</div></div>
-                    <div class="score">47.5</div>
-                    <div class="pct up">+3.12%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('오성첨단소재','052420','Gamma Disclosure','var(--team-c)',47.5,1.45)">
-                    <div class="rank">2</div>
-                    <div class="info"><b>오성첨단소재</b><div class="code">052420 · KOSDAQ</div></div>
-                    <div class="score">47.5</div>
-                    <div class="pct up">+1.45%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('한솔홀딩스','004150','Gamma Disclosure','var(--team-c)',34.2,-0.87)">
-                    <div class="rank">3</div>
-                    <div class="info"><b>한솔홀딩스</b><div class="code">004150 · KOSPI</div></div>
-                    <div class="score">34.2</div>
-                    <div class="pct down">-0.87%</div>
-                    <span class="arr">›</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Delta -->
-            <div class="acc" style="border-left-color:var(--team-d);">
-              <div class="acc-head" onclick="toggleAcc(this)">
-                <span class="chev">▶</span>
-                <div class="info">
-                  <div class="name">Delta Theme</div>
-                  <div class="summary">
-                    평균점수 <span class="num">51.3</span> · 평균 <span class="num up">+2.4%</span>
-                  </div>
-                </div>
-                <span class="count">5개</span>
-              </div>
-              <div class="acc-body">
-                <div class="acc-body-inner">
-                  <div class="srow" onclick="openStock('대동금속','020400','Delta Theme','var(--team-d)',57.8,30.00)">
-                    <div class="rank">1</div>
-                    <div class="info"><b>대동금속</b><div class="code">020400 · KOSPI</div></div>
-                    <div class="score">57.8</div>
-                    <div class="pct up">+30.00%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('유신','054930','Delta Theme','var(--team-d)',47.5,6.78)">
-                    <div class="rank">2</div>
-                    <div class="info"><b>유신</b><div class="code">054930 · KOSDAQ</div></div>
-                    <div class="score">47.5</div>
-                    <div class="pct up">+6.78%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('남광토건','001260','Delta Theme','var(--team-d)',46.2,15.59)">
-                    <div class="rank">3</div>
-                    <div class="info"><b>남광토건</b><div class="code">001260 · KOSPI</div></div>
-                    <div class="score">46.2</div>
-                    <div class="pct up">+15.59%</div>
-                    <span class="arr">›</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Echo -->
-            <div class="acc" style="border-left-color:var(--team-e);">
-              <div class="acc-head" onclick="toggleAcc(this)">
-                <span class="chev">▶</span>
-                <div class="info">
-                  <div class="name">Echo Frontier</div>
-                  <div class="summary">
-                    평균점수 <span class="num">48.7</span> · 평균 <span class="num up">+5.3%</span>
-                  </div>
-                </div>
-                <span class="count">8개</span>
-              </div>
-              <div class="acc-body">
-                <div class="acc-body-inner">
-                  <div class="srow" onclick="openStock('쏠리드','050890','Echo Frontier','var(--team-e)',72.3,17.63)">
-                    <div class="rank">1</div>
-                    <div class="info"><b>쏠리드</b><div class="code">050890 · KOSDAQ</div></div>
-                    <div class="score">72.3</div>
-                    <div class="pct up">+17.63%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('세미파이브','490470','Echo Frontier','var(--team-e)',68.5,26.72)">
-                    <div class="rank">2</div>
-                    <div class="info"><b>세미파이브</b><div class="code">490470 · KOSDAQ</div></div>
-                    <div class="score">68.5</div>
-                    <div class="pct up">+26.72%</div>
-                    <span class="arr">›</span>
-                  </div>
-                  <div class="srow" onclick="openStock('동진쎄미켐','005290','Echo Frontier','var(--team-e)',54.7,6.57)">
-                    <div class="rank">3</div>
-                    <div class="info"><b>동진쎄미켐</b><div class="code">005290 · KOSDAQ</div></div>
-                    <div class="score">54.7</div>
-                    <div class="pct up">+6.57%</div>
-                    <span class="arr">›</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <h2>내일 후보 <span class="sub">5전략 · 18종목</span></h2>
+            <div id="strat-list"></div>
           </div>
 
           <!-- 시스템 mini -->
@@ -705,107 +490,39 @@ html, body {
             <div style="flex:1;font-size:11px;color:var(--text-tertiary);">헬스 6/6 · 이슈 0건</div>
           </div>
         </div>
-
-        <!-- Drawer backdrop (Depth 3) -->
-        <div class="backdrop" id="drawer-backdrop" onclick="closeDrawer(event)">
-          <div class="drawer" onclick="event.stopPropagation()">
-            <button class="close" onclick="closeDrawer()">✕</button>
-            <div class="handle"></div>
-            <div class="drawer-content">
-              <h3 class="display" id="d-name">삼성전자</h3>
-              <div class="ticker-line">
-                <span class="num" id="d-code">005930</span> · KOSPI · <span id="d-strat" style="color:var(--team-a);font-weight:700;">Alpha Momentum</span>
-              </div>
-
-              <div class="kpi-grid" style="margin-bottom:16px;">
-                <div class="kpi">
-                  <div class="label">현재가</div>
-                  <div class="value">72,400원</div>
-                  <div class="meta up" id="d-chg">▲ +2.91%</div>
-                </div>
-                <div class="kpi">
-                  <div class="label">종합 점수</div>
-                  <div class="value" id="d-score">77.5</div>
-                  <div class="meta">23종목 중 1위</div>
-                </div>
-              </div>
-
-              <div class="section" style="margin-bottom:14px;">
-                <h2 style="font-size:0.85rem;margin-bottom:8px;">점수 분해</h2>
-                <div class="score-bar">
-                  <span class="label">등락률</span>
-                  <div class="track"><div class="fill" style="width:92%;"></div></div>
-                  <span class="val">32.1</span>
-                </div>
-                <div class="score-bar">
-                  <span class="label">거래대금</span>
-                  <div class="track"><div class="fill" style="width:85%;"></div></div>
-                  <span class="val">28.5</span>
-                </div>
-                <div class="score-bar">
-                  <span class="label">거래량 급증</span>
-                  <div class="track"><div class="fill" style="width:72%;"></div></div>
-                  <span class="val">17.9</span>
-                </div>
-                <div class="score-bar">
-                  <span class="label">가격대</span>
-                  <div class="track"><div class="fill" style="width:100%;"></div></div>
-                  <span class="val">15.0</span>
-                </div>
-              </div>
-
-              <div class="section" style="margin-bottom:14px;">
-                <h2 style="font-size:0.85rem;margin-bottom:8px;">최근 5일 수익률</h2>
-                <div class="daily-line">
-                  <div><div class="d">4/9</div><div class="v up">+1.2%</div></div>
-                  <div><div class="d">4/10</div><div class="v up">+2.5%</div></div>
-                  <div><div class="d">4/11</div><div class="v down">-0.8%</div></div>
-                  <div><div class="d">4/12</div><div class="v up">+3.1%</div></div>
-                  <div><div class="d">4/13</div><div class="v up">+2.9%</div></div>
-                </div>
-              </div>
-
-              <div class="act-btns">
-                <button class="primary">차트 보기</button>
-                <button class="secondary">전체 종목</button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
     <!-- ============== Guide panel ============== -->
     <div class="guide">
       <h2>🎯 인터랙션 가이드</h2>
-      <p>실제로 클릭해볼 수 있는 인터랙티브 프로토타입입니다. 아래 순서대로 테스트해보세요.</p>
+      <p>모든 뎁스가 아코디언입니다. 페이지 이동이나 모달 없이 인플레이스로 정보가 펼쳐집니다.</p>
 
       <div class="step">
         <b>① Depth 1 — 전략 전체 합</b><br>
-        "내일 후보" 섹션 각 전략 헤더에 <u>평균점수 + 평균수익률 + 종목 개수</u> 표시.<br>
+        각 전략 헤더에 <u>평균점수 · 평균수익률 · 종목 개수</u>.<br>
         Alpha는 초기에 펼쳐져 있음 (1위).
       </div>
 
       <div class="step">
         <b>② Depth 2 — 전략별 종목</b><br>
-        Beta/Gamma/Delta/Echo 헤더 클릭 → accordion 펼치기/접기.<br>
-        각 종목: 순위 + 이름 + 코드 + 점수 + 수익률.
+        전략 헤더 ▶ 클릭 → 종목 리스트 펼침.<br>
+        종목별: 순위 + 이름 + 코드 + 점수 + 수익률 + ›.
       </div>
 
       <div class="step">
-        <b>③ Depth 3 — 종목 상세</b><br>
-        종목 row 클릭 → 바텀시트 drawer 열림.<br>
-        drawer에: 현재가, 점수 분해(프로그레스 바), 5일 수익률, 액션 버튼.<br>
-        닫기: ✕ 버튼, 배경 터치, 또는 아래로 스와이프.
+        <b>③ Depth 3 — 종목 상세 (중첩 Accordion)</b><br>
+        종목 row › 클릭 → 같은 위치에서 상세 패널 펼침.<br>
+        현재가, 점수 분해, 5일 수익률, 액션 버튼.<br>
+        <b>다른 종목 클릭 시 이전 종목은 자동으로 닫힘</b> (한 전략 내).
       </div>
 
-      <h2>✨ 특징</h2>
+      <h2>✨ Drawer 대비 장점</h2>
       <p>
-        <b>컨텍스트 유지</b>: 페이지 이동 없이 모든 정보 접근<br>
-        <b>스크롤 최소화</b>: 관심 전략만 펼쳐서 필요한 정보만 scan<br>
-        <b>모바일 네이티브</b>: iOS 바텀시트 스타일 drawer<br>
-        <b>한국 금융 컨벤션</b>: 상승 빨강 / 하락 파랑<br>
-        <b>dashboard-skill 준수</b>: JetBrains Mono 숫자, gap-4, 작은 라벨
+        <b>풀스크린 가림 없음</b>: 다른 종목과 비교하면서 보기 쉬움<br>
+        <b>스크롤 위치 보존</b>: 닫고 다른 종목 열어도 위치 유지<br>
+        <b>중첩 컨텍스트 명확</b>: 어느 전략의 종목인지 시각적으로 명확<br>
+        <b>모바일 친화</b>: 한 손 엄지로만 조작 가능
       </p>
 
       <h2>🔧 적용 후 구조</h2>
@@ -813,15 +530,14 @@ html, body {
       <div class="step">
         <b>Arena 탭 = 이 화면</b> (5 sub-tabs 제거)<br>
         <b>BNF 탭 = 기존 iframe</b> (bnf_dashboard.html)<br>
-        → 메인 2탭, Arena는 단일 스크롤 + accordion + drawer
+        → 메인 2탭, Arena는 단일 스크롤 + 3-depth accordion
       </div>
 
       <h2>📋 다음 단계</h2>
-      <p>확인 후 만족하시면 실제 적용 가능:</p>
       <ol style="padding-left:20px;color:var(--text-secondary);font-size:0.9rem;line-height:1.8;">
-        <li><b>실 데이터 연결</b>: dummy → fetch('data/arena/...') 교체</li>
-        <li><b>기존 5 sub-tabs 제거</b>: Today/리더보드/팀별/전략후보/시스템 → 단일 스크롤</li>
-        <li><b>시스템 섹션</b>: 맨 하단 mini card로 축소 (또는 status bar만)</li>
+        <li><b>실 데이터 연결</b>: dummy → fetch('data/arena/...')</li>
+        <li><b>5 sub-tabs 제거</b>: 단일 스크롤로 통합</li>
+        <li><b>점수 분해 실측</b>: paper_trading score breakdown 연결</li>
       </ol>
     </div>
 
@@ -829,27 +545,178 @@ html, body {
 </div>
 
 <script>
-function toggleAcc(head) {
-  const acc = head.closest('.acc');
-  acc.classList.toggle('open');
+// 더미 데이터 (5 전략 × 종목들)
+const STRATEGIES = [
+  {
+    id: 'a', name: 'Alpha Momentum', color: 'var(--team-a)',
+    avgScore: 61.2, avgPct: 3.9, open: true,
+    stocks: [
+      { name: '삼성전자', code: '005930', mkt: 'KOSPI', score: 77.5, pct: 2.91, price: '72,400원', rank: 1, b1: 32.1, b2: 28.5, b3: 17.9, b4: 15.0, daily: [['4/9', 1.2], ['4/10', 2.5], ['4/11', -0.8], ['4/12', 3.1], ['4/13', 2.9]] },
+      { name: 'SK하이닉스', code: '000660', mkt: 'KOSPI', score: 64.1, pct: 1.85, price: '186,500원', rank: 2, b1: 28.7, b2: 21.4, b3: 14.0, b4: 14.5, daily: [['4/9', 0.8], ['4/10', 1.2], ['4/11', 1.5], ['4/12', 2.1], ['4/13', 1.85]] },
+      { name: '한화에어로스페이스', code: '012450', mkt: 'KOSPI', score: 58.3, pct: 3.86, price: '328,000원', rank: 3, b1: 25.2, b2: 19.8, b3: 13.3, b4: 12.0, daily: [['4/9', 2.1], ['4/10', 1.5], ['4/11', -1.2], ['4/12', 4.0], ['4/13', 3.86]] },
+      { name: '삼성전기', code: '009150', mkt: 'KOSPI', score: 54.2, pct: 9.50, price: '154,200원', rank: 4, b1: 30.1, b2: 16.5, b3: 12.0, b4: 11.0, daily: [['4/9', 1.0], ['4/10', 3.2], ['4/11', 2.0], ['4/12', 5.5], ['4/13', 9.5]] },
+      { name: '현대모비스', code: '012330', mkt: 'KOSPI', score: 51.7, pct: 1.42, price: '237,500원', rank: 5, b1: 22.0, b2: 17.0, b3: 11.5, b4: 13.0, daily: [['4/9', 0.5], ['4/10', 0.8], ['4/11', -0.3], ['4/12', 1.1], ['4/13', 1.42]] }
+    ]
+  },
+  {
+    id: 'b', name: 'Beta Contrarian', color: 'var(--team-b)',
+    avgScore: 55.6, avgPct: -1.9,
+    stocks: [
+      { name: 'LG에너지솔루션', code: '373220', mkt: 'KOSPI', score: 62.4, pct: -2.14, price: '385,000원', rank: 1, b1: 24.5, b2: 20.1, b3: 12.5, b4: 13.5, daily: [['4/9', -1.5], ['4/10', -2.1], ['4/11', -3.0], ['4/12', -1.8], ['4/13', -2.14]] },
+      { name: '미래에셋증권', code: '006800', mkt: 'KOSPI', score: 48.7, pct: -1.77, price: '8,920원', rank: 2, b1: 18.5, b2: 14.2, b3: 9.0, b4: 10.0, daily: [['4/9', -0.5], ['4/10', -1.2], ['4/11', -2.5], ['4/12', -1.0], ['4/13', -1.77]] }
+    ]
+  },
+  {
+    id: 'c', name: 'Gamma Disclosure', color: 'var(--team-c)',
+    avgScore: 47.5, avgPct: 1.2,
+    stocks: [
+      { name: 'EDGC', code: '245620', mkt: 'KOSDAQ', score: 47.5, pct: 3.12, price: '1,485원', rank: 1, b1: 20.5, b2: 12.0, b3: 8.0, b4: 7.0, daily: [['4/9', 1.0], ['4/10', 2.5], ['4/11', 0.5], ['4/12', 2.8], ['4/13', 3.12]] },
+      { name: '오성첨단소재', code: '052420', mkt: 'KOSDAQ', score: 47.5, pct: 1.45, price: '4,210원', rank: 2, b1: 18.0, b2: 13.5, b3: 8.0, b4: 8.0, daily: [['4/9', 0.5], ['4/10', 0.8], ['4/11', 1.0], ['4/12', 1.2], ['4/13', 1.45]] },
+      { name: '한솔홀딩스', code: '004150', mkt: 'KOSPI', score: 34.2, pct: -0.87, price: '5,780원', rank: 3, b1: 12.0, b2: 9.5, b3: 6.0, b4: 6.7, daily: [['4/9', -0.2], ['4/10', -0.5], ['4/11', -1.0], ['4/12', -0.6], ['4/13', -0.87]] }
+    ]
+  },
+  {
+    id: 'd', name: 'Delta Theme', color: 'var(--team-d)',
+    avgScore: 51.3, avgPct: 2.4,
+    stocks: [
+      { name: '대동금속', code: '020400', mkt: 'KOSPI', score: 57.8, pct: 30.00, price: '12,350원', rank: 1, b1: 35.0, b2: 13.5, b3: 6.5, b4: 2.8, daily: [['4/9', 5.5], ['4/10', 12.0], ['4/11', 8.5], ['4/12', 15.0], ['4/13', 30.0]] },
+      { name: '유신', code: '054930', mkt: 'KOSDAQ', score: 47.5, pct: 6.78, price: '8,920원', rank: 2, b1: 22.0, b2: 14.5, b3: 7.0, b4: 4.0, daily: [['4/9', 1.5], ['4/10', 3.2], ['4/11', 2.5], ['4/12', 4.5], ['4/13', 6.78]] },
+      { name: '남광토건', code: '001260', mkt: 'KOSPI', score: 46.2, pct: 15.59, price: '4,540원', rank: 3, b1: 28.0, b2: 10.5, b3: 4.5, b4: 3.2, daily: [['4/9', 2.5], ['4/10', 5.5], ['4/11', 7.0], ['4/12', 10.0], ['4/13', 15.59]] }
+    ]
+  },
+  {
+    id: 'e', name: 'Echo Frontier', color: 'var(--team-e)',
+    avgScore: 48.7, avgPct: 5.3,
+    stocks: [
+      { name: '쏠리드', code: '050890', mkt: 'KOSDAQ', score: 72.3, pct: 17.63, price: '6,820원', rank: 1, b1: 32.5, b2: 22.0, b3: 11.8, b4: 6.0, daily: [['4/9', 2.5], ['4/10', 5.0], ['4/11', 8.5], ['4/12', 12.0], ['4/13', 17.63]] },
+      { name: '세미파이브', code: '490470', mkt: 'KOSDAQ', score: 68.5, pct: 26.72, price: '15,250원', rank: 2, b1: 34.0, b2: 19.5, b3: 10.0, b4: 5.0, daily: [['4/9', 3.0], ['4/10', 8.5], ['4/11', 11.0], ['4/12', 18.5], ['4/13', 26.72]] },
+      { name: '동진쎄미켐', code: '005290', mkt: 'KOSDAQ', score: 54.7, pct: 6.57, price: '38,200원', rank: 3, b1: 25.0, b2: 17.0, b3: 8.5, b4: 4.2, daily: [['4/9', 1.5], ['4/10', 2.5], ['4/11', 3.5], ['4/12', 5.0], ['4/13', 6.57]] }
+    ]
+  }
+];
+
+const fmtPct = (n) => (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+const cls = (n) => n >= 0 ? 'up' : 'down';
+
+function renderBar(label, val, max) {
+  const w = Math.min(100, (val / max * 100)).toFixed(0);
+  return `
+    <div class="score-bar">
+      <span class="label">${label}</span>
+      <div class="track"><div class="fill" style="width:${w}%;"></div></div>
+      <span class="val">${val.toFixed(1)}</span>
+    </div>`;
 }
-function openStock(name, code, strat, color, score, pct) {
-  document.getElementById('d-name').textContent = name;
-  document.getElementById('d-code').textContent = code;
-  const stratEl = document.getElementById('d-strat');
-  stratEl.textContent = strat;
-  stratEl.style.color = color;
-  document.getElementById('d-score').textContent = score;
-  const chgEl = document.getElementById('d-chg');
-  const sign = pct >= 0 ? '▲ +' : '▼ ';
-  chgEl.textContent = sign + pct.toFixed(2) + '%';
-  chgEl.className = 'meta ' + (pct >= 0 ? 'up' : 'down');
-  document.getElementById('drawer-backdrop').classList.add('open');
+
+function renderDetail(s, totalCount) {
+  return `
+    <div class="mini-kpi">
+      <div class="k">
+        <div class="label">현재가</div>
+        <div class="value">${s.price}</div>
+        <div class="meta ${cls(s.pct)}">${s.pct >= 0 ? '▲ ' : '▼ '}${fmtPct(s.pct)}</div>
+      </div>
+      <div class="k">
+        <div class="label">종합 점수</div>
+        <div class="value">${s.score}</div>
+        <div class="meta">${totalCount}종목 중 ${s.rank}위</div>
+      </div>
+    </div>
+    <div class="detail-h">점수 분해</div>
+    ${renderBar('등락률', s.b1, 35)}
+    ${renderBar('거래대금', s.b2, 30)}
+    ${renderBar('거래량 급증', s.b3, 20)}
+    ${renderBar('가격대', s.b4, 15)}
+    <div class="detail-h">최근 5일 수익률</div>
+    <div class="daily-line">
+      ${s.daily.map(([d, p]) => `<div><div class="d">${d}</div><div class="v ${cls(p)}">${p >= 0 ? '+' : ''}${p}%</div></div>`).join('')}
+    </div>
+    <div class="act-btns">
+      <button class="primary">차트 보기</button>
+      <button class="secondary">매매 기록</button>
+    </div>
+  `;
 }
-function closeDrawer(e) {
-  if (e && e.target.closest('.drawer') && !e.target.classList.contains('close')) return;
-  document.getElementById('drawer-backdrop').classList.remove('open');
+
+function renderStrategies() {
+  const totalStocks = STRATEGIES.reduce((a, s) => a + s.stocks.length, 0);
+  const html = STRATEGIES.map((strat, sIdx) => `
+    <div class="acc${strat.open ? ' open' : ''}" style="border-left-color:${strat.color};">
+      <div class="acc-head" data-strat="${sIdx}">
+        <span class="chev">▶</span>
+        <div class="info">
+          <div class="name">${strat.name}</div>
+          <div class="summary">
+            평균점수 <span class="num">${strat.avgScore}</span> · 평균 <span class="num ${cls(strat.avgPct)}">${fmtPct(strat.avgPct)}</span>
+          </div>
+        </div>
+        <span class="count">${strat.stocks.length}개</span>
+      </div>
+      <div class="acc-body">
+        <div class="acc-body-inner">
+          ${strat.stocks.map((s, idx) => `
+            <div class="sacc" data-strat="${sIdx}" data-stock="${idx}">
+              <div class="sacc-head">
+                <div class="rank">${idx + 1}</div>
+                <div class="info">
+                  <b>${s.name}</b>
+                  <div class="code">${s.code} · ${s.mkt}</div>
+                </div>
+                <div class="score">${s.score}</div>
+                <div class="pct ${cls(s.pct)}">${fmtPct(s.pct)}</div>
+                <span class="chev2">›</span>
+              </div>
+              <div class="sacc-body"><div class="sacc-body-inner"></div></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('strat-list').innerHTML = html;
+  document.querySelector('h2 .sub').textContent = `5전략 · ${totalStocks}종목`;
 }
+
+function bindEvents() {
+  // 전략 accordion (Depth 1 → 2)
+  document.querySelectorAll('.acc-head').forEach(head => {
+    head.addEventListener('click', () => {
+      head.closest('.acc').classList.toggle('open');
+    });
+  });
+
+  // 종목 accordion (Depth 2 → 3)
+  document.querySelectorAll('.sacc-head').forEach(head => {
+    head.addEventListener('click', () => {
+      const sacc = head.closest('.sacc');
+      const wasOpen = sacc.classList.contains('open');
+      const parent = sacc.closest('.acc-body-inner');
+
+      // 같은 전략 내 다른 종목 닫기
+      parent.querySelectorAll('.sacc.open').forEach(other => {
+        if (other !== sacc) other.classList.remove('open');
+      });
+
+      if (!wasOpen) {
+        const sIdx = +sacc.dataset.strat;
+        const stockIdx = +sacc.dataset.stock;
+        const strat = STRATEGIES[sIdx];
+        const stock = strat.stocks[stockIdx];
+        const inner = sacc.querySelector('.sacc-body-inner');
+        if (!inner.dataset.filled) {
+          inner.innerHTML = renderDetail(stock, strat.stocks.length);
+          inner.dataset.filled = '1';
+        }
+        sacc.classList.add('open');
+      } else {
+        sacc.classList.remove('open');
+      }
+    });
+  });
+}
+
+renderStrategies();
+bindEvents();
 </script>
 </body>
 </html>
