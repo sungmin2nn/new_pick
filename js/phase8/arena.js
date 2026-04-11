@@ -26,42 +26,65 @@ let state = {
   history: {}, // tid -> [{date, summary, trades}, ...] (최근 → 과거 순)
 };
 
-// ============ Data loading ============
+// ============ Data loading (parallel) ============
 export async function loadArenaData(force = false) {
   const today = getTodayKST();
+  const histDates = getRecentDates(7); // 14 → 7일 축소
+  const recentHealthDates = [today, ...getRecentDates(7).slice(1)];
 
-  state.leaderboard = await fetchCached(`${DATA_BASE}/leaderboard.json`, force);
+  // 1) 모든 fetch 동시 발사 (Promise.all)
+  const [
+    leaderboard,
+    portfolios,
+    healthLogs,
+    candidates,
+    historyRaw,
+  ] = await Promise.all([
+    fetchCached(`${DATA_BASE}/leaderboard.json`, force),
 
-  for (const tid of TEAM_IDS) {
-    state.portfolios[tid] = await fetchCached(`${DATA_BASE}/${tid}/portfolio.json`, force);
+    Promise.all(TEAM_IDS.map(tid =>
+      fetchCached(`${DATA_BASE}/${tid}/portfolio.json`, force).then(d => [tid, d])
+    )),
+
+    // 헬스: 8일치 동시 fetch (첫 번째 non-null 사용)
+    Promise.all(recentHealthDates.map(d =>
+      fetchCached(`${DATA_BASE}/healthcheck/health_${d}.json`, force)
+    )),
+
+    Promise.all(TEAM_IDS.map(tid => {
+      const sid = TEAM_META[tid].strategy;
+      return fetchCached(`data/paper_trading/candidates_${today}_${sid}.json`, force).then(d => [sid, d]);
+    })),
+
+    // 매매 이력: 5팀 × 7일 × 2파일 = 70개 동시 fetch
+    Promise.all(TEAM_IDS.flatMap(tid =>
+      histDates.flatMap(date => [
+        fetchCached(`${DATA_BASE}/${tid}/daily/${date}/summary.json`, force).then(d => ({ tid, date, kind: 'summary', data: d })),
+        fetchCached(`${DATA_BASE}/${tid}/daily/${date}/trades.json`, force).then(d => ({ tid, date, kind: 'trades', data: d })),
+      ])
+    )),
+  ]);
+
+  // 2) 결과 정리
+  state.leaderboard = leaderboard;
+  state.portfolios = Object.fromEntries(portfolios);
+  state.candidates = Object.fromEntries(candidates);
+  state.health = healthLogs.find(h => h !== null) || null;
+
+  // 매매 이력 재구성: tid → date 별로 summary + trades 묶기
+  const histMap = {};
+  for (const tid of TEAM_IDS) histMap[tid] = {};
+  for (const item of historyRaw) {
+    if (!item.data) continue;
+    if (!histMap[item.tid][item.date]) histMap[item.tid][item.date] = { date: item.date };
+    histMap[item.tid][item.date][item.kind] = item.data;
   }
-
-  // Health: 오늘 → 최근 7일 fallback
-  state.health = await fetchCached(`${DATA_BASE}/healthcheck/health_${today}.json`, force);
-  if (!state.health) {
-    for (const d of getRecentDates(7).slice(1)) {
-      const log = await fetchCached(`${DATA_BASE}/healthcheck/health_${d}.json`, force);
-      if (log) { state.health = log; break; }
-    }
-  }
-
-  // Tomorrow candidates
+  // summary 있는 것만 push (최근 → 과거 정렬)
+  state.history = {};
   for (const tid of TEAM_IDS) {
-    const sid = TEAM_META[tid].strategy;
-    const path = `data/paper_trading/candidates_${today}_${sid}.json`;
-    state.candidates[sid] = await fetchCached(path, force);
-  }
-
-  // 매매 이력: 최근 14일 시도 → 실제 존재하는 것만 (leaderboard 의존 X)
-  const histDates = getRecentDates(14); // 오늘 → 14일 전 (내림차순)
-  for (const tid of TEAM_IDS) {
-    state.history[tid] = [];
-    for (const date of histDates) {
-      const summary = await fetchCached(`${DATA_BASE}/${tid}/daily/${date}/summary.json`, force);
-      if (!summary) continue;
-      const trades = await fetchCached(`${DATA_BASE}/${tid}/daily/${date}/trades.json`, force);
-      state.history[tid].push({ date, summary, trades });
-    }
+    state.history[tid] = Object.values(histMap[tid])
+      .filter(h => h.summary)
+      .sort((a, b) => b.date.localeCompare(a.date));
   }
 
   return state;
