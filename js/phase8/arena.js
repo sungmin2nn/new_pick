@@ -23,6 +23,7 @@ let state = {
   portfolios: {},
   health: null,
   candidates: {},
+  history: {}, // tid -> [{date, summary, trades}, ...] (최근 → 과거 순)
 };
 
 // ============ Data loading ============
@@ -49,6 +50,22 @@ export async function loadArenaData(force = false) {
     const sid = TEAM_META[tid].strategy;
     const path = `data/paper_trading/candidates_${today}_${sid}.json`;
     state.candidates[sid] = await fetchCached(path, force);
+  }
+
+  // 매매 이력: leaderboard.daily_history 의 날짜 기준 (최근 → 과거)
+  // 각 팀의 daily/{date}/summary.json + trades.json fetch
+  const histDates = (state.leaderboard?.daily_history || [])
+    .map(h => h.date)
+    .filter(Boolean)
+    .reverse(); // 최근 우선
+  for (const tid of TEAM_IDS) {
+    state.history[tid] = [];
+    for (const date of histDates) {
+      const summary = await fetchCached(`${DATA_BASE}/${tid}/daily/${date}/summary.json`, force);
+      if (!summary) continue;
+      const trades = await fetchCached(`${DATA_BASE}/${tid}/daily/${date}/trades.json`, force);
+      state.history[tid].push({ date, summary, trades });
+    }
   }
 
   return state;
@@ -325,6 +342,147 @@ function renderStrategiesAccordion(rows) {
   `;
 }
 
+// ============ History Section (전략별 매매 내역) ============
+function renderHistorySection() {
+  // 팀별로 history가 있는지 확인
+  const hasAny = TEAM_IDS.some(tid => (state.history[tid] || []).length > 0);
+  if (!hasAny) {
+    return `
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title display">📜 매매 내역</h2>
+          <span class="section-subtitle">아직 기록 없음</span>
+        </div>
+      </div>
+    `;
+  }
+
+  let totalDays = 0;
+  const accs = TEAM_IDS.map(tid => {
+    const meta = TEAM_META[tid];
+    const hist = state.history[tid] || [];
+    if (hist.length === 0) {
+      return `
+        <div class="acc-strat" style="border-left-color:${meta.color};">
+          <div class="acc-strat-head">
+            <span class="acc-chev">▶</span>
+            <div class="acc-info">
+              <div class="acc-name">${meta.name}</div>
+              <div class="acc-summary">매매 기록 없음</div>
+            </div>
+            <span class="acc-count">0</span>
+          </div>
+        </div>
+      `;
+    }
+    totalDays += hist.length;
+
+    // 최근 N일 총합 계산
+    const totalTrades = hist.reduce((s, h) => s + (h.summary?.simulation?.total_trades || 0), 0);
+    const totalWins = hist.reduce((s, h) => s + (h.summary?.simulation?.wins || 0), 0);
+    const winRate = totalTrades > 0 ? (totalWins / totalTrades * 100).toFixed(0) : 0;
+
+    const dayRows = hist.map((h, idx) => {
+      const sim = h.summary?.simulation || {};
+      const ret = sim.total_return ?? 0;
+      const trades = sim.total_trades ?? 0;
+      const wins = sim.wins ?? 0;
+      const dateStr = h.date ? `${h.date.slice(4,6)}/${h.date.slice(6,8)}` : '-';
+      const tradeResults = h.trades?.results || [];
+
+      return `
+        <div class="sacc">
+          <div class="sacc-head">
+            <div class="sacc-rank">${dateStr}</div>
+            <div class="sacc-info">
+              <b>${trades}건</b>
+              <div class="sacc-code">${wins}승 ${trades - wins}패</div>
+            </div>
+            <div class="sacc-pct ${colorClass(ret)}">${fmtPctSigned(ret)}</div>
+            <span class="sacc-chev">›</span>
+          </div>
+          <div class="sacc-body">
+            ${renderTradeDetail(tradeResults, h.summary)}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="acc-strat" style="border-left-color:${meta.color};">
+        <div class="acc-strat-head">
+          <span class="acc-chev">▶</span>
+          <div class="acc-info">
+            <div class="acc-name">${meta.name}</div>
+            <div class="acc-summary">
+              ${hist.length}일 · ${totalTrades}건 · 승률 <span class="num">${winRate}%</span>
+            </div>
+          </div>
+          <span class="acc-count">${hist.length}일</span>
+        </div>
+        <div class="acc-strat-body">
+          <div class="acc-strat-body-inner">${dayRows}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title display">📜 매매 내역</h2>
+        <span class="section-subtitle">최근 ${totalDays}건</span>
+      </div>
+      <div class="acc-list">${accs}</div>
+    </div>
+  `;
+}
+
+function renderTradeDetail(results, summary) {
+  if (!results || results.length === 0) {
+    return `<div class="sacc-detail"><div class="detail-h">매매 결과 없음</div></div>`;
+  }
+  const sim = summary?.simulation || {};
+  const rows = results.map(t => {
+    const cls = colorClass(t.return_pct);
+    return `
+      <div class="trade-row">
+        <div class="trade-name">
+          <b>${t.name || '-'}</b>
+          <div class="trade-code">${t.code || '-'}</div>
+        </div>
+        <div class="trade-prices">
+          <div class="num">${fmtMoney(t.entry_price)} → ${fmtMoney(t.exit_price)}</div>
+          <div class="trade-meta">${t.exit_reason || ''} · ${t.quantity || 0}주</div>
+        </div>
+        <div class="trade-ret ${cls}">
+          ${fmtPctSigned(t.return_pct)}
+          <div class="trade-amount num">${(t.return_amount || 0) >= 0 ? '+' : ''}${fmtMoney(t.return_amount)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="sacc-detail">
+      <div class="mini-kpi-grid">
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">일일 수익률</div>
+          <div class="mini-kpi-value ${colorClass(sim.total_return)}">${fmtPctSigned(sim.total_return ?? 0)}</div>
+          <div class="mini-kpi-meta">${fmtMoney(sim.total_return_amount ?? 0)}원</div>
+        </div>
+        <div class="mini-kpi">
+          <div class="mini-kpi-label">승률</div>
+          <div class="mini-kpi-value">${(sim.win_rate ?? 0).toFixed(0)}%</div>
+          <div class="mini-kpi-meta">${sim.wins ?? 0}승 ${(sim.total_trades ?? 0) - (sim.wins ?? 0)}패</div>
+        </div>
+      </div>
+      <div class="detail-h">매매 ${results.length}건</div>
+      <div class="trade-list">${rows}</div>
+    </div>
+  `;
+}
+
 function renderSystemMini() {
   const h = state.health || {};
   const checks = h.checks || [];
@@ -357,6 +515,7 @@ export function renderArena() {
     ${renderH2H(rows)}
     ${renderRanking(rows)}
     ${renderStrategiesAccordion(rows)}
+    ${renderHistorySection()}
     ${renderSystemMini()}
   `;
 

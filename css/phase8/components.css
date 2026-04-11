@@ -1154,6 +1154,60 @@
 }
 .detail-row:last-child { border-bottom: none; }
 
+/* Trade history list (inside sacc-detail) */
+.trade-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.trade-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-2);
+  align-items: center;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+.trade-name b {
+  font-size: var(--fs-xs);
+  display: block;
+  font-weight: var(--fw-semibold);
+}
+.trade-code {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-tertiary);
+}
+.trade-prices {
+  text-align: right;
+  font-size: 10px;
+}
+.trade-prices .num {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+.trade-meta {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+.trade-ret {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-xs);
+  text-align: right;
+  white-space: nowrap;
+}
+.trade-amount {
+  font-size: 9px;
+  font-weight: var(--fw-regular);
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
 /* System mini card */
 .system-mini {
   display: flex;
