@@ -52,12 +52,8 @@ export async function loadArenaData(force = false) {
     state.candidates[sid] = await fetchCached(path, force);
   }
 
-  // 매매 이력: leaderboard.daily_history 의 날짜 기준 (최근 → 과거)
-  // 각 팀의 daily/{date}/summary.json + trades.json fetch
-  const histDates = (state.leaderboard?.daily_history || [])
-    .map(h => h.date)
-    .filter(Boolean)
-    .reverse(); // 최근 우선
+  // 매매 이력: 최근 14일 시도 → 실제 존재하는 것만 (leaderboard 의존 X)
+  const histDates = getRecentDates(14); // 오늘 → 14일 전 (내림차순)
   for (const tid of TEAM_IDS) {
     state.history[tid] = [];
     for (const date of histDates) {
