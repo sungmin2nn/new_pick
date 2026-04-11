@@ -51,11 +51,9 @@
       <button class="main-tab active" data-tab="arena">
         🏟 <span>Arena</span>
       </button>
-      <button class="main-tab" data-tab="bnf">
+      <a href="bnf_dashboard.html" class="main-tab">
         🎯 <span>BNF</span>
-      </button>
-      <span class="flex-1"></span>
-      <a href="bnf_dashboard.html" class="btn" style="font-size:var(--fs-xs);">BNF Deep Dive →</a>
+      </a>
     </div>
   </div>
 
@@ -84,39 +82,18 @@
         <div class="sub-pane" id="arena-system"></div>
       </section>
 
-      <!-- ============ BNF Pane ============ -->
-      <section class="main-pane" id="pane-bnf">
-        <!-- Sub-tabs -->
-        <nav class="sub-tabs" id="bnf-subtabs" data-tab="bnf">
-          <button class="sub-tab active" data-section="bnf-strategy">📉 전략</button>
-          <button class="sub-tab" data-section="bnf-capital">💰 자본</button>
-          <button class="sub-tab" data-section="bnf-candidates">🎯 후보</button>
-          <button class="sub-tab" data-section="bnf-positions">📊 포지션</button>
-          <button class="sub-tab" data-section="bnf-history">📜 이력</button>
-        </nav>
-
-        <!-- Sub-panes -->
-        <div class="sub-pane active" id="bnf-strategy">
-          <div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">데이터 로딩 중...</div></div>
-        </div>
-        <div class="sub-pane" id="bnf-capital"></div>
-        <div class="sub-pane" id="bnf-candidates"></div>
-        <div class="sub-pane" id="bnf-positions"></div>
-        <div class="sub-pane" id="bnf-history"></div>
-      </section>
-
     </div>
   </main>
 
-  <!-- Bottom Mobile Nav (2 tabs) -->
+  <!-- Bottom Mobile Nav (Arena + BNF link) -->
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
       <button class="bottom-tab active" data-tab="arena">
         <span class="icon">🏟</span><span>Arena</span>
       </button>
-      <button class="bottom-tab" data-tab="bnf">
+      <a class="bottom-tab" href="bnf_dashboard.html">
         <span class="icon">🎯</span><span>BNF</span>
-      </button>
+      </a>
     </div>
   </nav>
 

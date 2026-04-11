@@ -1,12 +1,13 @@
-/* Phase 8 - App Main (라우팅 + 탭 토글 + PTR + Swipe) */
+/* Phase 8 - App Main (라우팅 + 탭 토글 + PTR + Swipe)
+ * Note: BNF는 별도 페이지(bnf_dashboard.html)로 분리. 메인 페이지는 Arena만.
+ */
 
 import { $, $$, fmtTime, getTodayKST, fmtDate } from './ui.js';
 import { initArena, refreshArena } from './arena.js';
-import { initBNF, refreshBNF } from './bnf.js';
 import { clearCache } from './cache.js';
 
 // ============ Tab management ============
-const TABS = ['arena', 'bnf'];
+const TABS = ['arena'];  // BNF is external link
 let currentTab = 'arena';
 
 function showMainTab(tab) {
@@ -47,7 +48,7 @@ async function refreshAll() {
   if (btn) btn.disabled = true;
   clearCache();
   try {
-    await Promise.all([refreshArena(), refreshBNF()]);
+    await refreshArena();
     updateStatusBar();
   } finally {
     if (btn) btn.disabled = false;
@@ -150,8 +151,8 @@ async function init() {
   const refreshBtn = $('#refresh-btn');
   if (refreshBtn) refreshBtn.addEventListener('click', refreshAll);
 
-  // Init data
-  await Promise.all([initArena(), initBNF()]);
+  // Init data (Arena only - BNF is external link)
+  await initArena();
   updateStatusBar();
 
   // Hash routing
