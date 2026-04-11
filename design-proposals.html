@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Arena 대시보드 리팩토링 — 5가지 디자인 비교</title>
+<title>D1 개선안 — 종목 상세 3가지 방식</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -49,9 +49,8 @@ html, body {
 .up { color: var(--up); }
 .down { color: var(--down); }
 
-/* ========== Page layout ========== */
 .page {
-  max-width: 1920px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 32px 16px;
 }
@@ -67,11 +66,11 @@ html, body {
   line-height: 1.6;
 }
 
-/* ========== Phone frames (mobile 375px) ========== */
+/* Phone frames */
 .phone-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(390px, 1fr));
-  gap: 32px;
+  gap: 48px;
 }
 .phone {
   background: #1A1A2E;
@@ -79,6 +78,8 @@ html, body {
   padding: 12px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.15);
   position: relative;
+  max-width: 420px;
+  margin: 0 auto;
 }
 .phone-label {
   position: absolute;
@@ -90,32 +91,33 @@ html, body {
   font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.05em;
   z-index: 10;
+  white-space: nowrap;
 }
 .phone-notes {
   position: absolute;
-  bottom: -56px; left: 0; right: 0;
+  bottom: -76px; left: 0; right: 0;
   color: var(--text-tertiary);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 .phone-screen {
   width: 100%;
-  height: 780px;
+  height: 820px;
   background: var(--bg-base);
   border-radius: 28px;
   overflow-y: auto;
   overflow-x: hidden;
   font-size: 13px;
   -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 .phone-screen::-webkit-scrollbar { width: 4px; }
 .phone-screen::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
 
-/* ========== Status bar (shared) ========== */
+/* Status bar */
 .sb {
   position: sticky; top: 0;
   background: rgba(255,255,255,0.92);
@@ -138,8 +140,8 @@ html, body {
 .sb .num { color: var(--text-primary); font-weight: 600; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-/* ========== Shared content styles ========== */
-.content { padding: 14px; }
+/* Content */
+.content { padding: 14px; padding-bottom: 80px; }
 .content h2 {
   font-family: var(--font-display);
   font-size: 0.95rem;
@@ -150,7 +152,6 @@ html, body {
 .content h2 .sub { font-size: 0.65rem; color: var(--text-tertiary); font-weight: 500; }
 .content .section { margin-bottom: 18px; }
 
-/* KPI tile */
 .kpi {
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -166,16 +167,9 @@ html, body {
   font-family: var(--font-mono); font-variant-numeric: tabular-nums;
   font-size: 1.25rem; font-weight: 700; letter-spacing: -0.03em;
 }
-.kpi .meta {
-  font-size: 10px; color: var(--text-tertiary); margin-top: 4px;
-}
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
+.kpi .meta { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
-/* Team card */
 .tc {
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -195,50 +189,6 @@ html, body {
 }
 .tc .elo { font-size: 9px; color: var(--text-tertiary); text-align: right; }
 
-/* Tab bar (top) */
-.tabs {
-  display: flex; gap: 4px;
-  padding: 0 14px;
-  border-bottom: 2px solid var(--border);
-  background: var(--bg-surface);
-  position: sticky; top: 33px;
-  z-index: 4;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.tabs::-webkit-scrollbar { display: none; }
-.tab {
-  padding: 10px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-tertiary);
-  border: none; background: transparent;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
-  white-space: nowrap;
-  font-family: inherit;
-}
-.tab.active { color: var(--accent-deep); border-color: var(--accent); }
-
-/* Bottom tab bar */
-.btab {
-  position: sticky; bottom: 0;
-  background: white;
-  border-top: 1px solid var(--border);
-  display: grid;
-  grid-template-columns: repeat(var(--cols, 2), 1fr);
-  padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0));
-}
-.btab button {
-  border: none; background: transparent;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  font-family: inherit; font-size: 9px; font-weight: 600;
-  color: var(--text-tertiary); padding: 6px;
-}
-.btab button.active { color: var(--accent-deep); }
-.btab button .ic { font-size: 16px; }
-
-/* H2H */
 .h2h {
   background: linear-gradient(135deg, white 0%, var(--bg-overlay) 100%);
   border: 1px solid var(--border);
@@ -260,7 +210,6 @@ html, body {
 .h2h-team .meta { font-size: 9px; color: var(--text-tertiary); margin-top: 2px; }
 .h2h-vs { font-family: var(--font-display); font-weight: 800; color: var(--text-muted); font-size: 1.1rem; }
 
-/* Pill */
 .pill {
   display: inline-flex; align-items: center; gap: 3px;
   padding: 2px 8px; border-radius: 999px;
@@ -268,70 +217,165 @@ html, body {
   border: 1px solid transparent;
 }
 .pill-ok { background: rgba(16,185,129,0.08); color: var(--success); border-color: rgba(16,185,129,0.25); }
-.pill-warn { background: rgba(245,158,11,0.08); color: var(--warning); border-color: rgba(245,158,11,0.25); }
 .pill-up { background: var(--up-bg); color: var(--up); border-color: rgba(239,68,68,0.25); }
 .pill-down { background: var(--down-bg); color: var(--down); border-color: rgba(59,130,246,0.25); }
 
-/* Compact row */
-.row {
-  display: flex; align-items: center; padding: 8px 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-.row:last-child { border-bottom: none; }
-.row .code { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); }
-.row .pct { font-family: var(--font-mono); font-weight: 700; font-size: 12px; }
-
-/* Card */
 .card {
   background: white; border: 1px solid var(--border);
   border-radius: 12px; padding: 12px; margin-bottom: 10px;
 }
+
+/* Stock row */
+.srow {
+  display: flex; align-items: center; padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+}
+.srow:last-child { border-bottom: none; }
+.srow .info { flex: 1; min-width: 0; }
+.srow .info b { font-size: 12px; }
+.srow .code { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); }
+.srow .score { font-size: 9px; color: var(--text-tertiary); }
+.srow .pct { font-family: var(--font-mono); font-weight: 700; font-size: 12px; white-space: nowrap; }
+.srow .arrow { color: var(--text-muted); margin-left: 6px; }
+
+/* Accordion */
+.acc-item {
+  background: white;
+  border: 1px solid var(--border);
+  border-left: 3px solid;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.acc-head {
+  padding: 10px 12px;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.acc-head .chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+.acc-item.open .acc-head .chevron { transform: rotate(90deg); }
+.acc-head .title {
+  flex: 1; font-weight: 700; font-size: 0.85rem;
+}
+.acc-head .desc {
+  display: block;
+  font-size: 9px; color: var(--text-tertiary); font-weight: 400;
+}
+.acc-head .count {
+  font-size: 10px; color: var(--text-tertiary);
+  background: var(--bg-overlay); padding: 2px 8px; border-radius: 999px;
+}
+.acc-body {
+  display: none;
+  padding: 0 12px 12px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 4px;
+}
+.acc-item.open .acc-body { display: block; }
+
+/* Drawer overlay */
+.drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(3px);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+}
+.drawer {
+  width: 100%;
+  max-height: 85%;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  padding: 20px 16px;
+  overflow-y: auto;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.drawer-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+.drawer h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+.drawer .ticker { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-tertiary); }
+.drawer .close {
+  position: absolute; top: 16px; right: 16px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--bg-overlay);
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+/* Link card for option C */
+.link-card {
+  background: linear-gradient(135deg, var(--accent-soft), white);
+  border: 1px solid rgba(0,198,190,0.3);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 12px;
+}
+.link-card .icon {
+  width: 40px; height: 40px;
+  background: white;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+.link-card .text { flex: 1; }
+.link-card .text b { font-size: 0.85rem; }
+.link-card .text .sub { font-size: 10px; color: var(--text-tertiary); display: block; }
+.link-card .arr { color: var(--accent-deep); font-size: 18px; }
 </style>
 </head>
 <body>
 <div class="page">
-  <h1 class="display">Arena 대시보드 리팩토링 — 5가지 디자인 안</h1>
+  <h1 class="display">D1 개선안 — 종목 상세 접근 방식 3가지</h1>
   <p class="intro">
-    Pearl Light Mode + 한국 금융 컨벤션(상승 빨강/하락 파랑) + 모바일 우선. 각 프레임은 iPhone 375×780 기준. 더미 데이터 동일 (2026-04-13 가정).<br>
-    모두 스크롤 가능. 중복 흡수 패턴이 각 안마다 다름.
+    D1 Ultra Minimal 기반 + 종목별 내용 표시 방식 3가지.<br>
+    각 프레임은 스크롤 가능. 더미 데이터 동일 (2026-04-13 · 5전략 23종목).
   </p>
 
   <div class="phone-grid">
 
     <!-- ============================================================
-         DESIGN 1: Ultra Minimal — 1탭 무한 스크롤
+         변형 A: 하단 Accordion (전략별 접기/펼치기)
          ============================================================ -->
     <div class="phone">
-      <div class="phone-label">D1 · Ultra Minimal</div>
+      <div class="phone-label">A · Accordion</div>
       <div class="phone-screen">
         <div class="sb">
-          <div class="left"><span class="dot"></span><span>시스템 정상</span><span>·</span><span class="num">2026-04-13</span></div>
-          <div class="num">14:32:47</div>
+          <div class="left"><span class="dot"></span><span>정상</span><span>·</span><span class="num">2026-04-13</span></div>
+          <div class="num">14:32</div>
         </div>
         <div class="content">
-          <!-- KPI 상단 -->
+          <!-- KPI -->
           <div class="section">
             <div class="kpi-grid">
-              <div class="kpi">
-                <div class="label">금일 평균</div>
-                <div class="value up">+3.66%</div>
-                <div class="meta">5팀 평균</div>
-              </div>
-              <div class="kpi">
-                <div class="label">최고</div>
-                <div class="value up">+22.52%</div>
-                <div class="meta">Alpha</div>
-              </div>
-              <div class="kpi">
-                <div class="label">총 자산</div>
-                <div class="value">52.3M</div>
-                <div class="meta">누적 +4.6%</div>
-              </div>
-              <div class="kpi">
-                <div class="label">총 매매</div>
-                <div class="value">57건</div>
-                <div class="meta">Day 3</div>
-              </div>
+              <div class="kpi"><div class="label">5팀 평균</div><div class="value up">+3.66%</div><div class="meta">Day 3</div></div>
+              <div class="kpi"><div class="label">최고</div><div class="value up">+22.52%</div><div class="meta">Alpha</div></div>
+              <div class="kpi"><div class="label">총 자산</div><div class="value">52.3M</div><div class="meta">누적 +4.6%</div></div>
+              <div class="kpi"><div class="label">총 매매</div><div class="value">57건</div><div class="meta">15승 42패</div></div>
             </div>
           </div>
 
@@ -355,347 +399,318 @@ html, body {
             </div>
           </div>
 
-          <!-- 5팀 간단 리스트 -->
+          <!-- 5팀 -->
           <div class="section">
             <h2>오늘 순위 <span class="sub">5팀</span></h2>
             <div class="tc" style="border-left-color:var(--team-a);"><div class="medal">🥇</div><div class="name">Alpha Momentum<span class="desc">MA5 + 거래량</span></div><div><div class="ret up">+22.52%</div><div class="elo">ELO 1095</div></div></div>
             <div class="tc" style="border-left-color:var(--team-d);"><div class="medal">🥈</div><div class="name">Delta Theme<span class="desc">테마 + 섹터</span></div><div><div class="ret up">+3.52%</div><div class="elo">ELO 1022</div></div></div>
-            <div class="tc" style="border-left-color:var(--team-c);"><div class="medal">🥉</div><div class="name">Gamma Disclosure<span class="desc">DART 호재</span></div><div><div class="ret down">-4.03%</div><div class="elo">ELO 992</div></div></div>
-            <div class="tc" style="border-left-color:var(--team-b);"><div class="medal">4</div><div class="name">Beta Contrarian<span class="desc">RSI 역추세</span></div><div><div class="ret down">-9.05%</div><div class="elo">ELO 906</div></div></div>
-            <div class="tc" style="border-left-color:var(--team-e);"><div class="medal">5</div><div class="name">Echo Frontier<span class="desc">시초가 갭</span></div><div><div class="ret up">+5.34%</div><div class="elo">ELO 1001</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-e);"><div class="medal">🥉</div><div class="name">Echo Frontier<span class="desc">시초가 갭</span></div><div><div class="ret up">+5.34%</div><div class="elo">ELO 1001</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-c);"><div class="medal">4</div><div class="name">Gamma Disclosure<span class="desc">DART 호재</span></div><div><div class="ret down">-4.03%</div><div class="elo">ELO 992</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-b);"><div class="medal">5</div><div class="name">Beta Contrarian<span class="desc">RSI 역추세</span></div><div><div class="ret down">-9.05%</div><div class="elo">ELO 906</div></div></div>
           </div>
 
-          <!-- 후보 요약 -->
+          <!-- 전체 종목 (Accordion) -->
           <div class="section">
-            <h2>내일 후보 <span class="sub">5전략 Top 3</span></h2>
-            <div class="card">
-              <div class="row"><div style="flex:1;"><b>삼성전자</b> <span class="code">005930</span><div style="font-size:9px;color:var(--text-tertiary);">Alpha · 점수 77.5</div></div><div class="pct up">+2.91%</div></div>
-              <div class="row"><div style="flex:1;"><b>SK하이닉스</b> <span class="code">000660</span><div style="font-size:9px;color:var(--text-tertiary);">Delta · 점수 64.1</div></div><div class="pct up">+1.85%</div></div>
-              <div class="row"><div style="flex:1;"><b>EDGC</b> <span class="code">245620</span><div style="font-size:9px;color:var(--text-tertiary);">Gamma · 점수 47.5</div></div><div class="pct up">+3.12%</div></div>
+            <h2>내일 후보 종목 <span class="sub">5전략 · 23종목</span></h2>
+
+            <!-- Alpha (open 상태) -->
+            <div class="acc-item open" style="border-left-color:var(--team-a);">
+              <div class="acc-head">
+                <span class="chevron">▶</span>
+                <div class="title">Alpha Momentum <span class="desc">모멘텀 추세</span></div>
+                <span class="count">5개</span>
+              </div>
+              <div class="acc-body">
+                <div class="srow"><div class="info"><b>삼성전자</b> <span class="code">005930</span><div class="score">점수 77.5</div></div><div class="pct up">+2.91%</div></div>
+                <div class="srow"><div class="info"><b>SK하이닉스</b> <span class="code">000660</span><div class="score">점수 64.1</div></div><div class="pct up">+1.85%</div></div>
+                <div class="srow"><div class="info"><b>한화에어로스페이스</b> <span class="code">012450</span><div class="score">점수 58.3</div></div><div class="pct up">+3.86%</div></div>
+                <div class="srow"><div class="info"><b>삼성전기</b> <span class="code">009150</span><div class="score">점수 54.2</div></div><div class="pct up">+9.50%</div></div>
+                <div class="srow"><div class="info"><b>현대모비스</b> <span class="code">012330</span><div class="score">점수 51.7</div></div><div class="pct up">+1.42%</div></div>
+              </div>
+            </div>
+
+            <!-- Beta (접힘) -->
+            <div class="acc-item" style="border-left-color:var(--team-b);">
+              <div class="acc-head">
+                <span class="chevron">▶</span>
+                <div class="title">Beta Contrarian <span class="desc">대형주 역추세</span></div>
+                <span class="count">2개</span>
+              </div>
+              <div class="acc-body">
+                <div class="srow"><div class="info"><b>LG에너지솔루션</b> <span class="code">373220</span><div class="score">점수 62.4</div></div><div class="pct down">-2.14%</div></div>
+                <div class="srow"><div class="info"><b>미래에셋증권</b> <span class="code">006800</span><div class="score">점수 48.7</div></div><div class="pct down">-1.77%</div></div>
+              </div>
+            </div>
+
+            <!-- Gamma -->
+            <div class="acc-item" style="border-left-color:var(--team-c);">
+              <div class="acc-head">
+                <span class="chevron">▶</span>
+                <div class="title">Gamma Disclosure <span class="desc">DART 공시</span></div>
+                <span class="count">3개</span>
+              </div>
+            </div>
+
+            <!-- Delta -->
+            <div class="acc-item" style="border-left-color:var(--team-d);">
+              <div class="acc-head">
+                <span class="chevron">▶</span>
+                <div class="title">Delta Theme <span class="desc">테마/정책</span></div>
+                <span class="count">5개</span>
+              </div>
+            </div>
+
+            <!-- Echo -->
+            <div class="acc-item" style="border-left-color:var(--team-e);">
+              <div class="acc-head">
+                <span class="chevron">▶</span>
+                <div class="title">Echo Frontier <span class="desc">시초가 갭</span></div>
+                <span class="count">8개</span>
+              </div>
             </div>
           </div>
 
           <!-- 시스템 mini -->
-          <div class="section">
-            <h2>시스템 <span class="sub">헬스</span></h2>
-            <div class="card" style="display:flex;align-items:center;gap:10px;">
-              <span class="pill pill-ok"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>정상</span>
-              <div style="flex:1;font-size:11px;color:var(--text-tertiary);">6/6 체크 통과 · 0 이슈</div>
-            </div>
+          <div class="card" style="display:flex;align-items:center;gap:10px;">
+            <span class="pill pill-ok">정상</span>
+            <div style="flex:1;font-size:11px;color:var(--text-tertiary);">헬스 6/6 · 이슈 0건</div>
           </div>
         </div>
       </div>
-      <div class="phone-notes"><b>탭 제로 · 무한 스크롤</b><br>모든 정보가 1화면 스트림. 가장 단순.</div>
-    </div>
-
-    <!-- ============================================================
-         DESIGN 2: Overview + Drilldown (카드 탭→drawer)
-         ============================================================ -->
-    <div class="phone">
-      <div class="phone-label">D2 · Overview + Drilldown</div>
-      <div class="phone-screen">
-        <div class="sb">
-          <div class="left"><span class="dot"></span><span>정상</span><span>·</span><span class="num">04-13</span><span>·</span><span>Day 3</span></div>
-          <div style="font-size:14px;">↻</div>
-        </div>
-        <div class="content">
-          <!-- 큰 히어로 KPI -->
-          <div class="card" style="padding:16px;text-align:center;background:linear-gradient(135deg,white,var(--bg-overlay));">
-            <div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);">오늘 5팀 평균</div>
-            <div class="num display" style="font-size:2.4rem;font-weight:800;margin:6px 0;color:var(--up);">+3.66%</div>
-            <div style="font-size:11px;color:var(--text-tertiary);">총 자산 <span class="num" style="color:var(--text-primary);font-weight:700;">52,349,000원</span> · 누적 +4.6%</div>
-          </div>
-
-          <!-- 팀 리스트 (탭 가능하다는 힌트) -->
-          <div class="section">
-            <h2>팀 순위 <span class="sub">탭하여 상세</span></h2>
-            <div class="tc" style="border-left-color:var(--team-a);cursor:pointer;">
-              <div class="medal">🥇</div>
-              <div class="name">Alpha Momentum
-                <span class="desc">5승 0패 · 100%</span>
-              </div>
-              <div><div class="ret up">+22.52%</div><div class="elo">ELO 1095 ▲+31</div></div>
-              <span style="color:var(--text-muted);margin-left:4px;">›</span>
-            </div>
-            <div class="tc" style="border-left-color:var(--team-d);">
-              <div class="medal">🥈</div>
-              <div class="name">Delta Theme
-                <span class="desc">4승 1패 · 80%</span>
-              </div>
-              <div><div class="ret up">+3.52%</div><div class="elo">ELO 1022 ▲+8</div></div>
-              <span style="color:var(--text-muted);margin-left:4px;">›</span>
-            </div>
-            <div class="tc" style="border-left-color:var(--team-c);">
-              <div class="medal">🥉</div>
-              <div class="name">Gamma Disclosure
-                <span class="desc">1승 3패 · 25%</span>
-              </div>
-              <div><div class="ret down">-4.03%</div><div class="elo">ELO 992 ▼-8</div></div>
-              <span style="color:var(--text-muted);margin-left:4px;">›</span>
-            </div>
-            <div class="tc" style="border-left-color:var(--team-e);">
-              <div class="medal">4</div>
-              <div class="name">Echo Frontier
-                <span class="desc">2승 3패 · 40%</span>
-              </div>
-              <div><div class="ret up">+5.34%</div><div class="elo">ELO 1001 ▲+1</div></div>
-              <span style="color:var(--text-muted);margin-left:4px;">›</span>
-            </div>
-            <div class="tc" style="border-left-color:var(--team-b);">
-              <div class="medal">5</div>
-              <div class="name">Beta Contrarian
-                <span class="desc">1승 4패 · 20%</span>
-              </div>
-              <div><div class="ret down">-9.05%</div><div class="elo">ELO 906 ▼-31</div></div>
-              <span style="color:var(--text-muted);margin-left:4px;">›</span>
-            </div>
-          </div>
-
-          <!-- 전략 후보 (mini) -->
-          <div class="section">
-            <h2>내일 후보 <span class="sub">5전략 · 총 23종목</span></h2>
-            <div class="card">
-              <div style="display:flex;gap:8px;justify-content:space-between;margin-bottom:8px;font-size:11px;">
-                <div><b>Alpha</b> 5</div><div><b>Beta</b> 2</div><div><b>Gamma</b> 3</div><div><b>Delta</b> 5</div><div><b>Echo</b> 8</div>
-              </div>
-              <div style="font-size:10px;color:var(--text-tertiary);text-align:center;padding-top:8px;border-top:1px solid var(--border-subtle);">전체 보기 →</div>
-            </div>
-          </div>
-        </div>
+      <div class="phone-notes">
+        <b>A · Accordion</b><br>
+        하단에 전략별 접기/펼치기.<br>
+        ✅ 컨텍스트 유지 (페이지 이동 X)<br>
+        ✅ 종목 전체 scan 쉬움
       </div>
-      <div class="phone-notes"><b>탭 제로 + Drawer 드릴다운</b><br>카드 탭 시 오른쪽 drawer로 상세. 가장 깔끔.</div>
     </div>
 
     <!-- ============================================================
-         DESIGN 3: Feed Style — 중요도순 피드
+         변형 B: Drawer (종목 탭 시 바텀시트 상세)
          ============================================================ -->
     <div class="phone">
-      <div class="phone-label">D3 · Feed Style</div>
+      <div class="phone-label">B · Drawer</div>
       <div class="phone-screen">
         <div class="sb">
-          <div class="left"><span class="dot"></span><span class="num">04-13 · 14:32</span></div>
-          <div style="font-weight:700;color:var(--accent-deep);">ARENA</div>
-        </div>
-        <div class="content">
-          <!-- 피드 아이템 1: 오늘 결과 -->
-          <div class="card" style="border-left:4px solid var(--team-a);">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-              <span style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);">🏆 오늘 1위</span>
-              <span style="font-size:8px;color:var(--text-muted);margin-left:auto;">14:32</span>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:8px;">
-              <b style="font-family:var(--font-display);font-size:1.05rem;">Alpha Momentum</b>
-              <span class="num up" style="font-size:1.3rem;font-weight:800;margin-left:auto;">+22.52%</span>
-            </div>
-            <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">5승 0패 · ELO 1095 (▲+31)</div>
-          </div>
-
-          <!-- 피드 아이템 2: KPI 묶음 -->
-          <div class="card">
-            <div style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">📊 5팀 요약</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
-              <div><div style="font-size:8px;color:var(--text-tertiary);">평균</div><div class="num up" style="font-weight:800;">+3.66%</div></div>
-              <div><div style="font-size:8px;color:var(--text-tertiary);">최고</div><div class="num up" style="font-weight:800;">+22.52%</div></div>
-              <div><div style="font-size:8px;color:var(--text-tertiary);">최저</div><div class="num down" style="font-weight:800;">-9.05%</div></div>
-            </div>
-          </div>
-
-          <!-- 피드 아이템 3: 손실 경고 -->
-          <div class="card" style="border-left:4px solid var(--down);background:var(--down-bg);">
-            <div style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--down);margin-bottom:4px;">⚠ 손실 주의</div>
-            <b style="font-family:var(--font-display);">Beta Contrarian</b>
-            <span class="num down" style="font-weight:800;float:right;">-9.05%</span>
-            <div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">14일 backtest: 1/33 승률 — 전략 재고 필요</div>
-          </div>
-
-          <!-- 피드 아이템 4: 상위 종목 -->
-          <div class="card">
-            <div style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">🎯 내일 Top 픽</div>
-            <div class="row"><div style="flex:1;"><b>삼성전자</b> <span class="code">005930</span></div><div class="pct up">+2.91%</div></div>
-            <div class="row"><div style="flex:1;"><b>SK하이닉스</b> <span class="code">000660</span></div><div class="pct up">+1.85%</div></div>
-            <div class="row"><div style="flex:1;"><b>대동금속</b> <span class="code">020400</span></div><div class="pct up">+30.00%</div></div>
-          </div>
-
-          <!-- 피드 아이템 5: 팀 하이라이트 -->
-          <div class="card" style="border-left:4px solid var(--team-e);">
-            <div style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:6px;">📈 3일 급등</div>
-            <div style="display:flex;align-items:baseline;gap:6px;">
-              <b style="font-family:var(--font-display);">Echo Frontier</b>
-              <span class="num up" style="font-weight:800;margin-left:auto;">+5.34%</span>
-            </div>
-            <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">갭 매매 전략 · 3일 연속 수익</div>
-          </div>
-
-          <!-- 피드 아이템 6: 시스템 -->
-          <div class="card">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="pill pill-ok"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;"></span>정상</span>
-              <span style="font-size:10px;color:var(--text-tertiary);">헬스체크 6/6 · 마지막 갱신 14:32</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="phone-notes"><b>피드형 (중요도순)</b><br>Twitter 스타일. 알림/하이라이트 중심.</div>
-    </div>
-
-    <!-- ============================================================
-         DESIGN 4: 3-Tab Compact (현재 5탭 → 3탭)
-         ============================================================ -->
-    <div class="phone">
-      <div class="phone-label">D4 · 3-Tab Compact</div>
-      <div class="phone-screen">
-        <div class="sb">
-          <div class="left"><span class="dot"></span><span>정상</span><span>·</span><span class="num">04-13 · 14:32</span></div>
-          <div class="num">Day 3</div>
-        </div>
-        <div class="tabs">
-          <button class="tab active">📊 Today</button>
-          <button class="tab">🎯 후보</button>
-          <button class="tab">⚙️ 시스템</button>
+          <div class="left"><span class="dot"></span><span>정상</span><span>·</span><span class="num">2026-04-13</span></div>
+          <div class="num">14:32</div>
         </div>
         <div class="content">
           <!-- KPI -->
           <div class="section">
             <div class="kpi-grid">
-              <div class="kpi">
-                <div class="label">5팀 평균</div>
-                <div class="value up">+3.66%</div>
-                <div class="meta">정상</div>
-              </div>
-              <div class="kpi">
-                <div class="label">총 자산</div>
-                <div class="value">52.3M</div>
-                <div class="meta">+4.6%</div>
-              </div>
+              <div class="kpi"><div class="label">5팀 평균</div><div class="value up">+3.66%</div><div class="meta">Day 3</div></div>
+              <div class="kpi"><div class="label">최고</div><div class="value up">+22.52%</div><div class="meta">Alpha</div></div>
+              <div class="kpi"><div class="label">총 자산</div><div class="value">52.3M</div><div class="meta">누적 +4.6%</div></div>
+              <div class="kpi"><div class="label">총 매매</div><div class="value">57건</div><div class="meta">15승 42패</div></div>
             </div>
           </div>
 
-          <!-- H2H compact -->
-          <div class="h2h" style="padding:10px;">
+          <!-- 5팀 간략 -->
+          <div class="section">
+            <h2>오늘 순위 <span class="sub">5팀 · 탭으로 상세</span></h2>
+            <div class="tc" style="border-left-color:var(--team-a);"><div class="medal">🥇</div><div class="name">Alpha Momentum</div><div><div class="ret up">+22.52%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-d);"><div class="medal">🥈</div><div class="name">Delta Theme</div><div><div class="ret up">+3.52%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-e);"><div class="medal">🥉</div><div class="name">Echo Frontier</div><div><div class="ret up">+5.34%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-c);"><div class="medal">4</div><div class="name">Gamma Disclosure</div><div><div class="ret down">-4.03%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-b);"><div class="medal">5</div><div class="name">Beta Contrarian</div><div><div class="ret down">-9.05%</div></div></div>
+          </div>
+
+          <!-- 내일 후보 (간단 리스트) -->
+          <div class="section">
+            <h2>내일 후보 <span class="sub">탭하여 상세</span></h2>
+            <div class="card">
+              <div class="srow"><div class="info"><b>삼성전자</b> <span class="code">005930 · Alpha</span></div><div class="pct up">+2.91%</div><span class="arrow">›</span></div>
+              <div class="srow"><div class="info"><b>SK하이닉스</b> <span class="code">000660 · Delta</span></div><div class="pct up">+1.85%</div><span class="arrow">›</span></div>
+              <div class="srow"><div class="info"><b>한화에어로</b> <span class="code">012450 · Alpha</span></div><div class="pct up">+3.86%</div><span class="arrow">›</span></div>
+              <div class="srow"><div class="info"><b>대동금속</b> <span class="code">020400 · Delta</span></div><div class="pct up">+30.00%</div><span class="arrow">›</span></div>
+              <div class="srow"><div class="info"><b>삼성전기</b> <span class="code">009150 · Alpha</span></div><div class="pct up">+9.50%</div><span class="arrow">›</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drawer overlay (열린 상태 시뮬레이션) -->
+        <div class="drawer-overlay">
+          <div class="drawer">
+            <button class="close">✕</button>
+            <div class="drawer-handle"></div>
+            <h3 class="display">삼성전자</h3>
+            <div class="ticker">005930 · KOSPI · Alpha Momentum</div>
+
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:16px;">
+              <div class="kpi"><div class="label">현재가</div><div class="value">72,400원</div><div class="meta up">▲ +2.91%</div></div>
+              <div class="kpi"><div class="label">점수</div><div class="value">77.5</div><div class="meta">5전략 중 1위</div></div>
+            </div>
+
+            <div class="section" style="margin-top:14px;">
+              <h2 style="font-size:0.8rem;">점수 분해</h2>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.6;">
+                <div style="display:flex;justify-content:space-between;padding:3px 0;"><span>등락률 (35%)</span><b class="num">32.1</b></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 0;"><span>거래대금 (30%)</span><b class="num">28.5</b></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 0;"><span>거래량 급증 (20%)</span><b class="num">17.9</b></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 0;"><span>가격대 (15%)</span><b class="num">15.0</b></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2 style="font-size:0.8rem;">최근 5일 수익률</h2>
+              <div style="font-size:11px;display:flex;justify-content:space-between;gap:8px;">
+                <span>4/9</span><span class="up">+1.2%</span>
+                <span>4/10</span><span class="up">+2.5%</span>
+                <span>4/11</span><span class="down">-0.8%</span>
+                <span>4/12</span><span class="up">+3.1%</span>
+                <span>4/13</span><span class="up">+2.9%</span>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
+              <button style="padding:10px;border-radius:10px;background:var(--accent);color:white;border:none;font-weight:700;font-family:inherit;">차트 보기</button>
+              <button style="padding:10px;border-radius:10px;background:var(--bg-overlay);color:var(--text-primary);border:none;font-weight:700;font-family:inherit;">전체 종목</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-notes">
+        <b>B · Drawer (바텀시트)</b><br>
+        종목 탭 시 아래에서 슬라이드.<br>
+        ✅ 상세 정보 풍부<br>
+        ✅ 모바일 네이티브 UX
+      </div>
+    </div>
+
+    <!-- ============================================================
+         변형 C: 별도 페이지 링크
+         ============================================================ -->
+    <div class="phone">
+      <div class="phone-label">C · 별도 페이지</div>
+      <div class="phone-screen">
+        <div class="sb">
+          <div class="left"><span class="dot"></span><span>정상</span><span>·</span><span class="num">2026-04-13</span></div>
+          <div class="num">14:32</div>
+        </div>
+        <div class="content">
+          <!-- KPI -->
+          <div class="section">
+            <div class="kpi-grid">
+              <div class="kpi"><div class="label">5팀 평균</div><div class="value up">+3.66%</div><div class="meta">Day 3</div></div>
+              <div class="kpi"><div class="label">최고</div><div class="value up">+22.52%</div><div class="meta">Alpha</div></div>
+              <div class="kpi"><div class="label">총 자산</div><div class="value">52.3M</div><div class="meta">누적 +4.6%</div></div>
+              <div class="kpi"><div class="label">총 매매</div><div class="value">57건</div><div class="meta">15승 42패</div></div>
+            </div>
+          </div>
+
+          <!-- H2H -->
+          <div class="h2h">
+            <div class="h2h-title">🏆 TOP 2 HEAD-TO-HEAD</div>
             <div class="h2h-body">
               <div class="h2h-team">
+                <div class="badge" style="color:var(--team-a);background:rgba(239,68,68,0.08);">1</div>
                 <div class="name">Alpha</div>
-                <div class="ret up" style="font-size:1rem;">+22.52%</div>
+                <div class="ret up">+22.52%</div>
                 <div class="meta">ELO 1095</div>
               </div>
-              <div class="h2h-vs" style="font-size:0.9rem;">VS</div>
+              <div class="h2h-vs">VS</div>
               <div class="h2h-team">
+                <div class="badge" style="color:var(--team-d);background:rgba(245,158,11,0.08);">2</div>
                 <div class="name">Delta</div>
-                <div class="ret up" style="font-size:1rem;">+3.52%</div>
+                <div class="ret up">+3.52%</div>
                 <div class="meta">ELO 1022</div>
               </div>
             </div>
           </div>
 
-          <!-- 5팀 순위 -->
+          <!-- 5팀 -->
           <div class="section">
-            <h2>순위 <span class="sub">오늘</span></h2>
-            <div class="tc" style="border-left-color:var(--team-a);padding:8px 10px;"><div class="medal" style="font-size:0.9rem;">🥇</div><div class="name" style="font-size:0.8rem;">Alpha Momentum</div><div class="ret up">+22.52%</div></div>
-            <div class="tc" style="border-left-color:var(--team-d);padding:8px 10px;"><div class="medal" style="font-size:0.9rem;">🥈</div><div class="name" style="font-size:0.8rem;">Delta Theme</div><div class="ret up">+3.52%</div></div>
-            <div class="tc" style="border-left-color:var(--team-e);padding:8px 10px;"><div class="medal" style="font-size:0.9rem;">🥉</div><div class="name" style="font-size:0.8rem;">Echo Frontier</div><div class="ret up">+5.34%</div></div>
-            <div class="tc" style="border-left-color:var(--team-c);padding:8px 10px;"><div class="medal" style="font-size:0.9rem;">4</div><div class="name" style="font-size:0.8rem;">Gamma Disclosure</div><div class="ret down">-4.03%</div></div>
-            <div class="tc" style="border-left-color:var(--team-b);padding:8px 10px;"><div class="medal" style="font-size:0.9rem;">5</div><div class="name" style="font-size:0.8rem;">Beta Contrarian</div><div class="ret down">-9.05%</div></div>
+            <h2>오늘 순위 <span class="sub">5팀</span></h2>
+            <div class="tc" style="border-left-color:var(--team-a);"><div class="medal">🥇</div><div class="name">Alpha Momentum</div><div><div class="ret up">+22.52%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-d);"><div class="medal">🥈</div><div class="name">Delta Theme</div><div><div class="ret up">+3.52%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-e);"><div class="medal">🥉</div><div class="name">Echo Frontier</div><div><div class="ret up">+5.34%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-c);"><div class="medal">4</div><div class="name">Gamma Disclosure</div><div><div class="ret down">-4.03%</div></div></div>
+            <div class="tc" style="border-left-color:var(--team-b);"><div class="medal">5</div><div class="name">Beta Contrarian</div><div><div class="ret down">-9.05%</div></div></div>
           </div>
-        </div>
 
-        <div class="btab" style="--cols:3;">
-          <button class="active"><span class="ic">📊</span><span>Today</span></button>
-          <button><span class="ic">🎯</span><span>후보</span></button>
-          <button><span class="ic">⚙️</span><span>시스템</span></button>
-        </div>
-      </div>
-      <div class="phone-notes"><b>3탭 (5→3)</b><br>Today/후보/시스템. 중복 흡수.</div>
-    </div>
+          <!-- 후보 Top 3 + 링크 -->
+          <div class="section">
+            <h2>내일 후보 <span class="sub">Top 3</span></h2>
+            <div class="card">
+              <div class="srow"><div class="info"><b>삼성전자</b> <span class="code">005930</span><div class="score">Alpha · 77.5</div></div><div class="pct up">+2.91%</div></div>
+              <div class="srow"><div class="info"><b>SK하이닉스</b> <span class="code">000660</span><div class="score">Delta · 64.1</div></div><div class="pct up">+1.85%</div></div>
+              <div class="srow"><div class="info"><b>한화에어로</b> <span class="code">012450</span><div class="score">Alpha · 58.3</div></div><div class="pct up">+3.86%</div></div>
+            </div>
 
-    <!-- ============================================================
-         DESIGN 5: Bento Dashboard — 상단 밀도 ↑
-         ============================================================ -->
-    <div class="phone">
-      <div class="phone-label">D5 · Bento Dashboard</div>
-      <div class="phone-screen">
-        <div class="sb">
-          <div class="left"><span class="dot"></span><span>정상</span><span>·</span><span class="num">14:32</span><span>·</span><span>5/5</span></div>
-          <div>↻</div>
-        </div>
-        <div class="content">
-          <!-- Bento grid: 2 col with spans -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-            <!-- Hero KPI -->
-            <div class="card" style="grid-column:span 4;padding:14px;background:linear-gradient(135deg,white,var(--accent-soft));border-color:rgba(0,198,190,0.2);">
-              <div style="font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-tertiary);">금일 성과</div>
-              <div style="display:flex;align-items:baseline;gap:10px;margin-top:4px;">
-                <div class="num display" style="font-size:1.8rem;font-weight:800;color:var(--up);">+3.66%</div>
-                <div style="font-size:10px;color:var(--text-tertiary);">5팀 평균</div>
+            <!-- 전체 종목 페이지 링크 -->
+            <a href="#" class="link-card" style="text-decoration:none;color:inherit;">
+              <div class="icon">📊</div>
+              <div class="text">
+                <b>전체 23종목 상세 보기</b>
+                <span class="sub">5전략별 종목 + 점수 분해 + 과거 성과</span>
               </div>
-              <div style="font-size:10px;color:var(--text-tertiary);margin-top:6px;">잔고 <span class="num" style="color:var(--text-primary);font-weight:700;">52,349,000원</span> · 57건</div>
-            </div>
-            <!-- Mini KPIs -->
-            <div class="card" style="grid-column:span 2;padding:10px;">
-              <div style="font-size:8px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;">최고</div>
-              <div class="num up" style="font-size:1.1rem;font-weight:800;">+22.52%</div>
-              <div style="font-size:9px;color:var(--text-tertiary);">Alpha</div>
-            </div>
-            <div class="card" style="grid-column:span 2;padding:10px;">
-              <div style="font-size:8px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;">최저</div>
-              <div class="num down" style="font-size:1.1rem;font-weight:800;">-9.05%</div>
-              <div style="font-size:9px;color:var(--text-tertiary);">Beta</div>
-            </div>
+              <span class="arr">→</span>
+            </a>
+            <a href="#" class="link-card" style="text-decoration:none;color:inherit;">
+              <div class="icon">🔍</div>
+              <div class="text">
+                <b>종목 검색 / 필터</b>
+                <span class="sub">코드, 점수, 섹터별 검색</span>
+              </div>
+              <span class="arr">→</span>
+            </a>
+          </div>
 
-            <!-- Team list -->
-            <div class="card" style="grid-column:span 4;padding:12px;">
-              <div style="font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">5팀 순위</div>
-              <div class="row" style="padding:5px 0;"><div style="width:4px;height:14px;background:var(--team-a);border-radius:2px;margin-right:8px;"></div><div style="flex:1;font-weight:600;font-size:12px;">🥇 Alpha</div><div class="pct up">+22.52%</div></div>
-              <div class="row" style="padding:5px 0;"><div style="width:4px;height:14px;background:var(--team-d);border-radius:2px;margin-right:8px;"></div><div style="flex:1;font-weight:600;font-size:12px;">🥈 Delta</div><div class="pct up">+3.52%</div></div>
-              <div class="row" style="padding:5px 0;"><div style="width:4px;height:14px;background:var(--team-e);border-radius:2px;margin-right:8px;"></div><div style="flex:1;font-weight:600;font-size:12px;">🥉 Echo</div><div class="pct up">+5.34%</div></div>
-              <div class="row" style="padding:5px 0;"><div style="width:4px;height:14px;background:var(--team-c);border-radius:2px;margin-right:8px;"></div><div style="flex:1;font-weight:600;font-size:12px;">4 Gamma</div><div class="pct down">-4.03%</div></div>
-              <div class="row" style="padding:5px 0;"><div style="width:4px;height:14px;background:var(--team-b);border-radius:2px;margin-right:8px;"></div><div style="flex:1;font-weight:600;font-size:12px;">5 Beta</div><div class="pct down">-9.05%</div></div>
-            </div>
-
-            <!-- Strategies mini -->
-            <div class="card" style="grid-column:span 2;padding:10px;">
-              <div style="font-size:8px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;">내일 후보</div>
-              <div class="num" style="font-size:1.4rem;font-weight:800;">23</div>
-              <div style="font-size:9px;color:var(--text-tertiary);">5전략</div>
-            </div>
-            <!-- Health mini -->
-            <div class="card" style="grid-column:span 2;padding:10px;">
-              <div style="font-size:8px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;">헬스</div>
-              <div style="margin-top:4px;"><span class="pill pill-ok">정상</span></div>
-              <div style="font-size:9px;color:var(--text-tertiary);margin-top:4px;">6/6 통과</div>
-            </div>
-
-            <!-- Top pick -->
-            <div class="card" style="grid-column:span 4;padding:12px;">
-              <div style="font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:6px;">🎯 Top 픽</div>
-              <div class="row"><div style="flex:1;"><b>삼성전자</b> <span class="code">005930</span></div><div class="pct up">+2.91%</div></div>
-              <div class="row"><div style="flex:1;"><b>SK하이닉스</b> <span class="code">000660</span></div><div class="pct up">+1.85%</div></div>
-            </div>
+          <!-- 시스템 mini -->
+          <div class="card" style="display:flex;align-items:center;gap:10px;">
+            <span class="pill pill-ok">정상</span>
+            <div style="flex:1;font-size:11px;color:var(--text-tertiary);">헬스 6/6 · 이슈 0건</div>
           </div>
         </div>
       </div>
-      <div class="phone-notes"><b>Bento 그리드 + 밀도 ↑</b><br>한 화면에 모든 핵심. 탭 없음.</div>
+      <div class="phone-notes">
+        <b>C · 별도 페이지</b><br>
+        메인은 요약, 상세는 별도 URL.<br>
+        ✅ 각 페이지 목적 명확<br>
+        ❌ 페이지 이동 부담
+      </div>
     </div>
 
   </div>
 
-  <div style="margin-top:64px;padding:24px;background:white;border-radius:16px;border:1px solid #E5E7EB;">
-    <h2 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:12px;">📊 비교 가이드</h2>
+  <div style="margin-top:96px;padding:24px;background:white;border-radius:16px;border:1px solid #E5E7EB;">
+    <h2 style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:12px;">📊 3가지 비교</h2>
     <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
       <thead><tr style="text-align:left;color:var(--text-tertiary);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">
-        <th style="padding:8px 12px;border-bottom:1px solid var(--border);">디자인</th>
-        <th style="padding:8px 12px;border-bottom:1px solid var(--border);">탭 수</th>
-        <th style="padding:8px 12px;border-bottom:1px solid var(--border);">핵심</th>
-        <th style="padding:8px 12px;border-bottom:1px solid var(--border);">장점</th>
-        <th style="padding:8px 12px;border-bottom:1px solid var(--border);">단점</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">방식</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">상세 접근</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">장점</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">단점</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #E5E7EB;">구현 난이도</th>
       </tr></thead>
       <tbody>
-        <tr><td style="padding:10px 12px;font-weight:700;">D1 Ultra Minimal</td><td style="padding:10px 12px;">0</td><td style="padding:10px 12px;">무한 스크롤</td><td style="padding:10px 12px;color:var(--success);">가장 단순, 모바일 최적</td><td style="padding:10px 12px;color:var(--text-tertiary);">스크롤 길음</td></tr>
-        <tr style="background:var(--bg-overlay);"><td style="padding:10px 12px;font-weight:700;">D2 Overview + Drilldown</td><td style="padding:10px 12px;">0</td><td style="padding:10px 12px;">카드→drawer</td><td style="padding:10px 12px;color:var(--success);">정보 접근성 ↑</td><td style="padding:10px 12px;color:var(--text-tertiary);">구현 복잡</td></tr>
-        <tr><td style="padding:10px 12px;font-weight:700;">D3 Feed Style</td><td style="padding:10px 12px;">0</td><td style="padding:10px 12px;">중요도순 피드</td><td style="padding:10px 12px;color:var(--success);">알림 중심 UX</td><td style="padding:10px 12px;color:var(--text-tertiary);">정보 위계 불명확</td></tr>
-        <tr style="background:var(--bg-overlay);"><td style="padding:10px 12px;font-weight:700;">D4 3-Tab Compact</td><td style="padding:10px 12px;">3</td><td style="padding:10px 12px;">Today/후보/시스템</td><td style="padding:10px 12px;color:var(--success);">탭 축소, 명확</td><td style="padding:10px 12px;color:var(--text-tertiary);">기존 구조와 유사</td></tr>
-        <tr><td style="padding:10px 12px;font-weight:700;">D5 Bento Dashboard</td><td style="padding:10px 12px;">0</td><td style="padding:10px 12px;">Bento 그리드</td><td style="padding:10px 12px;color:var(--success);">밀도 극대화</td><td style="padding:10px 12px;color:var(--text-tertiary);">작은 화면에 많음</td></tr>
+        <tr>
+          <td style="padding:10px 12px;font-weight:700;">A · Accordion</td>
+          <td style="padding:10px 12px;">하단 전략별 접기</td>
+          <td style="padding:10px 12px;color:var(--success);">컨텍스트 유지, 전체 scan 쉬움</td>
+          <td style="padding:10px 12px;color:var(--text-tertiary);">상세 정보 제한적</td>
+          <td style="padding:10px 12px;">⭐ 쉬움</td>
+        </tr>
+        <tr style="background:#F8FAFB;">
+          <td style="padding:10px 12px;font-weight:700;">B · Drawer (바텀시트)</td>
+          <td style="padding:10px 12px;">종목 탭 → 아래서 슬라이드</td>
+          <td style="padding:10px 12px;color:var(--success);">네이티브 UX, 상세 풍부</td>
+          <td style="padding:10px 12px;color:var(--text-tertiary);">구현 복잡</td>
+          <td style="padding:10px 12px;">⭐⭐ 중간</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;font-weight:700;">C · 별도 페이지</td>
+          <td style="padding:10px 12px;">링크 → 별도 URL</td>
+          <td style="padding:10px 12px;color:var(--success);">페이지별 목적 명확</td>
+          <td style="padding:10px 12px;color:var(--text-tertiary);">이동 부담, context loss</td>
+          <td style="padding:10px 12px;">⭐⭐⭐ 어려움</td>
+        </tr>
       </tbody>
     </table>
+    <p style="margin-top:16px;font-size:0.85rem;color:var(--text-tertiary);line-height:1.6;">
+      💡 <b>권장</b>: <b>A (Accordion)</b>이 가장 단순하고 빠르게 구현 가능. <b>B (Drawer)</b>는 더 풍부하지만 구현 시간이 더 걸림. A와 B 조합도 가능 (하단 accordion + 종목 탭 시 drawer).
+    </p>
   </div>
 </div>
 </body>
