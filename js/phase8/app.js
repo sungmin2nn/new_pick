@@ -17,14 +17,6 @@ function showMainTab(tab) {
   $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === `pane-${tab}`));
 
-  // BNF iframe lazy load (최초 활성화 시만)
-  if (tab === 'bnf') {
-    const iframe = $('#bnf-iframe');
-    if (iframe && !iframe.src && iframe.dataset.src) {
-      iframe.src = iframe.dataset.src;
-    }
-  }
-
   // URL hash 업데이트
   if (window.location.hash !== `#${tab}`) {
     history.replaceState(null, '', `#${tab}`);
