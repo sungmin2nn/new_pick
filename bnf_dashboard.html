@@ -240,56 +240,88 @@
         .tr-down { color: #3B82F6; }
         .tr-neutral { color: #6B7280; font-size: 0.85em; font-weight: 600; }
 
-        /* === A안: stats 테이블 카드 === */
-        .stats-table-card {
+        /* === BNF Stats Card (Hero + Groups) === */
+        .bnf-stats {
             background: #FFFFFF;
             border: 1px solid #E5E7EB;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            padding: 20px 18px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
         }
-        .stats-table-title {
-            font-size: 0.9em;
-            font-weight: 700;
-            color: #6B7280;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
+
+        /* Hero section */
+        .bnf-hero {
+            text-align: center;
+            padding: 8px 0 18px;
             border-bottom: 1px solid #F0F2F5;
+            margin-bottom: 14px;
         }
-        .stats-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .stats-table th {
-            text-align: left;
-            font-weight: 500;
-            color: #6B7280;
-            padding: 8px 0;
-            font-size: 0.85em;
-            width: 40%;
-            border-bottom: 1px solid #F0F2F5;
-        }
-        .stats-table td {
-            text-align: right;
+        .bnf-hero-num {
             font-family: 'JetBrains Mono', monospace;
             font-variant-numeric: tabular-nums;
-            font-weight: 600;
+            font-size: 2.6em;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.04em;
             color: #1A1A2E;
+            margin-bottom: 6px;
+        }
+        .bnf-hero-num.bnf-pos { color: #EF4444; }
+        .bnf-hero-num.bnf-neg { color: #3B82F6; }
+        .bnf-hero-num.bnf-zero { color: #9CA3AF; }
+        .bnf-hero-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+        .bnf-hero-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 11px;
+            color: #6B7280;
+            line-height: 1.4;
+        }
+
+        /* Group section */
+        .bnf-group {
             padding: 8px 0;
-            font-size: 0.95em;
             border-bottom: 1px solid #F0F2F5;
         }
-        .stats-table tr:last-child th,
-        .stats-table tr:last-child td { border-bottom: none; }
-        .stats-table tr.row-emph th { color: #1A1A2E; font-weight: 700; }
-        .stats-table tr.row-emph td {
-            font-size: 1.15em;
+        .bnf-group:last-child { border-bottom: none; padding-bottom: 0; }
+        .bnf-group-label {
+            font-size: 10px;
             font-weight: 700;
-            color: #00A39C;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
         }
-        .stats-table td.positive { color: #EF4444; }
-        .stats-table td.negative { color: #3B82F6; }
+        .bnf-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 5px 0;
+        }
+        .bnf-row-label {
+            font-size: 13px;
+            color: #4a4a5e;
+            font-weight: 500;
+        }
+        .bnf-row-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A2E;
+            letter-spacing: -0.01em;
+        }
+        .bnf-row-val.bnf-pos { color: #EF4444; }
+        .bnf-row-val.bnf-neg { color: #3B82F6; }
+        .bnf-row-val.bnf-zero { color: #6B7280; }
 
         /* (legacy - 호환용) */
         .stats-grid {
@@ -683,25 +715,41 @@
             <span id="slotStatus"></span>
         </div>
 
-        <!-- Stats Table (A안 - 한 카드, 2열 표) -->
-        <div class="stats-table-card">
-            <div class="stats-table-title">💰 자본 / 통계</div>
-            <table class="stats-table">
-                <tbody>
-                    <tr><th>초기 자본</th><td id="stInitialCap">-</td></tr>
-                    <tr><th>현재 자본</th><td id="stCurrentCap">-</td></tr>
-                    <tr><th>사용 자본</th><td id="stUsedCap">-</td></tr>
-                    <tr><th>실현 손익</th><td id="stRealizedPnl">-</td></tr>
-                    <tr><th>미실현 손익</th><td id="stUnrealizedPnl">-</td></tr>
-                    <tr class="row-emph"><th>누적 수익률</th><td id="stTotalReturn">-</td></tr>
-                    <tr><th>총 매매</th><td id="stTotalTrades">-</td></tr>
-                    <tr><th>평균 수익률</th><td id="stAvgReturn">-</td></tr>
-                    <tr><th>보유 포지션</th><td id="stOpenPositions">-</td></tr>
-                </tbody>
-            </table>
+        <!-- Stats Card (Hero KPI + 그룹) -->
+        <div class="bnf-stats">
+            <!-- Hero -->
+            <div class="bnf-hero">
+                <div class="bnf-hero-num" id="stTotalReturn">-</div>
+                <div class="bnf-hero-label">누적 수익률</div>
+                <div class="bnf-hero-sub" id="stHeroSub">-</div>
+            </div>
+
+            <!-- 자본 -->
+            <div class="bnf-group">
+                <div class="bnf-group-label">자본</div>
+                <div class="bnf-row"><span class="bnf-row-label">초기</span><span class="bnf-row-val" id="stInitialCap">-</span></div>
+                <div class="bnf-row"><span class="bnf-row-label">현재</span><span class="bnf-row-val" id="stCurrentCap">-</span></div>
+                <div class="bnf-row"><span class="bnf-row-label">사용</span><span class="bnf-row-val" id="stUsedCap">-</span></div>
+            </div>
+
+            <!-- 손익 -->
+            <div class="bnf-group">
+                <div class="bnf-group-label">손익</div>
+                <div class="bnf-row"><span class="bnf-row-label">실현</span><span class="bnf-row-val" id="stRealizedPnl">-</span></div>
+                <div class="bnf-row"><span class="bnf-row-label">미실현</span><span class="bnf-row-val" id="stUnrealizedPnl">-</span></div>
+            </div>
+
+            <!-- 매매 -->
+            <div class="bnf-group">
+                <div class="bnf-group-label">매매</div>
+                <div class="bnf-row"><span class="bnf-row-label">거래</span><span class="bnf-row-val" id="stTotalTrades">-</span></div>
+                <div class="bnf-row"><span class="bnf-row-label">승률</span><span class="bnf-row-val" id="stWinRate">-</span></div>
+                <div class="bnf-row"><span class="bnf-row-label">평균</span><span class="bnf-row-val" id="stAvgReturn">-</span></div>
+                <div class="bnf-row"><span class="bnf-row-label">포지션</span><span class="bnf-row-val" id="stOpenPositions">-</span></div>
+            </div>
         </div>
 
-        <!-- Hidden 호환 (기존 ID 유지 - 다른 코드가 참조 가능) -->
+        <!-- Hidden 호환 -->
         <div style="display:none;">
             <span id="totalReturn"></span>
             <span id="winRate"></span>
@@ -780,15 +828,31 @@
             </div>
         </div>
 
-        <!-- Trade History (카드 리스트 - Pearl Light 디자인) -->
+        <!-- Trade History -->
         <div class="section">
             <h2>📋 매매 내역</h2>
-            <div id="tradeList" class="trade-list">
-                <div class="trade-empty">매매 내역이 없습니다</div>
-            </div>
-            <!-- legacy hidden table (loadTradeHistory 호환용) -->
-            <div style="display:none;">
-                <table id="tradeHistory"><tbody></tbody></table>
+            <div class="table-wrapper">
+                <table id="tradeHistory">
+                    <thead>
+                        <tr>
+                            <th>매수일</th>
+                            <th>구분</th>
+                            <th>종목</th>
+                            <th>매수가</th>
+                            <th>수량</th>
+                            <th>금액</th>
+                            <th>분할</th>
+                            <th>매도가</th>
+                            <th>매도일</th>
+                            <th>손익률</th>
+                            <th>보유기간</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="12" class="no-data">매매 내역이 없습니다</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1060,22 +1124,37 @@
             const fmtPct = (n) => (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
             const cls = (n) => n >= 0 ? 'positive' : 'negative';
 
-            // === 신규 stats 테이블 ===
-            const setVal = (id, text, className) => {
+            // === 신규 stats 카드 ===
+            const setVal = (id, text, posCls) => {
                 const el = document.getElementById(id);
                 if (!el) return;
                 el.textContent = text;
-                if (className !== undefined) el.className = className;
+                if (posCls !== undefined) {
+                    el.classList.remove('bnf-pos', 'bnf-neg', 'bnf-zero');
+                    el.classList.add(posCls);
+                }
             };
+            const cssCls = (n) => n > 0 ? 'bnf-pos' : (n < 0 ? 'bnf-neg' : 'bnf-zero');
+
+            // Hero
+            setVal('stTotalReturn', fmtPct(totalReturnPct), cssCls(totalReturnPct));
+            const totalPnl = realizedPnl + unrealizedPnl;
+            setVal('stHeroSub', `${fmtSigned(totalPnl)} (실현 ${fmtSigned(realizedPnl)} · 미실현 ${fmtSigned(unrealizedPnl)})`);
+
+            // 자본
             setVal('stInitialCap', fmtMoney(totalCapital));
-            setVal('stCurrentCap', fmtMoney(currentCapital), cls(currentCapital - totalCapital));
-            setVal('stUsedCap', fmtMoney(usedCapital) + ' (' + usagePercent.toFixed(1) + '%)');
-            setVal('stRealizedPnl', fmtSigned(realizedPnl), cls(realizedPnl));
-            setVal('stUnrealizedPnl', fmtSigned(unrealizedPnl), cls(unrealizedPnl));
-            setVal('stTotalReturn', fmtPct(totalReturnPct), cls(totalReturnPct));
-            setVal('stTotalTrades', totalTrades + '건 (' + winCount + '승 ' + lossCount + '패, 승률 ' + winRate.toFixed(0) + '%)');
+            setVal('stCurrentCap', fmtMoney(currentCapital), cssCls(currentCapital - totalCapital));
+            setVal('stUsedCap', fmtMoney(usedCapital) + ` (${usagePercent.toFixed(1)}%)`);
+
+            // 손익
+            setVal('stRealizedPnl', fmtSigned(realizedPnl), cssCls(realizedPnl));
+            setVal('stUnrealizedPnl', fmtSigned(unrealizedPnl), cssCls(unrealizedPnl));
+
+            // 매매
+            setVal('stTotalTrades', `${totalTrades}건 (${winCount}승 ${lossCount}패)`);
+            setVal('stWinRate', winRate.toFixed(1) + '%');
             setVal('stAvgReturn', avgReturn.toFixed(2) + '%');
-            setVal('stOpenPositions', openPositions + ' / 5개');
+            setVal('stOpenPositions', `${openPositions} / 5`);
 
             // === 자금 현황 (capital-status bar) ===
             updateCapitalStatus(stats, positions);
@@ -1238,78 +1317,37 @@
                 initEmptyChart();
                 updateUnrealizedChart();
 
-                // 신규 카드 리스트 렌더 (Pearl Light)
-                const tradeListEl = document.getElementById('tradeList');
-                if (!tradeListEl) return;
-
                 if (allTrades.length === 0) {
-                    tradeListEl.innerHTML = '<div class="trade-empty">매매 내역이 없습니다</div>';
+                    tbody.innerHTML = '<tr><td colspan="12" class="no-data">매매 내역이 없습니다</td></tr>';
                     return;
                 }
 
-                const fmtDate = (s) => {
-                    if (!s) return '-';
-                    const d = String(s).replace(/-/g, '');
-                    return d.length >= 8 ? `${d.slice(4,6)}/${d.slice(6,8)}` : s;
-                };
-
-                tradeListEl.innerHTML = allTrades.slice(0, 30).map(t => {
+                tbody.innerHTML = allTrades.slice(0, 30).map(t => {
                     const isBuy = t.type === 'BUY';
-                    const isClosed = !isBuy && t.return_pct != null;
-                    const cls = (n) => n >= 0 ? 'tr-up' : 'tr-down';
-                    const sign = (n) => (n >= 0 ? '+' : '');
-                    const profit = t.profit;
+                    const typeClass = isBuy ? 'positive' : 'negative';
+                    const typeLabel = isBuy ? '매수' : '매도';
 
-                    // 우측 큰 숫자: 청산은 손익률, 진입중은 "보유중"
-                    let bigNum = '';
-                    let bigClass = '';
-                    if (isClosed) {
-                        bigNum = `${sign(t.return_pct)}${t.return_pct.toFixed(2)}%`;
-                        bigClass = cls(t.return_pct);
-                    } else if (isBuy) {
-                        bigNum = '보유중';
-                        bigClass = 'tr-neutral';
+                    let pnlDisplay = '-';
+                    if (!isBuy && t.return_pct !== undefined && t.return_pct !== null) {
+                        const pnlClass = t.return_pct >= 0 ? 'positive' : 'negative';
+                        pnlDisplay = `<span class="${pnlClass}">${t.return_pct >= 0 ? '+' : ''}${t.return_pct.toFixed(1)}%</span>`;
                     }
-
-                    // 부가: profit 원
-                    let subProfit = '';
-                    if (isClosed && profit != null) {
-                        subProfit = `${sign(profit)}${profit.toLocaleString()}원`;
-                    }
-
-                    // badge: 매수/매도 + reason
-                    const badge = isBuy
-                        ? '<span class="tr-badge tr-badge-buy">매수</span>'
-                        : '<span class="tr-badge tr-badge-sell">청산</span>';
-                    const reason = t.reason
-                        ? `<span class="tr-reason">${t.reason}</span>`
-                        : '';
-
-                    // 가격/수량 행
-                    const priceLine = isClosed
-                        ? `${(t.buy_price || 0).toLocaleString()} → ${(t.sell_price || 0).toLocaleString()}`
-                        : `${(t.buy_price || 0).toLocaleString()}원`;
-
-                    const dateLine = isClosed
-                        ? `${fmtDate(t.buy_date)} → ${fmtDate(t.sell_date)}${t.holding_days && t.holding_days !== '-' ? ' · ' + t.holding_days : ''}`
-                        : `${fmtDate(t.buy_date)} 진입`;
 
                     return `
-                        <div class="trade-card">
-                            <div class="tr-left">
-                                <div class="tr-name">
-                                    <b>${t.name || '-'}</b>
-                                    ${badge}
-                                </div>
-                                <div class="tr-meta">${dateLine}</div>
-                                <div class="tr-meta tr-num">${priceLine} · ${t.quantity || 0}주</div>
-                                ${reason ? `<div class="tr-reason-line">${reason}</div>` : ''}
-                            </div>
-                            <div class="tr-right">
-                                <div class="tr-big ${bigClass}">${bigNum}</div>
-                                ${subProfit ? `<div class="tr-sub ${bigClass}">${subProfit}</div>` : ''}
-                            </div>
-                        </div>
+                        <tr>
+                            <td>${t.buy_date || '-'}</td>
+                            <td><span class="${typeClass}" style="font-weight:600;">${typeLabel}</span></td>
+                            <td>${t.name}</td>
+                            <td>${(t.buy_price || 0).toLocaleString()}</td>
+                            <td>${t.quantity}주</td>
+                            <td>${(t.amount || 0).toLocaleString()}</td>
+                            <td>${t.partial || '-'}</td>
+                            <td>${isBuy ? '-' : (t.sell_price || 0).toLocaleString()}</td>
+                            <td>${isBuy ? '-' : (t.sell_date || '-')}</td>
+                            <td>${pnlDisplay}</td>
+                            <td>${isBuy ? '-' : (t.holding_days || '-')}</td>
+                            <td style="font-size:0.8em;">${t.reason || ''}</td>
+                        </tr>
                     `;
                 }).join('');
 
