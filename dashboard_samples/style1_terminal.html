@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NTB Terminal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0a;
+    --bg-card: #111111;
+    --bg-card-alt: #161616;
+    --border: #1e1e1e;
+    --border-bright: #2a2a2a;
+    --green: #00d26a;
+    --green-dim: #0a3d20;
+    --red: #ff4757;
+    --red-dim: #3d0a12;
+    --yellow: #ffc107;
+    --yellow-dim: #3d3000;
+    --blue: #4a9eff;
+    --blue-dim: #0a1f3d;
+    --text: #c8c8c8;
+    --text-dim: #666666;
+    --text-bright: #ffffff;
+    --orange: #ff8c00;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .container {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  .status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #050505;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    display: inline-block;
+    animation: pulse 2s infinite;
+    margin-right: 4px;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .section {
+    border-bottom: 1px solid var(--border);
+    padding: 12px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+  }
+  .section-header .tag {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    border: 1px solid var(--border-bright);
+    color: var(--text-dim);
+    margin-left: auto;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+  }
+  .kpi-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .kpi-value {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .kpi-sub {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .t-table {
+    width: 100%;
+    font-size: 11px;
+    border-collapse: collapse;
+  }
+  .t-table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--text-dim);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 4px 4px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .t-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #131313;
+    vertical-align: middle;
+  }
+  .t-table tr:last-child td { border-bottom: none; }
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .rank-1 { background: #ffd70033; color: #ffd700; }
+  .rank-2 { background: #c0c0c033; color: #c0c0c0; }
+  .rank-3 { background: #cd7f3233; color: #cd7f32; }
+  .rank-4 { background: #4a4a4a33; color: #888; }
+  .rank-5 { background: #4a4a4a33; color: #888; }
+  .elo-bar-bg {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 3px;
+    overflow: hidden;
+  }
+  .elo-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s;
+  }
+  .trade-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid #131313;
+    font-size: 11px;
+  }
+  .trade-row:last-child { border-bottom: none; }
+  .trade-name {
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .trade-prices {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .trade-pnl {
+    text-align: right;
+    min-width: 80px;
+  }
+  .trade-pnl-pct {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .trade-pnl-amt {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .trade-tag {
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-weight: 600;
+    margin-left: 6px;
+    white-space: nowrap;
+  }
+  .tag-win { background: var(--green-dim); color: var(--green); border: 1px solid #0d4a2a; }
+  .tag-loss { background: var(--red-dim); color: var(--red); border: 1px solid #4a0d15; }
+  .tag-hold { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #4a3d00; }
+  .tag-cut { background: var(--red-dim); color: var(--red); border: 1px solid #4a0d15; }
+  .monitor-row {
+    padding: 8px 0;
+    border-bottom: 1px solid #131313;
+  }
+  .monitor-row:last-child { border-bottom: none; }
+  .monitor-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .monitor-bar-bg {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .monitor-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    position: absolute;
+    left: 50%;
+    transition: width 0.3s;
+  }
+  .monitor-bar-center {
+    position: absolute;
+    left: 50%;
+    top: -1px;
+    width: 1px;
+    height: 6px;
+    background: var(--text-dim);
+  }
+  .bnf-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .bnf-stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 8px;
+    text-align: center;
+  }
+  .bnf-stat-label {
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+  .bnf-stat-value {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .cand-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid #131313;
+    font-size: 11px;
+  }
+  .cand-row:last-child { border-bottom: none; }
+  .cand-rank {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-dim);
+    min-width: 16px;
+    text-align: center;
+  }
+  .cand-name { flex: 1; font-weight: 500; }
+  .cand-strat {
+    font-size: 9px;
+    color: var(--blue);
+    background: var(--blue-dim);
+    border: 1px solid #1a3355;
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .cand-score {
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+  .c-green { color: var(--green); }
+  .c-red { color: var(--red); }
+  .c-yellow { color: var(--yellow); }
+  .c-blue { color: var(--blue); }
+  .c-orange { color: var(--orange); }
+  .c-dim { color: var(--text-dim); }
+  .c-bright { color: var(--text-bright); }
+  .footer {
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    border-top: 1px solid var(--border);
+  }
+  .blink { animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .loading-wrap { display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:12px; }
+  .loading-spin { width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="loading-wrap">
+    <div class="loading-spin"></div>
+    <div class="mono c-dim" style="font-size:11px;">Loading data...</div>
+  </div>
+</div>
+
+<script>
+const BASE = '../';
+const TEAMS = ['team_a','team_b','team_c','team_d','team_e'];
+const TEAM_NAMES = {team_a:'Alpha Momentum',team_b:'Beta Contrarian',team_c:'Gamma Disclosure',team_d:'Delta Theme',team_e:'Echo Frontier'};
+const TEAM_SHORT = {team_a:'Alpha',team_b:'Beta',team_c:'Gamma',team_d:'Delta',team_e:'Echo'};
+const TEAM_COLORS = {team_a:'#EF4444',team_b:'#3B82F6',team_c:'#10B981',team_d:'#F59E0B',team_e:'#8B5CF6'};
+const TEAM_STRATS = {team_a:'momentum',team_b:'largecap_contrarian',team_c:'dart_disclosure',team_d:'theme_policy',team_e:'frontier_gap'};
+
+async function fetchJ(path) {
+  try { const r = await fetch(BASE + path); if (!r.ok) return null; return r.json(); } catch { return null; }
+}
+
+async function loadData() {
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().slice(0,10).replace(/-/g,''));
+  }
+  const [leaderboard, bnfPos, bnfCand] = await Promise.all([
+    fetchJ('data/arena/leaderboard.json'),
+    fetchJ('data/bnf/positions.json'),
+    fetchJ('data/bnf/candidates.json'),
+  ]);
+  let status=null, candidates=null, dataDate=dates[0];
+  for (const dt of dates) {
+    const s = await fetchJ(`data/paper_trading/status_${dt}.json`);
+    if (s) { status = s; dataDate = dt; break; }
+  }
+  for (const dt of dates) {
+    const c = await fetchJ(`data/paper_trading/candidates_${dt}_all.json`);
+    if (c) { candidates = c; break; }
+  }
+  const portfolios = {}, trades = {}, summaries = {};
+  await Promise.all(TEAMS.map(async tid => {
+    portfolios[tid] = await fetchJ(`data/arena/${tid}/portfolio.json`);
+    for (const dt of dates) {
+      if (!trades[tid]) { const t = await fetchJ(`data/arena/${tid}/daily/${dt}/trades.json`); if(t) trades[tid]=t; }
+      if (!summaries[tid]) { const s = await fetchJ(`data/arena/${tid}/daily/${dt}/summary.json`); if(s) summaries[tid]=s; }
+    }
+  }));
+  return { leaderboard, status, candidates, bnfPos, bnfCand, portfolios, trades, summaries, dataDate };
+}
+
+function fmt(n) { return n != null ? Number(n).toLocaleString('ko-KR') : '-'; }
+function fmtK(n) { return n != null ? Math.round(n/1000).toLocaleString('ko-KR') + 'K' : '-'; }
+function pctClass(v) { return v > 0 ? 'c-green' : v < 0 ? 'c-red' : 'c-dim'; }
+function pctStr(v) { return v > 0 ? '+' + v.toFixed(2) + '%' : v.toFixed(2) + '%'; }
+
+function render(data) {
+  const app = document.getElementById('app');
+  const now = new Date();
+  const dateStr = data.dataDate ? data.dataDate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : now.toISOString().slice(0,10);
+  const timeStr = now.toTimeString().slice(0,5) + ' KST';
+
+  // Calculate KPIs
+  let totalCapital = 0, totalTrades = 0, totalWins = 0;
+  const teamList = data.leaderboard?.teams ? [...data.leaderboard.teams].sort((a,b) => (b.elo||0) - (a.elo||0)) : [];
+
+  TEAMS.forEach(tid => {
+    const p = data.portfolios[tid];
+    if (p) {
+      totalCapital += p.current_capital || 0;
+      totalTrades += p.total_trades || 0;
+      totalWins += p.total_wins || 0;
+    }
+  });
+  const totalLosses = totalTrades - totalWins;
+  const winRate = totalTrades > 0 ? (totalWins / totalTrades * 100) : 0;
+  const avgReturn = teamList.length > 0 ? teamList.reduce((s,t) => s + (t.total_return_pct || 0), 0) / teamList.length : 0;
+  const initialCapital = TEAMS.length * 10000000;
+  const capitalDiff = totalCapital - initialCapital;
+
+  // Collect all trades
+  let allTrades = [];
+  TEAMS.forEach(tid => {
+    const t = data.trades[tid];
+    if (t?.results) {
+      t.results.forEach(r => allTrades.push(r));
+    }
+  });
+  const wins = allTrades.filter(t => (t.return_pct || t.pnl_pct || 0) > 0);
+  const losses = allTrades.filter(t => (t.return_pct || t.pnl_pct || 0) <= 0);
+  const todayPnl = allTrades.reduce((s,t) => s + (t.pnl || t.profit || 0), 0);
+
+  // BNF
+  const bnfPositions = data.bnfPos?.positions || [];
+  const bnfStats = data.bnfPos?.stats || {};
+  const bnfTotalReturn = bnfStats.total_return_pct || bnfPositions.reduce((s,p) => s + (p.return_pct || 0), 0);
+  const bnfWinRate = bnfStats.win_rate || 0;
+  const bnfCapital = bnfStats.initial_capital || 3000000;
+  const bnfCurrent = bnfStats.current_value || bnfStats.total_value || bnfCapital;
+  const bnfUnrealized = bnfPositions.reduce((s,p) => s + (p.unrealized_pnl || 0), 0);
+
+  // Candidates
+  let candList = [];
+  if (data.candidates?.strategies) {
+    Object.values(data.candidates.strategies).forEach(strat => {
+      if (strat.candidates) {
+        strat.candidates.forEach(c => { if (!candList.find(x => x.code === c.code)) candList.push(c); });
+      }
+    });
+  }
+  candList.sort((a,b) => (b.score||0) - (a.score||0));
+  candList = candList.slice(0, 5);
+
+  // Paper trading monitor
+  const monitorStocks = data.status?.stocks || [];
+
+  // ELO range for bar width
+  const minElo = teamList.length > 0 ? Math.min(...teamList.map(t=>t.elo||1000)) : 800;
+  const maxElo = teamList.length > 0 ? Math.max(...teamList.map(t=>t.elo||1000)) : 1200;
+  const eloRange = maxElo - minElo || 1;
+
+  // Rank colors
+  const barColors = ['var(--green)','var(--blue)','var(--orange)','var(--text-dim)','var(--red)'];
+
+  app.innerHTML = `
+  <!-- STATUS BAR -->
+  <div class="status-bar mono">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span class="status-dot"></span>
+      <span class="c-green" style="font-weight:600;">NTB</span>
+      <span class="c-dim">v2.1</span>
+    </div>
+    <div>
+      <span class="c-dim">${dateStr}</span>
+      <span class="c-dim" style="margin:0 4px;">|</span>
+      <span class="c-dim">${timeStr}</span>
+    </div>
+  </div>
+
+  <!-- KPI SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <span style="color:var(--green);">></span> SYSTEM KPI
+      <span class="tag">${teamList.length} TEAMS</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">5팀 평균 수익률</div>
+        <div class="kpi-value mono ${pctClass(avgReturn)}">${avgReturn > 0 ? '+' : ''}${avgReturn.toFixed(2)}<span style="font-size:13px;">%</span></div>
+        <div class="kpi-sub mono">vs 코스피 -</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">총 자산 (5팀 합산)</div>
+        <div class="kpi-value mono c-bright" style="font-size:16px;">${fmt(totalCapital)}</div>
+        <div class="kpi-sub mono ${pctClass(capitalDiff)}">${capitalDiff >= 0 ? '+' : ''}${fmt(capitalDiff)}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">총 매매</div>
+        <div class="kpi-value mono c-bright">${totalTrades}<span style="font-size:13px;color:var(--text-dim);">건</span></div>
+        <div class="kpi-sub mono"><span class="c-green">${totalWins}W</span> <span class="c-dim">/</span> <span class="c-red">${totalLosses}L</span></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">승률</div>
+        <div class="kpi-value mono c-yellow">${winRate.toFixed(1)}<span style="font-size:13px;">%</span></div>
+        <div class="kpi-sub mono c-dim">target 60%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM LEADERBOARD -->
+  <div class="section">
+    <div class="section-header">
+      <span style="color:var(--blue);">></span> TEAM LEADERBOARD
+      <span class="tag">ELO RANK</span>
+    </div>
+    <table class="t-table mono">
+      <thead>
+        <tr>
+          <th style="width:24px;">#</th>
+          <th>Team</th>
+          <th style="text-align:right;">ELO</th>
+          <th style="text-align:right;">수익률</th>
+          <th style="text-align:right;">자금</th>
+          <th style="text-align:right;">승률</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${teamList.map((t, i) => {
+          const tid = t.team_id || t.id || '';
+          const p = data.portfolios[tid];
+          const ret = t.total_return_pct ?? p?.total_return_pct ?? 0;
+          const cap = p?.current_capital ?? 10000000;
+          const wr = p?.total_trades > 0 ? (p.total_wins / p.total_trades * 100) : 0;
+          const eloPct = eloRange > 0 ? ((t.elo - minElo) / eloRange * 100) : 50;
+          const name = TEAM_SHORT[tid] || t.name || tid;
+          return `<tr>
+            <td><span class="rank-badge rank-${i+1}">${i+1}</span></td>
+            <td>
+              <div style="font-weight:600;color:${i < 3 ? 'var(--text-bright)' : 'var(--text)'};font-size:11px;">${name}</div>
+              <div class="elo-bar-bg"><div class="elo-bar-fill" style="width:${eloPct}%;background:${barColors[i] || 'var(--text-dim)'};"></div></div>
+            </td>
+            <td style="text-align:right;${i === 0 ? 'color:var(--text-bright);' : ''}font-weight:600;">${t.elo || '-'}</td>
+            <td style="text-align:right;" class="${pctClass(ret)}">${ret > 0 ? '+' : ''}${ret.toFixed(2)}%</td>
+            <td style="text-align:right;font-size:10px;">${fmtK(cap)}</td>
+            <td style="text-align:right;" class="${wr >= 50 ? 'c-green' : wr > 0 ? 'c-dim' : 'c-dim'}">${p?.total_trades > 0 ? wr.toFixed(0) + '%' : '-'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TODAY P&L -->
+  <div class="section">
+    <div class="section-header">
+      <span style="color:var(--green);">></span> TODAY P&L
+      <span class="tag">${data.dataDate ? data.dataDate.slice(4,6) + '/' + data.dataDate.slice(6,8) : '-'} 결산</span>
+    </div>
+    ${allTrades.length > 0 ? `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:6px 8px;background:var(--bg-card);border:1px solid var(--border);border-radius:3px;" class="mono">
+      <div style="font-size:10px;">
+        <span class="c-green">${wins.length}W</span> <span class="c-dim">/</span> <span class="c-red">${losses.length}L</span>
+      </div>
+      <div style="font-size:13px;font-weight:700;" class="${pctClass(todayPnl)}">${todayPnl >= 0 ? '+' : ''}${fmt(Math.round(todayPnl))}원</div>
+    </div>
+    <div>
+      ${[...wins, ...losses].map(t => {
+        const pnlPct = t.return_pct || t.pnl_pct || 0;
+        const pnl = t.pnl || t.profit || 0;
+        const isWin = pnlPct > 0;
+        const buyP = t.buy_price || t.entry_price || 0;
+        const sellP = t.sell_price || t.exit_price || 0;
+        return `<div class="trade-row">
+          <div style="flex:1;">
+            <div class="trade-name ${isWin ? 'c-bright' : ''}">${t.name || t.stock_name || t.code || '-'}</div>
+            <div class="trade-prices mono">${fmt(buyP)} → ${fmt(sellP)}</div>
+          </div>
+          <div class="trade-pnl mono">
+            <div class="trade-pnl-pct ${pctClass(pnlPct)}">${pnlPct > 0 ? '+' : ''}${pnlPct.toFixed(1)}%</div>
+            <div class="trade-pnl-amt">${pnl >= 0 ? '+' : ''}${fmt(Math.round(pnl))}</div>
+          </div>
+          <span class="trade-tag ${isWin ? 'tag-win' : 'tag-loss'}">${isWin ? '익절' : '손절'}</span>
+        </div>`;
+      }).join('')}
+    </div>` : '<div class="mono c-dim" style="font-size:11px;text-align:center;padding:16px 0;">거래 데이터 없음</div>'}
+  </div>
+
+  <!-- LIVE MONITOR -->
+  <div class="section">
+    <div class="section-header">
+      <span style="color:var(--yellow);">></span> PAPER TRADING MONITOR
+      <span class="tag">장중</span>
+    </div>
+    <div>
+      ${monitorStocks.length > 0 ? monitorStocks.map(s => {
+        const chg = s.change_pct || s.pnl_pct || 0;
+        const isPos = chg >= 0;
+        const statusTag = s.status === 'sold_profit' ? '<span class="trade-tag tag-win">익절</span>' :
+                          s.status === 'sold_loss' ? '<span class="trade-tag tag-cut">손절</span>' :
+                          '<span class="trade-tag tag-hold">대기</span>';
+        const barW = Math.min(Math.abs(chg) * 5, 50);
+        return `<div class="monitor-row">
+          <div class="monitor-top">
+            <div>
+              <span style="font-size:11px;font-weight:500;" class="${isPos ? 'c-bright' : ''}">${s.name || s.stock_name || s.code || '-'}</span>
+              ${statusTag}
+            </div>
+            <div class="mono" style="font-size:11px;">
+              <span class="c-dim">${fmt(s.buy_price || s.entry_price || 0)} →</span> <span class="${isPos ? 'c-bright' : ''}">${fmt(s.current_price || 0)}</span>
+              <span class="${pctClass(chg)}" style="font-weight:600;margin-left:4px;">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</span>
+            </div>
+          </div>
+          <div class="monitor-bar-bg" style="height:4px;position:relative;">
+            <div class="monitor-bar-center"></div>
+            <div style="position:absolute;${isPos ? 'left:50%' : 'right:50%'};height:100%;width:${barW}%;background:var(--${isPos ? 'green' : 'red'});border-radius:2px;"></div>
+          </div>
+        </div>`;
+      }).join('') : '<div class="mono c-dim" style="font-size:11px;text-align:center;padding:16px 0;">모니터링 데이터 없음</div>'}
+    </div>
+  </div>
+
+  <!-- BNF SECTION -->
+  <div class="section">
+    <div class="section-header">
+      <span style="color:var(--orange);">></span> BNF POSITIONS
+      <span class="tag">SWING</span>
+    </div>
+    <div class="bnf-stat-grid mono">
+      <div class="bnf-stat">
+        <div class="bnf-stat-label">총자본</div>
+        <div class="bnf-stat-value c-bright">${fmtK(bnfCapital)}</div>
+      </div>
+      <div class="bnf-stat">
+        <div class="bnf-stat-label">현재가치</div>
+        <div class="bnf-stat-value ${pctClass(bnfCurrent - bnfCapital)}">${fmtK(bnfCurrent)}</div>
+      </div>
+      <div class="bnf-stat">
+        <div class="bnf-stat-label">수익률</div>
+        <div class="bnf-stat-value ${pctClass(bnfTotalReturn)}">${bnfTotalReturn > 0 ? '+' : ''}${bnfTotalReturn.toFixed(2)}%</div>
+      </div>
+    </div>
+    ${bnfPositions.length > 0 ? `
+    <table class="t-table mono" style="font-size:11px;">
+      <thead>
+        <tr>
+          <th>종목</th>
+          <th style="text-align:right;">매입</th>
+          <th style="text-align:right;">현재</th>
+          <th style="text-align:right;">수익률</th>
+          <th style="text-align:right;">미실현</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${bnfPositions.map(p => {
+          const ret = p.return_pct || 0;
+          const unr = p.unrealized_pnl || 0;
+          return `<tr>
+            <td class="${ret >= 0 ? 'c-bright' : ''}" style="font-weight:500;">${p.name || p.stock_name || '-'}</td>
+            <td style="text-align:right;">${fmt(p.buy_price || p.avg_price || 0)}</td>
+            <td style="text-align:right;">${fmt(p.current_price || 0)}</td>
+            <td style="text-align:right;" class="${pctClass(ret)}">${ret > 0 ? '+' : ''}${ret.toFixed(2)}%</td>
+            <td style="text-align:right;" class="${pctClass(unr)}">${unr >= 0 ? '+' : ''}${fmt(Math.round(unr))}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <div style="display:flex;justify-content:center;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);" class="mono">
+      <span class="c-dim" style="font-size:10px;">승률 <span class="c-yellow">${bnfWinRate}%</span></span>
+      <span class="c-dim" style="font-size:10px;">미실현 합 <span class="${pctClass(bnfUnrealized)}">${bnfUnrealized >= 0 ? '+' : ''}${fmt(Math.round(bnfUnrealized))}</span></span>
+    </div>` : '<div class="mono c-dim" style="font-size:11px;text-align:center;padding:16px 0;">BNF 데이터 없음</div>'}
+  </div>
+
+  <!-- TOMORROW CANDIDATES -->
+  <div class="section">
+    <div class="section-header">
+      <span style="color:var(--blue);">></span> TOMORROW CANDIDATES
+      <span class="tag">예정</span>
+    </div>
+    <div>
+      ${candList.length > 0 ? candList.map((c, i) => {
+        const scoreColor = c.score >= 70 ? 'c-yellow' : c.score >= 55 ? 'c-blue' : 'c-dim';
+        return `<div class="cand-row">
+          <div class="cand-rank mono">${String(i+1).padStart(2,'0')}</div>
+          <div class="cand-name ${i < 3 ? 'c-bright' : ''}">${c.name || c.stock_name || c.code || '-'}</div>
+          <div class="cand-strat">${c.strategy || c.strat || '-'}</div>
+          <div class="cand-score mono ${scoreColor}">${c.score ? c.score.toFixed(1) : '-'}</div>
+        </div>`;
+      }).join('') : '<div class="mono c-dim" style="font-size:11px;text-align:center;padding:16px 0;">후보 데이터 없음</div>'}
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer mono">
+    NEWS TRADING BOT <span class="c-dim">|</span> TERMINAL v2.1 <span class="c-dim">|</span> PAPER TRADING MODE<br>
+    <span class="c-dim" style="font-size:8px;">LAST SYNC ${dateStr} ${timeStr}</span>
+    <span class="blink c-green" style="font-size:8px;margin-left:4px;">_</span>
+  </div>
+  `;
+}
+
+document.addEventListener('DOMContentLoaded', () => { loadData().then(render).catch(e => { console.error(e); document.getElementById('app').innerHTML = '<div class="loading-wrap"><div class="mono c-red" style="font-size:12px;">데이터 로딩 실패</div><div class="mono c-dim" style="font-size:10px;">'+e.message+'</div></div>'; }); });
+</script>
+
+<!-- Style Switcher -->
+<div id="style-fab" onclick="document.getElementById('style-modal').classList.toggle('hidden')" style="position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:#fbbf24;color:#000;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(251,191,36,.4);z-index:9999;">🎨</div>
+<div id="style-modal" class="hidden" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:flex-end;justify-content:center;">
+  <div onclick="document.getElementById('style-modal').classList.add('hidden')" style="position:absolute;inset:0;background:rgba(0,0,0,.5);"></div>
+  <div style="position:relative;width:100%;max-width:430px;max-height:70vh;overflow-y:auto;background:#1a1a1a;border-radius:20px 20px 0 0;padding:20px;">
+    <div style="text-align:center;margin-bottom:16px;"><div style="width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 12px;"></div><div style="font-weight:700;font-size:16px;color:#fff;">스타일 변경</div></div>
+    <div id="style-list" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"></div>
+  </div>
+</div>
+<script>
+const STYLES = [
+  {id:'style1_terminal',name:'Terminal',icon:'💻'},
+  {id:'style2_card',name:'Card',icon:'🃏'},
+  {id:'style3_glass',name:'Glass',icon:'🔮'},
+  {id:'style4_table',name:'Table+',icon:'📊'},
+  {id:'style5_chart',name:'Chart',icon:'📈'},
+  {id:'style6_kanban',name:'Kanban',icon:'📋'},
+  {id:'style7_sports',name:'Sports',icon:'🏟'},
+  {id:'style8_hybrid',name:'Hybrid',icon:'⚡'},
+  {id:'style9_stockapp',name:'MTS',icon:'📱'},
+];
+const currentFile = location.pathname.split('/').pop().replace('.html','');
+const list = document.getElementById('style-list');
+STYLES.forEach(s => {
+  const active = currentFile === s.id;
+  const btn = document.createElement('div');
+  btn.style.cssText = `padding:12px 8px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid ${active?'#fbbf24':'rgba(255,255,255,.1)'};background:${active?'rgba(251,191,36,.15)':'rgba(255,255,255,.03)'};`;
+  btn.innerHTML = `<div style="font-size:24px;">${s.icon}</div><div style="font-size:11px;margin-top:4px;color:${active?'#fbbf24':'rgba(255,255,255,.6)'};">${s.name}</div>`;
+  if (!active) btn.onclick = () => location.href = s.id + '.html';
+  list.appendChild(btn);
+});
+document.head.insertAdjacentHTML('beforeend','<style>.hidden{display:none!important;}</style>');
+</script>
+
+</body>
+</html>

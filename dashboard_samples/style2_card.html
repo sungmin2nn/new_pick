@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Trading Dashboard — Minimal Card</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<style>
+  * { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+  body { background: #F8FAFB; -webkit-tap-highlight-color: transparent; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .pill-green { background: #ECFDF5; color: #059669; }
+  .pill-red { background: #FEF2F2; color: #DC2626; }
+  .donut-ring { fill: none; stroke-width: 6; }
+  .donut-segment { fill: none; stroke-width: 6; stroke-linecap: round; }
+  .loading-wrap { display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:12px; }
+  .loading-spin { width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:#2563EB;border-radius:50%;animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        surface: '#FFFFFF',
+        bg: '#F8FAFB',
+        muted: '#94A3B8',
+        accent: '#2563EB',
+        profit: '#059669',
+        loss: '#DC2626',
+      }
+    }
+  }
+}
+</script>
+</head>
+<body class="bg-bg min-h-screen pb-12">
+
+<div class="max-w-[430px] mx-auto px-4 pt-6" id="app">
+  <div class="loading-wrap">
+    <div class="loading-spin"></div>
+    <div style="font-size:12px;color:#94A3B8;">Loading data...</div>
+  </div>
+</div>
+
+<script>
+const BASE = '../';
+const TEAMS = ['team_a','team_b','team_c','team_d','team_e'];
+const TEAM_NAMES = {team_a:'Alpha Momentum',team_b:'Beta Contrarian',team_c:'Gamma Disclosure',team_d:'Delta Theme',team_e:'Echo Frontier'};
+const TEAM_COLORS = {team_a:'#EF4444',team_b:'#3B82F6',team_c:'#10B981',team_d:'#F59E0B',team_e:'#8B5CF6'};
+const TEAM_STRATS = {team_a:'momentum',team_b:'largecap_contrarian',team_c:'dart_disclosure',team_d:'theme_policy',team_e:'frontier_gap'};
+const TEAM_ICONS = {team_a:'🏆',team_b:'🔄',team_c:'📊',team_d:'🎯',team_e:'🚀'};
+const TEAM_BG = {team_a:'emerald',team_b:'red',team_c:'blue',team_d:'amber',team_e:'violet'};
+
+async function fetchJ(path) {
+  try { const r = await fetch(BASE + path); if (!r.ok) return null; return r.json(); } catch { return null; }
+}
+
+async function loadData() {
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().slice(0,10).replace(/-/g,''));
+  }
+  const [leaderboard, bnfPos, bnfCand] = await Promise.all([
+    fetchJ('data/arena/leaderboard.json'),
+    fetchJ('data/bnf/positions.json'),
+    fetchJ('data/bnf/candidates.json'),
+  ]);
+  let status=null, candidates=null, dataDate=dates[0];
+  for (const dt of dates) {
+    const s = await fetchJ(`data/paper_trading/status_${dt}.json`);
+    if (s) { status = s; dataDate = dt; break; }
+  }
+  for (const dt of dates) {
+    const c = await fetchJ(`data/paper_trading/candidates_${dt}_all.json`);
+    if (c) { candidates = c; break; }
+  }
+  const portfolios = {}, trades = {}, summaries = {};
+  await Promise.all(TEAMS.map(async tid => {
+    portfolios[tid] = await fetchJ(`data/arena/${tid}/portfolio.json`);
+    for (const dt of dates) {
+      if (!trades[tid]) { const t = await fetchJ(`data/arena/${tid}/daily/${dt}/trades.json`); if(t) trades[tid]=t; }
+      if (!summaries[tid]) { const s = await fetchJ(`data/arena/${tid}/daily/${dt}/summary.json`); if(s) summaries[tid]=s; }
+    }
+  }));
+  return { leaderboard, status, candidates, bnfPos, bnfCand, portfolios, trades, summaries, dataDate };
+}
+
+function fmt(n) { return n != null ? Number(n).toLocaleString('ko-KR') : '-'; }
+function pctClass(v) { return v > 0 ? 'text-profit' : v < 0 ? 'text-loss' : 'text-muted'; }
+
+function render(data) {
+  const app = document.getElementById('app');
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth()+1, d = now.getDate();
+  const dateLabel = `${y}년 ${m}월 ${d}일`;
+
+  // KPIs
+  let totalCapital = 0, totalTrades = 0, totalWins = 0;
+  const teamList = data.leaderboard?.teams ? [...data.leaderboard.teams].sort((a,b) => (b.elo||0) - (a.elo||0)) : [];
+
+  TEAMS.forEach(tid => {
+    const p = data.portfolios[tid];
+    if (p) {
+      totalCapital += p.current_capital || 0;
+      totalTrades += p.total_trades || 0;
+      totalWins += p.total_wins || 0;
+    }
+  });
+  const totalLosses = totalTrades - totalWins;
+  const winRate = totalTrades > 0 ? (totalWins / totalTrades * 100) : 0;
+  const avgReturn = teamList.length > 0 ? teamList.reduce((s,t) => s + (t.total_return_pct || 0), 0) / teamList.length : 0;
+
+  // All trades
+  let allTrades = [];
+  TEAMS.forEach(tid => {
+    const t = data.trades[tid];
+    if (t?.results) t.results.forEach(r => allTrades.push(r));
+  });
+  const wins = allTrades.filter(t => (t.return_pct || t.pnl_pct || 0) > 0);
+  const losses = allTrades.filter(t => (t.return_pct || t.pnl_pct || 0) <= 0);
+
+  // BNF
+  const bnfPositions = data.bnfPos?.positions || [];
+  const bnfStats = data.bnfPos?.stats || {};
+  const bnfTotalReturn = bnfStats.total_return_pct || bnfPositions.reduce((s,p) => s + (p.return_pct || 0), 0);
+  const bnfWinRate = bnfStats.win_rate || 0;
+  const bnfWinPct = Math.max(0, Math.min(100, bnfWinRate));
+  const bnfLossPct = 100 - bnfWinPct;
+  const circumference = 2 * Math.PI * 16;
+  const winArc = (bnfWinPct / 100) * circumference;
+  const lossArc = (bnfLossPct / 100) * circumference;
+
+  // Candidates
+  let candList = [];
+  if (data.candidates?.strategies) {
+    Object.values(data.candidates.strategies).forEach(strat => {
+      if (strat.candidates) strat.candidates.forEach(c => { if (!candList.find(x => x.code === c.code)) candList.push(c); });
+    });
+  }
+  candList.sort((a,b) => (b.score||0) - (a.score||0));
+  candList = candList.slice(0, 5);
+
+  const heroReturnPill = avgReturn >= 0
+    ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold pill-green">
+        <svg class="w-3 h-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+        +${avgReturn.toFixed(2)}%
+      </span>`
+    : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold pill-red">
+        <svg class="w-3 h-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        ${avgReturn.toFixed(2)}%
+      </span>`;
+
+  app.innerHTML = `
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <p class="text-muted text-xs tracking-wide">${dateLabel}</p>
+      <h1 class="text-[22px] font-bold text-gray-900 mt-0.5">트레이딩 대시보드</h1>
+    </div>
+    <div class="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center">
+      <svg class="w-4.5 h-4.5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+    </div>
+  </div>
+
+  <!-- Hero Card: Total P&L -->
+  <div class="bg-surface rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4">
+    <p class="text-muted text-xs font-medium tracking-wide mb-1">총 자산</p>
+    <p class="text-[32px] font-extrabold text-gray-900 tracking-tight">${fmt(totalCapital)}<span class="text-base font-semibold text-muted ml-0.5">원</span></p>
+    <div class="flex items-center gap-2 mt-2">
+      ${heroReturnPill}
+      <span class="text-muted text-xs">${teamList.length}팀 평균</span>
+    </div>
+    <div class="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-gray-100">
+      <div>
+        <p class="text-muted text-[10px] font-medium">총 거래</p>
+        <p class="text-gray-900 text-lg font-bold">${totalTrades}<span class="text-xs text-muted font-medium">건</span></p>
+      </div>
+      <div>
+        <p class="text-muted text-[10px] font-medium">승 / 패</p>
+        <p class="text-gray-900 text-lg font-bold">${totalWins}<span class="text-xs text-muted font-medium">승</span> ${totalLosses}<span class="text-xs text-muted font-medium">패</span></p>
+      </div>
+      <div>
+        <p class="text-muted text-[10px] font-medium">승률</p>
+        <p class="text-gray-900 text-lg font-bold">${winRate.toFixed(1)}<span class="text-xs text-muted font-medium">%</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Cards: Horizontal Scroll -->
+  <div class="mb-4">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-bold text-gray-900">팀 성과 <span class="text-muted font-medium">(ELO순)</span></h2>
+      <span class="text-[10px] text-muted">← 스크롤 →</span>
+    </div>
+    <div class="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-1">
+      ${teamList.map((t, i) => {
+        const tid = t.team_id || t.id || '';
+        const p = data.portfolios[tid];
+        const ret = t.total_return_pct ?? p?.total_return_pct ?? 0;
+        const cap = p?.current_capital ?? 10000000;
+        const wr = p?.total_trades > 0 ? (p.total_wins / p.total_trades * 100) : 0;
+        const icon = TEAM_ICONS[tid] || '📊';
+        const bg = TEAM_BG[tid] || 'gray';
+        const retColor = ret > 0 ? 'text-profit' : ret < 0 ? 'text-loss' : 'text-muted';
+        const wrColor = wr >= 50 ? 'text-profit' : wr > 0 ? 'text-muted' : 'text-muted';
+        const barColor = wr >= 50 ? 'bg-emerald-400' : wr > 0 ? 'bg-amber-400' : 'bg-gray-300';
+        return `<div class="min-w-[200px] bg-surface rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex-shrink-0">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-xl bg-${bg}-50 flex items-center justify-center text-sm">${icon}</div>
+            <div>
+              <p class="text-xs font-bold text-gray-900">${TEAM_NAMES[tid] || t.name || tid}</p>
+              <p class="text-[10px] text-muted">ELO ${t.elo || '-'}</p>
+            </div>
+          </div>
+          <p class="text-xl font-extrabold ${retColor}">${ret > 0 ? '+' : ''}${ret.toFixed(2)}%</p>
+          <p class="text-xs text-muted mt-0.5">${fmt(cap)}원</p>
+          <div class="mt-3">
+            <div class="flex justify-between text-[10px] mb-1">
+              <span class="text-muted">승률</span>
+              <span class="font-semibold ${wrColor}">${p?.total_trades > 0 ? wr.toFixed(0) + '%' : '—'}</span>
+            </div>
+            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div class="h-full ${barColor} rounded-full" style="width:${wr}%"></div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- Today Trades: Pill List -->
+  <div class="bg-surface rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-bold text-gray-900">오늘의 거래</h2>
+      <span class="text-[10px] text-muted px-2 py-0.5 bg-gray-100 rounded-full">${allTrades.length}건</span>
+    </div>
+    <div class="space-y-2">
+      ${allTrades.length > 0 ? (() => {
+        const sorted = [...allTrades].sort((a,b) => (b.return_pct||b.pnl_pct||0) - (a.return_pct||a.pnl_pct||0));
+        const winsHtml = sorted.filter(t => (t.return_pct||t.pnl_pct||0) > 0).map(t => {
+          const pct = t.return_pct || t.pnl_pct || 0;
+          const pnl = t.pnl || t.profit || 0;
+          return `<div class="flex items-center justify-between py-2.5 px-3.5 rounded-xl bg-emerald-50/60">
+            <div class="flex items-center gap-2.5">
+              <div class="w-1.5 h-1.5 rounded-full bg-profit"></div>
+              <span class="text-[13px] font-medium text-gray-900">${t.name || t.stock_name || t.code || '-'}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-bold text-profit">+${pct.toFixed(0)}%</span>
+              <span class="text-[10px] text-muted ml-1.5">+${fmt(Math.round(pnl))}</span>
+            </div>
+          </div>`;
+        }).join('');
+        const lossesHtml = sorted.filter(t => (t.return_pct||t.pnl_pct||0) <= 0).map(t => {
+          const pct = t.return_pct || t.pnl_pct || 0;
+          const pnl = t.pnl || t.profit || 0;
+          return `<div class="flex items-center justify-between py-2.5 px-3.5 rounded-xl bg-red-50/60">
+            <div class="flex items-center gap-2.5">
+              <div class="w-1.5 h-1.5 rounded-full bg-loss"></div>
+              <span class="text-[13px] font-medium text-gray-900">${t.name || t.stock_name || t.code || '-'}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-bold text-loss">${pct.toFixed(0)}%</span>
+              <span class="text-[10px] text-muted ml-1.5">${fmt(Math.round(pnl))}</span>
+            </div>
+          </div>`;
+        }).join('');
+        return winsHtml + (winsHtml && lossesHtml ? '<div class="border-t border-gray-100 my-1"></div>' : '') + lossesHtml;
+      })() : '<div class="text-center text-muted text-xs py-4">거래 데이터 없음</div>'}
+    </div>
+  </div>
+
+  <!-- BNF Donut Chart Card -->
+  <div class="bg-surface rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-bold text-gray-900">BNF 전략</h2>
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${bnfTotalReturn >= 0 ? 'pill-green' : 'pill-red'}">${bnfTotalReturn > 0 ? '+' : ''}${bnfTotalReturn.toFixed(2)}%</span>
+    </div>
+    <div class="flex items-center gap-5">
+      <!-- Donut Chart -->
+      <div class="relative flex-shrink-0">
+        <svg width="100" height="100" viewBox="0 0 42 42">
+          <circle class="donut-ring" cx="21" cy="21" r="16" stroke="#F1F5F9"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="16"
+            stroke="#059669"
+            stroke-dasharray="${winArc.toFixed(2)} ${lossArc.toFixed(2)}"
+            stroke-dashoffset="25"
+            transform="rotate(-90 21 21)"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="16"
+            stroke="#F87171"
+            stroke-dasharray="${lossArc.toFixed(2)} ${winArc.toFixed(2)}"
+            stroke-dashoffset="${(100 - winArc + 25).toFixed(2)}"
+            transform="rotate(-90 21 21)"></circle>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-[15px] font-bold text-gray-900">${bnfWinRate}%</span>
+          <span class="text-[8px] text-muted">승률</span>
+        </div>
+      </div>
+      <!-- BNF List -->
+      <div class="flex-1 space-y-2">
+        ${bnfPositions.length > 0 ? bnfPositions.map(p => {
+          const ret = p.return_pct || 0;
+          return `<div class="flex items-center justify-between">
+            <span class="text-xs text-gray-700">${p.name || p.stock_name || '-'}</span>
+            <span class="text-xs font-bold ${ret >= 0 ? 'text-profit' : 'text-loss'}">${ret > 0 ? '+' : ''}${ret.toFixed(2)}%</span>
+          </div>`;
+        }).join('') + `<div class="border-t border-gray-100 pt-2 flex items-center justify-between">
+          <span class="text-xs font-semibold text-gray-900">Total</span>
+          <span class="text-xs font-bold ${bnfTotalReturn >= 0 ? 'text-profit' : 'text-loss'}">${bnfTotalReturn > 0 ? '+' : ''}${bnfTotalReturn.toFixed(2)}%</span>
+        </div>` : '<div class="text-xs text-muted">데이터 없음</div>'}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tomorrow Candidates: Horizontal Scroll -->
+  <div class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-bold text-gray-900">내일 후보 TOP 5</h2>
+      <span class="text-[10px] text-muted">← 스크롤 →</span>
+    </div>
+    <div class="flex gap-3 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-1">
+      ${candList.length > 0 ? candList.map((c, i) => {
+        const score = c.score || 0;
+        return `<div class="min-w-[150px] bg-surface rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex-shrink-0">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-bold text-accent bg-blue-50 px-2 py-0.5 rounded-full">#${i+1}</span>
+            <span class="text-[10px] font-bold text-accent">${score.toFixed(1)}점</span>
+          </div>
+          <p class="text-[13px] font-bold text-gray-900 leading-tight">${c.name || c.stock_name || c.code || '-'}</p>
+          <div class="mt-2.5 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-accent rounded-full" style="width:${score}%"></div>
+          </div>
+        </div>`;
+      }).join('') : '<div class="text-xs text-muted py-4">후보 데이터 없음</div>'}
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <p class="text-center text-[10px] text-muted pb-4">News Trading Bot Dashboard v2.0 — Minimal Card Style</p>
+  `;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadData().then(render).catch(e => {
+    console.error(e);
+    document.getElementById('app').innerHTML = '<div class="loading-wrap"><div style="font-size:13px;color:#DC2626;">데이터 로딩 실패</div><div style="font-size:11px;color:#94A3B8;">'+e.message+'</div></div>';
+  });
+});
+</script>
+
+<!-- Style Switcher -->
+<div id="style-fab" onclick="document.getElementById('style-modal').classList.toggle('hidden')" style="position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:#fbbf24;color:#000;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(251,191,36,.4);z-index:9999;">🎨</div>
+<div id="style-modal" class="hidden" style="position:fixed;inset:0;z-index:10000;display:flex;align-items:flex-end;justify-content:center;">
+  <div onclick="document.getElementById('style-modal').classList.add('hidden')" style="position:absolute;inset:0;background:rgba(0,0,0,.5);"></div>
+  <div style="position:relative;width:100%;max-width:430px;max-height:70vh;overflow-y:auto;background:#1a1a1a;border-radius:20px 20px 0 0;padding:20px;">
+    <div style="text-align:center;margin-bottom:16px;"><div style="width:40px;height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin:0 auto 12px;"></div><div style="font-weight:700;font-size:16px;color:#fff;">스타일 변경</div></div>
+    <div id="style-list" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;"></div>
+  </div>
+</div>
+<script>
+const STYLES = [
+  {id:'style1_terminal',name:'Terminal',icon:'💻'},
+  {id:'style2_card',name:'Card',icon:'🃏'},
+  {id:'style3_glass',name:'Glass',icon:'🔮'},
+  {id:'style4_table',name:'Table+',icon:'📊'},
+  {id:'style5_chart',name:'Chart',icon:'📈'},
+  {id:'style6_kanban',name:'Kanban',icon:'📋'},
+  {id:'style7_sports',name:'Sports',icon:'🏟'},
+  {id:'style8_hybrid',name:'Hybrid',icon:'⚡'},
+  {id:'style9_stockapp',name:'MTS',icon:'📱'},
+];
+const currentFile = location.pathname.split('/').pop().replace('.html','');
+const list = document.getElementById('style-list');
+STYLES.forEach(s => {
+  const active = currentFile === s.id;
+  const btn = document.createElement('div');
+  btn.style.cssText = `padding:12px 8px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid ${active?'#fbbf24':'rgba(255,255,255,.1)'};background:${active?'rgba(251,191,36,.15)':'rgba(255,255,255,.03)'};`;
+  btn.innerHTML = `<div style="font-size:24px;">${s.icon}</div><div style="font-size:11px;margin-top:4px;color:${active?'#fbbf24':'rgba(255,255,255,.6)'};">${s.name}</div>`;
+  if (!active) btn.onclick = () => location.href = s.id + '.html';
+  list.appendChild(btn);
+});
+document.head.insertAdjacentHTML('beforeend','<style>.hidden{display:none!important;}</style>');
+</script>
+
+</body>
+</html>

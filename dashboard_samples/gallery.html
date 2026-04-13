@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Arena Dashboard · 7 Style Gallery</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: { sans: ['Pretendard','system-ui','sans-serif'], display: ['Outfit','Pretendard','sans-serif'], mono: ['JetBrains Mono','monospace'] } } } }
+</script>
+<style>
+  html, body { background: #0a0a0a; color: #fff; font-family: 'Pretendard', system-ui, sans-serif; word-break: keep-all; -webkit-tap-highlight-color: transparent; }
+  .num { font-feature-settings: 'tnum'; font-family: 'Outfit', sans-serif; }
+
+  /* Layout */
+  .shell { display: grid; grid-template-columns: 320px 1fr; min-height: 100dvh; }
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: sticky; top: 0; z-index: 30; padding: 12px 14px; border-right: none; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .sidebar .header-top { margin-bottom: 10px; }
+    .sidebar #menu { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    .sidebar #menu::-webkit-scrollbar { display: none; }
+    .sidebar .cat-label { display: none; }
+    .sidebar .pill { flex-shrink: 0; margin-bottom: 0; padding: 8px 12px; scroll-snap-align: start; }
+    .sidebar .pill .arrow { display: none; }
+    .sidebar .pill .tag { display: none; }
+    .sidebar .pill .name { font-size: 12px; white-space: nowrap; }
+    .sidebar > .text-\[10px\] { display: none; }
+    .viewer { padding: 16px 12px; }
+    .phone { width: 100%; max-width: 430px; height: calc(100dvh - 140px); border-width: 4px; border-radius: 28px; }
+    .phone .notch { width: 90px; height: 20px; border-radius: 0 0 10px 10px; }
+  }
+
+  /* Sidebar */
+  .sidebar { background: #0d0d0f; border-right: 1px solid rgba(255,255,255,.06); overflow-y: auto; padding: 24px 20px 40px; }
+  .pill {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border-radius: 12px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.06);
+    cursor: pointer; transition: all .2s;
+    margin-bottom: 6px;
+  }
+  .pill:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); }
+  .pill.active { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.4); }
+  .pill .num-tag { font-family: 'Outfit', sans-serif; font-size: 11px; color: rgba(255,255,255,.4); width: 28px; }
+  .pill.active .num-tag { color: #fbbf24; }
+  .pill .label { flex: 1; }
+  .pill .name { font-size: 13px; font-weight: 500; }
+  .pill .tag { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 1px; }
+  .pill .arrow { color: rgba(255,255,255,.3); font-size: 16px; }
+  .pill.active .arrow { color: #fbbf24; }
+
+  .cat-label { font-size: 9px; letter-spacing: .25em; text-transform: uppercase; color: rgba(255,255,255,.35); margin: 18px 4px 8px; }
+
+  /* Main viewer */
+  .viewer { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 24px; gap: 16px; background:
+    radial-gradient(80% 50% at 50% 0%, rgba(251,191,36,.04), transparent 70%),
+    radial-gradient(60% 40% at 100% 100%, rgba(244,114,182,.03), transparent 70%),
+    #0a0a0a;
+    min-height: 100dvh;
+  }
+
+  .viewer-meta { width: 100%; max-width: 460px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
+  .viewer-meta .vname { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 300; }
+  .viewer-meta .tag { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 2px; }
+  .viewer-meta .open-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 999px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    font-size: 12px; color: #fbbf24;
+    cursor: pointer; transition: all .2s; text-decoration: none;
+  }
+  .viewer-meta .open-btn:hover { background: rgba(251,191,36,.15); }
+
+  .phone {
+    width: 460px; max-width: calc(100vw - 48px);
+    height: calc(100dvh - 160px); max-height: 920px;
+    background: #000;
+    border-radius: 36px;
+    border: 8px solid #1a1a1a;
+    box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.05);
+    overflow: hidden; position: relative;
+  }
+  .phone iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+  .phone .notch {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 24px;
+    background: #1a1a1a;
+    border-radius: 0 0 14px 14px;
+    z-index: 10;
+  }
+
+  .footer-hint { font-size: 11px; color: rgba(255,255,255,.4); text-align: center; max-width: 460px; line-height: 1.6; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .header-top .logo { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 300; }
+  .header-top .count { font-size: 10px; color: rgba(255,255,255,.4); letter-spacing: .15em; text-transform: uppercase; }
+
+  /* Grain overlay */
+  .grain { position: fixed; inset: 0; pointer-events: none; z-index: 60; opacity: .06; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="header-top">
+      <div>
+        <div class="logo">Arena Dashboard</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;">Style Gallery</div>
+      </div>
+      <div class="count">9 Styles</div>
+    </div>
+
+    <div id="menu"></div>
+
+    <div class="text-[10px]" style="color:rgba(255,255,255,.3);margin-top:20px;line-height:1.6;padding:0 4px;">
+      모바일 트레이딩 대시보드 9가지 스타일 프로토타입.<br>
+      실제 Arena + BNF 데이터 기반.
+    </div>
+  </div>
+
+  <!-- Viewer -->
+  <div class="viewer">
+    <div class="viewer-meta">
+      <div>
+        <div class="vname" id="viewer-name">-</div>
+        <div class="tag" id="viewer-tag">-</div>
+      </div>
+      <a class="open-btn" id="open-btn" href="#" target="_blank">
+        새 탭 ↗
+      </a>
+    </div>
+    <div class="phone">
+      <div class="notch"></div>
+      <iframe id="viewer-frame" allow="autoplay"></iframe>
+    </div>
+    <div class="footer-hint">
+      좌측 메뉴에서 스타일을 선택하세요 · 모바일 430px 기준 · 실제 데이터 기반
+    </div>
+  </div>
+</div>
+
+<script>
+const items = [
+  {
+    id: 'style1',
+    name: 'Dark Terminal',
+    tag: 'Bloomberg / TradingView',
+    cat: 'DARK',
+    src: 'style1_terminal.html',
+    color: '#10b981',
+  },
+  {
+    id: 'style2',
+    name: 'Minimal Card',
+    tag: 'Apple Health / Robinhood',
+    cat: 'LIGHT',
+    src: 'style2_card.html',
+    color: '#3b82f6',
+  },
+  {
+    id: 'style3',
+    name: 'Gradient Glass',
+    tag: 'Crypto / Glassmorphism',
+    cat: 'DARK',
+    src: 'style3_glass.html',
+    color: '#8b5cf6',
+  },
+  {
+    id: 'style4',
+    name: 'Data Table+',
+    tag: 'Excel · 정렬/필터/검색/스파크라인',
+    cat: 'LIGHT',
+    src: 'style4_table.html',
+    color: '#6b7280',
+  },
+  {
+    id: 'style5',
+    name: 'Chart-centric',
+    tag: 'TradingView / Chart.js',
+    cat: 'DARK',
+    src: 'style5_chart.html',
+    color: '#e94560',
+  },
+  {
+    id: 'style6',
+    name: 'Kanban / Status',
+    tag: 'Notion / Linear',
+    cat: 'LIGHT',
+    src: 'style6_kanban.html',
+    color: '#f59e0b',
+  },
+  {
+    id: 'style7',
+    name: 'Sports Scoreboard',
+    tag: 'ESPN / Premier League',
+    cat: 'DARK',
+    src: 'style7_sports.html',
+    color: '#ef4444',
+  },
+  {
+    id: 'style8',
+    name: 'Best-of Hybrid',
+    tag: '1~7 장점 조합 · Chart.js',
+    cat: 'HYBRID',
+    src: 'style8_hybrid.html',
+    color: '#fbbf24',
+  },
+  {
+    id: 'style9',
+    name: 'Stock App',
+    tag: '토스증권 / 카카오페이 MTS',
+    cat: 'HYBRID',
+    src: 'style9_stockapp.html',
+    color: '#ff3b30',
+  },
+];
+
+const menu = document.getElementById('menu');
+const frame = document.getElementById('viewer-frame');
+const viewerName = document.getElementById('viewer-name');
+const viewerTag = document.getElementById('viewer-tag');
+const openBtn = document.getElementById('open-btn');
+
+let currentCat = '';
+items.forEach((d, i) => {
+  if (d.cat !== currentCat) {
+    currentCat = d.cat;
+    const cl = document.createElement('div');
+    cl.className = 'cat-label';
+    cl.textContent = d.cat;
+    menu.appendChild(cl);
+  }
+
+  const pill = document.createElement('div');
+  pill.className = 'pill';
+  pill.dataset.idx = i;
+  pill.innerHTML = `
+    <div class="num-tag" style="font-family:'Outfit',sans-serif;">${String(i + 1).padStart(2, '0')}</div>
+    <div class="label">
+      <div class="name">${d.name}</div>
+      <div class="tag">${d.tag}</div>
+    </div>
+    <div class="arrow">›</div>
+  `;
+  pill.style.borderLeftColor = d.color;
+  pill.addEventListener('click', () => show(i));
+  menu.appendChild(pill);
+});
+
+function show(idx) {
+  const d = items[idx];
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.pill[data-idx="${idx}"]`)?.classList.add('active');
+
+  viewerName.textContent = d.name;
+  viewerTag.textContent = d.tag;
+  openBtn.href = d.src;
+  frame.src = d.src;
+}
+
+// 초기 선택
+show(0);
+</script>
+</body>
+</html>
