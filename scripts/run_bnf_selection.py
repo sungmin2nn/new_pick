@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-BNF 종목 선정 실행 스크립트 (KRX OpenAPI 전체 시장 fetch)
+BNF 종목 선정 실행 스크립트 (KRX OpenAPI + pykrx 하이브리드)
 
 - 워크플로우(bnf-selection.yml)에서 호출
-- KRX OpenAPI로 KOSPI+KOSDAQ 전종목 1회 fetch (시총/등락률/거래대금)
-- 시총 + 거래대금 필터 → 통과한 종목만 historical 추가 fetch (drop 계산)
+- KRX OpenAPI로 KOSPI+KOSDAQ 전종목 1회 fetch (시총/거래대금 필터)
+- pykrx로 필터 통과 종목 히스토리 fetch (당일 데이터 포함, 낙폭 계산)
 - 결과: data/bnf/candidates.json + candidates_{date}.json
 """
 
@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import pytz
+from pykrx import stock as pykrx_stock
 
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -36,14 +37,14 @@ LOOKBACK_HIGH = 20  # 고점 lookback
 TOP_N = 20
 
 
-def resolve_trading_date(krx: KRXClient, date_str: str) -> str:
-    """주어진 날짜가 비거래일이면 가장 최근 거래일로 거슬러 올라감"""
+def resolve_trading_date(date_str: str) -> str:
+    """주어진 날짜가 비거래일이면 가장 최근 거래일로 거슬러 올라감 (pykrx 사용)"""
     dt = datetime.strptime(date_str, "%Y%m%d")
     for _ in range(10):
         d = dt.strftime("%Y%m%d")
         try:
-            df = krx.get_index_ohlcv(d, "KOSPI")
-            if not df.empty:
+            df = pykrx_stock.get_market_ohlcv_by_date(d, d, "005930")
+            if not df.empty and float(df.iloc[0]["종가"]) > 0:
                 return d
         except Exception:
             pass
@@ -62,16 +63,28 @@ def main():
 
     krx = KRXClient()
 
-    # 1) 거래일 resolve (주말/공휴일 → 최근 거래일)
-    date_str = resolve_trading_date(krx, today_str)
+    # 1) 거래일 resolve (주말/공휴일 → 최근 거래일, pykrx 사용)
+    date_str = resolve_trading_date(today_str)
     if date_str != today_str:
         print(f"비거래일 → fetch_date={date_str}")
 
-    # 2) KOSPI + KOSDAQ 전종목 fetch
-    print(f"\n[1/3] 시장 데이터 수집 ({date_str})")
+    # 2) KOSPI + KOSDAQ 전종목 fetch (KRX OpenAPI, 당일 없으면 전일 폴백)
+    fetch_date = date_str
+    print(f"\n[1/3] 시장 데이터 수집 ({fetch_date})")
     all_stocks = {}  # code -> {name, price, market_cap, trading_value, market}
     for market in ("KOSPI", "KOSDAQ"):
-        df = krx.get_stock_ohlcv(date_str, market=market)
+        df = krx.get_stock_ohlcv(fetch_date, market=market)
+        if df.empty:
+            # 당일 데이터 없으면 전일로 폴백 (KRX OpenAPI 반영 지연)
+            prev_dt = datetime.strptime(fetch_date, "%Y%m%d") - timedelta(days=1)
+            for _ in range(5):
+                prev_str = prev_dt.strftime("%Y%m%d")
+                df = krx.get_stock_ohlcv(prev_str, market=market)
+                if not df.empty:
+                    if market == "KOSPI":
+                        print(f"  ※ KRX API 당일 미반영 → {prev_str} 데이터 사용")
+                    break
+                prev_dt -= timedelta(days=1)
         if df.empty:
             print(f"  {market}: 0 (skip)")
             continue
@@ -112,14 +125,11 @@ def main():
     start_dt = end_dt - timedelta(days=LOOKBACK_HIGH + 15)  # 여유
 
     candidates = []
+    start_str = start_dt.strftime("%Y%m%d")
+    end_str = end_dt.strftime("%Y%m%d")
     for code, s in filtered.items():
         try:
-            df = krx.get_history(
-                code,
-                start_dt.strftime("%Y%m%d"),
-                end_dt.strftime("%Y%m%d"),
-                market=s["market"],
-            )
+            df = pykrx_stock.get_market_ohlcv_by_date(start_str, end_str, code)
             if df.empty or len(df) < 11:
                 continue
 
