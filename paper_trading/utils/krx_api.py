@@ -38,7 +38,7 @@ class KRXClient:
         idx = client.get_index_ohlcv('20260410', market='KOSPI')
     """
 
-    BASE_URL = "http://data-dbg.krx.co.kr/svc/apis"
+    BASE_URL = "https://data-dbg.krx.co.kr/svc/apis"
     TIMEOUT = 15
     RATE_LIMIT_SLEEP = 0.2  # 호출 간 200ms (KRX 권장 안전선)
 
