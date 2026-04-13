@@ -56,6 +56,7 @@ jobs:
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       env:
         DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        KRX_API_KEY: ${{ secrets.KRX_API_KEY }}
         TZ: Asia/Seoul
       run: |
         python -c "
@@ -84,6 +85,7 @@ jobs:
       env:
         TZ: Asia/Seoul
         DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        KRX_API_KEY: ${{ secrets.KRX_API_KEY }}
       run: |
         python -c "
         from paper_trading.multi_strategy_runner import run_all_strategies

@@ -27,6 +27,7 @@ jobs:
     - name: Run BNF selector
       env:
         TZ: Asia/Seoul
+        KRX_API_KEY: ${{ secrets.KRX_API_KEY }}
       run: python scripts/run_bnf_selection.py
 
     - name: Commit and push results

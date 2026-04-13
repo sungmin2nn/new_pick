@@ -27,6 +27,8 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run BNF simulation
+      env:
+        KRX_API_KEY: ${{ secrets.KRX_API_KEY }}
       run: python scripts/run_bnf_simulation.py
 
     - name: Commit and push results
