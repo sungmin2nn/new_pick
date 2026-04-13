@@ -256,6 +256,10 @@ class KRXClient:
         try:
             r = self.session.get(url, params=params, timeout=self.TIMEOUT)
             self._last_call_at = time.time()
+            if r.status_code == 401:
+                raise RuntimeError(
+                    f"KRX API 인증 실패 (401): API 키를 확인하세요. {r.text[:200]}"
+                )
             if r.status_code != 200:
                 logger.warning(f"KRX API {r.status_code}: {r.text[:200]}")
                 return []
