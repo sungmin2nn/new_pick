@@ -117,8 +117,35 @@ function initPTR() {
   }, { passive: true });
 }
 
+// ============ Dark Mode ============
+function initTheme() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  applyTheme(theme);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const btn = $('#theme-toggle');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = theme === 'dark' ? '#0f1419' : '#F8FAFB';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
 // ============ Init ============
 async function init() {
+  // Theme
+  initTheme();
+  const themeBtn = $('#theme-toggle');
+  if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+
   // Tab listeners
   $$('.main-tab').forEach(btn => {
     btn.addEventListener('click', () => showMainTab(btn.dataset.tab));

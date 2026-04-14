@@ -15,6 +15,22 @@ const TEAM_META = {
 };
 
 const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
+const NAVER_STOCK_URL = 'https://m.stock.naver.com/domestic/stock/';
+
+function stockLink(code, label) {
+  if (!code) return label || '-';
+  return `<a href="${NAVER_STOCK_URL}${code}" target="_blank" rel="noopener" class="trade-name-link" onclick="event.stopPropagation();">${label || code}</a>`;
+}
+
+function stockCodeLink(code) {
+  if (!code) return '-';
+  return `<a href="${NAVER_STOCK_URL}${code}" target="_blank" rel="noopener" class="cand-code-link" onclick="event.stopPropagation();">${code} ↗</a>`;
+}
+
+function stockDetailLink(code, name) {
+  if (!code) return '';
+  return `<a href="${NAVER_STOCK_URL}${code}" target="_blank" rel="noopener" class="stock-link" onclick="event.stopPropagation();"><span class="stock-link-icon">📊</span> ${name || code} 네이버 증권</a>`;
+}
 const TEAM_IDS = Object.keys(TEAM_META);
 const DATA_BASE = 'data/arena';
 
@@ -356,8 +372,8 @@ function renderCandidatesTable() {
     <tr class="cand-row" data-idx="${i}">
       <td class="num right">${i + 1}</td>
       <td>
-        <b>${c.name || '-'}</b>
-        <div class="cand-code">${c.code || '-'}</div>
+        <b>${stockLink(c.code, c.name || '-')}</b>
+        <div class="cand-code">${stockCodeLink(c.code)}</div>
       </td>
       <td>
         <span class="team-pill" style="background:${c._color}15;color:${c._color};border-color:${c._color}40;">
@@ -407,6 +423,7 @@ function renderCandDetail(c) {
 
   return `
     <div class="sacc-detail">
+      <div style="margin-bottom:var(--space-3);">${stockDetailLink(c.code, c.name)}</div>
       <div class="mini-kpi-grid">
         <div class="mini-kpi">
           <div class="mini-kpi-label">현재가</div>
@@ -535,8 +552,8 @@ function renderTradeDetail(results, summary) {
     return `
       <div class="trade-row">
         <div class="trade-name">
-          <b>${t.name || '-'}</b>
-          <div class="trade-code">${t.code || '-'}</div>
+          <b>${stockLink(t.code, t.name || '-')}</b>
+          <div class="trade-code">${stockCodeLink(t.code)}</div>
         </div>
         <div class="trade-prices">
           <div class="num">${fmtMoney(t.entry_price)} → ${fmtMoney(t.exit_price)}</div>
