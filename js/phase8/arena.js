@@ -623,18 +623,41 @@ function renderStrategyPanel() {
   if (!strategyConfig || !strategyConfig.strategies) return '';
   const all = Object.entries(strategyConfig.strategies);
   const enabled = all.filter(([, e]) => e.enabled);
-  const disabled = all.filter(([, e]) => !e.enabled);
+
+  const riskLabel = { low: '낮음', medium: '보통', high: '높음' };
+  const riskPill = { low: 'pill-success', medium: 'pill-warning', high: 'pill-critical' };
 
   const cards = all.map(([sid, entry]) => {
     const on = entry.enabled;
     const src = entry.source === 'lab' ? 'Lab' : 'NTB';
-    const srcCls = entry.source === 'lab' ? 'accent' : '';
+    const srcCls = entry.source === 'lab' ? 'accent' : 'neutral';
+    const teamColor = entry.team_id ? (TEAM_COLORS[entry.team_id] || '#6B7280') : '#9CA3AF';
+    const activatedStr = entry.activated_at || '-';
+    const capitalStr = entry.initial_capital ? (entry.initial_capital / 10000).toLocaleString() + '만' : '-';
+
     return `
-      <div class="strategy-item" style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--border-subtle);">
-        <span style="width:10px;height:10px;border-radius:50%;background:${on ? 'var(--success)' : 'var(--text-disabled)'};flex-shrink:0;"></span>
-        <span style="flex:1;font-size:var(--fs-sm);font-weight:${on ? '600' : '400'};color:${on ? 'var(--text-primary)' : 'var(--text-muted)'};">${entry.team_name || sid}</span>
-        <span class="team-pill" style="background:var(--${srcCls || 'neutral'}-bg);color:var(--${srcCls || 'neutral'});font-size:10px;padding:1px 6px;">${src}</span>
-        <span style="font-size:10px;color:var(--text-tertiary);">${entry.category || ''}</span>
+      <div class="acc-strat" style="border-left-color:${teamColor};${on ? '' : 'opacity:0.6;'}">
+        <div class="acc-strat-head">
+          <span class="acc-chev">▶</span>
+          <span style="width:10px;height:10px;border-radius:50%;background:${on ? 'var(--success)' : 'var(--text-disabled)'};flex-shrink:0;"></span>
+          <div class="acc-info">
+            <div class="acc-name">${entry.emoji || ''} ${entry.team_name || sid}</div>
+            <div class="acc-summary">${entry.description || ''}</div>
+          </div>
+          <span class="team-pill" style="background:var(--${srcCls}-bg);color:var(--${srcCls === 'accent' ? 'accent-deep' : 'text-tertiary'});font-size:10px;padding:1px 6px;">${src}</span>
+        </div>
+        <div class="acc-strat-body">
+          <div class="acc-strat-body-inner">
+            <div class="detail-row"><span>카테고리</span><span class="pill pill-neutral" style="font-size:11px;">${entry.category || '-'}</span></div>
+            <div class="detail-row"><span>리스크</span><span class="pill ${riskPill[entry.risk_level] || 'pill-neutral'}" style="font-size:11px;">${riskLabel[entry.risk_level] || entry.risk_level || '-'}</span></div>
+            <div class="detail-row"><span>출처</span><span>${src}</span></div>
+            <div class="detail-row"><span>활성화</span><span>${on ? '✅ ON' : '⬜ OFF'}</span></div>
+            <div class="detail-row"><span>활성화 날짜</span><span class="num">${activatedStr}</span></div>
+            <div class="detail-row"><span>초기 자본</span><span class="num">${capitalStr}</span></div>
+            <div class="detail-row"><span>Top N</span><span class="num">${entry.top_n ?? '-'}</span></div>
+            <div class="detail-row"><span>배정 팀</span><span>${entry.team_id || '미배정'}</span></div>
+          </div>
+        </div>
       </div>
     `;
   }).join('');
@@ -645,9 +668,7 @@ function renderStrategyPanel() {
         <h2 class="section-title display">🧪 전략 Lab</h2>
         <span class="section-subtitle">${enabled.length}/${all.length} 활성</span>
       </div>
-      <div class="card" style="padding:0;overflow:hidden;">
-        ${cards}
-      </div>
+      <div class="acc-list">${cards}</div>
     </div>
   `;
 }

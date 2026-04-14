@@ -27,6 +27,10 @@ const Charts = {
 
         const ctx = canvas.getContext('2d');
 
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.clientHeight || 200);
+        grad.addColorStop(0, 'rgba(0,255,135,0.15)');
+        grad.addColorStop(1, 'transparent');
+
         this.instances[canvasId] = new Chart(ctx, {
             type: 'line',
             data: {
@@ -34,11 +38,15 @@ const Charts = {
                 datasets: [{
                     label: '자본',
                     data: equityData.map(d => d.capital),
-                    borderColor: '#00C6BE',
-                    backgroundColor: 'rgba(0, 198, 190, 0.15)',
+                    borderColor: '#00ff87',
+                    backgroundColor: grad,
                     tension: 0.4,
                     fill: true,
-                    pointRadius: 0,
+                    borderWidth: 2.5,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#0a0a0a',
+                    pointBorderColor: '#00ff87',
+                    pointBorderWidth: 2,
                     pointHoverRadius: 6
                 }]
             },
@@ -71,12 +79,17 @@ const Charts = {
                 scales: {
                     x: {
                         grid: {
-                            display: false
-                        }
+                            color: 'rgba(255,255,255,0.06)'
+                        },
+                        ticks: { color: '#9CA3AF' }
                     },
                     y: {
                         beginAtZero: false,
+                        grid: {
+                            color: 'rgba(255,255,255,0.06)'
+                        },
                         ticks: {
+                            color: '#9CA3AF',
                             callback: function(value) {
                                 return value.toLocaleString('ko-KR') + '원';
                             }

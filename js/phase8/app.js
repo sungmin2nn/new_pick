@@ -8,9 +8,32 @@ import { clearCache } from './cache.js';
 
 // ============ Tab management ============
 const TABS = ['arena', 'bnf'];
+// 하단 네비에서 arena 내부 섹션으로 스크롤하는 가상 탭
+const SECTION_TABS = { candidates: '📋 내일 후보', trades: '📜 매매 내역', lab: '🧪 전략 Lab' };
 let currentTab = 'arena';
 
 function showMainTab(tab) {
+  // 가상 탭 처리 (arena 내부 섹션으로 스크롤)
+  if (SECTION_TABS[tab]) {
+    // arena pane 활성화
+    currentTab = 'arena';
+    $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'arena'));
+    $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-arena'));
+
+    // 해당 섹션으로 스크롤
+    const keyword = SECTION_TABS[tab];
+    const sections = document.querySelectorAll('#arena-content .section');
+    for (const sec of sections) {
+      const title = sec.querySelector('.section-title');
+      if (title && title.textContent.includes(keyword.slice(2))) {
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        break;
+      }
+    }
+    return;
+  }
+
   if (!TABS.includes(tab)) return;
   currentTab = tab;
   $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
@@ -151,6 +174,7 @@ async function init() {
     btn.addEventListener('click', () => showMainTab(btn.dataset.tab));
   });
   $$('.bottom-tab').forEach(btn => {
+    if (btn.tagName === 'A') return; // skip link tabs
     btn.addEventListener('click', () => showMainTab(btn.dataset.tab));
   });
 

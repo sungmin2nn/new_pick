@@ -504,6 +504,9 @@
         .chart-container {
             height: 220px;
             position: relative;
+            background: #0a0a0a;
+            border-radius: 12px;
+            padding: 10px;
         }
 
         /* Table */
@@ -1390,6 +1393,11 @@
                 const ctx = document.getElementById('performanceChart').getContext('2d');
                 if (performanceChart) performanceChart.destroy();
 
+                const perfGrad = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight || 200);
+                const perfColor = unrealizedPct >= 0 ? '#00ff87' : '#EF4444';
+                perfGrad.addColorStop(0, unrealizedPct >= 0 ? 'rgba(0,255,135,0.15)' : 'rgba(239,68,68,0.15)');
+                perfGrad.addColorStop(1, 'transparent');
+
                 performanceChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -1397,12 +1405,15 @@
                         datasets: [{
                             label: '미실현 수익률 (%)',
                             data: [0, unrealizedPct],
-                            borderColor: unrealizedPct >= 0 ? '#10B981' : '#EF4444',
-                            backgroundColor: unrealizedPct >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                            borderColor: perfColor,
+                            backgroundColor: perfGrad,
                             fill: true,
-                            tension: 0.3,
-                            pointRadius: 8,
-                            pointBackgroundColor: unrealizedPct >= 0 ? '#10B981' : '#EF4444'
+                            tension: 0.4,
+                            borderWidth: 2.5,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0a0a0a',
+                            pointBorderColor: perfColor,
+                            pointBorderWidth: 2
                         }]
                     },
                     options: {
@@ -1410,21 +1421,21 @@
                         maintainAspectRatio: false,
                         scales: {
                             y: {
-                                grid: { color: 'rgba(0,0,0,0.05)' },
+                                grid: { color: 'rgba(255,255,255,0.06)' },
                                 ticks: {
-                                    color: '#6B7280',
+                                    color: '#9CA3AF',
                                     callback: v => v.toFixed(1) + '%'
                                 },
                                 suggestedMin: Math.min(0, unrealizedPct - 5),
                                 suggestedMax: Math.max(0, unrealizedPct + 5)
                             },
                             x: {
-                                grid: { color: 'rgba(0,0,0,0.05)' },
-                                ticks: { color: '#6B7280', font: { size: 10 } }
+                                grid: { color: 'rgba(255,255,255,0.06)' },
+                                ticks: { color: '#9CA3AF', font: { size: 10 } }
                             }
                         },
                         plugins: {
-                            legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
+                            legend: { labels: { color: '#E5E7EB', font: { size: 11 } } },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => ctx.parsed.y.toFixed(2) + '%'
@@ -1440,6 +1451,11 @@
 
                 const currentValue = INITIAL_CAPITAL + unrealizedPnl;
 
+                const portGrad = portfolioCtx.createLinearGradient(0, 0, 0, portfolioCtx.canvas.clientHeight || 200);
+                const portColor = currentValue >= INITIAL_CAPITAL ? '#00ff87' : '#EF4444';
+                portGrad.addColorStop(0, currentValue >= INITIAL_CAPITAL ? 'rgba(0,255,135,0.15)' : 'rgba(239,68,68,0.15)');
+                portGrad.addColorStop(1, 'transparent');
+
                 portfolioChart = new Chart(portfolioCtx, {
                     type: 'line',
                     data: {
@@ -1447,12 +1463,15 @@
                         datasets: [{
                             label: '자산 (원)',
                             data: [INITIAL_CAPITAL, currentValue],
-                            borderColor: currentValue >= INITIAL_CAPITAL ? '#10B981' : '#EF4444',
-                            backgroundColor: currentValue >= INITIAL_CAPITAL ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                            borderColor: portColor,
+                            backgroundColor: portGrad,
                             fill: true,
-                            tension: 0.3,
-                            pointRadius: 8,
-                            pointBackgroundColor: currentValue >= INITIAL_CAPITAL ? '#10B981' : '#EF4444'
+                            tension: 0.4,
+                            borderWidth: 2.5,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0a0a0a',
+                            pointBorderColor: portColor,
+                            pointBorderWidth: 2
                         }]
                     },
                     options: {
@@ -1460,21 +1479,21 @@
                         maintainAspectRatio: false,
                         scales: {
                             y: {
-                                grid: { color: 'rgba(0,0,0,0.05)' },
+                                grid: { color: 'rgba(255,255,255,0.06)' },
                                 ticks: {
-                                    color: '#6B7280',
+                                    color: '#9CA3AF',
                                     callback: v => (v / 10000).toFixed(0) + '만'
                                 },
                                 suggestedMin: Math.min(INITIAL_CAPITAL, currentValue) * 0.95,
                                 suggestedMax: Math.max(INITIAL_CAPITAL, currentValue) * 1.05
                             },
                             x: {
-                                grid: { color: 'rgba(0,0,0,0.05)' },
-                                ticks: { color: '#6B7280', font: { size: 10 } }
+                                grid: { color: 'rgba(255,255,255,0.06)' },
+                                ticks: { color: '#9CA3AF', font: { size: 10 } }
                             }
                         },
                         plugins: {
-                            legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
+                            legend: { labels: { color: '#E5E7EB', font: { size: 11 } } },
                             tooltip: {
                                 callbacks: {
                                     label: ctx => ctx.parsed.y.toLocaleString() + '원'
@@ -1496,6 +1515,10 @@
 
             if (portfolioChart) portfolioChart.destroy();
 
+            const emptyGrad = portfolioCtx.createLinearGradient(0, 0, 0, portfolioCtx.canvas.clientHeight || 200);
+            emptyGrad.addColorStop(0, 'rgba(0,255,135,0.15)');
+            emptyGrad.addColorStop(1, 'transparent');
+
             portfolioChart = new Chart(portfolioCtx, {
                 type: 'line',
                 data: {
@@ -1503,12 +1526,15 @@
                     datasets: [{
                         label: '자산 (원)',
                         data: [INITIAL_CAPITAL, INITIAL_CAPITAL],
-                        borderColor: '#00C6BE',
-                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
+                        borderColor: '#00ff87',
+                        backgroundColor: emptyGrad,
                         fill: true,
-                        tension: 0.3,
-                        pointRadius: 6,
-                        pointBackgroundColor: '#00C6BE'
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#0a0a0a',
+                        pointBorderColor: '#00ff87',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
@@ -1516,9 +1542,9 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            grid: { color: 'rgba(255,255,255,0.06)' },
                             ticks: {
-                                color: '#6B7280',
+                                color: '#9CA3AF',
                                 callback: function(value) {
                                     return (value / 10000).toFixed(0) + '만원';
                                 }
@@ -1527,12 +1553,12 @@
                             max: INITIAL_CAPITAL * 1.2
                         },
                         x: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280', font: { size: 10 } }
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF', font: { size: 10 } }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } }
+                        legend: { labels: { color: '#E5E7EB', font: { size: 11 } } }
                     }
                 }
             });
@@ -1571,6 +1597,10 @@
                 portfolioChart.destroy();
             }
 
+            const pGrad = portfolioCtx.createLinearGradient(0, 0, 0, portfolioCtx.canvas.clientHeight || 200);
+            pGrad.addColorStop(0, 'rgba(0,255,135,0.15)');
+            pGrad.addColorStop(1, 'transparent');
+
             portfolioChart = new Chart(portfolioCtx, {
                 type: 'line',
                 data: {
@@ -1578,12 +1608,15 @@
                     datasets: [{
                         label: '자산 (원)',
                         data: [INITIAL_CAPITAL, ...portfolioValues],
-                        borderColor: '#00C6BE',
-                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
+                        borderColor: '#00ff87',
+                        backgroundColor: pGrad,
                         fill: true,
-                        tension: 0.3,
+                        tension: 0.4,
+                        borderWidth: 2.5,
                         pointRadius: 4,
-                        pointBackgroundColor: '#00C6BE'
+                        pointBackgroundColor: '#0a0a0a',
+                        pointBorderColor: '#00ff87',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
@@ -1591,9 +1624,9 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            grid: { color: 'rgba(255,255,255,0.06)' },
                             ticks: {
-                                color: '#6B7280',
+                                color: '#9CA3AF',
                                 callback: function(value) {
                                     return (value / 10000).toFixed(0) + '만원';
                                 }
@@ -1602,12 +1635,12 @@
                             suggestedMax: INITIAL_CAPITAL * 1.2
                         },
                         x: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280', maxRotation: 45, font: { size: 10 } }
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF', maxRotation: 45, font: { size: 10 } }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } },
+                        legend: { labels: { color: '#E5E7EB', font: { size: 11 } } },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -1625,6 +1658,10 @@
                 performanceChart.destroy();
             }
 
+            const cGrad = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight || 200);
+            cGrad.addColorStop(0, 'rgba(0,255,135,0.15)');
+            cGrad.addColorStop(1, 'transparent');
+
             performanceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -1632,10 +1669,15 @@
                     datasets: [{
                         label: '누적 수익률 (%)',
                         data: cumulativeReturns,
-                        borderColor: '#00C6BE',
-                        backgroundColor: 'rgba(0, 198, 190, 0.1)',
+                        borderColor: '#00ff87',
+                        backgroundColor: cGrad,
                         fill: true,
-                        tension: 0.3
+                        tension: 0.4,
+                        borderWidth: 2.5,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#0a0a0a',
+                        pointBorderColor: '#00ff87',
+                        pointBorderWidth: 2
                     }]
                 },
                 options: {
@@ -1643,16 +1685,16 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280' }
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF' }
                         },
                         x: {
-                            grid: { color: 'rgba(0,0,0,0.05)' },
-                            ticks: { color: '#6B7280', maxRotation: 45, font: { size: 10 } }
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF', maxRotation: 45, font: { size: 10 } }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#1A1A2E', font: { size: 11 } } }
+                        legend: { labels: { color: '#E5E7EB', font: { size: 11 } } }
                     }
                 }
             });
