@@ -21,6 +21,14 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Checkout strategy-lab
+      uses: actions/checkout@v5
+      with:
+        repository: sungmin2nn/strategy-lab
+        path: ../strategy-lab
+        token: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true
+
     - name: Pull latest changes
       run: |
         git pull origin master || true

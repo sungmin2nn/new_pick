@@ -24,3 +24,12 @@ __all__ = [
     'DartDisclosureStrategy',
     'FrontierGapStrategy',
 ]
+
+# strategy_config.json 기반 추가 전략 동적 로드
+try:
+    from .dynamic_loader import load_enabled_strategies
+    _dynamic = load_enabled_strategies()
+    if _dynamic:
+        print(f"[Strategies] {len(_dynamic)}개 전략 활성 (동적 로드 포함)")
+except Exception as _e:
+    print(f"[Strategies] 동적 로더 스킵: {_e}")

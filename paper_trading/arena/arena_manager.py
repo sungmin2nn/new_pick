@@ -11,7 +11,7 @@ from typing import Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from .team import Team, TeamPortfolio, TEAM_CONFIGS, ARENA_DIR
+from .team import Team, TeamPortfolio, TEAM_CONFIGS, ARENA_DIR, load_teams_from_config
 from .leaderboard import Leaderboard
 
 KST = timezone(timedelta(hours=9))
@@ -35,6 +35,9 @@ class ArenaManager:
     def __init__(self, initial_capital: int = None):
         self.initial_capital = initial_capital or self.DEFAULT_CAPITAL
         ARENA_DIR.mkdir(parents=True, exist_ok=True)
+
+        # strategy_config.json에서 동적 팀 로드
+        load_teams_from_config()
 
         # 팀 초기화
         self.teams: Dict[str, Team] = {}

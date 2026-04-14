@@ -16,6 +16,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
 
+    - name: Checkout strategy-lab
+      uses: actions/checkout@v5
+      with:
+        repository: sungmin2nn/strategy-lab
+        path: ../strategy-lab
+        token: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:

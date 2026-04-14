@@ -6,15 +6,44 @@ import {
   colorClass, $, $$, getTodayKST, getRecentDates
 } from './ui.js';
 
-const TEAM_META = {
+// 기본 팀 (strategy_config.json 로드 전 폴백)
+const DEFAULT_TEAM_META = {
   team_a: { name: 'Alpha Momentum', desc: 'MA5 + 거래량 급증', color: '#EF4444', strategy: 'momentum' },
   team_b: { name: 'Beta Contrarian', desc: '대형주 RSI 역추세', color: '#3B82F6', strategy: 'largecap_contrarian' },
   team_c: { name: 'Gamma Disclosure', desc: 'DART 호재 공시', color: '#10B981', strategy: 'dart_disclosure' },
   team_d: { name: 'Delta Theme', desc: '테마/정책 + 섹터', color: '#F59E0B', strategy: 'theme_policy' },
   team_e: { name: 'Echo Frontier', desc: '시초가 갭 + surge', color: '#8B5CF6', strategy: 'frontier_gap' },
 };
+const TEAM_COLORS = {
+  team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981', team_d: '#F59E0B', team_e: '#8B5CF6',
+  team_f: '#EC4899', team_g: '#14B8A6', team_h: '#F97316', team_i: '#6366F1', team_j: '#84CC16',
+  team_k: '#D946EF', team_l: '#0EA5E9', team_m: '#F43F5E', team_n: '#22D3EE', team_o: '#A855F7',
+};
 
-const MEDALS = ['🥇', '🥈', '🥉', '4', '5'];
+let TEAM_META = { ...DEFAULT_TEAM_META };
+let strategyConfig = null;
+
+async function loadStrategyConfig() {
+  try {
+    const config = await fetchCached('data/arena/strategy_config.json');
+    if (!config || !config.strategies) return;
+    strategyConfig = config;
+    const dynamicMeta = {};
+    for (const [sid, entry] of Object.entries(config.strategies)) {
+      if (!entry.enabled || !entry.team_id) continue;
+      dynamicMeta[entry.team_id] = {
+        name: entry.team_name, desc: entry.description,
+        color: TEAM_COLORS[entry.team_id] || '#6B7280', strategy: sid,
+      };
+    }
+    if (Object.keys(dynamicMeta).length > 0) {
+      TEAM_META = dynamicMeta;
+      TEAM_IDS = Object.keys(TEAM_META);
+    }
+  } catch (e) { console.warn('[Arena] strategy_config 로드 실패', e); }
+}
+
+const MEDALS = ['🥇', '🥈', '🥉', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
 const NAVER_STOCK_URL = 'https://m.stock.naver.com/domestic/stock/';
 
 function stockLink(code, label) {
@@ -31,7 +60,7 @@ function stockDetailLink(code, name) {
   if (!code) return '';
   return `<a href="${NAVER_STOCK_URL}${code}" target="_blank" rel="noopener" class="stock-link" onclick="event.stopPropagation();"><span class="stock-link-icon">📊</span> ${name || code} 네이버 증권</a>`;
 }
-const TEAM_IDS = Object.keys(TEAM_META);
+let TEAM_IDS = Object.keys(TEAM_META);
 const DATA_BASE = 'data/arena';
 
 let state = {
@@ -44,6 +73,9 @@ let state = {
 
 // ============ Data loading (parallel) ============
 export async function loadArenaData(force = false) {
+  // strategy_config.json 먼저 로드하여 동적 팀 설정
+  await loadStrategyConfig();
+
   const today = getTodayKST();
   const histDates = getRecentDates(7); // 14 → 7일 축소
   const recentHealthDates = [today, ...getRecentDates(7).slice(1)];
@@ -587,6 +619,39 @@ function renderTradeDetail(results, summary) {
   `;
 }
 
+function renderStrategyPanel() {
+  if (!strategyConfig || !strategyConfig.strategies) return '';
+  const all = Object.entries(strategyConfig.strategies);
+  const enabled = all.filter(([, e]) => e.enabled);
+  const disabled = all.filter(([, e]) => !e.enabled);
+
+  const cards = all.map(([sid, entry]) => {
+    const on = entry.enabled;
+    const src = entry.source === 'lab' ? 'Lab' : 'NTB';
+    const srcCls = entry.source === 'lab' ? 'accent' : '';
+    return `
+      <div class="strategy-item" style="display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--border-subtle);">
+        <span style="width:10px;height:10px;border-radius:50%;background:${on ? 'var(--success)' : 'var(--text-disabled)'};flex-shrink:0;"></span>
+        <span style="flex:1;font-size:var(--fs-sm);font-weight:${on ? '600' : '400'};color:${on ? 'var(--text-primary)' : 'var(--text-muted)'};">${entry.team_name || sid}</span>
+        <span class="team-pill" style="background:var(--${srcCls || 'neutral'}-bg);color:var(--${srcCls || 'neutral'});font-size:10px;padding:1px 6px;">${src}</span>
+        <span style="font-size:10px;color:var(--text-tertiary);">${entry.category || ''}</span>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title display">🧪 전략 Lab</h2>
+        <span class="section-subtitle">${enabled.length}/${all.length} 활성</span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        ${cards}
+      </div>
+    </div>
+  `;
+}
+
 function renderSystemMini() {
   const h = state.health || {};
   const checks = h.checks || [];
@@ -619,6 +684,7 @@ export function renderArena() {
     ${renderH2H(rows)}
     ${renderCandidatesTable()}
     ${renderTeamsAccordion(rows)}
+    ${renderStrategyPanel()}
     ${renderSystemMini()}
   `;
 

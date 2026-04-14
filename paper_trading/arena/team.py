@@ -12,9 +12,8 @@ KST = timezone(timedelta(hours=9))
 
 ARENA_DIR = Path(__file__).parent.parent.parent / "data" / "arena"
 
-# 팀 정의 (5팀: 4 base + Phase 3F neighbor)
-# 텔레그램 표시는 메달만 사용 (이모지 의미 충돌 방지) — emoji 필드는 대시보드/내부 식별용
-TEAM_CONFIGS = {
+# 기본 팀 정의 (레거시 호환 — strategy_config.json이 없을 때 폴백)
+_DEFAULT_TEAM_CONFIGS = {
     "team_a": {
         "team_id": "team_a",
         "team_name": "Alpha Momentum",
@@ -51,6 +50,30 @@ TEAM_CONFIGS = {
         "description": "Frontier Gap - 시초가 갭 +2~5% + 거래량 surge (Phase 3F)",
     },
 }
+
+# 동적 팀 설정: strategy_config.json 기반 또는 기본값
+TEAM_CONFIGS = {}
+
+
+def load_teams_from_config():
+    """strategy_config.json에서 enabled 전략을 TEAM_CONFIGS로 로드"""
+    global TEAM_CONFIGS
+    try:
+        from paper_trading.strategies.dynamic_loader import (
+            get_enabled_team_configs, load_enabled_strategies, load_config
+        )
+        config = load_config()
+        if config:
+            TEAM_CONFIGS.update(get_enabled_team_configs(config))
+            load_enabled_strategies(config)
+            print(f"[Team] strategy_config.json → {len(TEAM_CONFIGS)}팀 로드")
+            return
+    except Exception as e:
+        print(f"[Team] 동적 로드 실패, 기본값 사용: {e}")
+
+    # 폴백: 기본 5팀
+    TEAM_CONFIGS.update(_DEFAULT_TEAM_CONFIGS)
+    print(f"[Team] 기본 설정 → {len(TEAM_CONFIGS)}팀")
 
 
 @dataclass
