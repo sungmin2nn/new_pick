@@ -1,0 +1,927 @@
+{
+  "date": "20260414",
+  "status": "success",
+  "teams": {
+    "team_a": {
+      "team_id": "team_a",
+      "team_name": "Alpha Momentum",
+      "strategy_id": "momentum",
+      "status": "success",
+      "selection": {
+        "strategy_id": "momentum",
+        "strategy_name": "모멘텀 추세",
+        "date": "20260414",
+        "selected_at": "2026-04-14 17:56:17",
+        "count": 5,
+        "candidates": [
+          {
+            "code": "122630",
+            "name": "KODEX 레버리지",
+            "price": 94185,
+            "change_pct": 6.01,
+            "score": 78.2,
+            "score_detail": {
+              "change_pct": 20.68338249754179,
+              "trading_value": 30.0,
+              "volume_surge": 20,
+              "price_level": 7.5
+            },
+            "rank": 1,
+            "market_cap": 0,
+            "volume": 0,
+            "trading_value": 63057000000
+          },
+          {
+            "code": "217590",
+            "name": "티엠씨",
+            "price": 34650,
+            "change_pct": 10.17,
+            "score": 74.0,
+            "score_detail": {
+              "change_pct": 35.0,
+              "trading_value": 3.9721204624387463,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 2,
+            "market_cap": 0,
+            "volume": 100,
+            "trading_value": 8349000000
+          },
+          {
+            "code": "488080",
+            "name": "TIGER 반도체TOP10레버리지",
+            "price": 44905,
+            "change_pct": 5.21,
+            "score": 60.5,
+            "score_detail": {
+              "change_pct": 17.930186823992134,
+              "trading_value": 7.5203387411389695,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 3,
+            "market_cap": 0,
+            "volume": 0,
+            "trading_value": 15807000000
+          },
+          {
+            "code": "102970",
+            "name": "KODEX 증권",
+            "price": 29230,
+            "change_pct": 5.66,
+            "score": 59.9,
+            "score_detail": {
+              "change_pct": 19.478859390363816,
+              "trading_value": 5.381797421380655,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 4,
+            "market_cap": 0,
+            "volume": 0,
+            "trading_value": 11312000000
+          },
+          {
+            "code": "487230",
+            "name": "KODEX 미국AI전력핵심인프라",
+            "price": 22625,
+            "change_pct": 4.84,
+            "score": 59.4,
+            "score_detail": {
+              "change_pct": 16.65683382497542,
+              "trading_value": 7.712545791902564,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 5,
+            "market_cap": 0,
+            "volume": 0,
+            "trading_value": 16211000000
+          }
+        ],
+        "params": {
+          "min_price": 3000,
+          "min_change": 3.0,
+          "max_change": 15.0,
+          "min_trading_value": 30,
+          "weights": {
+            "change_pct": 35,
+            "trading_value": 30,
+            "volume_surge": 20,
+            "price_level": 15
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260414",
+        "strategy_id": "momentum",
+        "strategy_name": "Alpha Momentum",
+        "total_trades": 5,
+        "wins": 4,
+        "losses": 1,
+        "win_rate": 80.0,
+        "total_return": 0.68,
+        "avg_return": 0.14,
+        "total_return_amount": 15137,
+        "profit_exits": 0,
+        "loss_exits": 1,
+        "close_exits": 4,
+        "results": [
+          {
+            "code": "122630",
+            "name": "KODEX 레버리지",
+            "entry_price": 93465,
+            "exit_price": 94185,
+            "quantity": 24,
+            "return_pct": 0.77,
+            "return_amount": 17280,
+            "exit_type": "close",
+            "entry_time": "09:05",
+            "exit_time": "15:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 3.31,
+            "max_loss_pct": -0.18
+          },
+          {
+            "code": "217590",
+            "name": "티엠씨",
+            "entry_price": 38550,
+            "exit_price": 37393,
+            "quantity": 59,
+            "return_pct": -3.0,
+            "return_amount": -68263,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:12",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 0,
+            "max_loss_pct": -15.05
+          },
+          {
+            "code": "488080",
+            "name": "TIGER 반도체TOP10레버리지",
+            "entry_price": 44785,
+            "exit_price": 44905,
+            "quantity": 51,
+            "return_pct": 0.27,
+            "return_amount": 6120,
+            "exit_type": "close",
+            "entry_time": "09:05",
+            "exit_time": "15:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 2.03,
+            "max_loss_pct": -0.22
+          },
+          {
+            "code": "102970",
+            "name": "KODEX 증권",
+            "entry_price": 28690,
+            "exit_price": 29230,
+            "quantity": 79,
+            "return_pct": 1.88,
+            "return_amount": 42660,
+            "exit_type": "close",
+            "entry_time": "09:05",
+            "exit_time": "15:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 3.05,
+            "max_loss_pct": 0
+          },
+          {
+            "code": "487230",
+            "name": "KODEX 미국AI전력핵심인프라",
+            "entry_price": 22455,
+            "exit_price": 22625,
+            "quantity": 102,
+            "return_pct": 0.76,
+            "return_amount": 17340,
+            "exit_type": "close",
+            "entry_time": "09:05",
+            "exit_time": "15:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 1.07,
+            "max_loss_pct": -0.02
+          }
+        ]
+      }
+    },
+    "team_b": {
+      "team_id": "team_b",
+      "team_name": "Beta Contrarian",
+      "strategy_id": "largecap_contrarian",
+      "status": "success",
+      "selection": {
+        "strategy_id": "largecap_contrarian",
+        "strategy_name": "대형주 역추세",
+        "date": "20260414",
+        "selected_at": "2026-04-14 17:53:49",
+        "count": 1,
+        "candidates": [
+          {
+            "code": "352820",
+            "name": "하이브",
+            "price": 245500,
+            "change_pct": -1.8,
+            "score": 82.5,
+            "score_detail": {
+              "market_cap": 30.0,
+              "change_pct": 25.0,
+              "trading_value": 20.0,
+              "price_level": 7.5
+            },
+            "rank": 1,
+            "market_cap": 10581600000000,
+            "volume": 500,
+            "trading_value": 105816000000
+          }
+        ],
+        "params": {
+          "min_price": 5000,
+          "max_change": -1.5,
+          "min_trading_value": 50,
+          "min_market_cap": 1000000000000,
+          "kospi_drop_threshold": -2.0,
+          "weights": {
+            "market_cap": 30,
+            "change_pct": 25,
+            "trading_value": 20,
+            "price_level": 15,
+            "volatility": 10
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260414",
+        "strategy_id": "largecap_contrarian",
+        "strategy_name": "Beta Contrarian",
+        "total_trades": 1,
+        "wins": 0,
+        "losses": 1,
+        "win_rate": 0.0,
+        "total_return": -2.39,
+        "avg_return": -2.39,
+        "total_return_amount": -216000,
+        "profit_exits": 0,
+        "loss_exits": 0,
+        "close_exits": 1,
+        "results": [
+          {
+            "code": "352820",
+            "name": "하이브",
+            "entry_price": 251500,
+            "exit_price": 245500,
+            "quantity": 36,
+            "return_pct": -2.39,
+            "return_amount": -216000,
+            "exit_type": "close",
+            "entry_time": "09:05",
+            "exit_time": "15:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 0,
+            "max_loss_pct": -2.39
+          }
+        ]
+      }
+    },
+    "team_c": {
+      "team_id": "team_c",
+      "team_name": "Gamma Disclosure",
+      "strategy_id": "dart_disclosure",
+      "status": "success",
+      "selection": {
+        "strategy_id": "dart_disclosure",
+        "strategy_name": "DART 공시",
+        "date": "20260414",
+        "selected_at": "2026-04-14 17:57:07",
+        "count": 1,
+        "candidates": [
+          {
+            "code": "351320",
+            "name": "넥사다이내믹스",
+            "price": 1403,
+            "change_pct": 0,
+            "score": 47.5,
+            "score_detail": {
+              "disclosure": 40.0,
+              "change_pct": 0,
+              "trading_value": 0.0,
+              "market_cap": 7.5,
+              "dart_raw": 15.0,
+              "disclosures": [
+                {
+                  "category": "투자",
+                  "report_nm": "타법인주식및출자증권취득결정              ",
+                  "amount": 0
+                }
+              ]
+            },
+            "rank": 1,
+            "market_cap": 0,
+            "volume": 328090,
+            "trading_value": 0
+          }
+        ],
+        "params": {
+          "weights": {
+            "disclosure": 40,
+            "change_pct": 25,
+            "trading_value": 20,
+            "market_cap": 15
+          },
+          "min_market_cap": 100000000000,
+          "max_market_cap": 10000000000000,
+          "min_trading_value": 1000000000
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260414",
+        "strategy_id": "dart_disclosure",
+        "strategy_name": "Gamma Disclosure",
+        "total_trades": 1,
+        "wins": 0,
+        "losses": 1,
+        "win_rate": 0.0,
+        "total_return": -3.04,
+        "avg_return": -3.04,
+        "total_return_amount": -306222,
+        "profit_exits": 0,
+        "loss_exits": 1,
+        "close_exits": 0,
+        "results": [
+          {
+            "code": "351320",
+            "name": "넥사다이내믹스",
+            "entry_price": 1514,
+            "exit_price": 1468,
+            "quantity": 6657,
+            "return_pct": -3.04,
+            "return_amount": -306222,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 0.13,
+            "max_loss_pct": -10.3
+          }
+        ]
+      }
+    },
+    "team_d": {
+      "team_id": "team_d",
+      "team_name": "Delta Theme",
+      "strategy_id": "theme_policy",
+      "status": "success",
+      "selection": {
+        "strategy_id": "theme_policy",
+        "strategy_name": "테마/정책",
+        "date": "20260414",
+        "selected_at": "2026-04-14 17:57:04",
+        "count": 5,
+        "candidates": [
+          {
+            "code": "006360",
+            "name": "GS건설",
+            "price": 37450,
+            "change_pct": 3.17,
+            "score": 63.0,
+            "score_detail": {
+              "theme_relevance": 40.0,
+              "change_pct": 7.9,
+              "trading_value": 0.1,
+              "theme_strength": 15.0,
+              "themes": [
+                "건설 대표주",
+                "GTX(수도권 광역급행철도)",
+                "수자원(양적/질적 개선)"
+              ]
+            },
+            "rank": 1,
+            "market_cap": 0,
+            "volume": 5000,
+            "trading_value": 32050000000
+          },
+          {
+            "code": "005930",
+            "name": "삼성전자",
+            "price": 206500,
+            "change_pct": 2.74,
+            "score": 61.9,
+            "score_detail": {
+              "theme_relevance": 26.7,
+              "change_pct": 6.9,
+              "trading_value": 20.0,
+              "theme_strength": 8.3,
+              "themes": [
+                "마이크로 LED",
+                "뉴로모픽 반도체"
+              ]
+            },
+            "rank": 2,
+            "market_cap": 0,
+            "volume": 100,
+            "trading_value": 12072565000000
+          },
+          {
+            "code": "047040",
+            "name": "대우건설",
+            "price": 23500,
+            "change_pct": -1.05,
+            "score": 58.5,
+            "score_detail": {
+              "theme_relevance": 40.0,
+              "change_pct": 3.4,
+              "trading_value": 0.2,
+              "theme_strength": 15.0,
+              "themes": [
+                "건설 대표주",
+                "GTX(수도권 광역급행철도)",
+                "수자원(양적/질적 개선)"
+              ]
+            },
+            "rank": 3,
+            "market_cap": 0,
+            "volume": 5000,
+            "trading_value": 96563000000
+          },
+          {
+            "code": "054930",
+            "name": "유신",
+            "price": 28200,
+            "change_pct": 4.25,
+            "score": 57.3,
+            "score_detail": {
+              "theme_relevance": 40.0,
+              "change_pct": 10.6,
+              "trading_value": 0.0,
+              "theme_strength": 6.7,
+              "themes": [
+                "GTX(수도권 광역급행철도)",
+                "우크라이나 재건",
+                "수자원(양적/질적 개선)"
+              ]
+            },
+            "rank": 4,
+            "market_cap": 0,
+            "volume": 5000,
+            "trading_value": 846000000
+          },
+          {
+            "code": "054220",
+            "name": "비츠로시스",
+            "price": 566,
+            "change_pct": 9.27,
+            "score": 56.5,
+            "score_detail": {
+              "theme_relevance": 26.7,
+              "change_pct": 23.2,
+              "trading_value": 0.0,
+              "theme_strength": 6.7,
+              "themes": [
+                "GTX(수도권 광역급행철도)",
+                "수자원(양적/질적 개선)"
+              ]
+            },
+            "rank": 5,
+            "market_cap": 0,
+            "volume": 500,
+            "trading_value": 351000000
+          }
+        ],
+        "params": {
+          "active_themes": [
+            {
+              "name": "건설 대표주",
+              "change_pct": 6.92
+            },
+            {
+              "name": "마이크로 LED",
+              "change_pct": 3.85
+            },
+            {
+              "name": "뉴로모픽 반도체",
+              "change_pct": 3.39
+            },
+            {
+              "name": "GTX(수도권 광역급행철도)",
+              "change_pct": 3.09
+            },
+            {
+              "name": "우크라이나 재건",
+              "change_pct": 3.0
+            },
+            {
+              "name": "유심(USIM)",
+              "change_pct": 2.94
+            },
+            {
+              "name": "건설 중소형",
+              "change_pct": 2.92
+            },
+            {
+              "name": "건설기계",
+              "change_pct": 2.75
+            },
+            {
+              "name": "수자원(양적/질적 개선)",
+              "change_pct": 2.52
+            },
+            {
+              "name": "통신",
+              "change_pct": 2.34
+            }
+          ],
+          "theme_count": 10,
+          "total_stocks": 158,
+          "weights": {
+            "theme_relevance": 40,
+            "change_pct": 25,
+            "trading_value": 20,
+            "theme_strength": 15
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260414",
+        "strategy_id": "theme_policy",
+        "strategy_name": "Delta Theme",
+        "total_trades": 5,
+        "wins": 4,
+        "losses": 1,
+        "win_rate": 80.0,
+        "total_return": 9.84,
+        "avg_return": 1.97,
+        "total_return_amount": 197900,
+        "profit_exits": 2,
+        "loss_exits": 1,
+        "close_exits": 2,
+        "results": [
+          {
+            "code": "006360",
+            "name": "GS건설",
+            "entry_price": 36450,
+            "exit_price": 37450,
+            "quantity": 55,
+            "return_pct": 2.74,
+            "return_amount": 55000,
+            "exit_type": "close",
+            "entry_time": "09:05",
+            "exit_time": "15:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 3.98,
+            "max_loss_pct": -2.19
+          },
+          {
+            "code": "005930",
+            "name": "삼성전자",
+            "entry_price": 206000,
+            "exit_price": 206500,
+            "quantity": 9,
+            "return_pct": 0.24,
+            "return_amount": 4500,
+            "exit_type": "close",
+            "entry_time": "09:05",
+            "exit_time": "15:20",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 1.94,
+            "max_loss_pct": -0.24
+          },
+          {
+            "code": "047040",
+            "name": "대우건설",
+            "entry_price": 23650,
+            "exit_price": 22940,
+            "quantity": 85,
+            "return_pct": -3.0,
+            "return_amount": -60350,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:17",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 3.17,
+            "max_loss_pct": -3.59
+          },
+          {
+            "code": "054930",
+            "name": "유신",
+            "entry_price": 27150,
+            "exit_price": 28507,
+            "quantity": 74,
+            "return_pct": 5.0,
+            "return_amount": 100418,
+            "exit_type": "profit",
+            "entry_time": "09:05",
+            "exit_time": "14:10",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 5.52,
+            "max_loss_pct": -0.37
+          },
+          {
+            "code": "054220",
+            "name": "비츠로시스",
+            "entry_price": 535,
+            "exit_price": 561,
+            "quantity": 3782,
+            "return_pct": 4.86,
+            "return_amount": 98332,
+            "exit_type": "profit",
+            "entry_time": "09:05",
+            "exit_time": "09:44",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 7.48,
+            "max_loss_pct": -0.56
+          }
+        ]
+      }
+    },
+    "team_e": {
+      "team_id": "team_e",
+      "team_name": "Echo Frontier",
+      "strategy_id": "frontier_gap",
+      "status": "no_candidates",
+      "simulation": null
+    }
+  },
+  "leaderboard": {
+    "ranking": [
+      {
+        "team_id": "team_a",
+        "team_name": "Alpha Momentum",
+        "emoji": "🔴",
+        "elo": 1132,
+        "rank": 2,
+        "total_1st": 4,
+        "total_2nd": 1,
+        "total_3rd": 0,
+        "total_4th": 0,
+        "best_day_return": 22.52,
+        "worst_day_return": 0,
+        "elo_rank": 1
+      },
+      {
+        "team_id": "team_d",
+        "team_name": "Delta Theme",
+        "emoji": "🟡",
+        "elo": 1045,
+        "rank": 1,
+        "total_1st": 1,
+        "total_2nd": 2,
+        "total_3rd": 1,
+        "total_4th": 1,
+        "best_day_return": 9.84,
+        "worst_day_return": -8.96,
+        "elo_rank": 2
+      },
+      {
+        "team_id": "team_e",
+        "team_name": "Echo Frontier",
+        "emoji": "🟣",
+        "elo": 981,
+        "rank": 3,
+        "total_1st": 0,
+        "total_2nd": 0,
+        "total_3rd": 2,
+        "total_4th": 1,
+        "best_day_return": 0,
+        "worst_day_return": 0,
+        "elo_rank": 3
+      },
+      {
+        "team_id": "team_c",
+        "team_name": "Gamma Disclosure",
+        "emoji": "🟢",
+        "elo": 974,
+        "rank": 5,
+        "total_1st": 0,
+        "total_2nd": 2,
+        "total_3rd": 2,
+        "total_4th": 0,
+        "best_day_return": 3.98,
+        "worst_day_return": -4.03,
+        "total_5th": 1,
+        "elo_rank": 4
+      },
+      {
+        "team_id": "team_b",
+        "team_name": "Beta Contrarian",
+        "emoji": "🔵",
+        "elo": 868,
+        "rank": 4,
+        "total_1st": 0,
+        "total_2nd": 0,
+        "total_3rd": 0,
+        "total_4th": 3,
+        "best_day_return": 0,
+        "worst_day_return": -11.15,
+        "total_5th": 2,
+        "elo_rank": 5
+      }
+    ],
+    "recent_history": [
+      {
+        "date": "20260410",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_a",
+            "total_return": 22.52,
+            "win_rate": 100.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_d",
+            "total_return": 3.52,
+            "win_rate": 80.0,
+            "trades": 5
+          },
+          {
+            "rank": 3,
+            "team_id": "team_c",
+            "total_return": -4.03,
+            "win_rate": 25.0,
+            "trades": 4
+          },
+          {
+            "rank": 4,
+            "team_id": "team_b",
+            "total_return": -9.05,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260410",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_a",
+            "total_return": 22.52,
+            "win_rate": 100.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_c",
+            "total_return": 3.98,
+            "win_rate": 50.0,
+            "trades": 4
+          },
+          {
+            "rank": 3,
+            "team_id": "team_d",
+            "total_return": 3.52,
+            "win_rate": 80.0,
+            "trades": 5
+          },
+          {
+            "rank": 4,
+            "team_id": "team_b",
+            "total_return": -9.05,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260410",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_a",
+            "total_return": 22.52,
+            "win_rate": 100.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_c",
+            "total_return": 3.98,
+            "win_rate": 50.0,
+            "trades": 4
+          },
+          {
+            "rank": 3,
+            "team_id": "team_e",
+            "total_return": 0,
+            "win_rate": 0,
+            "trades": 0
+          },
+          {
+            "rank": 4,
+            "team_id": "team_d",
+            "total_return": -8.96,
+            "win_rate": 0.0,
+            "trades": 5
+          },
+          {
+            "rank": 5,
+            "team_id": "team_b",
+            "total_return": -9.05,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260413",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_a",
+            "total_return": 9.0,
+            "win_rate": 60.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_d",
+            "total_return": 7.59,
+            "win_rate": 80.0,
+            "trades": 5
+          },
+          {
+            "rank": 3,
+            "team_id": "team_c",
+            "total_return": 0,
+            "win_rate": 0,
+            "trades": 0
+          },
+          {
+            "rank": 4,
+            "team_id": "team_e",
+            "total_return": 0,
+            "win_rate": 0,
+            "trades": 0
+          },
+          {
+            "rank": 5,
+            "team_id": "team_b",
+            "total_return": -11.15,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260414",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_d",
+            "total_return": 9.84,
+            "win_rate": 80.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_a",
+            "total_return": 0.68,
+            "win_rate": 80.0,
+            "trades": 5
+          },
+          {
+            "rank": 3,
+            "team_id": "team_e",
+            "total_return": 0,
+            "win_rate": 0,
+            "trades": 0
+          },
+          {
+            "rank": 4,
+            "team_id": "team_b",
+            "total_return": -2.39,
+            "win_rate": 0.0,
+            "trades": 1
+          },
+          {
+            "rank": 5,
+            "team_id": "team_c",
+            "total_return": -3.04,
+            "win_rate": 0.0,
+            "trades": 1
+          }
+        ]
+      }
+    ],
+    "total_days": 5,
+    "last_updated": "2026-04-14 18:00:54"
+  }
+}
