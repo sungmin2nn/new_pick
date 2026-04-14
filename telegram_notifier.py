@@ -146,7 +146,12 @@ class TelegramNotifier:
                 name = s.get('name', s.get('stock_name', 'N/A'))
                 code = s.get('code', s.get('stock_code', ''))
                 score = s.get('score', s.get('total_score', 0))
-                stock_lines.append(f"{i}. {name} ({code}) - {score}점")
+                change = s.get('change_pct', 0)
+                strategy = s.get('strategy', '')
+                chg_sign = "+" if change >= 0 else ""
+                chg_emoji = "🔴" if change > 0 else "🔵" if change < 0 else "⚪"
+                strat_tag = f" [{strategy}]" if strategy else ""
+                stock_lines.append(f"{i}. {name} ({code}) {chg_emoji}{chg_sign}{change:.2f}% · {score}점{strat_tag}")
 
             stocks_text = "\n".join(stock_lines)
 
