@@ -383,7 +383,7 @@ function render(data) {
 
   // Calculate KPIs
   let totalCapital = 0, totalTrades = 0, totalWins = 0;
-  const teamList = data.leaderboard?.teams ? [...data.leaderboard.teams].sort((a,b) => (b.elo||0) - (a.elo||0)) : [];
+  const teamList = data.leaderboard?.teams ? Object.values(data.leaderboard.teams).sort((a,b) => (b.elo||0) - (a.elo||0)) : [];
 
   TEAMS.forEach(tid => {
     const p = data.portfolios[tid];

@@ -206,7 +206,7 @@ function fmtPct(n) { return n != null ? (n > 0 ? '+' : '') + Number(n).toFixed(2
 
 function render(data) {
   const lb = data.leaderboard;
-  const teams = lb ? [...(lb.teams || [])].sort((a,b) => (a.rank||99) - (b.rank||99)) : [];
+  const teams = lb?.teams ? Object.values(lb.teams).sort((a,b) => (a.rank||99) - (b.rank||99)) : [];
   const history = lb ? (lb.daily_history || []) : [];
   const today = new Date().toISOString().slice(0,10);
   const now = new Date();

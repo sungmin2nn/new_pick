@@ -629,7 +629,7 @@ function render(data) {
   const teamRows = [];
   TEAMS.forEach(tid => {
     const p = data.portfolios[tid];
-    const lb = data.leaderboard && data.leaderboard.teams ? data.leaderboard.teams.find(t => t.team_id === tid || t.team_name === TEAM_NAMES[tid]) : null;
+    const lb = data.leaderboard && data.leaderboard.teams ? Object.values(data.leaderboard.teams).find(t => t.team_id === tid || t.team_name === TEAM_NAMES[tid]) : null;
     const cap = p ? (p.current_capital || 0) : 10000000;
     const initCap = p ? (p.initial_capital || 10000000) : 10000000;
     const cum = p ? (p.total_return_pct || ((cap - initCap) / initCap * 100)) : 0;

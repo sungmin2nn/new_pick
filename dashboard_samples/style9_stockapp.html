@@ -415,7 +415,7 @@ function renderBnf(el) {
 function renderArena(el) {
   const d = DATA;
   const lb = d.leaderboard;
-  const teams = lb ? [...(lb.teams || [])].sort((a,b) => (a.rank||99) - (b.rank||99)) : [];
+  const teams = lb?.teams ? Object.values(lb.teams).sort((a,b) => (a.rank||99) - (b.rank||99)) : [];
 
   el.innerHTML = `
   <header class="flex items-center justify-between px-5 pt-14 pb-3 sticky top-0 bg-bg/95 backdrop-blur-sm z-30">

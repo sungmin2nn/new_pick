@@ -191,7 +191,7 @@ function scoreClass(n) { return n > 0 ? 'score-positive' : n < 0 ? 'score-negati
 
 function render(data) {
   const lb = data.leaderboard;
-  const teams = lb ? [...(lb.teams || [])].sort((a,b) => (a.rank||99) - (b.rank||99)) : [];
+  const teams = lb?.teams ? Object.values(lb.teams).sort((a,b) => (a.rank||99) - (b.rank||99)) : [];
   const history = lb ? (lb.daily_history || []) : [];
   const latestDay = history.length > 0 ? history[history.length - 1] : null;
   const dayNum = history.length || 0;
