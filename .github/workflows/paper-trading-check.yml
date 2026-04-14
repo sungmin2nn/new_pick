@@ -129,11 +129,11 @@ jobs:
                 if s['status'] == 'profit_hit':
                     notifier.send_sell_signal(
                         s['name'], s.get('code', ''),
-                        s.get('current_price', 0), 'profit', s.get('pnl_pct', 0))
+                        s.get('current_price', 0), 'profit', s.get('current_pct', 0))
                 elif s['status'] == 'loss_hit':
                     notifier.send_sell_signal(
                         s['name'], s.get('code', ''),
-                        s.get('current_price', 0), 'loss', s.get('pnl_pct', 0))
+                        s.get('current_price', 0), 'loss', s.get('current_pct', 0))
         except Exception as e:
             print(f'장중 알림 오류: {e}')
         "
