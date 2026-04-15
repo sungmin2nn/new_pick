@@ -83,48 +83,12 @@ class FrontierGapStrategy(BaseStrategy):
             print("  KRX OpenAPI 사용 불가 - 선정 불가")
             return []
 
-        # 1. 당일 KOSPI + KOSDAQ 전종목 OHLCV
-        try:
-            kospi_df = krx.get_stock_ohlcv(date, market='KOSPI')
-            kosdaq_df = krx.get_stock_ohlcv(date, market='KOSDAQ')
-        except Exception as e:
-            print(f"  KRX fetch 오류: {e}")
-            return []
+        # 1. 당일 KOSPI + KOSDAQ 전종목 OHLCV (KRX OpenAPI → pykrx 폴백)
+        all_stocks = self._fetch_all_stocks(date, krx)
 
-        if kospi_df.empty and kosdaq_df.empty:
+        if not all_stocks:
             print("  데이터 없음")
             return []
-
-        all_stocks = []
-        for df, mkt in [(kospi_df, 'KOSPI'), (kosdaq_df, 'KOSDAQ')]:
-            if df.empty:
-                continue
-            for code, row in df.iterrows():
-                try:
-                    open_p = float(row.get('시가', 0))
-                    close_p = float(row.get('종가', 0))
-                    if open_p == 0 or close_p == 0:
-                        continue
-                    # 전일 종가 = 종가 - 전일대비
-                    prev_close = close_p - float(row.get('전일대비', 0))
-                    if prev_close <= 0:
-                        continue
-                    gap_pct = (open_p - prev_close) / prev_close * 100
-                    all_stocks.append({
-                        'code': code,
-                        'name': row.get('종목명', ''),
-                        'open': int(open_p),
-                        'close': int(close_p),
-                        'prev_close': int(prev_close),
-                        'gap_pct': gap_pct,
-                        'change_pct': float(row.get('등락률', 0)),
-                        'volume': int(row.get('거래량', 0)),
-                        'trading_value': int(row.get('거래대금', 0)),
-                        'market_cap': int(row.get('시가총액', 0)),
-                        'market': mkt,
-                    })
-                except Exception:
-                    continue
 
         print(f"  전체 종목: {len(all_stocks)}개")
 
@@ -147,6 +111,95 @@ class FrontierGapStrategy(BaseStrategy):
 
         print(f"  선정 완료: {len(self.candidates)}개")
         return self.candidates
+
+    def _fetch_all_stocks(self, date: str, krx) -> List[Dict]:
+        """KRX OpenAPI로 fetch, 빈 결과면 pykrx 폴백"""
+        all_stocks = []
+
+        # 1차: KRX OpenAPI
+        try:
+            kospi_df = krx.get_stock_ohlcv(date, market='KOSPI')
+            kosdaq_df = krx.get_stock_ohlcv(date, market='KOSDAQ')
+        except Exception as e:
+            print(f"  KRX OpenAPI fetch 오류: {e}")
+            kospi_df = kosdaq_df = None
+
+        # KRX OpenAPI 성공 시 파싱
+        if kospi_df is not None and kosdaq_df is not None and (not kospi_df.empty or not kosdaq_df.empty):
+            for df, mkt in [(kospi_df, 'KOSPI'), (kosdaq_df, 'KOSDAQ')]:
+                if df is None or df.empty:
+                    continue
+                for code, row in df.iterrows():
+                    try:
+                        open_p = float(row.get('시가', 0))
+                        close_p = float(row.get('종가', 0))
+                        if open_p == 0 or close_p == 0:
+                            continue
+                        prev_close = close_p - float(row.get('전일대비', 0))
+                        if prev_close <= 0:
+                            continue
+                        gap_pct = (open_p - prev_close) / prev_close * 100
+                        all_stocks.append({
+                            'code': code, 'name': row.get('종목명', ''),
+                            'open': int(open_p), 'close': int(close_p),
+                            'prev_close': int(prev_close), 'gap_pct': gap_pct,
+                            'change_pct': float(row.get('등락률', 0)),
+                            'volume': int(row.get('거래량', 0)),
+                            'trading_value': int(row.get('거래대금', 0)),
+                            'market_cap': int(row.get('시가총액', 0)),
+                            'market': mkt,
+                        })
+                    except Exception:
+                        continue
+
+        if all_stocks:
+            print(f"  [KRX OpenAPI] {len(all_stocks)}개")
+            return all_stocks
+
+        # 2차: pykrx 폴백
+        print("  KRX OpenAPI 데이터 없음 → pykrx 폴백")
+        try:
+            from pykrx import stock as pykrx_stock
+            for mkt in ['KOSPI', 'KOSDAQ']:
+                try:
+                    tickers = pykrx_stock.get_market_ohlcv_by_ticker(date, market=mkt)
+                    if tickers.empty:
+                        continue
+                    for code, row in tickers.iterrows():
+                        try:
+                            open_p = float(row.get('시가', 0))
+                            close_p = float(row.get('종가', 0))
+                            if open_p == 0 or close_p == 0:
+                                continue
+                            prev_close = close_p - float(row.get('등락률', 0)) / 100 * close_p
+                            # pykrx 등락률은 % 단위
+                            chg_pct = float(row.get('등락률', 0))
+                            if close_p != 0 and chg_pct != 0:
+                                prev_close = close_p / (1 + chg_pct / 100)
+                            if prev_close <= 0:
+                                continue
+                            gap_pct = (open_p - prev_close) / prev_close * 100
+                            all_stocks.append({
+                                'code': code, 'name': '',
+                                'open': int(open_p), 'close': int(close_p),
+                                'prev_close': int(prev_close), 'gap_pct': gap_pct,
+                                'change_pct': chg_pct,
+                                'volume': int(row.get('거래량', 0)),
+                                'trading_value': int(row.get('거래대금', 0)),
+                                'market_cap': int(row.get('시가총액', 0)),
+                                'market': mkt,
+                            })
+                        except Exception:
+                            continue
+                except Exception as e:
+                    print(f"  pykrx {mkt} 오류: {e}")
+
+            if all_stocks:
+                print(f"  [pykrx 폴백] {len(all_stocks)}개")
+        except ImportError:
+            print("  pykrx 미설치")
+
+        return all_stocks
 
     def _filter_stocks(self, stocks: List[Dict]) -> List[Dict]:
         """1차 필터: 갭 범위 + 가격 + 거래대금 + 우선주 제외"""

@@ -295,5 +295,71 @@
         ]
       }
     ]
+  },
+  {
+    "date": "20260414",
+    "checked_at": "2026-04-14 22:32:30",
+    "status": "unhealthy",
+    "checks": [
+      {
+        "check_type": "workflow_files",
+        "workflow": "paper-trading-select",
+        "description": "장전 종목 선정",
+        "status": "pass",
+        "details": "모든 파일 정상"
+      },
+      {
+        "check_type": "workflow_files",
+        "workflow": "paper-trading",
+        "description": "장후 최종 결과",
+        "status": "pass",
+        "details": "모든 파일 정상"
+      },
+      {
+        "check_type": "workflow_files",
+        "workflow": "paper-trading-check",
+        "description": "장중 상태 체크",
+        "status": "pass",
+        "details": "모든 파일 정상"
+      },
+      {
+        "check_type": "team_selections",
+        "description": "팀별 종목 선정 여부",
+        "status": "fail",
+        "details": "종목 미선정: Echo Frontier(frontier_gap)"
+      },
+      {
+        "check_type": "arena_integrity",
+        "description": "아레나 리포트 무결성",
+        "status": "pass",
+        "details": "4/5팀 정상 실행"
+      },
+      {
+        "check_type": "portfolio_health",
+        "description": "포트폴리오 건전성",
+        "status": "warning",
+        "details": "team_b: 5연패",
+        "warnings": [
+          "team_b: 5연패"
+        ]
+      }
+    ],
+    "issues": [
+      {
+        "check_type": "team_selections",
+        "description": "팀별 종목 선정 여부",
+        "status": "fail",
+        "details": "종목 미선정: Echo Frontier(frontier_gap)"
+      },
+      {
+        "check_type": "portfolio_health",
+        "description": "포트폴리오 건전성",
+        "status": "warning",
+        "details": "team_b: 5연패",
+        "warnings": [
+          "team_b: 5연패"
+        ]
+      }
+    ]
   }
 ]
