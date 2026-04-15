@@ -1389,89 +1389,71 @@
                 const unrealizedPnl = stats.unrealized_pnl || (totalValue - totalCost);
                 const unrealizedPct = totalCost > 0 ? (unrealizedPnl / totalCost * 100) : 0;
 
-                // 누적 수익률 차트 업데이트
+                // 포지션별 일별 수익률 바 차트
                 const ctx = document.getElementById('performanceChart').getContext('2d');
                 if (performanceChart) performanceChart.destroy();
 
-                const perfGrad = ctx.createLinearGradient(0, 0, 0, ctx.canvas.clientHeight || 200);
-                const perfColor = unrealizedPct >= 0 ? '#00ff87' : '#EF4444';
-                perfGrad.addColorStop(0, unrealizedPct >= 0 ? 'rgba(0,255,135,0.15)' : 'rgba(239,68,68,0.15)');
-                perfGrad.addColorStop(1, 'transparent');
+                const posLabels = positions.map(p => p.name || p.code);
+                const posReturns = positions.map(p => {
+                    const cost = (p.avg_price || 0) * (p.total_quantity || 0);
+                    const val = (p.current_price || 0) * (p.total_quantity || 0);
+                    return cost > 0 ? ((val - cost) / cost * 100) : 0;
+                });
+                const posColors = posReturns.map(v => v >= 0 ? 'rgba(0,255,135,0.7)' : 'rgba(239,68,68,0.7)');
 
                 performanceChart = new Chart(ctx, {
-                    type: 'line',
+                    type: 'bar',
                     data: {
-                        labels: ['시작 (' + startDate + ')', '현재 (' + today + ')'],
+                        labels: posLabels,
                         datasets: [{
-                            label: '미실현 수익률 (%)',
-                            data: [0, unrealizedPct],
-                            borderColor: perfColor,
-                            backgroundColor: perfGrad,
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 2.5,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#0a0a0a',
-                            pointBorderColor: perfColor,
-                            pointBorderWidth: 2
+                            label: '종목별 수익률 (%)',
+                            data: posReturns,
+                            backgroundColor: posColors,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        indexAxis: 'y',
                         scales: {
-                            y: {
-                                grid: { color: 'rgba(255,255,255,0.06)' },
-                                ticks: {
-                                    color: '#9CA3AF',
-                                    callback: v => v.toFixed(1) + '%'
-                                },
-                                suggestedMin: Math.min(0, unrealizedPct - 5),
-                                suggestedMax: Math.max(0, unrealizedPct + 5)
-                            },
                             x: {
                                 grid: { color: 'rgba(255,255,255,0.06)' },
-                                ticks: { color: '#9CA3AF', font: { size: 10 } }
+                                ticks: { color: '#9CA3AF', callback: v => v.toFixed(1) + '%', font: { size: 10 } }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#E5E7EB', font: { size: 11 } }
                             }
                         },
                         plugins: {
-                            legend: { labels: { color: '#E5E7EB', font: { size: 11 } } },
+                            legend: { display: false },
                             tooltip: {
-                                callbacks: {
-                                    label: ctx => ctx.parsed.y.toFixed(2) + '%'
-                                }
+                                backgroundColor: '#1a1a1a', borderColor: '#333', borderWidth: 1,
+                                callbacks: { label: c => (c.parsed.x >= 0 ? '+' : '') + c.parsed.x.toFixed(2) + '%' }
                             }
                         }
                     }
                 });
 
-                // 자산 추이 차트도 업데이트
+                // 자산 추이 바 차트 (시작 vs 현재)
                 const portfolioCtx = document.getElementById('portfolioChart').getContext('2d');
                 if (portfolioChart) portfolioChart.destroy();
 
                 const currentValue = INITIAL_CAPITAL + unrealizedPnl;
 
-                const portGrad = portfolioCtx.createLinearGradient(0, 0, 0, portfolioCtx.canvas.clientHeight || 200);
-                const portColor = currentValue >= INITIAL_CAPITAL ? '#00ff87' : '#EF4444';
-                portGrad.addColorStop(0, currentValue >= INITIAL_CAPITAL ? 'rgba(0,255,135,0.15)' : 'rgba(239,68,68,0.15)');
-                portGrad.addColorStop(1, 'transparent');
-
+                const portBarColor = currentValue >= INITIAL_CAPITAL ? 'rgba(0,255,135,0.7)' : 'rgba(239,68,68,0.7)';
                 portfolioChart = new Chart(portfolioCtx, {
-                    type: 'line',
+                    type: 'bar',
                     data: {
-                        labels: ['시작', '현재'],
+                        labels: ['초기 자본', '현재 평가'],
                         datasets: [{
                             label: '자산 (원)',
                             data: [INITIAL_CAPITAL, currentValue],
-                            borderColor: portColor,
-                            backgroundColor: portGrad,
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 2.5,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#0a0a0a',
-                            pointBorderColor: portColor,
-                            pointBorderWidth: 2
+                            backgroundColor: ['rgba(107,114,128,0.5)', portBarColor],
+                            borderRadius: 6,
+                            barPercentage: 0.5,
                         }]
                     },
                     options: {
