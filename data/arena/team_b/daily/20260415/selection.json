@@ -1,0 +1,41 @@
+{
+  "strategy_id": "largecap_contrarian",
+  "strategy_name": "대형주 역추세",
+  "date": "20260415",
+  "selected_at": "2026-04-15 17:54:34",
+  "count": 1,
+  "candidates": [
+    {
+      "code": "005830",
+      "name": "DB손해보험",
+      "price": 164800,
+      "change_pct": -3.91,
+      "score": 82.5,
+      "score_detail": {
+        "market_cap": 30.0,
+        "change_pct": 25.0,
+        "trading_value": 20.0,
+        "price_level": 7.5
+      },
+      "rank": 1,
+      "market_cap": 11434500000000,
+      "volume": 500,
+      "trading_value": 114345000000
+    }
+  ],
+  "params": {
+    "min_price": 5000,
+    "max_change": -1.5,
+    "min_trading_value": 50,
+    "min_market_cap": 1000000000000,
+    "kospi_drop_threshold": -2.0,
+    "weights": {
+      "market_cap": 30,
+      "change_pct": 25,
+      "trading_value": 20,
+      "price_level": 15,
+      "volatility": 10
+    }
+  },
+  "simulation": null
+}
