@@ -1,0 +1,149 @@
+name: Strategy Toggle (ON/OFF)
+
+on:
+  workflow_dispatch:
+    inputs:
+      strategy_id:
+        description: '전략 ID (예: eod_reversal_korean)'
+        required: true
+        type: choice
+        options:
+          - volatility_breakout_lw
+          - eod_reversal_korean
+          - sector_rotation
+          - foreign_flow_momentum
+          - turtle_breakout_short
+          - kospi_intraday_momentum
+          - opening_30min_volume_burst
+          - news_catalyst_timing
+          - multi_signal_hybrid
+          - overnight_etf_reversal
+          - momentum
+          - largecap_contrarian
+          - dart_disclosure
+          - theme_policy
+          - frontier_gap
+      action:
+        description: '동작'
+        required: true
+        type: choice
+        options:
+          - 'ON (활성화)'
+          - 'OFF (비활성화)'
+          - 'STATUS (상태 확인)'
+
+jobs:
+  toggle:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - name: Pull latest
+      run: git pull origin master || true
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install python-dotenv
+
+    - name: Toggle strategy
+      run: |
+        python3 << 'PYEOF'
+        import json
+        from pathlib import Path
+        from datetime import datetime, timezone, timedelta
+
+        KST = timezone(timedelta(hours=9))
+        CONFIG_PATH = Path("data/arena/strategy_config.json")
+
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            config = json.load(f)
+
+        sid = "${{ inputs.strategy_id }}"
+        action = "${{ inputs.action }}"
+
+        if sid not in config["strategies"]:
+            print(f"❌ 전략 없음: {sid}")
+            exit(1)
+
+        entry = config["strategies"][sid]
+        print(f"\n{'='*50}")
+        print(f"전략: {entry['team_name']} ({sid})")
+        print(f"출처: {entry['source']}")
+        print(f"현재 상태: {'ON ✅' if entry['enabled'] else 'OFF ⬜'}")
+        print(f"팀 ID: {entry.get('team_id', 'N/A')}")
+        print(f"활성화일: {entry.get('activated_at', 'N/A')}")
+        print(f"{'='*50}")
+
+        if "STATUS" in action:
+            # 전체 현황 표시
+            print(f"\n📊 전체 전략 현황:")
+            on_count = 0
+            for s_id, s_entry in config["strategies"].items():
+                status = "✅ ON " if s_entry["enabled"] else "⬜ OFF"
+                team = s_entry.get("team_id", "-")
+                print(f"  {status}  {s_entry['team_name']:25s} ({s_id}) → {team}")
+                if s_entry["enabled"]:
+                    on_count += 1
+            print(f"\n활성: {on_count}/{len(config['strategies'])}개")
+
+        elif "ON" in action:
+            if entry["enabled"]:
+                print(f"\n⚠️ 이미 활성화 상태입니다.")
+            else:
+                entry["enabled"] = True
+                entry["activated_at"] = datetime.now(KST).strftime("%Y-%m-%d")
+
+                if not entry.get("team_id"):
+                    pool = config.get("team_id_pool", [])
+                    if pool:
+                        entry["team_id"] = pool.pop(0)
+                    else:
+                        print("❌ team_id pool 소진!")
+                        exit(1)
+
+                config["updated_at"] = datetime.now(KST).strftime("%Y-%m-%dT%H:%M:%S")
+                with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                    json.dump(config, f, ensure_ascii=False, indent=2)
+
+                print(f"\n✅ 활성화 완료!")
+                print(f"   팀 ID: {entry['team_id']}")
+                print(f"   다음 거래일부터 페이퍼 트레이딩 참여")
+
+        elif "OFF" in action:
+            if not entry["enabled"]:
+                print(f"\n⚠️ 이미 비활성화 상태입니다.")
+            else:
+                entry["enabled"] = False
+                config["updated_at"] = datetime.now(KST).strftime("%Y-%m-%dT%H:%M:%S")
+                with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                    json.dump(config, f, ensure_ascii=False, indent=2)
+
+                print(f"\n⬜ 비활성화 완료!")
+                print(f"   팀 ID: {entry['team_id']} (데이터 보존)")
+                print(f"   페이퍼 트레이딩에서 제외됨")
+        PYEOF
+
+    - name: Commit changes
+      if: contains(inputs.action, 'ON') || contains(inputs.action, 'OFF')
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add data/arena/strategy_config.json
+        git diff --cached --quiet && echo "No changes" || \
+          git commit -m "🔀 Strategy ${{ inputs.action }}: ${{ inputs.strategy_id }}" && \
+          git push
+
+    - name: Summary
+      run: |
+        echo "## 🔀 Strategy Toggle" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **전략**: ${{ inputs.strategy_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **동작**: ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
