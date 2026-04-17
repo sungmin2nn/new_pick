@@ -54,16 +54,16 @@ except ImportError:
     logger.warning("KRX OpenAPI client not available")
 
 
-# ─── 선정 기준 상수 ───
-BB_PERIOD = 20           # 볼린저밴드 이동평균 기간
+# ─── 선정 기준 상수 (1년 백테스트 최적화 결과) ───
+BB_PERIOD = 15           # 볼린저밴드 기간 (20→15, 더 민감)
 BB_STD_MULT = 2          # 표준편차 배수
-PERCENT_B_THRESHOLD = 0.3  # %B 임계값 (하단 30% 이하)
+PERCENT_B_THRESHOLD = 0.2  # %B 임계값 (하단 20% 이하, 엄격)
 RSI_PERIOD = 14          # RSI 기간
-RSI_THRESHOLD = 40       # RSI 과매도 기준 (40 이하)
+RSI_THRESHOLD = 30       # RSI 과매도 기준 (30 이하, 엄격)
 VOLUME_RATIO_THRESHOLD = 1.0  # 거래량 기준 (평균 이상)
-MIN_MARKET_CAP = 100_000_000_000       # 시가총액 1000억원
+MIN_MARKET_CAP = 1_000_000_000_000     # 시가총액 1조원 (대형주만)
 MIN_TRADING_VALUE = 3_000_000_000      # 거래대금 30억원
-LOOKBACK_DAYS = 40       # 과거 데이터 조회 일수 (BB 20일 + RSI 14일 + 여유)
+LOOKBACK_DAYS = 35       # 과거 데이터 조회 일수 (BB 15일 + RSI 14일 + 여유)
 TOP_N = 20
 
 # 제외 키워드

@@ -26,11 +26,13 @@ sys.path.insert(0, PROJECT_ROOT)
 
 from paper_trading.bnf.position import BNFPositionManager, POSITION_RATIO
 
-# ─── 볼린저 스윙 전용 상수 ───
-BOLLINGER_STOP_LOSS_PCT = -5.0     # 손절 -5%
-BOLLINGER_TAKE_PROFIT_PCT = 7.0    # 익절 +7%
-MAX_HOLDING_DAYS = 5               # 최대 보유 영업일
-BB_PERIOD = 20                     # 중심선 계산용
+# ─── 볼린저 스윙 전용 상수 (1년 백테스트 최적화) ───
+BOLLINGER_STOP_LOSS_PCT = -6.0     # 손절 -6%
+BOLLINGER_TAKE_PROFIT_PCT = 7.0    # 익절 +7% (폴백, 지표 기반 익절 우선)
+MAX_HOLDING_DAYS = 12              # 최대 보유 12영업일
+BB_PERIOD = 15                     # 볼린저밴드 기간
+TP_BB_THRESHOLD = 0.7              # %B 익절 기준
+TP_RSI_THRESHOLD = 40              # RSI 익절 기준
 
 
 def count_business_days(start_date: str, end_date: str) -> int:
@@ -151,41 +153,74 @@ def main():
 
         gain_pct = ((current_price / avg_price) - 1) * 100
 
-        # 2a) 손절 체크 (-5%)
+        # 2a) 손절 체크 (-6%)
         if gain_pct <= BOLLINGER_STOP_LOSS_PCT:
             trade = mgr.close_position(
                 code, current_price, today,
-                exit_reason=f"손절 ({gain_pct:+.1f}%, 기준 {BOLLINGER_STOP_LOSS_PCT}%)"
+                exit_reason=f"손절 ({gain_pct:+.1f}%)"
             )
             if trade:
                 closed_trades.append(trade)
                 print(f"  손절: {pos['name']} ({gain_pct:+.1f}%)")
             continue
 
-        # 2b) 익절 체크 (+7%)
+        # 2b) 지표 기반 익절: %B >= 0.7
+        bb_data = get_bb_middle(code, today_str)
+        if isinstance(bb_data, (int, float)) and bb_data > 0:
+            bb_middle = bb_data
+        else:
+            bb_middle = 0
+        # %B 계산 (간이)
+        pb_now = None
+        try:
+            from paper_trading.bnf.bollinger_selector import calculate_bollinger_bands, calculate_rsi
+            from pykrx import stock as _pykrx
+            from datetime import datetime as _dt, timedelta as _td
+            _end = _dt.strptime(today_str, "%Y%m%d") if len(today_str) == 8 else _dt.strptime(today_str, "%Y-%m-%d")
+            _start = _end - _td(days=35)
+            _df = _pykrx.get_market_ohlcv_by_date(_start.strftime("%Y%m%d"), _end.strftime("%Y%m%d"), code)
+            if not _df.empty and len(_df) >= BB_PERIOD:
+                import numpy as np
+                _closes = _df["종가"].astype(float).values
+                _, _, _, pb_now = calculate_bollinger_bands(_closes, period=BB_PERIOD)
+                rsi_now = calculate_rsi(_closes)
+        except:
+            pb_now = None
+            rsi_now = None
+
+        if pb_now is not None and pb_now >= TP_BB_THRESHOLD:
+            trade = mgr.close_position(
+                code, current_price, today,
+                exit_reason=f"익절 %B={pb_now:.2f} (기준≥{TP_BB_THRESHOLD})"
+            )
+            if trade:
+                closed_trades.append(trade)
+                print(f"  익절BB: {pos['name']} %B={pb_now:.2f} ({gain_pct:+.1f}%)")
+            continue
+
+        # 2c) 지표 기반 익절: RSI >= 40
+        if rsi_now is not None and rsi_now >= TP_RSI_THRESHOLD:
+            trade = mgr.close_position(
+                code, current_price, today,
+                exit_reason=f"익절 RSI={rsi_now:.0f} (기준≥{TP_RSI_THRESHOLD})"
+            )
+            if trade:
+                closed_trades.append(trade)
+                print(f"  익절RSI: {pos['name']} RSI={rsi_now:.0f} ({gain_pct:+.1f}%)")
+            continue
+
+        # 2d) 수익률 익절 (+7% 폴백)
         if gain_pct >= BOLLINGER_TAKE_PROFIT_PCT:
             trade = mgr.close_position(
                 code, current_price, today,
-                exit_reason=f"익절 ({gain_pct:+.1f}%, 기준 +{BOLLINGER_TAKE_PROFIT_PCT}%)"
+                exit_reason=f"익절 +{gain_pct:.1f}%"
             )
             if trade:
                 closed_trades.append(trade)
-                print(f"  익절(+{BOLLINGER_TAKE_PROFIT_PCT}%): {pos['name']} ({gain_pct:+.1f}%)")
+                print(f"  익절%: {pos['name']} ({gain_pct:+.1f}%)")
             continue
 
-        # 2c) 중심선(MA20) 도달 체크
-        bb_middle = get_bb_middle(code, today_str)
-        if bb_middle > 0 and current_price >= bb_middle:
-            trade = mgr.close_position(
-                code, current_price, today,
-                exit_reason=f"BB중심선 도달 (MA20={bb_middle:,.0f}, 현재={current_price:,})"
-            )
-            if trade:
-                closed_trades.append(trade)
-                print(f"  BB중심선 도달: {pos['name']} (MA20={bb_middle:,.0f})")
-            continue
-
-        # 2d) 기한 청산 (5영업일)
+        # 2e) 기한 청산 (12영업일)
         if entry_date:
             biz_days = count_business_days(entry_date, today)
             if biz_days >= MAX_HOLDING_DAYS:
@@ -203,9 +238,11 @@ def main():
     else:
         print("\n[자동 청산] 해당 없음")
 
-    # --- 3) 신규 진입 ---
-    slots = mgr.open_slots()
-    print(f"\n[신규 진입] 가능 슬롯: {slots}개")
+    # --- 3) 신규 진입 (최대 3종목) ---
+    BOLLINGER_MAX_POSITIONS = 3
+    current_open = len([p for p in mgr.positions if p.get("state") != "CLOSED"])
+    slots = max(0, BOLLINGER_MAX_POSITIONS - current_open)
+    print(f"\n[신규 진입] 가능 슬롯: {slots}개 (최대 {BOLLINGER_MAX_POSITIONS}종목)")
 
     position_size = mgr.total_capital * POSITION_RATIO
 
