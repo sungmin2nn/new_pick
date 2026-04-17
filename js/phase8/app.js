@@ -9,19 +9,19 @@ import { clearCache } from './cache.js';
 // ============ Tab management ============
 const TABS = ['arena', 'bnf'];
 // 하단 네비에서 arena 내부 섹션으로 스크롤하는 가상 탭
-const SECTION_TABS = { candidates: '📋 내일 후보', trades: '📜 매매 내역', lab: '🧪 전략 Lab' };
+const SECTION_TABS = { candidates: '📋 내일 후보', trades: '📜 매매 내역' };
+
+// 볼린저 탭: BNF pane으로 전환 후 볼린저 섹션으로 스크롤
+const BNF_SECTION_TABS = { bollinger: '볼린저 스윙' };
 let currentTab = 'arena';
 
 function showMainTab(tab) {
   // 가상 탭 처리 (arena 내부 섹션으로 스크롤)
   if (SECTION_TABS[tab]) {
-    // arena pane 활성화
     currentTab = 'arena';
     $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'arena'));
     $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-arena'));
-
-    // 해당 섹션으로 스크롤
     const keyword = SECTION_TABS[tab];
     const sections = document.querySelectorAll('#arena-content .section');
     for (const sec of sections) {
@@ -31,6 +31,25 @@ function showMainTab(tab) {
         break;
       }
     }
+    return;
+  }
+
+  // 볼린저 탭: BNF pane 전환 후 볼린저 섹션으로 스크롤
+  if (BNF_SECTION_TABS[tab]) {
+    currentTab = 'bnf';
+    $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'bnf'));
+    $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-bnf'));
+    // iframe 내부 볼린저 섹션으로 스크롤
+    setTimeout(() => {
+      const iframe = document.getElementById('bnf-iframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          const el = iframe.contentDocument.getElementById('bollingerSection');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch(e) { /* cross-origin 무시 */ }
+      }
+    }, 500);
     return;
   }
 

@@ -560,6 +560,24 @@
         #candidatesTable td:nth-child(6),
         #candidatesTable td:nth-child(7) { text-align: right; }
 
+        /* Bollinger Tables */
+        #bbCandidatesTable td:nth-child(3),
+        #bbCandidatesTable td:nth-child(4),
+        #bbCandidatesTable td:nth-child(5),
+        #bbCandidatesTable td:nth-child(6),
+        #bbCandidatesTable td:nth-child(7),
+        #bbCandidatesTable td:nth-child(8) { text-align: right; }
+        #bbPositionsTable td:nth-child(4),
+        #bbPositionsTable td:nth-child(5),
+        #bbPositionsTable td:nth-child(6),
+        #bbPositionsTable td:nth-child(7),
+        #bbPositionsTable td:nth-child(8) { text-align: right; }
+        #bbTradeHistory td:nth-child(3),
+        #bbTradeHistory td:nth-child(5),
+        #bbTradeHistory td:nth-child(6),
+        #bbTradeHistory td:nth-child(7),
+        #bbTradeHistory td:nth-child(8) { text-align: right; }
+
         /* Capital Status */
         .capital-status {
             background: linear-gradient(135deg, rgba(0, 198, 190, 0.08), rgba(0, 198, 190, 0.02));
@@ -858,6 +876,94 @@
                 </table>
             </div>
         </div>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- 볼린저 스윙 섹션 -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div style="margin-top:40px; padding-top:20px; border-top:3px solid #6366F1;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+                <h1 style="color:#6366F1; font-size:1.3em; margin:0;">
+                    <span style="background:linear-gradient(135deg,#6366F1,#818CF8); color:white; padding:3px 10px; border-radius:12px; font-size:0.65em; vertical-align:middle;">BB</span>
+                    볼린저 스윙
+                </h1>
+                <span style="color:#6B7280; font-size:0.8em;">BB(20,2) + RSI(14) | 손절 -5% / 익절 MA20 또는 +7% / 최대 5일</span>
+            </div>
+
+            <!-- 볼린저 후보 종목 -->
+            <div class="section">
+                <h2 style="color:#6366F1;">📊 볼린저 스윙 후보 종목</h2>
+                <div class="table-wrapper">
+                    <table id="bbCandidatesTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>종목</th>
+                                <th>현재가</th>
+                                <th>%B</th>
+                                <th>RSI</th>
+                                <th>BB하단</th>
+                                <th>BB중심</th>
+                                <th>거래량비</th>
+                                <th>선정 사유</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bbCandidatesBody">
+                            <tr><td colspan="9" class="no-data">데이터 로딩 중...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 볼린저 포지션 -->
+            <div class="section">
+                <h2 style="color:#6366F1;">💼 볼린저 스윙 포지션</h2>
+                <div class="table-wrapper">
+                    <table id="bbPositionsTable">
+                        <thead>
+                            <tr>
+                                <th>종목</th>
+                                <th>매수일</th>
+                                <th>D+N</th>
+                                <th>평균단가</th>
+                                <th>현재가</th>
+                                <th>수량</th>
+                                <th>손익</th>
+                                <th>수익률</th>
+                                <th>청산조건</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bbPositionsBody">
+                            <tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 볼린저 매매 이력 -->
+            <div class="section">
+                <h2 style="color:#6366F1;">📋 볼린저 스윙 매매 내역</h2>
+                <div class="table-wrapper">
+                    <table id="bbTradeHistory">
+                        <thead>
+                            <tr>
+                                <th>종목</th>
+                                <th>매수일</th>
+                                <th>매수가</th>
+                                <th>매도일</th>
+                                <th>매도가</th>
+                                <th>수량</th>
+                                <th>손익률</th>
+                                <th>손익금</th>
+                                <th>사유</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bbTradeHistoryBody">
+                            <tr><td colspan="9" class="no-data">매매 내역이 없습니다</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer>
@@ -905,6 +1011,8 @@
                 await loadPositions();
                 // 거래 이력 로드
                 await loadTradeHistory();
+                // 볼린저 스윙 데이터 로드
+                await loadBollingerData();
             } catch (error) {
                 console.error('BNF data load error:', error);
             }
@@ -1544,6 +1652,164 @@
                     }
                 }
             });
+        }
+
+        // ═══════════════════════════════════════
+        // 볼린저 스윙 데이터 로드
+        // ═══════════════════════════════════════
+
+        async function loadBollingerData() {
+            await loadBBCandidates();
+            await loadBBPositions();
+            await loadBBTradeHistory();
+        }
+
+        async function loadBBCandidates() {
+            const tbody = document.getElementById('bbCandidatesBody');
+            if (!tbody) return;
+
+            try {
+                // 보유 종목 코드
+                let ownedCodes = [];
+                try {
+                    const posResp = await fetch('data/bnf/bollinger_positions.json?t=' + Date.now());
+                    if (posResp.ok) {
+                        const posData = await posResp.json();
+                        ownedCodes = (posData.positions || [])
+                            .filter(p => p.state !== 'CLOSED')
+                            .map(p => p.code);
+                    }
+                } catch (e) { /* no positions yet */ }
+
+                const response = await fetch('data/bnf/bollinger_candidates.json?t=' + Date.now());
+                if (!response.ok) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">볼린저 후보 데이터가 없습니다</td></tr>';
+                    return;
+                }
+                const data = await response.json();
+                const candidates = (data.candidates || []).filter(c => !ownedCodes.includes(c.code));
+
+                if (candidates.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">조건 충족 종목 없음 (또는 모두 보유 중)</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = candidates.map((c, i) => {
+                    const pctB = (c.percent_b || 0).toFixed(3);
+                    const rsi = (c.rsi || 0).toFixed(1);
+                    const bbLower = Math.round(c.bb_lower || 0).toLocaleString();
+                    const bbMiddle = Math.round(c.bb_middle || 0).toLocaleString();
+                    const volRatio = (c.vol_ratio || 0).toFixed(1);
+                    const reason = c.reasons || c.selection_reason || '';
+
+                    return `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td><a href="https://m.stock.naver.com/domestic/stock/${c.code}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;"><strong>${c.name}</strong> <span style="color:#6366F1;font-size:0.8em;">${c.code} ↗</span></a></td>
+                            <td>${(c.price || 0).toLocaleString()}원</td>
+                            <td style="color:#EF4444;font-weight:600;">${pctB}</td>
+                            <td style="color:#EF4444;font-weight:600;">${rsi}</td>
+                            <td>${bbLower}원</td>
+                            <td>${bbMiddle}원</td>
+                            <td>${volRatio}x</td>
+                            <td style="font-size:0.75em;color:#6366F1;">${reason}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('BB candidates load error:', error);
+                tbody.innerHTML = '<tr><td colspan="9" class="no-data">데이터를 불러오지 못했어요</td></tr>';
+            }
+        }
+
+        async function loadBBPositions() {
+            const tbody = document.getElementById('bbPositionsBody');
+            if (!tbody) return;
+
+            try {
+                const response = await fetch('data/bnf/bollinger_positions.json?t=' + Date.now());
+                if (!response.ok) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">포지션 데이터가 없습니다</td></tr>';
+                    return;
+                }
+                const data = await response.json();
+                const positions = (data.positions || []).filter(p => p.state !== 'CLOSED');
+
+                if (positions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">보유 중인 포지션이 없습니다</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = positions.map(p => {
+                    const pnlClass = (p.unrealized_pnl || 0) >= 0 ? 'positive' : 'negative';
+                    const pnlPct = p.unrealized_pnl_pct || 0;
+                    const entryDate = new Date(p.entry_date);
+                    const today = new Date();
+                    const holdingDays = Math.floor((today - entryDate) / (1000 * 60 * 60 * 24));
+
+                    // 청산 조건 표시
+                    const stopPrice = Math.round((p.avg_price || 0) * 0.95);
+                    const profitPrice = Math.round((p.avg_price || 0) * 1.07);
+                    const sellCondition = `손절 ${stopPrice.toLocaleString()} / 익절 ${profitPrice.toLocaleString()} 또는 MA20 / D+5`;
+
+                    return `
+                        <tr>
+                            <td><a href="https://m.stock.naver.com/domestic/stock/${p.code}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;"><strong>${p.name}</strong><br><span style="color:#6366F1;font-size:0.75em;">${p.code} ↗</span></a></td>
+                            <td>${p.entry_date || '-'}</td>
+                            <td>D+${holdingDays} <span style="color:${holdingDays >= 4 ? '#EF4444' : '#6B7280'};font-size:0.8em;">${holdingDays >= 5 ? '(청산!)' : holdingDays >= 4 ? '(주의)' : ''}</span></td>
+                            <td>${(p.avg_price || 0).toLocaleString()}</td>
+                            <td>${(p.current_price || 0).toLocaleString()}</td>
+                            <td>${p.total_quantity || 0}주</td>
+                            <td class="${pnlClass}">${(p.unrealized_pnl || 0) >= 0 ? '+' : ''}${(p.unrealized_pnl || 0).toLocaleString()}</td>
+                            <td class="${pnlClass}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(1)}%</td>
+                            <td style="font-size:0.7em;">${sellCondition}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('BB positions load error:', error);
+                tbody.innerHTML = '<tr><td colspan="9" class="no-data">포지션 데이터를 불러오지 못했어요</td></tr>';
+            }
+        }
+
+        async function loadBBTradeHistory() {
+            const tbody = document.getElementById('bbTradeHistoryBody');
+            if (!tbody) return;
+
+            try {
+                const response = await fetch('data/bnf/bollinger_trades.json?t=' + Date.now());
+                if (!response.ok) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">매매 내역이 없습니다</td></tr>';
+                    return;
+                }
+                const data = await response.json();
+                const trades = data.trades || [];
+
+                if (trades.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-data">매매 내역이 없습니다</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = trades.slice(0, 30).map(t => {
+                    const pnlClass = (t.return_pct || 0) >= 0 ? 'positive' : 'negative';
+                    return `
+                        <tr>
+                            <td><a href="https://m.stock.naver.com/domestic/stock/${t.code}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${t.name} <span style="color:#6366F1;">↗</span></a></td>
+                            <td>${t.entry_date || '-'}</td>
+                            <td>${(t.entry_price || 0).toLocaleString()}</td>
+                            <td>${t.exit_date || '-'}</td>
+                            <td>${(t.exit_price || 0).toLocaleString()}</td>
+                            <td>${t.quantity || 0}주</td>
+                            <td class="${pnlClass}">${(t.return_pct || 0) >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(1)}%</td>
+                            <td class="${pnlClass}">${(t.profit || 0) >= 0 ? '+' : ''}${(t.profit || 0).toLocaleString()}원</td>
+                            <td style="font-size:0.75em;">${t.exit_reason || ''}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('BB trade history load error:', error);
+                tbody.innerHTML = '<tr><td colspan="9" class="no-data">매매 내역을 불러오지 못했어요</td></tr>';
+            }
         }
 
         // 성과 차트 업데이트

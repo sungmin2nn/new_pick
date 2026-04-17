@@ -1,0 +1,81 @@
+name: Bollinger Swing Trading
+
+on:
+  schedule:
+    - cron: '40 7 * * 1-5'   # 16:40 KST - 종목 선정 (장 마감 후)
+    - cron: '30 0 * * 1-5'   # 09:30 KST - 포지션 체크 (장 시작)
+    - cron: '30 6 * * 1-5'   # 15:30 KST - 장마감 체크
+  workflow_dispatch: # 수동 실행 가능
+    inputs:
+      action:
+        description: '실행 작업'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - selection
+          - check
+          - both
+
+jobs:
+  bollinger-selection:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'selection' || github.event.inputs.action == 'both') || github.event.schedule == '40 7 * * 1-5'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Bollinger selector
+      env:
+        TZ: Asia/Seoul
+        KRX_API_KEY: ${{ secrets.KRX_API_KEY }}
+      run: python scripts/run_bollinger_selection.py
+
+    - name: Commit and push results
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add data/bnf/bollinger_candidates*.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "BB 볼린저 스윙 종목 선정 - $(date +'%Y-%m-%d')" && git pull --rebase && git push) || true
+
+  bollinger-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'check' || github.event.inputs.action == 'both') || github.event.schedule == '30 0 * * 1-5' || github.event.schedule == '30 6 * * 1-5'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Bollinger position check
+      env:
+        TZ: Asia/Seoul
+        KRX_API_KEY: ${{ secrets.KRX_API_KEY }}
+      run: python scripts/run_bollinger_check.py
+
+    - name: Commit and push results
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add data/bnf/bollinger_positions.json data/bnf/bollinger_trades.json
+        git diff --quiet && git diff --staged --quiet || (git commit -m "BB 볼린저 스윙 포지션 체크 - $(date +'%Y-%m-%d %H:%M')" && git pull --rebase && git push) || true
