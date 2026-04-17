@@ -4,10 +4,11 @@
 
 import { $, $$, fmtTime, getTodayKST, fmtDate } from './ui.js';
 import { initArena, refreshArena } from './arena.js';
+import { initTelegram, refreshTelegram } from './telegram.js';
 import { clearCache } from './cache.js';
 
 // ============ Tab management ============
-const TABS = ['arena', 'bnf', 'bollinger'];
+const TABS = ['arena', 'telegram', 'bnf', 'bollinger'];
 // 하단 네비에서 arena 내부 섹션으로 스크롤하는 가상 탭
 const SECTION_TABS = { candidates: '📋 내일 후보', trades: '📜 매매 내역' };
 
@@ -39,11 +40,19 @@ function showMainTab(tab) {
     return;
   }
 
-  if (!TABS.includes(tab)) return;
+  if (!TABS.includes(tab)) {
+    console.warn('[Tab] 미등록 탭:', tab, 'TABS:', TABS);
+    return;
+  }
+  console.log('[Tab] 전환:', tab);
   currentTab = tab;
   $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === `pane-${tab}`));
+  $$('.main-pane').forEach(p => {
+    const isActive = p.id === `pane-${tab}`;
+    p.classList.toggle('active', isActive);
+    if (isActive) console.log('[Tab] pane 활성화:', p.id);
+  });
 
   // URL hash 업데이트
   if (window.location.hash !== `#${tab}`) {
@@ -67,7 +76,7 @@ async function refreshAll() {
   if (btn) btn.disabled = true;
   clearCache();
   try {
-    await refreshArena();
+    await Promise.all([refreshArena(), refreshTelegram()]);
     updateStatusBar();
   } finally {
     if (btn) btn.disabled = false;
@@ -187,8 +196,8 @@ async function init() {
   const refreshBtn = $('#refresh-btn');
   if (refreshBtn) refreshBtn.addEventListener('click', refreshAll);
 
-  // Init data (Arena only - BNF is external link)
-  await initArena();
+  // Init data
+  await Promise.all([initArena(), initTelegram()]);
   updateStatusBar();
 
   // Hash routing
