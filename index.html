@@ -50,14 +50,17 @@
   <div class="main-tabs">
     <div class="container inline" style="gap:var(--space-2); width:100%; max-width:var(--container-max);">
       <button class="main-tab active" data-tab="arena">
-        🏟 <span>Arena</span>
+        🏠 <span>홈</span>
+      </button>
+      <button class="main-tab" data-tab="telegram">
+        📨 <span>알림</span>
       </button>
       <button class="main-tab" data-tab="bnf">
         🎯 <span>BNF</span>
       </button>
-      <a class="main-tab" href="dashboard_samples/gallery.html" style="text-decoration:none;">
-        🎨 <span>New</span>
-      </a>
+      <button class="main-tab" data-tab="bollinger">
+        📉 <span>볼린저</span>
+      </button>
     </div>
   </div>
 
@@ -69,6 +72,28 @@
       <section class="main-pane active" id="pane-arena">
         <div id="arena-content">
           <div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">데이터 로딩 중...</div></div>
+        </div>
+      </section>
+
+      <!-- ============ Telegram Pane ============ -->
+      <section class="main-pane" id="pane-telegram">
+        <div class="section">
+          <!-- 날짜 네비게이션 -->
+          <div class="card" style="padding:var(--space-3) var(--space-4);">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <button id="tg-prev" class="btn btn-icon" style="font-size:1.4rem; min-width:44px;" title="이전 날짜">‹</button>
+              <div style="display:flex; align-items:center; gap:var(--space-2); cursor:pointer;" id="tg-today" title="오늘로 이동">
+                <span id="tg-date-display" style="font-size:var(--fs-lg); font-weight:var(--fw-semibold); font-variant-numeric:tabular-nums;">-</span>
+                <span id="tg-today-badge" class="pill-dot pulse-dot" style="background:var(--accent); width:6px; height:6px; display:none;"></span>
+              </div>
+              <button id="tg-next" class="btn btn-icon" style="font-size:1.4rem; min-width:44px;" title="다음 날짜" disabled>›</button>
+            </div>
+            <div id="tg-stats" style="display:flex; align-items:center; justify-content:center; gap:var(--space-2); margin-top:var(--space-2); font-size:var(--fs-xs); color:var(--text-secondary);"></div>
+          </div>
+          <!-- 발송 이력 목록 -->
+          <div id="telegram-content" style="margin-top:var(--space-3);">
+            <div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">로딩 중...</div></div>
+          </div>
         </div>
       </section>
 
