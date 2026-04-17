@@ -57,10 +57,10 @@ except ImportError:
 # ─── 선정 기준 상수 ───
 BB_PERIOD = 20           # 볼린저밴드 이동평균 기간
 BB_STD_MULT = 2          # 표준편차 배수
-PERCENT_B_THRESHOLD = 0.2  # %B 임계값 (하단 근접)
+PERCENT_B_THRESHOLD = 0.3  # %B 임계값 (하단 30% 이하)
 RSI_PERIOD = 14          # RSI 기간
-RSI_THRESHOLD = 30       # RSI 과매도 기준
-VOLUME_RATIO_THRESHOLD = 1.3  # 거래량 5일 평균 대비 배수
+RSI_THRESHOLD = 40       # RSI 과매도 기준 (40 이하)
+VOLUME_RATIO_THRESHOLD = 1.0  # 거래량 기준 (평균 이상)
 MIN_MARKET_CAP = 100_000_000_000       # 시가총액 1000억원
 MIN_TRADING_VALUE = 3_000_000_000      # 거래대금 30억원
 LOOKBACK_DAYS = 40       # 과거 데이터 조회 일수 (BB 20일 + RSI 14일 + 여유)
@@ -360,25 +360,15 @@ class BollingerSelector:
         return all_stocks
 
     def _filter_basic(self, stocks: List[Dict]) -> List[Dict]:
-        """기본 필터: 시총 + 거래대금 + 양봉 + 제외종목"""
+        """기본 필터: 시총 + 거래대금 + 제외종목 (양봉 조건 제거 — BB 하단 종목은 하락 중)"""
         filtered = []
         for s in stocks:
-            # 시가총액
             if s["market_cap"] < MIN_MARKET_CAP:
                 continue
-            # 거래대금
             if s["trading_value"] < MIN_TRADING_VALUE:
                 continue
-            # 양봉 (종가 > 시가, 등락률 > 0)
-            if s["close"] <= s["open"] or s["change_pct"] <= 0:
-                continue
-            # 제외 종목
             if is_excluded(s["name"]):
                 continue
-            # 우선주 코드 (끝이 0이 아닌 것 = 우선주일 가능성)
-            if s["code"][-1] != "0" and s["code"][-1] not in ("5",):
-                # 보수적으로 끝자리 0만 허용하지 않고, 5도 제외
-                pass  # 코드 끝자리만으로는 완벽 판별 불가, name 기반 필터로 충분
             filtered.append(s)
         return filtered
 
@@ -403,7 +393,16 @@ class BollingerSelector:
                 logger.info(f"  진행: {idx}/{total} - 후보: {len(candidates)}개")
 
             try:
-                df = pykrx_stock.get_market_ohlcv_by_date(start_str, end_str, s["code"])
+                # KRX API history 우선, pykrx 폴백
+                df = None
+                if KRX_AVAILABLE:
+                    try:
+                        krx = KRXClient()
+                        df = krx.get_history(s["code"], start_str, end_str, market=s.get("market", "KOSPI"))
+                    except Exception:
+                        pass
+                if df is None or df.empty:
+                    df = pykrx_stock.get_market_ohlcv_by_date(start_str, end_str, s["code"])
                 if df.empty or len(df) < BB_PERIOD + 1:
                     continue
 
