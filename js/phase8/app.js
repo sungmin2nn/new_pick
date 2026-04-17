@@ -21,29 +21,22 @@ function showMainTab(tab) {
     $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'arena'));
     $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-arena'));
-    const keyword = SECTION_TABS[tab];
-    const sections = document.querySelectorAll('#arena-content .section');
-    for (const sec of sections) {
-      const title = sec.querySelector('.section-title');
-      if (title && title.textContent.includes(keyword.slice(2))) {
-        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        break;
-      }
-    }
-    return;
-  }
-
-  // 볼린저 탭: iframe 로드 시 볼린저 섹션으로 스크롤
-  if (tab === 'bollinger') {
+    // 약간의 딜레이 후 스크롤 (pane 전환 렌더 대기)
     setTimeout(() => {
-      const iframe = document.getElementById('bollinger-iframe');
-      if (iframe && iframe.contentWindow) {
-        try {
-          const el = iframe.contentDocument.getElementById('bollingerSection');
-          if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
-        } catch(e) { /* cross-origin */ }
+      const keyword = SECTION_TABS[tab];
+      const searchText = keyword.replace(/^.\s*/, ''); // 이모지+공백 제거
+      const sections = document.querySelectorAll('#arena-content .section, #arena-content .card');
+      for (const sec of sections) {
+        const title = sec.querySelector('.section-title');
+        if (title && title.textContent.includes(searchText)) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
       }
-    }, 300);
+      // 섹션 못 찾으면 페이지 하단으로
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 100);
+    return;
   }
 
   if (!TABS.includes(tab)) return;
