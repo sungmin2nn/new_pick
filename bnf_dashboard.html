@@ -73,17 +73,15 @@ tr:hover{background:rgba(0,198,190,.02)}
 .r{text-align:right}
 .no-data{text-align:center;padding:24px;color:#9ca3af}
 
-/* === Trade Card === */
-.trade-cards{display:flex;flex-direction:column;gap:6px}
-.trade-card{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;border-left:3px solid #e5e7eb;gap:12px}
-.trade-card.win{border-left-color:#10b981}
-.trade-card.lose{border-left-color:#ef4444}
-.tc-left{min-width:0;flex:1}
-.tc-name{font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
-.tc-meta{font-size:11px;color:#6b7280;margin-top:2px;font-variant-numeric:tabular-nums}
-.tc-right{text-align:right;flex-shrink:0}
-.tc-pnl{font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
-.tc-profit{font-size:11px;font-variant-numeric:tabular-nums;margin-top:2px}
+/* === Trade Table Sort/Filter === */
+.sortable{cursor:pointer;user-select:none;position:relative}
+.sortable:hover{color:#1a1a2e}
+.sortable::after{content:'';margin-left:3px;font-size:9px;color:#ccc}
+.sortable.asc::after{content:'▲';color:#1a1a2e}
+.sortable.desc::after{content:'▼';color:#1a1a2e}
+.page-btn{padding:4px 10px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;font-size:11px;cursor:pointer;color:#6b7280}
+.page-btn.active{background:#1a1a2e;color:#fff;border-color:#1a1a2e}
+.page-btn:hover:not(.active){background:#f0f2f5}
 
 /* === Accordion === */
 .accord-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:10px 0;user-select:none}
@@ -180,10 +178,39 @@ if(window.self!==window.top){document.documentElement.classList.add('in-iframe')
 
 <!-- S7: Trade History -->
 <div class="section">
-  <div class="section-title">매매 내역</div>
-  <div class="trade-cards" id="tradeCards">
-    <div class="no-data">로딩 중...</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+    <div class="section-title" style="margin:0">매매 내역</div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <select id="tradeFilter" style="padding:4px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:11px;background:#fff;color:#1a1a2e;cursor:pointer;">
+        <option value="all">전체</option>
+        <option value="낙폭">낙폭과대</option>
+        <option value="볼린저">볼린저</option>
+        <option value="win">익절만</option>
+        <option value="loss">손절만</option>
+      </select>
+      <span id="tradeCount" style="font-size:11px;color:#9ca3af;"></span>
+    </div>
   </div>
+  <div class="tbl-wrap">
+    <table id="tradeTable">
+      <thead>
+        <tr>
+          <th class="sortable" data-col="name">종목</th>
+          <th class="sortable" data-col="strategy">전략</th>
+          <th class="sortable r" data-col="entry_date">매수일</th>
+          <th class="sortable r" data-col="exit_date">매도일</th>
+          <th class="r">수량</th>
+          <th class="sortable r" data-col="return_pct">수익률</th>
+          <th class="sortable r" data-col="profit">손익</th>
+          <th>사유</th>
+        </tr>
+      </thead>
+      <tbody id="tradeBody">
+        <tr><td colspan="8" class="no-data">로딩 중...</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="tradePaging" style="display:flex;justify-content:center;gap:4px;margin-top:8px;"></div>
 </div>
 
 <!-- S8: Strategy Rules (Accordion) -->
@@ -533,31 +560,93 @@ function renderBbCandidates(cand, pos) {
   </tr>`).join('');
 }
 
-// ============ S7: Trade History ============
+// ============ S7: Trade History (Table + Sort + Filter + Paging) ============
+let allTrades = [];
+let tradeSort = { col: 'exit_date', dir: 'desc' };
+let tradePage = 0;
+const PAGE_SIZE = 15;
+
 function renderTradeHistory(hist, bbTrades) {
-  const all = [];
-  if (hist && hist.trades) hist.trades.forEach(t => all.push({...t, strategy: '낙폭'}));
-  if (bbTrades && bbTrades.trades) bbTrades.trades.forEach(t => all.push({...t, strategy: '볼린저'}));
-  all.sort((a,b) => (b.exit_date||'').localeCompare(a.exit_date||''));
+  allTrades = [];
+  if (hist && hist.trades) hist.trades.forEach(t => allTrades.push({...t, strategy: '낙폭'}));
+  if (bbTrades && bbTrades.trades) bbTrades.trades.forEach(t => allTrades.push({...t, strategy: '볼린저'}));
 
-  const el = document.getElementById('tradeCards');
-  if (!all.length) { el.innerHTML = '<div class="no-data">매매 내역이 없습니다</div>'; return; }
+  // Filter change
+  document.getElementById('tradeFilter').onchange = () => { tradePage = 0; drawTradeTable(); };
 
-  el.innerHTML = all.slice(0, 30).map(t => {
-    const isWin = (t.return_pct||0) >= 0;
-    const cls = isWin ? 'win' : 'lose';
+  // Sort click
+  document.querySelectorAll('#tradeTable .sortable').forEach(th => {
+    th.onclick = () => {
+      const col = th.dataset.col;
+      if (tradeSort.col === col) tradeSort.dir = tradeSort.dir === 'asc' ? 'desc' : 'asc';
+      else { tradeSort.col = col; tradeSort.dir = 'desc'; }
+      tradePage = 0;
+      drawTradeTable();
+    };
+  });
+
+  drawTradeTable();
+}
+
+function drawTradeTable() {
+  const filter = document.getElementById('tradeFilter').value;
+  let filtered = [...allTrades];
+
+  // Filter
+  if (filter === '낙폭') filtered = filtered.filter(t => t.strategy === '낙폭');
+  else if (filter === '볼린저') filtered = filtered.filter(t => t.strategy === '볼린저');
+  else if (filter === 'win') filtered = filtered.filter(t => (t.return_pct||0) >= 0);
+  else if (filter === 'loss') filtered = filtered.filter(t => (t.return_pct||0) < 0);
+
+  // Sort
+  const { col, dir } = tradeSort;
+  filtered.sort((a, b) => {
+    let va = a[col], vb = b[col];
+    if (typeof va === 'string') { va = va || ''; vb = vb || ''; return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va); }
+    va = va || 0; vb = vb || 0;
+    return dir === 'asc' ? va - vb : vb - va;
+  });
+
+  // Update sort indicators
+  document.querySelectorAll('#tradeTable .sortable').forEach(th => {
+    th.classList.remove('asc', 'desc');
+    if (th.dataset.col === col) th.classList.add(dir);
+  });
+
+  // Count
+  document.getElementById('tradeCount').textContent = filtered.length + '건';
+
+  // Paging
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if (tradePage >= totalPages) tradePage = Math.max(0, totalPages - 1);
+  const start = tradePage * PAGE_SIZE;
+  const page = filtered.slice(start, start + PAGE_SIZE);
+
+  // Render rows
+  const tbody = document.getElementById('tradeBody');
+  if (!page.length) { tbody.innerHTML = '<tr><td colspan="8" class="no-data">매매 내역이 없습니다</td></tr>'; return; }
+
+  tbody.innerHTML = page.map(t => {
     const tagCls = t.strategy === '볼린저' ? 'tag-bb' : 'tag-bnf';
-    return `<div class="trade-card ${cls}">
-      <div class="tc-left">
-        <div class="tc-name">${t.name} <span class="tag ${tagCls}" style="font-size:9px;padding:1px 6px;">${t.strategy}</span></div>
-        <div class="tc-meta">${t.entry_date} → ${t.exit_date} · ${t.quantity||0}주 · ${t.exit_reason||''}</div>
-      </div>
-      <div class="tc-right">
-        <div class="tc-pnl ${pnlCls(t.return_pct||0)}">${fmtPct(t.return_pct||0)}</div>
-        <div class="tc-profit ${pnlCls(t.profit||0)}">${fmtSign(t.profit||0)}원</div>
-      </div>
-    </div>`;
+    const retPct = t.return_pct || 0;
+    return `<tr>
+      <td>${link(t.code, t.name)}</td>
+      <td><span class="tag ${tagCls}" style="font-size:9px;padding:1px 6px;">${t.strategy}</span></td>
+      <td class="r">${(t.entry_date||'').slice(5)}</td>
+      <td class="r">${(t.exit_date||'').slice(5)}</td>
+      <td class="r">${t.quantity||0}</td>
+      <td class="r ${pnlCls(retPct)}" style="font-weight:700">${fmtPct(retPct)}</td>
+      <td class="r ${pnlCls(t.profit||0)}">${fmtSign(t.profit||0)}</td>
+      <td style="font-size:11px;color:#9ca3af">${t.exit_reason||''}</td>
+    </tr>`;
   }).join('');
+
+  // Paging buttons
+  const pagingEl = document.getElementById('tradePaging');
+  if (totalPages <= 1) { pagingEl.innerHTML = ''; return; }
+  pagingEl.innerHTML = Array.from({ length: totalPages }, (_, i) =>
+    `<button class="page-btn ${i === tradePage ? 'active' : ''}" onclick="tradePage=${i};drawTradeTable()">${i + 1}</button>`
+  ).join('');
 }
 
 // ============ Accordion ============
