@@ -58,9 +58,6 @@
       <button class="main-tab" data-tab="bnf">
         🎯 <span>BNF</span>
       </button>
-      <button class="main-tab" data-tab="bollinger">
-        📉 <span>볼린저</span>
-      </button>
     </div>
   </div>
 
@@ -113,16 +110,6 @@
         </script>
       </section>
 
-      <!-- ============ Bollinger Pane (iframe → bnf_dashboard.html#bollingerSection) ============ -->
-      <section class="main-pane" id="pane-bollinger">
-        <iframe
-          id="bollinger-iframe"
-          src="bnf_dashboard.html#bollingerSection"
-          title="볼린저 스윙 대시보드"
-          style="width:100%; height:calc(100vh - 160px); min-height:700px; border:none; border-radius:var(--radius-lg); background:var(--bg-surface); box-shadow:var(--shadow-card); display:block;"
-        ></iframe>
-      </section>
-
     </div>
   </main>
 
@@ -141,40 +128,11 @@
       <button class="bottom-tab" data-tab="bnf">
         <span class="icon">🎯</span><span>BNF</span>
       </button>
-      <button class="bottom-tab" data-tab="bollinger">
-        <span class="icon">📉</span><span>볼린저</span>
-      </button>
     </div>
   </nav>
 
   <!-- Phase 8 App (ES Module) -->
   <script type="module" src="js/phase8/app.js"></script>
 
-  <!-- Fallback: 볼린저 탭 전환 (ES module 로드 실패 시에도 동작) -->
-  <script>
-  (function() {
-    document.addEventListener('click', function(e) {
-      var btn = e.target.closest('[data-tab="bollinger"]');
-      if (!btn) return;
-
-      // 모든 pane 비활성화 → bollinger만 활성화
-      document.querySelectorAll('.main-pane').forEach(function(p) {
-        p.classList.remove('active');
-      });
-      var bollingerPane = document.getElementById('pane-bollinger');
-      if (bollingerPane) bollingerPane.classList.add('active');
-
-      // 탭 버튼 active 처리
-      document.querySelectorAll('.main-tab').forEach(function(b) {
-        b.classList.toggle('active', b.dataset.tab === 'bollinger');
-      });
-      document.querySelectorAll('.bottom-tab').forEach(function(b) {
-        b.classList.toggle('active', b.dataset.tab === 'bollinger');
-      });
-
-      window.scrollTo({ top: 0 });
-    });
-  })();
-  </script>
 </body>
 </html>

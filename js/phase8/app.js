@@ -8,7 +8,7 @@ import { initTelegram, refreshTelegram } from './telegram.js';
 import { clearCache } from './cache.js';
 
 // ============ Tab management ============
-const TABS = ['arena', 'telegram', 'bnf', 'bollinger'];
+const TABS = ['arena', 'telegram', 'bnf'];
 // 하단 네비에서 arena 내부 섹션으로 스크롤하는 가상 탭
 const SECTION_TABS = { candidates: '📋 내일 후보', trades: '📜 매매 내역' };
 
@@ -62,16 +62,6 @@ function showMainTab(tab) {
         iframe.contentWindow.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }, 200);
-  }
-  if (tab === 'bollinger') {
-    const iframe = $('#bollinger-iframe');
-    if (iframe) {
-      // hash로 볼린저 섹션 위치로 이동
-      const src = 'bnf_dashboard.html?v=' + Date.now() + '#bollingerSection';
-      if (!iframe.src.includes('#bollingerSection') || iframe.src.indexOf('?v=') === -1) {
-        iframe.src = src;
-      }
-    }
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
