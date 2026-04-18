@@ -12,20 +12,18 @@ const TABS = ['arena', 'telegram', 'bnf', 'bollinger'];
 // 하단 네비에서 arena 내부 섹션으로 스크롤하는 가상 탭
 const SECTION_TABS = { candidates: '📋 내일 후보', trades: '📜 매매 내역' };
 
-// (볼린저는 정식 pane으로 분리됨)
 let currentTab = 'arena';
 
 function showMainTab(tab) {
-  // 가상 탭 처리 (arena 내부 섹션으로 스크롤)
+  // arena 내부 섹션 가상 탭 처리
   if (SECTION_TABS[tab]) {
     currentTab = 'arena';
     $$('.main-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'arena'));
     $$('.bottom-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     $$('.main-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-arena'));
-    // 약간의 딜레이 후 스크롤 (pane 전환 렌더 대기)
     setTimeout(() => {
       const keyword = SECTION_TABS[tab];
-      const searchText = keyword.replace(/^.\s*/, ''); // 이모지+공백 제거
+      const searchText = keyword.replace(/^.\s*/, '');
       const sections = document.querySelectorAll('#arena-content .section, #arena-content .card');
       for (const sec of sections) {
         const title = sec.querySelector('.section-title');
@@ -34,7 +32,6 @@ function showMainTab(tab) {
           return;
         }
       }
-      // 섹션 못 찾으면 페이지 하단으로
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 100);
     return;
@@ -54,9 +51,27 @@ function showMainTab(tab) {
     if (isActive) console.log('[Tab] pane 활성화:', p.id);
   });
 
-  // URL hash 업데이트
   if (window.location.hash !== `#${tab}`) {
     history.replaceState(null, '', `#${tab}`);
+  }
+  // BNF/볼린저 탭 전환 시 iframe 처리
+  if (tab === 'bnf') {
+    setTimeout(() => {
+      const iframe = $('#bnf-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 200);
+  }
+  if (tab === 'bollinger') {
+    const iframe = $('#bollinger-iframe');
+    if (iframe) {
+      // hash로 볼린저 섹션 위치로 이동
+      const src = 'bnf_dashboard.html?v=' + Date.now() + '#bollingerSection';
+      if (!iframe.src.includes('#bollingerSection') || iframe.src.indexOf('?v=') === -1) {
+        iframe.src = src;
+      }
+    }
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

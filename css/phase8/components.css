@@ -1339,3 +1339,119 @@
   font-size: var(--fs-xs);
   color: var(--text-tertiary);
 }
+
+/* ========================================================
+   TELEGRAM HISTORY
+   ======================================================== */
+.tg-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tg-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--duration-default);
+}
+.tg-item.tg-fail {
+  border-left: 3px solid var(--danger);
+}
+.tg-item.tg-success {
+  border-left: 3px solid var(--success);
+}
+
+.tg-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  min-height: 48px;
+}
+.tg-item-header:active {
+  background: var(--bg-hover);
+}
+
+.tg-item-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tg-status { font-size: var(--fs-sm); flex-shrink: 0; }
+.tg-time {
+  font-size: var(--fs-xs);
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 56px;
+}
+.tg-emoji { font-size: var(--fs-sm); flex-shrink: 0; }
+.tg-label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tg-error-badge {
+  font-size: 10px;
+  background: var(--danger-bg, rgba(220,38,38,0.1));
+  color: var(--danger);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tg-chevron {
+  font-size: 1.2rem;
+  color: var(--text-tertiary);
+  transition: transform var(--duration-default);
+  flex-shrink: 0;
+}
+.tg-item.open .tg-chevron {
+  transform: rotate(90deg);
+}
+
+/* 아코디언 상세 (접힘) */
+.tg-item-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+.tg-item.open .tg-item-body {
+  max-height: 600px;
+}
+
+.tg-message {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  padding-top: 0;
+  font-family: 'JetBrains Mono', var(--ff-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--bg-inset, var(--bg-surface));
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* 통계 */
+.tg-stat { font-weight: var(--fw-semibold); }
+.tg-stat.success { color: var(--success); }
+.tg-stat.fail { color: var(--danger); }
+.tg-stat.up { color: var(--success); }
+.tg-stat.down { color: var(--danger); }
+.tg-stat.neutral { color: var(--warning); }
+.tg-stat-divider { color: var(--text-quaternary); }

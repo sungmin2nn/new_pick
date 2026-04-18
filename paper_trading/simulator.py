@@ -64,23 +64,26 @@ class TradingSimulator:
     매매 규칙:
     - 진입: 당일 시가 매수 (09:00~09:05)
     - 익절: +3% 도달 시 즉시 청산
-    - 손절: -1.5% 도달 시 즉시 청산
+    - 손절: -2.0% 도달 시 즉시 청산
     - 시간 청산: 14:30 이후 종가 청산
     """
 
     # 매매 파라미터
     PROFIT_TARGET = 5.0     # 익절 +5%
-    LOSS_TARGET = -3.0      # 손절 -3%
+    LOSS_TARGET = -3.0      # 손절 -3% (기본값, 전략별 오버라이드 가능)
     EXIT_DEADLINE = "14:30"
     INITIAL_CAPITAL = 1_000_000  # 초기 자본 100만원
     MAX_STOCKS = 5          # 최대 종목 수
 
-    def __init__(self, capital: int = None, strategy_id: str = None, strategy_name: str = None):
+    def __init__(self, capital: int = None, strategy_id: str = None, strategy_name: str = None,
+                 loss_target: float = None):
         self.capital = capital or self.INITIAL_CAPITAL
         self.results: List[TradeResult] = []
         self.trade_date: str = ""
         self.strategy_id: str = strategy_id or ""
         self.strategy_name: str = strategy_name or ""
+        if loss_target is not None:
+            self.LOSS_TARGET = loss_target
 
         # 분봉 수집기 초기화
         if INTRADAY_AVAILABLE:

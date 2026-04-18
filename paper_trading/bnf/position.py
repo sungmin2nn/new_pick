@@ -326,6 +326,26 @@ class BNFPositionManager:
         total_return_simple = sum(t.get("return_pct", 0) for t in self.trades)
         avg_return = (total_return_simple / total_trades) if total_trades > 0 else 0
 
+        # MDD (Maximum Drawdown) 계산 - 날짜순 누적 자산 기준
+        mdd = 0.0
+        if self.trades:
+            sorted_trades = sorted(self.trades, key=lambda t: t.get("exit_date", ""))
+            daily_profit: Dict[str, int] = {}
+            for t in sorted_trades:
+                d = t.get("exit_date", "")
+                daily_profit[d] = daily_profit.get(d, 0) + t.get("profit", 0)
+
+            cum_profit = 0
+            peak = self.total_capital
+            for d in sorted(daily_profit.keys()):
+                cum_profit += daily_profit[d]
+                equity = self.total_capital + cum_profit
+                if equity > peak:
+                    peak = equity
+                drawdown = (equity - peak) / peak * 100 if peak > 0 else 0
+                if drawdown < mdd:
+                    mdd = drawdown
+
         return {
             "total_trades": total_trades,
             "win_count": win_count,
@@ -335,6 +355,7 @@ class BNFPositionManager:
             "total_return": round(total_return_actual, 2),  # 메인 (자본 대비 실현)
             "total_return_simple": round(total_return_simple, 2),  # 단순 합
             "avg_return": round(avg_return, 2),
+            "mdd": round(mdd, 2),
         }
 
 

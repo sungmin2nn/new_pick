@@ -61,13 +61,15 @@ class LargecapContrarianStrategy(BaseStrategy):
 
     # 필터 조건
     MIN_PRICE = 5000          # 최소 가격
-    MAX_CHANGE = -1.5         # 최대 등락률 (하락만)
+    MAX_CHANGE = -3.0         # 최대 등락률 (하락만) # 변경: -1.5 → -3.0 (역추세 신호 강화)
     MIN_TRADING_VALUE = 50    # 최소 거래대금 (억)
     MIN_MARKET_CAP = 1_000_000_000_000  # 최소 시가총액 (1조원)
     KOSPI_DROP_THRESHOLD = -2.0  # KOSPI 급락 시 매수 차단 (%)
     RSI_PERIOD = 14           # RSI 계산 기간
     RSI_OVERSOLD = 35         # RSI 과매도 임계 (≤이면 진입 후보)
     RSI_LOOKBACK_DAYS = 20    # RSI 계산용 과거 데이터 일수
+    ENTRY_TIME = "09:30"      # 진입 시점 (초반 변동성 회피)
+    LOSS_TARGET = -2.0        # 전략 고유 손절 -2% (기본 -3%보다 타이트)
 
     # 점수 가중치
     WEIGHTS = {
@@ -399,5 +401,6 @@ class LargecapContrarianStrategy(BaseStrategy):
             'min_trading_value': self.MIN_TRADING_VALUE,
             'min_market_cap': self.MIN_MARKET_CAP,
             'kospi_drop_threshold': self.KOSPI_DROP_THRESHOLD,
+            'entry_time': self.ENTRY_TIME,
             'weights': self.WEIGHTS
         }

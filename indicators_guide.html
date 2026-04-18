@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BB / %B / RSI / MFI 지표 가이드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Pretendard',-apple-system,sans-serif; }
+body { background:#0d1117; color:#e6edf3; padding:20px; line-height:1.7; }
+.container { max-width:860px; margin:0 auto; }
+h1 { font-size:22px; font-weight:800; margin-bottom:8px; }
+h1 span { color:#58a6ff; }
+.subtitle { color:#8b949e; font-size:13px; margin-bottom:28px; }
+h2 { font-size:16px; font-weight:700; margin:32px 0 12px; display:flex; align-items:center; gap:8px; }
+h2 .num { background:#1f6feb; color:#fff; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; }
+.card { background:#161b22; border:1px solid #21262d; border-radius:12px; padding:20px; margin-bottom:16px; }
+
+/* BB Diagram */
+.bb-diagram { position:relative; height:260px; margin:16px 0; }
+.bb-band { position:absolute; left:0; right:0; border-radius:8px; }
+.bb-upper { top:0; height:80px; background:linear-gradient(180deg, rgba(248,81,73,0.15), rgba(248,81,73,0.03)); border-top:2px solid rgba(248,81,73,0.5); }
+.bb-middle { top:80px; height:100px; background:linear-gradient(180deg, rgba(88,166,255,0.05), rgba(88,166,255,0.05)); }
+.bb-lower { top:180px; height:80px; background:linear-gradient(180deg, rgba(63,185,80,0.03), rgba(63,185,80,0.15)); border-bottom:2px solid rgba(63,185,80,0.5); }
+.bb-center-line { position:absolute; top:130px; left:0; right:0; height:1px; border-top:2px dashed rgba(88,166,255,0.4); }
+.bb-label { position:absolute; right:12px; font-size:11px; font-weight:700; }
+.bb-label.upper { top:8px; color:#f85149; }
+.bb-label.mid { top:122px; color:#58a6ff; }
+.bb-label.lower { bottom:8px; color:#3fb950; }
+.bb-zone-label { position:absolute; left:12px; font-size:11px; }
+.bb-zone-label.sell { top:30px; color:#f8514988; }
+.bb-zone-label.neutral { top:120px; color:#8b949e; }
+.bb-zone-label.buy { bottom:30px; color:#3fb95088; }
+.bb-price-dot { position:absolute; left:50%; width:12px; height:12px; border-radius:50%; transform:translateX(-50%); z-index:2; }
+
+/* Gauge bars */
+.gauge-row { display:flex; gap:12px; margin:12px 0; }
+.gauge { flex:1; }
+.gauge-label { font-size:11px; color:#8b949e; margin-bottom:4px; text-align:center; }
+.gauge-bar { height:32px; border-radius:6px; display:flex; overflow:hidden; position:relative; }
+.gauge-seg { display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+.gauge-marker { position:absolute; top:-6px; width:2px; height:44px; background:#fff; z-index:2; }
+.gauge-marker::after { content:attr(data-val); position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:10px; color:#fff; font-weight:700; white-space:nowrap; }
+
+/* Signal table */
+.sig-table { width:100%; border-collapse:collapse; font-size:12px; margin:12px 0; }
+.sig-table th { background:#1c2128; padding:10px 12px; text-align:left; color:#8b949e; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #21262d; }
+.sig-table td { padding:10px 12px; border-bottom:1px solid #21262d22; }
+.sig-table tr:hover { background:#1f6feb11; }
+.tag { padding:3px 8px; border-radius:10px; font-size:10px; font-weight:700; display:inline-block; }
+.tag.buy { background:#3fb95022; color:#3fb950; }
+.tag.sell { background:#f8514922; color:#f85149; }
+.tag.neutral { background:#8b949e22; color:#8b949e; }
+.tag.strong { background:#da3633; color:#fff; }
+.tag.strongbuy { background:#238636; color:#fff; }
+
+/* Comparison table */
+.cmp-table { width:100%; border-collapse:collapse; font-size:12px; margin:12px 0; }
+.cmp-table th { background:#1c2128; padding:10px; text-align:center; color:#8b949e; font-size:11px; border-bottom:1px solid #21262d; }
+.cmp-table td { padding:10px; text-align:center; border-bottom:1px solid #21262d22; }
+.cmp-table td:first-child { text-align:left; font-weight:600; }
+
+/* Chart */
+.chart-wrap { height:220px; margin:12px 0; }
+
+/* Flow */
+.flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:16px 0; justify-content:center; }
+.flow-box { background:#1c2128; border:1px solid #30363d; border-radius:8px; padding:10px 14px; text-align:center; font-size:12px; min-width:100px; }
+.flow-box .val { font-size:16px; font-weight:800; margin-top:2px; }
+.flow-arrow { color:#30363d; font-size:18px; }
+.flow-box.highlight { border-color:#3fb950; background:#3fb95011; }
+.flow-box.danger { border-color:#f85149; background:#f8514911; }
+
+/* Formula */
+.formula { background:#1c2128; border:1px solid #30363d; border-radius:8px; padding:14px 18px; font-family:'SF Mono',Monaco,monospace; font-size:13px; color:#79c0ff; margin:10px 0; letter-spacing:0.3px; }
+.formula .comment { color:#8b949e; }
+
+.pos { color:#3fb950; }
+.neg { color:#f85149; }
+.blue { color:#58a6ff; }
+
+@media (max-width:600px) {
+  body { padding:12px; }
+  .gauge-row { flex-direction:column; }
+  .flow { gap:4px; }
+  .flow-box { min-width:70px; font-size:11px; padding:8px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1><span>BB %B RSI MFI</span> 지표 가이드</h1>
+<p class="subtitle">볼린저밴드 매매의 핵심 4가지 기술적 지표를 시각적으로 설명합니다</p>
+
+<!-- ===================== 1. BB ===================== -->
+<h2><span class="num">1</span> BB (Bollinger Bands) 볼린저밴드</h2>
+<div class="card">
+  <p style="font-size:13px; color:#c9d1d9; margin-bottom:8px;">주가의 <strong>변동성 범위</strong>를 상/중/하 3개 밴드로 표시. 주가의 95%가 밴드 안에서 움직인다.</p>
+
+  <div class="formula">
+    상단밴드 = SMA(20) + 표준편차 x 2 <span class="comment">← 저항</span><br>
+    중심선 &nbsp;&nbsp;= SMA(20) <span class="comment">← 20일 이동평균</span><br>
+    하단밴드 = SMA(20) - 표준편차 x 2 <span class="comment">← 지지</span>
+  </div>
+
+  <div class="bb-diagram">
+    <div class="bb-band bb-upper"></div>
+    <div class="bb-band bb-middle"></div>
+    <div class="bb-band bb-lower"></div>
+    <div class="bb-center-line"></div>
+    <span class="bb-label upper">상단밴드 (저항)</span>
+    <span class="bb-label mid">중심선 SMA20</span>
+    <span class="bb-label lower">하단밴드 (지지)</span>
+    <span class="bb-zone-label sell">SELL ZONE</span>
+    <span class="bb-zone-label neutral">중립</span>
+    <span class="bb-zone-label buy">BUY ZONE</span>
+  </div>
+
+  <table class="sig-table">
+    <tr><th>밴드 패턴</th><th>의미</th><th>시그널</th></tr>
+    <tr><td>밴드 폭 좁아짐 (스퀴즈)</td><td>변동성 축소 → 큰 움직임 예고</td><td><span class="tag neutral">대기</span></td></tr>
+    <tr><td>주가 하단밴드 터치/이탈</td><td>과매도 구간 진입</td><td><span class="tag buy">매수 후보</span></td></tr>
+    <tr><td>주가 상단밴드 터치/돌파</td><td>과매수 구간 진입</td><td><span class="tag sell">매도 후보</span></td></tr>
+    <tr><td>밴드 폭 급격히 확대</td><td>변동성 폭발, 추세 시작</td><td><span class="tag neutral">추세 확인</span></td></tr>
+  </table>
+</div>
+
+<!-- ===================== 2. %B ===================== -->
+<h2><span class="num">2</span> %B (Percent B) 밴드 내 위치</h2>
+<div class="card">
+  <p style="font-size:13px; color:#c9d1d9; margin-bottom:8px;">현재 주가가 볼린저밴드 안에서 <strong>어디에 위치하는지</strong> 0~1 사이 숫자로 표현.</p>
+
+  <div class="formula">
+    %B = (현재가 - 하단밴드) / (상단밴드 - 하단밴드)
+  </div>
+
+  <!-- Visual gauge -->
+  <div style="margin:20px 0;">
+    <div style="display:flex; height:48px; border-radius:8px; overflow:hidden; position:relative;">
+      <div class="gauge-seg" style="flex:2; background:linear-gradient(90deg,#238636,#3fb950);">
+        <span style="color:#fff;">강한 매수</span>
+      </div>
+      <div class="gauge-seg" style="flex:1; background:#3fb95066;">
+        <span>매수</span>
+      </div>
+      <div class="gauge-seg" style="flex:4; background:#1c2128;">
+        <span style="color:#8b949e;">중립 구간</span>
+      </div>
+      <div class="gauge-seg" style="flex:1; background:#f8514966;">
+        <span>매도</span>
+      </div>
+      <div class="gauge-seg" style="flex:2; background:linear-gradient(90deg,#f85149,#da3633);">
+        <span style="color:#fff;">강한 매도</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:11px; color:#8b949e;">
+      <span>0.0 (하단밴드)</span>
+      <span>0.2</span>
+      <span>0.3</span>
+      <span>0.5 (중심)</span>
+      <span>0.8</span>
+      <span>1.0 (상단밴드)</span>
+    </div>
+  </div>
+
+  <table class="sig-table">
+    <tr><th>%B 값</th><th>위치</th><th>의미</th><th>시그널</th></tr>
+    <tr><td class="pos" style="font-weight:700;">< 0.0</td><td>하단밴드 이탈</td><td>극단적 과매도</td><td><span class="tag strongbuy">강력 매수</span></td></tr>
+    <tr><td class="pos" style="font-weight:700;">0.0 ~ 0.2</td><td>하단밴드 근처</td><td>과매도</td><td><span class="tag buy">매수</span></td></tr>
+    <tr><td style="font-weight:700;">0.2 ~ 0.3</td><td>하단 영역</td><td>약한 과매도</td><td><span class="tag buy">매수 관심</span></td></tr>
+    <tr><td style="font-weight:700; color:#8b949e;">0.3 ~ 0.8</td><td>밴드 중간</td><td>중립</td><td><span class="tag neutral">관망</span></td></tr>
+    <tr><td class="neg" style="font-weight:700;">0.8 ~ 1.0</td><td>상단밴드 근처</td><td>과매수</td><td><span class="tag sell">매도</span></td></tr>
+    <tr><td class="neg" style="font-weight:700;">> 1.0</td><td>상단밴드 돌파</td><td>극단적 과매수</td><td><span class="tag strong">강력 매도</span></td></tr>
+  </table>
+
+  <p style="font-size:12px; color:#8b949e; margin-top:8px;">
+    BNF 볼린저 전략 기준: <code style="color:#79c0ff;">%B &lt; 0.3</code> → 매수 후보 진입
+  </p>
+</div>
+
+<!-- ===================== 3. RSI ===================== -->
+<h2><span class="num">3</span> RSI (Relative Strength Index) 상대강도지수</h2>
+<div class="card">
+  <p style="font-size:13px; color:#c9d1d9; margin-bottom:8px;">일정 기간 <strong>상승 vs 하락의 힘 비율</strong>을 0~100으로 수치화. 가격만 본다.</p>
+
+  <div class="formula">
+    RS = 14일 평균 상승폭 / 14일 평균 하락폭<br>
+    RSI = 100 - (100 / (1 + RS))
+  </div>
+
+  <div style="margin:20px 0;">
+    <div style="display:flex; height:48px; border-radius:8px; overflow:hidden;">
+      <div class="gauge-seg" style="flex:20; background:linear-gradient(90deg,#238636,#3fb950);">
+        <span style="color:#fff;">과매도</span>
+      </div>
+      <div class="gauge-seg" style="flex:10; background:#3fb95044;">
+        <span style="font-size:9px;">약과매도</span>
+      </div>
+      <div class="gauge-seg" style="flex:30; background:#1c2128;">
+        <span style="color:#8b949e;">중립</span>
+      </div>
+      <div class="gauge-seg" style="flex:10; background:#f8514944;">
+        <span style="font-size:9px;">약과매수</span>
+      </div>
+      <div class="gauge-seg" style="flex:30; background:linear-gradient(90deg,#f85149,#da3633);">
+        <span style="color:#fff;">과매수</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:11px; color:#8b949e;">
+      <span>0</span>
+      <span style="color:#3fb950; font-weight:700;">30</span>
+      <span>40</span>
+      <span>50</span>
+      <span>60</span>
+      <span style="color:#f85149; font-weight:700;">70</span>
+      <span>100</span>
+    </div>
+  </div>
+
+  <table class="sig-table">
+    <tr><th>RSI 값</th><th>상태</th><th>시그널</th></tr>
+    <tr><td class="pos" style="font-weight:700;">0 ~ 30</td><td>과매도 (팔 사람이 거의 없음)</td><td><span class="tag buy">매수</span></td></tr>
+    <tr><td style="font-weight:700;">30 ~ 40</td><td>약한 과매도</td><td><span class="tag buy">매수 관심</span></td></tr>
+    <tr><td style="font-weight:700; color:#8b949e;">40 ~ 60</td><td>중립</td><td><span class="tag neutral">관망</span></td></tr>
+    <tr><td style="font-weight:700;">60 ~ 70</td><td>약한 과매수</td><td><span class="tag sell">매도 관심</span></td></tr>
+    <tr><td class="neg" style="font-weight:700;">70 ~ 100</td><td>과매수 (살 사람이 거의 없음)</td><td><span class="tag sell">매도</span></td></tr>
+  </table>
+
+  <p style="font-size:12px; color:#8b949e; margin-top:8px;">
+    BNF 볼린저 전략 기준: <code style="color:#79c0ff;">RSI &lt; 40</code> → 매수 후보 진입
+  </p>
+</div>
+
+<!-- ===================== 4. MFI ===================== -->
+<h2><span class="num">4</span> MFI (Money Flow Index) 자금흐름지수</h2>
+<div class="card">
+  <p style="font-size:13px; color:#c9d1d9; margin-bottom:8px;">RSI + <strong>거래량</strong>. 실제 돈이 유입/이탈되고 있는지 측정. "거래량이 뒷받침되는 RSI"</p>
+
+  <div class="formula">
+    TP = (고가 + 저가 + 종가) / 3 <span class="comment">← Typical Price</span><br>
+    Money Flow = TP x 거래량<br>
+    MFI = 100 - (100 / (1 + 양의MF합 / 음의MF합)) <span class="comment">← 14일 기준</span>
+  </div>
+
+  <div style="margin:20px 0;">
+    <div style="display:flex; height:48px; border-radius:8px; overflow:hidden;">
+      <div class="gauge-seg" style="flex:20; background:linear-gradient(90deg,#238636,#3fb950);">
+        <span style="color:#fff;">자금 이탈</span>
+      </div>
+      <div class="gauge-seg" style="flex:60; background:#1c2128;">
+        <span style="color:#8b949e;">정상 범위</span>
+      </div>
+      <div class="gauge-seg" style="flex:20; background:linear-gradient(90deg,#f85149,#da3633);">
+        <span style="color:#fff;">자금 과유입</span>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:11px; color:#8b949e;">
+      <span>0</span>
+      <span style="color:#3fb950; font-weight:700;">20</span>
+      <span>50</span>
+      <span style="color:#f85149; font-weight:700;">80</span>
+      <span>100</span>
+    </div>
+  </div>
+
+  <table class="sig-table">
+    <tr><th>MFI 값</th><th>자금 흐름</th><th>시그널</th></tr>
+    <tr><td class="pos" style="font-weight:700;">0 ~ 20</td><td>자금 대량 이탈 (공포 매도)</td><td><span class="tag buy">매수</span></td></tr>
+    <tr><td style="font-weight:700; color:#8b949e;">20 ~ 80</td><td>정상 범위</td><td><span class="tag neutral">관망</span></td></tr>
+    <tr><td class="neg" style="font-weight:700;">80 ~ 100</td><td>자금 과유입 (과열)</td><td><span class="tag sell">매도</span></td></tr>
+  </table>
+</div>
+
+<!-- ===================== RSI vs MFI ===================== -->
+<h2><span class="num">VS</span> RSI vs MFI 비교</h2>
+<div class="card">
+  <table class="cmp-table">
+    <tr><th></th><th>RSI</th><th>MFI</th></tr>
+    <tr><td>입력 데이터</td><td>가격(종가)만</td><td>가격 + <strong class="blue">거래량</strong></td></tr>
+    <tr><td>측정 대상</td><td>가격의 상승/하락 힘</td><td>실제 자금 유입/이탈</td></tr>
+    <tr><td>범위</td><td>0 ~ 100</td><td>0 ~ 100</td></tr>
+    <tr><td>과매도</td><td class="pos">< 30</td><td class="pos">< 20</td></tr>
+    <tr><td>과매수</td><td class="neg">> 70</td><td class="neg">> 80</td></tr>
+    <tr><td>장점</td><td>단순, 빠름</td><td>거래량 반영 = 더 정밀</td></tr>
+    <tr><td>단점</td><td>거래량 무시</td><td>거래량 왜곡 시 오류</td></tr>
+    <tr>
+      <td>예시</td>
+      <td>가격만 하락 → RSI 30<br><span style="color:#8b949e; font-size:11px;">진짜 바닥? 모름</span></td>
+      <td>가격 하락 + 거래량 폭증 → MFI 15<br><span style="color:#3fb950; font-size:11px;">공포매도 = 바닥 가능성 높음</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- ===================== Combined Signal ===================== -->
+<h2><span class="num">!</span> 4개 지표 조합 매매 시그널</h2>
+<div class="card">
+  <p style="font-size:13px; color:#c9d1d9; margin-bottom:16px;">지표 1개만으로 판단하면 오류 많음. <strong>4개를 동시에 확인</strong>해야 신뢰도 상승.</p>
+
+  <!-- BUY Signal -->
+  <div style="background:#3fb95011; border:1px solid #3fb95033; border-radius:10px; padding:16px; margin-bottom:12px;">
+    <div style="font-size:14px; font-weight:700; color:#3fb950; margin-bottom:12px;">BUY 매수 조건 (4개 모두 충족 시)</div>
+    <div class="flow">
+      <div class="flow-box highlight">
+        <div style="font-size:10px; color:#8b949e;">BB</div>
+        <div class="val pos">하단밴드</div>
+        <div style="font-size:10px;">근처/이탈</div>
+      </div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-box highlight">
+        <div style="font-size:10px; color:#8b949e;">%B</div>
+        <div class="val pos">&lt; 0.3</div>
+        <div style="font-size:10px;">밴드 하단</div>
+      </div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-box highlight">
+        <div style="font-size:10px; color:#8b949e;">RSI</div>
+        <div class="val pos">&lt; 40</div>
+        <div style="font-size:10px;">과매도</div>
+      </div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-box highlight">
+        <div style="font-size:10px; color:#8b949e;">MFI</div>
+        <div class="val pos">&lt; 30</div>
+        <div style="font-size:10px;">자금 이탈</div>
+      </div>
+      <span class="flow-arrow">=</span>
+      <div class="flow-box" style="border-color:#238636; background:#23863622;">
+        <div class="val" style="color:#3fb950; font-size:20px;">BUY</div>
+        <div style="font-size:10px; color:#3fb950;">분할매수</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELL Signal -->
+  <div style="background:#f8514911; border:1px solid #f8514933; border-radius:10px; padding:16px;">
+    <div style="font-size:14px; font-weight:700; color:#f85149; margin-bottom:12px;">SELL 매도 조건</div>
+    <div class="flow">
+      <div class="flow-box danger">
+        <div style="font-size:10px; color:#8b949e;">BB</div>
+        <div class="val neg">상단밴드</div>
+        <div style="font-size:10px;">근처/돌파</div>
+      </div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-box danger">
+        <div style="font-size:10px; color:#8b949e;">%B</div>
+        <div class="val neg">&gt; 0.8</div>
+        <div style="font-size:10px;">밴드 상단</div>
+      </div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-box danger">
+        <div style="font-size:10px; color:#8b949e;">RSI</div>
+        <div class="val neg">&gt; 70</div>
+        <div style="font-size:10px;">과매수</div>
+      </div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-box danger">
+        <div style="font-size:10px; color:#8b949e;">MFI</div>
+        <div class="val neg">&gt; 80</div>
+        <div style="font-size:10px;">자금 과유입</div>
+      </div>
+      <span class="flow-arrow">=</span>
+      <div class="flow-box" style="border-color:#da3633; background:#da363322;">
+        <div class="val" style="color:#f85149; font-size:20px;">SELL</div>
+        <div style="font-size:10px; color:#f85149;">익절/매도</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Practical Example ===================== -->
+<h2><span class="num">EX</span> 실전 예시: 삼천당제약 (04/13 매수)</h2>
+<div class="card">
+  <div class="flow" style="margin-bottom:16px;">
+    <div class="flow-box">
+      <div style="font-size:10px; color:#8b949e;">BB</div>
+      <div class="val" style="font-size:14px;">하단밴드 이탈</div>
+      <div style="font-size:10px; color:#3fb950;">고점 대비 -59%</div>
+    </div>
+    <span class="flow-arrow">+</span>
+    <div class="flow-box">
+      <div style="font-size:10px; color:#8b949e;">%B</div>
+      <div class="val pos" style="font-size:14px;">0.08</div>
+      <div style="font-size:10px;">극단적 과매도</div>
+    </div>
+    <span class="flow-arrow">+</span>
+    <div class="flow-box">
+      <div style="font-size:10px; color:#8b949e;">RSI</div>
+      <div class="val pos" style="font-size:14px;">22.5</div>
+      <div style="font-size:10px;">강한 과매도</div>
+    </div>
+    <span class="flow-arrow">=</span>
+    <div class="flow-box highlight">
+      <div style="font-size:10px;">매수 505,000원</div>
+      <div class="val pos" style="font-size:14px;">+13.9%</div>
+      <div style="font-size:10px;">575,000원 익절</div>
+    </div>
+  </div>
+  <p style="font-size:12px; color:#8b949e; text-align:center;">
+    지표 3개 모두 과매도 → 매수 → 2일 만에 +13.9% 수익
+  </p>
+</div>
+
+<!-- ===================== Current BNF Strategy ===================== -->
+<h2><span class="num">NOW</span> 현재 BNF 볼린저 전략 설정</h2>
+<div class="card">
+  <table class="cmp-table">
+    <tr><th>지표</th><th>매수 기준</th><th>적용 여부</th></tr>
+    <tr><td>BB 기간</td><td>20일</td><td><span class="tag buy">적용</span></td></tr>
+    <tr><td>BB 표준편차</td><td>x 2</td><td><span class="tag buy">적용</span></td></tr>
+    <tr><td>%B</td><td>&lt; 0.3</td><td><span class="tag buy">적용</span></td></tr>
+    <tr><td>RSI (14일)</td><td>&lt; 40</td><td><span class="tag buy">적용</span></td></tr>
+    <tr><td>거래량 비율</td><td>&gt; 1.0x</td><td><span class="tag buy">적용</span></td></tr>
+    <tr><td>MFI</td><td>&lt; 30</td><td><span class="tag neutral">미적용</span></td></tr>
+  </table>
+  <p style="font-size:12px; color:#8b949e; margin-top:8px; text-align:center;">
+    MFI 추가 시 거래량 + 가격을 동시 확인 → 허위 시그널 필터링 강화 가능
+  </p>
+</div>
+
+<div style="text-align:center; padding:24px 0; color:#30363d; font-size:11px;">
+  News Trading Bot - Technical Indicator Guide
+</div>
+
+</div>
+</body>
+</html>

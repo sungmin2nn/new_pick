@@ -181,7 +181,7 @@ jobs:
             from paper_trading.arena.arena_manager import ArenaManager
             arena = ArenaManager()
             msg = arena.format_telegram_daily(today)
-            notifier.send_message(msg)
+            notifier.send_message(msg, msg_type='arena_report')
             print('Arena 결과 알림 전송')
         except Exception as e:
             print(f'Arena 알림 오류: {e}')
@@ -193,7 +193,7 @@ jobs:
             report = checker.run_check(date=today)
             alert = checker.format_telegram_alert(report)
             if alert:
-                notifier.send_message(alert)
+                notifier.send_message(alert, msg_type='healthcheck')
                 print('헬스체크 알림 전송')
         except Exception as e:
             print(f'헬스체크 알림 오류: {e}')

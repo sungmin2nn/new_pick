@@ -12,6 +12,7 @@ from .momentum import MomentumStrategy
 from .theme_policy import ThemePolicyStrategy
 from .dart_disclosure import DartDisclosureStrategy
 from .frontier_gap import FrontierGapStrategy
+from .hybrid_alpha_delta import HybridAlphaDeltaStrategy
 
 __all__ = [
     'BaseStrategy',
@@ -23,6 +24,7 @@ __all__ = [
     'ThemePolicyStrategy',
     'DartDisclosureStrategy',
     'FrontierGapStrategy',
+    'HybridAlphaDeltaStrategy',
 ]
 
 # strategy_config.json 기반 추가 전략 동적 로드

@@ -72,12 +72,20 @@ jobs:
             print('::warning::Arena 헬스체크 이슈 발견')
         "
 
+    - name: Sync daily status to results
+      if: github.event.schedule == '0 8 * * 1-5'  # 17:00 KST 스케줄만
+      env:
+        TZ: Asia/Seoul
+      run: |
+        python scripts/sync_status_to_results.py --backfill
+
     - name: Commit status
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
 
         git add data/paper_trading/status_*.json 2>/dev/null || true
+        git add data/paper_trading/results.json 2>/dev/null || true
         git add data/arena/healthcheck/ 2>/dev/null || true
 
         git diff --quiet && git diff --staged --quiet || \
@@ -107,7 +115,7 @@ jobs:
                 report = json.load(f)
             alert = checker.format_telegram_alert(report)
             if alert:
-                notifier.send_message(alert)
+                notifier.send_message(alert, msg_type='healthcheck')
                 print('헬스체크 알림 전송')
             else:
                 print('이상 없음 - 알림 생략')

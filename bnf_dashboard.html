@@ -833,11 +833,58 @@
             </div>
         </div>
 
+        <!-- Risk KPI Cards -->
+        <div class="section">
+            <h2>📊 리스크 지표</h2>
+            <div id="riskKpiCards" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px;">
+                <div class="bnf-group" style="text-align:center; padding:12px 8px;">
+                    <div style="font-size:11px; color:#9CA3AF;">MDD (최대낙폭)</div>
+                    <div id="kpiMdd" style="font-size:1.3rem; font-weight:700; color:#EF4444; margin-top:4px;">-</div>
+                </div>
+                <div class="bnf-group" style="text-align:center; padding:12px 8px;">
+                    <div style="font-size:11px; color:#9CA3AF;">Sharpe Ratio</div>
+                    <div id="kpiSharpe" style="font-size:1.3rem; font-weight:700; color:#00ff87; margin-top:4px;">-</div>
+                </div>
+                <div class="bnf-group" style="text-align:center; padding:12px 8px;">
+                    <div style="font-size:11px; color:#9CA3AF;">손익비 (PF)</div>
+                    <div id="kpiProfitFactor" style="font-size:1.3rem; font-weight:700; color:#00ff87; margin-top:4px;">-</div>
+                </div>
+                <div class="bnf-group" style="text-align:center; padding:12px 8px;">
+                    <div style="font-size:11px; color:#9CA3AF;">평균 보유일</div>
+                    <div id="kpiAvgHold" style="font-size:1.3rem; font-weight:700; color:#E5E7EB; margin-top:4px;">-</div>
+                </div>
+                <div class="bnf-group" style="text-align:center; padding:12px 8px;">
+                    <div style="font-size:11px; color:#9CA3AF;">최대 연속손실</div>
+                    <div id="kpiMaxConsecLoss" style="font-size:1.3rem; font-weight:700; color:#EF4444; margin-top:4px;">-</div>
+                </div>
+                <div class="bnf-group" style="text-align:center; padding:12px 8px;">
+                    <div style="font-size:11px; color:#9CA3AF;">평균익절 / 평균손절</div>
+                    <div id="kpiAvgWinLoss" style="font-size:1.1rem; font-weight:700; color:#E5E7EB; margin-top:4px;">-</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Portfolio Value Chart -->
         <div class="section">
-            <h2>💰 자산 추이 (300만원 시작)</h2>
+            <h2>💰 자산 추이 (Equity Curve)</h2>
             <div class="chart-container">
                 <canvas id="portfolioChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Drawdown Chart -->
+        <div class="section">
+            <h2>📉 낙폭 (Drawdown)</h2>
+            <div class="chart-container">
+                <canvas id="drawdownChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Daily P&L Bar -->
+        <div class="section">
+            <h2>📊 일별 손익</h2>
+            <div class="chart-container">
+                <canvas id="dailyPnlChart"></canvas>
             </div>
         </div>
 
@@ -847,6 +894,12 @@
             <div class="chart-container">
                 <canvas id="performanceChart"></canvas>
             </div>
+        </div>
+
+        <!-- Monthly Returns Heatmap -->
+        <div class="section">
+            <h2>📅 월별 수익률</h2>
+            <div id="monthlyHeatmap" style="overflow-x:auto;"></div>
         </div>
 
         <!-- Trade History -->
@@ -880,7 +933,7 @@
         <!-- ═══════════════════════════════════════════════════════ -->
         <!-- 볼린저 스윙 섹션 -->
         <!-- ═══════════════════════════════════════════════════════ -->
-        <div style="margin-top:40px; padding-top:20px; border-top:3px solid #6366F1;">
+        <div id="bollingerSection" style="margin-top:40px; padding-top:20px; border-top:3px solid #6366F1;">
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
                 <h1 style="color:#6366F1; font-size:1.3em; margin:0;">
                     <span style="background:linear-gradient(135deg,#6366F1,#818CF8); color:white; padding:3px 10px; border-radius:12px; font-size:0.65em; vertical-align:middle;">BB</span>
@@ -973,6 +1026,8 @@
     <script>
         let performanceChart = null;
         let portfolioChart = null;
+        let drawdownChart = null;
+        let dailyPnlChart = null;
         const INITIAL_CAPITAL = 3000000; // 300만원
         let autoRefreshInterval = null;
         const AUTO_REFRESH_INTERVAL = 60000; // 1분
@@ -1946,7 +2001,185 @@
                     }
                 }
             });
+
+            // ========== Drawdown 차트 ==========
+            const ddValues = [];
+            let peak = INITIAL_CAPITAL;
+            [INITIAL_CAPITAL, ...portfolioValues].forEach(v => {
+                if (v > peak) peak = v;
+                ddValues.push(((v - peak) / peak) * 100);
+            });
+
+            const ddCtx = document.getElementById('drawdownChart').getContext('2d');
+            if (drawdownChart) drawdownChart.destroy();
+
+            const ddGrad = ddCtx.createLinearGradient(0, 0, 0, ddCtx.canvas.clientHeight || 200);
+            ddGrad.addColorStop(0, 'transparent');
+            ddGrad.addColorStop(1, 'rgba(239,68,68,0.3)');
+
+            drawdownChart = new Chart(ddCtx, {
+                type: 'line',
+                data: {
+                    labels: ['시작', ...dates],
+                    datasets: [{
+                        label: 'Drawdown (%)',
+                        data: ddValues,
+                        borderColor: '#EF4444',
+                        backgroundColor: ddGrad,
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#0a0a0a',
+                        pointBorderColor: '#EF4444',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF', callback: v => v.toFixed(1) + '%' },
+                            max: 0
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF', maxRotation: 45, font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#E5E7EB', font: { size: 11 } } },
+                        tooltip: { callbacks: { label: c => 'DD: ' + c.parsed.y.toFixed(2) + '%' } }
+                    }
+                }
+            });
+
+            // ========== 일별 손익 Bar 차트 ==========
+            const dailyProfitValues = dates.map(d => dailyProfits[d] || 0);
+            const barColors = dailyProfitValues.map(v => v >= 0 ? 'rgba(0,255,135,0.7)' : 'rgba(239,68,68,0.7)');
+
+            const dpCtx = document.getElementById('dailyPnlChart').getContext('2d');
+            if (dailyPnlChart) dailyPnlChart.destroy();
+
+            dailyPnlChart = new Chart(dpCtx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: '일별 손익 (원)',
+                        data: dailyProfitValues,
+                        backgroundColor: barColors,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF', callback: v => (v / 10000).toFixed(0) + '만' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#9CA3AF', maxRotation: 45, font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#E5E7EB', font: { size: 11 } } },
+                        tooltip: { callbacks: { label: c => c.parsed.y.toLocaleString() + '원' } }
+                    }
+                }
+            });
+
+            // ========== KPI 지표 계산 ==========
+            // MDD
+            const mdd = Math.min(...ddValues);
+            document.getElementById('kpiMdd').textContent = mdd.toFixed(1) + '%';
+
+            // Sharpe Ratio (일별 수익률 기반, 연환산)
+            const dailyReturnPcts = dates.map(d => dailyReturns[d] || 0);
+            const avgReturn = dailyReturnPcts.reduce((a, b) => a + b, 0) / dailyReturnPcts.length;
+            const variance = dailyReturnPcts.reduce((a, b) => a + Math.pow(b - avgReturn, 2), 0) / dailyReturnPcts.length;
+            const stdDev = Math.sqrt(variance);
+            const sharpe = stdDev > 0 ? (avgReturn / stdDev) * Math.sqrt(252) : 0;
+            const sharpeEl = document.getElementById('kpiSharpe');
+            sharpeEl.textContent = sharpe.toFixed(2);
+            sharpeEl.style.color = sharpe >= 1 ? '#00ff87' : sharpe >= 0 ? '#FBBF24' : '#EF4444';
+
+            // Profit Factor
+            const wins = trades.filter(t => t.profit > 0);
+            const losses = trades.filter(t => t.profit < 0);
+            const totalWin = wins.reduce((a, t) => a + t.profit, 0);
+            const totalLoss = Math.abs(losses.reduce((a, t) => a + t.profit, 0));
+            const pf = totalLoss > 0 ? totalWin / totalLoss : totalWin > 0 ? Infinity : 0;
+            const pfEl = document.getElementById('kpiProfitFactor');
+            pfEl.textContent = pf === Infinity ? '∞' : pf.toFixed(2);
+            pfEl.style.color = pf >= 2 ? '#00ff87' : pf >= 1 ? '#FBBF24' : '#EF4444';
+
+            // 평균 보유일
+            const holdDays = trades.map(t => {
+                const d1 = new Date(t.entry_date);
+                const d2 = new Date(t.exit_date);
+                return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+            });
+            const avgHold = holdDays.reduce((a, b) => a + b, 0) / holdDays.length;
+            document.getElementById('kpiAvgHold').textContent = avgHold.toFixed(1) + '일';
+
+            // 최대 연속 손실
+            let maxConsec = 0, curConsec = 0;
+            trades.forEach(t => {
+                if (t.profit < 0) { curConsec++; maxConsec = Math.max(maxConsec, curConsec); }
+                else { curConsec = 0; }
+            });
+            document.getElementById('kpiMaxConsecLoss').textContent = maxConsec + '회';
+
+            // 평균 익절 / 평균 손절
+            const avgWin = wins.length > 0 ? (wins.reduce((a, t) => a + t.return_pct, 0) / wins.length) : 0;
+            const avgLoss = losses.length > 0 ? (losses.reduce((a, t) => a + t.return_pct, 0) / losses.length) : 0;
+            const awlEl = document.getElementById('kpiAvgWinLoss');
+            awlEl.innerHTML = `<span style="color:#00ff87">+${avgWin.toFixed(1)}%</span> / <span style="color:#EF4444">${avgLoss.toFixed(1)}%</span>`;
+
+            // ========== 월별 수익률 히트맵 ==========
+            const monthlyReturns = {};
+            trades.forEach(t => {
+                const ym = t.exit_date.substring(0, 7); // "2026-04"
+                if (!monthlyReturns[ym]) monthlyReturns[ym] = 0;
+                monthlyReturns[ym] += t.return_pct || 0;
+            });
+
+            const months = Object.keys(monthlyReturns).sort();
+            if (months.length > 0) {
+                let html = '<table style="width:100%; border-collapse:collapse; font-size:12px;">';
+                html += '<thead><tr><th style="padding:8px; color:#9CA3AF; text-align:left;">월</th><th style="padding:8px; color:#9CA3AF; text-align:right;">수익률</th><th style="padding:8px; color:#9CA3AF; text-align:left;">시각화</th></tr></thead><tbody>';
+                months.forEach(m => {
+                    const ret = monthlyReturns[m];
+                    const color = ret >= 0 ? '#00ff87' : '#EF4444';
+                    const bgColor = ret >= 0 ? 'rgba(0,255,135,0.15)' : 'rgba(239,68,68,0.15)';
+                    const barWidth = Math.min(Math.abs(ret) * 3, 100);
+                    html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.06);">`;
+                    html += `<td style="padding:8px 8px; color:#E5E7EB; font-weight:600;">${m}</td>`;
+                    html += `<td style="padding:8px 8px; color:${color}; text-align:right; font-weight:700; font-variant-numeric:tabular-nums;">${ret >= 0 ? '+' : ''}${ret.toFixed(1)}%</td>`;
+                    html += `<td style="padding:8px 8px;"><div style="height:18px; width:${barWidth}%; background:${bgColor}; border-left:3px solid ${color}; border-radius:0 4px 4px 0;"></div></td>`;
+                    html += `</tr>`;
+                });
+                html += '</tbody></table>';
+                document.getElementById('monthlyHeatmap').innerHTML = html;
+            }
         }
+    </script>
+    <script>
+      // Hash 기반 섹션 자동 스크롤 (iframe에서 #bollingerSection 호출 시)
+      window.addEventListener('load', function() {
+        if (window.location.hash) {
+          var el = document.querySelector(window.location.hash);
+          if (el) {
+            setTimeout(function() { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 300);
+          }
+        }
+      });
     </script>
 </body>
 </html>

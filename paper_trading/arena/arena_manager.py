@@ -60,7 +60,7 @@ class ArenaManager:
             "teams": {tid: t.get_config() for tid, t in self.teams.items()},
             "rules": {
                 "profit_target_pct": 5.0,
-                "loss_target_pct": -3.0,
+                "loss_target_pct": -3.0,  # 기본값 (전략별 오버라이드 가능)
                 "exit_deadline": "14:30",
                 "max_stocks_per_team": 5,
             },
@@ -140,10 +140,14 @@ class ArenaManager:
                     continue
 
                 # 팀의 현재 자금으로 시뮬레이터 생성
+                # 전략 고유 손절 파라미터가 있으면 적용
+                strategy_cls = StrategyRegistry.get(strategy_id)
+                strategy_loss = getattr(strategy_cls, 'LOSS_TARGET', None) if strategy_cls else None
                 simulator = TradingSimulator(
                     capital=int(team.portfolio.current_capital),
                     strategy_id=strategy_id,
                     strategy_name=team.team_name,
+                    loss_target=strategy_loss,
                 )
 
                 # Candidate → StockCandidate 변환

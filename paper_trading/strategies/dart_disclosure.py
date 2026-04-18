@@ -10,7 +10,7 @@ import os
 import logging
 from pathlib import Path
 from typing import List, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -129,7 +129,9 @@ class DartDisclosureStrategy(BaseStrategy):
 
         - KRX historical 지원으로 과거 날짜 backtest 가능
         - 시장 단위 1번 fetch 후 매핑 (효율 ↑)
-        - Naver 폴백 (당일만)
+        - pykrx/naver 폴백: 시장 단위 fetch (get_market_ohlcv_by_ticker +
+          get_market_cap_by_ticker)로 시총/거래대금 누락 방지
+        - 당일 데이터 없으면 전일로 자동 폴백
         """
         stocks = []
 
@@ -185,33 +187,87 @@ class DartDisclosureStrategy(BaseStrategy):
                 if stocks:
                     return stocks
             except Exception as e:
-                logger.warning(f"  KRX fetch 실패, naver 폴백: {e}")
+                logger.warning(f"  KRX fetch 실패, pykrx/naver 폴백: {e}")
 
-        # 2차: Naver 폴백 (당일만)
+        # 2차: pykrx/naver 폴백 - 시장 단위 1회 fetch + 매핑
+        #   기존: 종목별 get_market_ohlcv_by_date() → 당일 미장 시 빈 결과,
+        #         get_market_cap_by_date(ticker=) 미지원으로 시총=0
+        #   수정: get_market_ohlcv_by_ticker(date) + get_market_cap_by_ticker(date)
+        #         시장 전체를 한 번에 가져와서 매핑 (효율 + 정확도 ↑)
         if pykrx_stock is None:
             return stocks
+
+        ohlcv_data = {}   # code -> row (종가, 등락률, 거래량, 거래대금)
+        cap_data = {}     # code -> 시가총액
+
+        # 당일 → 전일 자동 폴백 (당일 장 시작 전이면 데이터 없음)
+        fetch_dates = [date]
+        try:
+            dt = datetime.strptime(date, '%Y%m%d')
+            prev = dt - timedelta(days=1)
+            # 주말 건너뛰기
+            while prev.weekday() >= 5:
+                prev -= timedelta(days=1)
+            fetch_dates.append(prev.strftime('%Y%m%d'))
+        except ValueError:
+            pass
+
+        fetched = False
+        used_date = date
+        for try_date in fetch_dates:
+            for market in ['KOSPI', 'KOSDAQ']:
+                try:
+                    df = pykrx_stock.get_market_ohlcv_by_ticker(try_date, market=market)
+                    if df is None or df.empty:
+                        continue
+                    for code in df.index:
+                        if code in valid_codes and code not in ohlcv_data:
+                            ohlcv_data[code] = df.loc[code]
+                except Exception as e:
+                    logger.debug(f"  OHLCV fetch 실패 ({market}, {try_date}): {e}")
+                    continue
+
+                try:
+                    cap_df = pykrx_stock.get_market_cap_by_ticker(try_date, market=market)
+                    if cap_df is not None and not cap_df.empty:
+                        for code in cap_df.index:
+                            if code in valid_codes and code not in cap_data:
+                                if '시가총액' in cap_df.columns:
+                                    cap_data[code] = int(cap_df.loc[code]['시가총액'])
+                except Exception as e:
+                    logger.debug(f"  시총 fetch 실패 ({market}, {try_date}): {e}")
+                    continue
+
+            if ohlcv_data:
+                used_date = try_date
+                fetched = True
+                break
+
+        if used_date != date and fetched:
+            logger.info(f"  당일({date}) 데이터 없음 → 전일({used_date}) 데이터 사용")
+
+        # 매핑
         for stock_code, dart_score in positive_stocks:
             if not stock_code or len(stock_code) != 6:
                 continue
+            row = ohlcv_data.get(stock_code)
+            if row is None:
+                continue
             try:
-                df = pykrx_stock.get_market_ohlcv_by_date(
-                    fromdate=date, todate=date, ticker=stock_code
-                )
-                if df.empty:
-                    continue
-                row = df.iloc[0]
                 close = int(row['종가'])
-                change = float(row['등락률']) if '등락률' in row else 0
-                volume = int(row['거래량'])
-                trading_value = int(row.get('거래대금', 0))
-                name = pykrx_stock.get_market_ticker_name(stock_code)
-                try:
-                    cap_df = pykrx_stock.get_market_cap_by_date(
-                        fromdate=date, todate=date, ticker=stock_code
-                    )
-                    market_cap = int(cap_df.iloc[0]['시가총액']) if not cap_df.empty else 0
-                except Exception:
-                    market_cap = 0
+                if close == 0:
+                    continue
+                change = float(row['등락률']) if '등락률' in row.index else 0
+                volume = int(row['거래량']) if '거래량' in row.index else 0
+                trading_value = int(row['거래대금']) if '거래대금' in row.index else 0
+                name = str(row.get('종목명', '')) if hasattr(row, 'get') else ''
+                if not name:
+                    try:
+                        name = pykrx_stock.get_market_ticker_name(stock_code)
+                    except Exception:
+                        name = stock_code
+                market_cap = cap_data.get(stock_code, 0)
+
                 disc_summary = [{
                     'category': d.category,
                     'report_nm': d.report_nm[:50],
@@ -229,7 +285,7 @@ class DartDisclosureStrategy(BaseStrategy):
                     'disclosures': disc_summary,
                 })
             except Exception as e:
-                logger.debug(f"     [DART] naver 폴백 실패 ({stock_code}): {e}")
+                logger.debug(f"     [DART] pykrx/naver 매핑 실패 ({stock_code}): {e}")
                 continue
 
         return stocks
