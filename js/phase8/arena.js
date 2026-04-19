@@ -1043,6 +1043,7 @@ export function renderMonthlyReturnsTable() {
 const STRATEGY_RULES = {
   momentum: {
     name: 'Alpha Momentum',
+    summary: '주가가 상승 추세에 있고 거래량이 폭발적으로 증가한 종목을 찾습니다. 5일 이동평균선 위에서 거래량이 평소 3배 이상 터지면, 시장의 관심이 집중되며 추가 상승할 가능성이 높다는 논리입니다.',
     signal: 'MA5 위 + 거래량 5일평균 3배 급증',
     entry: '시초가 매수 (09:00~09:05)',
     exit_profit: '+5% 익절',
@@ -1053,6 +1054,7 @@ const STRATEGY_RULES = {
   },
   largecap_contrarian: {
     name: 'Beta Contrarian',
+    summary: '대형주(시총 1조 이상)가 과도하게 하락했을 때 반등을 노리는 역발상 전략입니다. RSI 지표가 35 이하로 떨어지면 "팔 사람은 다 팔았다"는 신호이며, 대형주는 쉽게 망하지 않으므로 반등 확률이 높습니다.',
     signal: 'RSI(14) ≤ 35 과매도 + 대형주',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1063,6 +1065,7 @@ const STRATEGY_RULES = {
   },
   dart_disclosure: {
     name: 'Gamma Disclosure',
+    summary: '전날 저녁~당일 아침 사이에 DART(전자공시)에 올라온 호재성 공시를 빠르게 포착합니다. 좋은 공시(실적 개선, 대규모 계약 등)가 나오면 장 시작과 함께 주가가 반응하는데, 이 타이밍을 잡습니다.',
     signal: 'DART 호재 공시 (전일 18시~당일 08:30)',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1073,6 +1076,7 @@ const STRATEGY_RULES = {
   },
   theme_policy: {
     name: 'Delta Theme',
+    summary: '그날 시장에서 가장 뜨거운 테마(예: AI, 방산, 2차전지)의 선도주를 매매합니다. 네이버 금융에서 실시간 급상승 테마를 감지하고, 해당 테마를 이끄는 대장주에 올라탑니다.',
     signal: '네이버 실시간 급상승 테마 TOP10 관련주',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1083,6 +1087,7 @@ const STRATEGY_RULES = {
   },
   frontier_gap: {
     name: 'Echo Frontier',
+    summary: '장 시작 시 전일 종가보다 2~5% 높게 시작하는 종목(갭 상승)을 매수합니다. 갭 상승은 밤사이 호재가 있었다는 의미이고, 장 시작 30분이 거래대금의 38%가 집중되는 "골든타임"이라 추가 상승을 기대합니다.',
     signal: '시초가 갭 +2~5% + 거래량 5일평균 2배',
     entry: '시초가 매수 (골든타임 09:00~09:30)',
     exit_profit: '+5% 익절',
@@ -1093,6 +1098,7 @@ const STRATEGY_RULES = {
   },
   hybrid_alpha_delta: {
     name: 'Alpha-Delta Hybrid',
+    summary: '모멘텀(Alpha)과 테마(Delta) 두 전략의 점수를 합산하여, 상승 추세와 시장 테마를 동시에 만족하는 종목만 선별합니다. 한 가지 기준보다 두 가지를 동시에 충족하면 신뢰도가 높아집니다.',
     signal: '모멘텀 + 테마 전략의 가중평균 조합',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1103,6 +1109,7 @@ const STRATEGY_RULES = {
   },
   volatility_breakout_lw: {
     name: 'Zeta Volatility',
+    summary: '전설적 트레이더 래리 윌리엄스의 변동성 돌파 전략입니다. 전일 고가-저가 변동폭의 절반만큼 시초가에서 상승하면 "오늘은 상승하는 날"이라 판단하고 매수합니다.',
     signal: '전일 변동폭 × K(0.5) 돌파 + 거래량 1.5배',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1113,6 +1120,7 @@ const STRATEGY_RULES = {
   },
   turtle_breakout_short: {
     name: 'Kappa Turtle',
+    summary: '최근 5일간 최고가를 돌파한 종목을 매수합니다. 신고가 돌파는 저항선이 깨졌다는 의미로, 새로운 상승 추세의 시작 신호입니다. 거래량이 1.5배 이상 동반되면 돌파의 신뢰도가 높아집니다.',
     signal: '5일 신고가 돌파 + 거래량 1.5배 동반',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1123,6 +1131,7 @@ const STRATEGY_RULES = {
   },
   sector_rotation: {
     name: 'Theta Sector',
+    summary: '그날 가장 강하게 오르는 업종(섹터)을 찾고, 그 업종의 대장주를 매수합니다. 업종이 오를 때 대장주가 가장 많이 오르는 경향이 있어, "강한 업종의 1등"을 타는 전략입니다.',
     signal: 'KOSPI 강세 업종 TOP5 → 시총 상위 대장주',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1133,6 +1142,7 @@ const STRATEGY_RULES = {
   },
   eod_reversal_korean: {
     name: 'Eta Reversal',
+    summary: '장중에 -3~8% 크게 하락했지만 저점에서 30% 이상 회복한 종목을 매수합니다. 하루 크게 빠졌다 반등하는 것은 매도 압력이 소진되었다는 신호이며, 다음날 추가 반등을 기대합니다.',
     signal: '당일 -3~8% 하락 + 저점 30% 회복',
     entry: '종가 근접 매수',
     exit_profit: '다음날 시초가 매도',
@@ -1143,6 +1153,7 @@ const STRATEGY_RULES = {
   },
   foreign_flow_momentum: {
     name: 'Iota Flow',
+    summary: '외국인 투자자가 3일 연속 순매수하면서 주가도 상승하는 종목을 찾습니다. 외국인은 정보력이 뛰어난 "스마트 머니"로 불리며, 연속 매수는 확신이 있다는 신호입니다.',
     signal: '외국인 3일 연속 순매수 + 가격 상승',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1153,6 +1164,7 @@ const STRATEGY_RULES = {
   },
   bollinger_reversal: {
     name: 'Pi Bollinger (단타)',
+    summary: '볼린저밴드 하단에 닿으면서 RSI도 30 이하인 극도의 과매도 종목을 매수합니다. 통계적으로 평균 가격대로 돌아오려는 성질(평균 회귀)을 이용하며, 양봉 전환이 확인되면 반등이 시작된 것으로 봅니다.',
     signal: 'BB(15) %B < 0.2 + RSI(14) < 30 + 양봉',
     entry: '시초가 매수',
     exit_profit: '+5% 익절',
@@ -1163,6 +1175,7 @@ const STRATEGY_RULES = {
   },
   overnight_etf_reversal: {
     name: 'Omicron ETF',
+    summary: '장 마감 전에 약세인 KOSPI200 ETF를 매수하고 다음날 시초가에 매도합니다. 학술 연구에서 검증된 전략으로, 한국 ETF 시장에서 종가→시초가 사이 양의 수익률이 관찰됩니다. 리스크가 가장 낮은 전략입니다.',
     signal: 'KOSPI200 ETF 종가매수 → 다음날 시초가 매도',
     entry: '종가 매수 (ETF)',
     exit_profit: '다음날 시초가 매도',
@@ -1191,7 +1204,10 @@ export function renderStrategyPanel() {
 
     const rules = STRATEGY_RULES[sid];
     const rulesHtml = rules ? `
-            <div class="detail-h" style="margin-top:var(--space-3);">매매 규칙</div>
+            <div style="padding:var(--space-3);background:var(--bg-tinted);border-radius:var(--radius-md);margin:var(--space-2) 0;font-size:var(--fs-sm);line-height:1.6;color:var(--text-secondary);">
+              💡 ${rules.summary}
+            </div>
+            <div class="detail-h">매매 규칙</div>
             <div class="detail-row"><span>📡 시그널</span><span>${rules.signal}</span></div>
             <div class="detail-row"><span>🟢 진입</span><span>${rules.entry}</span></div>
             <div class="detail-row"><span>🎯 익절</span><span>${rules.exit_profit}</span></div>
