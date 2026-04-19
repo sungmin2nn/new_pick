@@ -146,7 +146,13 @@ export async function loadArenaData(force = false) {
   state.leaderboard = leaderboard;
   state.portfolios = Object.fromEntries(portfolios);
   state.candidates = Object.fromEntries(candidates);
-  state.health = healthLogs.find(h => h !== null) || null;
+  // 헬스: 배열이면 마지막 항목 사용 (날짜별 누적 구조)
+  const rawHealth = healthLogs.find(h => h !== null) || null;
+  if (Array.isArray(rawHealth) && rawHealth.length > 0) {
+    state.health = rawHealth[rawHealth.length - 1];
+  } else {
+    state.health = rawHealth;
+  }
 
   // 매매 이력 재구성: tid → date 별로 summary + trades 묶기
   const histMap = {};
