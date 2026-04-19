@@ -890,7 +890,6 @@ export function renderArena() {
     const rows = buildTeamRows();
     container.innerHTML = `
       ${renderKPI(rows)}
-      ${renderH2H(rows)}
       ${renderCandidatesTable()}
       ${renderTeamsAccordion(rows)}
       ${renderSystemMini()}
