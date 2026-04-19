@@ -105,13 +105,18 @@ tr:hover{background:rgba(0,198,190,.02)}
 .modal-close:hover{background:#e5e7eb}
 .modal-body{padding:14px 18px}
 .modal-chart{width:100%;height:320px;border-radius:8px;overflow:hidden;background:#131722}
-.modal-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px}
-.modal-legend-item{display:flex;align-items:center;gap:4px}
-.modal-legend-dot{width:16px;height:2px;border-radius:1px}
-.modal-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:12px}
-.modal-info-item{display:flex;justify-content:space-between;padding:6px 10px;background:#f8fafb;border-radius:6px}
-.modal-info-label{color:#6b7280}
+.modal-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.modal-legend-item{display:flex;align-items:center;gap:5px;padding:4px 10px;background:#f8fafb;border:1px solid #e5e7eb;border-radius:6px;font-size:11px;font-weight:500}
+.modal-legend-dot{width:18px;height:3px;border-radius:1px;flex-shrink:0}
+.modal-legend-dot.dashed{background:repeating-linear-gradient(90deg,var(--c) 0,var(--c) 4px,transparent 4px,transparent 8px)!important;height:2px}
+.modal-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-top:12px;font-size:12px}
+.modal-info-item{display:flex;justify-content:space-between;padding:8px 10px;background:#f8fafb;border:1px solid #f0f2f5;border-radius:8px}
+.modal-info-label{color:#6b7280;font-size:11px}
 .modal-info-val{font-weight:700;font-variant-numeric:tabular-nums}
+.modal-naver{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#f0f2f5;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;font-weight:600;color:#00a39c;margin-top:12px;text-decoration:none}
+.modal-naver:hover{background:#e5e7eb}
+.modal-strategy-desc{margin-top:10px;padding:10px 12px;background:#f8fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;line-height:1.7;color:#6b7280}
+.modal-strategy-desc strong{color:#1a1a2e}
 
 /* === Responsive === */
 @media(max-width:600px){
@@ -275,6 +280,8 @@ if(window.self!==window.top){document.documentElement.classList.add('in-iframe')
       <div class="modal-chart" id="modalChart"></div>
       <div class="modal-legend" id="modalLegend"></div>
       <div class="modal-info" id="modalInfo"></div>
+      <div class="modal-strategy-desc" id="modalStrategyDesc"></div>
+      <a class="modal-naver" id="modalNaver" href="#" target="_blank">네이버 증권에서 보기 &rarr;</a>
     </div>
   </div>
 </div>
@@ -701,7 +708,8 @@ function openStockChart(code, name, strategy, extraData) {
   const tagCls = strategy === 'bb' ? 'tag-bb' : 'tag-bnf';
   const tagName = strategy === 'bb' ? '볼린저' : '낙폭과대';
   document.getElementById('modalTitle').innerHTML =
-    `${name} <span class="tag ${tagCls}" style="font-size:10px;padding:2px 8px;">${tagName}</span>`;
+    `${name} <span style="color:#9ca3af;font-weight:400;font-size:12px;margin-left:4px">${code}</span> <span class="tag ${tagCls}" style="font-size:10px;padding:2px 8px;">${tagName}</span>`;
+  document.getElementById('modalNaver').href = `https://m.stock.naver.com/domestic/stock/${code}`;
   modal.classList.add('open');
 
   // Clear previous chart
@@ -770,6 +778,7 @@ async function fetchStockChart(code, name, strategy, extra, container) {
   const lines = [];
   const legends = [];
   const infoItems = [];
+  let strategyDesc = '';
 
   if (strategy === 'bnf') {
     const high20d = extra.high_20d || Math.max(...ohlcv.map(d => d.high));
@@ -786,21 +795,26 @@ async function fetchStockChart(code, name, strategy, extra, container) {
       lines.push({ price: slPrice, color: '#ef4444', style: 2, width: 1, title: '손절 (-3%)' });
     }
 
-    legends.push({ color: '#fbbf24', label: '20일 고점' });
-    legends.push({ color: '#22c55e', label: '진입기준 (-25%)' });
+    legends.push({ color: '#fbbf24', label: '20일 고점', dashed: true });
+    legends.push({ color: '#22c55e', label: '진입기준 (-25%)', dashed: true });
     if (extra.avg_price) {
-      legends.push({ color: '#ffffff', label: '매수가' });
-      legends.push({ color: '#3b82f6', label: '익절 +10%' });
-      legends.push({ color: '#ef4444', label: '손절 -3%' });
+      legends.push({ color: '#ffffff', label: '매수가', dashed: false });
+      legends.push({ color: '#3b82f6', label: '익절 +10%', dashed: true });
+      legends.push({ color: '#ef4444', label: '손절 -3%', dashed: true });
     }
 
     infoItems.push({ label: '20일 고점', val: fmt(high20d) + '원' });
-    infoItems.push({ label: '현재가', val: fmt(lastClose) + '원', cls: pnlCls(lastClose - high20d) });
+    infoItems.push({ label: '현재가', val: fmt(lastClose) + '원' });
     infoItems.push({ label: '고점 대비', val: '-' + ((high20d - lastClose) / high20d * 100).toFixed(1) + '%', cls: 'neg-c' });
+    infoItems.push({ label: '진입 기준가', val: fmt(entryLine) + '원' });
     if (extra.avg_price) {
       const pnlPct = ((lastClose - avgPrice) / avgPrice * 100);
-      infoItems.push({ label: '수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
+      infoItems.push({ label: '매수가', val: fmt(avgPrice) + '원' });
+      infoItems.push({ label: '평가 수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
+      infoItems.push({ label: '익절 목표', val: fmt(tpPrice) + '원' });
+      infoItems.push({ label: '손절 기준', val: fmt(slPrice) + '원', cls: 'neg-c' });
     }
+    strategyDesc = `<strong>낙폭과대 전략:</strong> 20일 고점 대비 -25% 이상 하락한 대형주(시총 1조+)에 진입. 손절 -3% / 익절 +10% (분할: +5%→+10%→트레일링). 최대 5포지션.`;
 
   } else { // bollinger
     const closes = ohlcv.map(d => d.close);
@@ -825,28 +839,45 @@ async function fetchStockChart(code, name, strategy, extra, container) {
       const lowerSeries = lwChart.addLineSeries({ color: '#22c55e66', lineWidth: 1, lineStyle: 2 });
       lowerSeries.setData(bbLower);
 
-      legends.push({ color: '#ef4444', label: 'BB 상단' });
-      legends.push({ color: '#fbbf24', label: 'BB 중심 (SMA15)' });
-      legends.push({ color: '#22c55e', label: 'BB 하단' });
+      legends.push({ color: '#ef4444', label: 'BB 상단', dashed: true });
+      legends.push({ color: '#fbbf24', label: 'BB 중심 (SMA15)', dashed: true });
+      legends.push({ color: '#22c55e', label: 'BB 하단', dashed: true });
+
+      // BB 최신값 info
+      if (bbUpper.length) {
+        const lastBBU = bbUpper[bbUpper.length-1].value;
+        const lastBBM = bbMiddle[bbMiddle.length-1].value;
+        const lastBBL = bbLower[bbLower.length-1].value;
+        infoItems.push({ label: 'BB 상단', val: fmt(lastBBU) + '원' });
+        infoItems.push({ label: 'BB 중심', val: fmt(lastBBM) + '원' });
+        infoItems.push({ label: 'BB 하단', val: fmt(lastBBL) + '원' });
+        infoItems.push({ label: 'BB 폭', val: fmt(lastBBU - lastBBL) + '원' });
+      }
     }
 
     const avgPrice = extra.avg_price || lastClose;
+    const tpBb = Math.round(avgPrice * 1.07);
+    const slBb = Math.round(avgPrice * 0.94);
     if (extra.avg_price) {
       lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: '매수가' });
-      lines.push({ price: Math.round(avgPrice * 1.07), color: '#3b82f6', style: 2, width: 1, title: '익절 (+7%)' });
-      lines.push({ price: Math.round(avgPrice * 0.94), color: '#ef4444', style: 2, width: 1, title: '손절 (-6%)' });
-      legends.push({ color: '#ffffff', label: '매수가' });
-      legends.push({ color: '#3b82f6', label: '익절 +7%' });
-      legends.push({ color: '#ef4444', label: '손절 -6%' });
+      lines.push({ price: tpBb, color: '#3b82f6', style: 2, width: 1, title: '익절 (+7%)' });
+      lines.push({ price: slBb, color: '#ef4444', style: 2, width: 1, title: '손절 (-6%)' });
+      legends.push({ color: '#ffffff', label: '매수가', dashed: false });
+      legends.push({ color: '#3b82f6', label: '익절 +7%', dashed: true });
+      legends.push({ color: '#ef4444', label: '손절 -6%', dashed: true });
     }
 
     infoItems.push({ label: '현재가', val: fmt(lastClose) + '원' });
     if (extra.percent_b !== undefined) infoItems.push({ label: '%B', val: extra.percent_b.toFixed(3), cls: extra.percent_b < 0.2 ? 'pos-c' : '' });
-    if (extra.rsi !== undefined) infoItems.push({ label: 'RSI', val: extra.rsi.toFixed(1), cls: extra.rsi <= 30 ? 'pos-c' : '' });
+    if (extra.rsi !== undefined) infoItems.push({ label: 'RSI(14)', val: extra.rsi.toFixed(1), cls: extra.rsi <= 30 ? 'pos-c' : '' });
     if (extra.avg_price) {
       const pnlPct = ((lastClose - avgPrice) / avgPrice * 100);
-      infoItems.push({ label: '수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
+      infoItems.push({ label: '매수가', val: fmt(avgPrice) + '원' });
+      infoItems.push({ label: '평가 수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
+      infoItems.push({ label: '익절 목표', val: fmt(tpBb) + '원' });
+      infoItems.push({ label: '손절 기준', val: fmt(slBb) + '원', cls: 'neg-c' });
     }
+    strategyDesc = `<strong>볼린저 스윙:</strong> BB(15,2) 하단 %B&lt;0.2 + RSI&le;30 + 거래량 1.0x 이상. 손절 -6% / 익절 %B&ge;0.7 OR RSI&ge;40 OR +7%. 최대 12일 보유, 3포지션.`;
   }
 
   // Draw price lines
@@ -868,15 +899,22 @@ async function fetchStockChart(code, name, strategy, extra, container) {
 
   lwChart.timeScale().fitContent();
 
-  // Render legend
-  document.getElementById('modalLegend').innerHTML = legends.map(l =>
-    `<div class="modal-legend-item"><div class="modal-legend-dot" style="background:${l.color}"></div>${l.label}</div>`
-  ).join('');
+  // Render legend (실선 vs 점선 구분)
+  document.getElementById('modalLegend').innerHTML = legends.map(l => {
+    const dotCls = l.dashed ? 'modal-legend-dot dashed' : 'modal-legend-dot';
+    const style = l.dashed
+      ? `--c:${l.color};background:repeating-linear-gradient(90deg,${l.color} 0,${l.color} 4px,transparent 4px,transparent 8px)`
+      : `background:${l.color}`;
+    return `<div class="modal-legend-item"><div class="${dotCls}" style="${style}"></div>${l.label}</div>`;
+  }).join('');
 
   // Render info
   document.getElementById('modalInfo').innerHTML = infoItems.map(i =>
     `<div class="modal-info-item"><span class="modal-info-label">${i.label}</span><span class="modal-info-val ${i.cls||''}">${i.val}</span></div>`
   ).join('');
+
+  // Render strategy description
+  document.getElementById('modalStrategyDesc').innerHTML = strategyDesc;
 
   // Resize handler
   new ResizeObserver(() => {
