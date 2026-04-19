@@ -167,40 +167,156 @@ function buildTeamRows() {
   });
 }
 
+// ============ Helpers: MDD, Profit Factor, Sparkline ============
+function calcMDD() {
+  const history = state.leaderboard?.daily_history || [];
+  if (history.length === 0) return 0;
+  // 팀 평균 total_return per day
+  const avgReturns = history.map(d => {
+    const ranking = d.ranking || [];
+    if (ranking.length === 0) return 0;
+    return ranking.reduce((s, r) => s + (r.total_return || 0), 0) / ranking.length;
+  });
+  let peak = -Infinity, mdd = 0;
+  for (const v of avgReturns) {
+    if (v > peak) peak = v;
+    const dd = peak - v;
+    if (dd > mdd) mdd = dd;
+  }
+  return -mdd; // negative value
+}
+
+function calcProfitFactor() {
+  let totalProfit = 0, totalLoss = 0;
+  for (const tid of TEAM_IDS) {
+    const hist = state.history[tid] || [];
+    for (const h of hist) {
+      const results = h.trades?.results || [];
+      for (const t of results) {
+        const amt = t.return_amount || 0;
+        if (amt > 0) totalProfit += amt;
+        else if (amt < 0) totalLoss += Math.abs(amt);
+      }
+    }
+  }
+  return totalLoss > 0 ? totalProfit / totalLoss : totalProfit > 0 ? Infinity : 0;
+}
+
+function calcRealizedPnL() {
+  let total = 0;
+  for (const tid of TEAM_IDS) {
+    const hist = state.history[tid] || [];
+    for (const h of hist) {
+      const results = h.trades?.results || [];
+      for (const t of results) {
+        total += t.return_amount || 0;
+      }
+    }
+  }
+  return total;
+}
+
+function calcUnrealizedPnL() {
+  // portfolios don't have open positions in current data model
+  // Unrealized = (current_capital - initial_capital) - realized
+  const totalCapital = TEAM_IDS.reduce((s, tid) => {
+    const pf = state.portfolios[tid] || {};
+    return s + (pf.current_capital ?? pf.initial_capital ?? 10000000);
+  }, 0);
+  const totalInitial = TEAM_IDS.reduce((s, tid) => {
+    const pf = state.portfolios[tid] || {};
+    const meta = TEAM_META[tid];
+    return s + (pf.initial_capital ?? strategyConfig?.strategies?.[meta.strategy]?.initial_capital ?? 10000000);
+  }, 0);
+  const totalPnL = totalCapital - totalInitial;
+  const realized = calcRealizedPnL();
+  return totalPnL - realized;
+}
+
+function buildSparklineSVG(values, width = 120, height = 32) {
+  if (!values || values.length < 2) return '';
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const step = width / (values.length - 1);
+  const points = values.map((v, i) => `${(i * step).toFixed(1)},${(height - ((v - min) / range) * (height - 4) - 2).toFixed(1)}`).join(' ');
+  const last = values[values.length - 1];
+  const colorCls = last >= (values[0] || 0) ? 'sparkline-up' : 'sparkline-down';
+  return `<svg class="sparkline hero-sparkline ${colorCls}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+    <polyline fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${points}"/>
+  </svg>`;
+}
+
 // ============ Sections ============
 function renderKPI(rows) {
   const dailyAvg = rows.reduce((s, t) => s + t.today_pct, 0) / Math.max(rows.length, 1);
-  const sorted = [...rows].sort((a, b) => b.today_pct - a.today_pct);
-  const maxRow = sorted[0];
   const totalCapital = rows.reduce((s, t) => s + t.capital, 0);
   const totalInitial = rows.reduce((s, t) => s + t.initial_capital, 0);
   const totalCum = totalInitial > 0 ? ((totalCapital - totalInitial) / totalInitial) * 100 : 0;
   const dayN = state.leaderboard?.daily_history?.length ?? 0;
   const totalTrades = rows.reduce((s, t) => s + t.trades, 0);
   const totalWins = rows.reduce((s, t) => s + t.wins, 0);
+  const winRate = totalTrades > 0 ? Math.round(totalWins / totalTrades * 100) : 0;
+  const mdd = calcMDD();
+  const pf = calcProfitFactor();
+
+  // Sparkline: equity curve from daily_history (avg total_return)
+  const history = state.leaderboard?.daily_history || [];
+  const equityValues = history.map(d => {
+    const ranking = d.ranking || [];
+    if (ranking.length === 0) return 0;
+    return ranking.reduce((s, r) => s + (r.total_return || 0), 0) / ranking.length;
+  });
+
+  // Realized / Unrealized P&L
+  const realizedPnL = calcRealizedPnL();
+  const unrealizedPnL = calcUnrealizedPnL();
+  const totalPnL = totalCapital - totalInitial;
+  const realizedPct = totalInitial > 0 ? (realizedPnL / totalInitial) * 100 : 0;
+  const unrealizedPct = totalInitial > 0 ? (unrealizedPnL / totalInitial) * 100 : 0;
 
   return `
     <div class="section">
-      <div class="kpi-grid">
-        <div class="kpi">
-          <div class="kpi-label">${rows.length}팀 평균</div>
-          <div class="kpi-value ${colorClass(dailyAvg)}">${fmtPctSigned(dailyAvg)}</div>
-          <div class="kpi-meta">Day ${dayN}</div>
+      <div class="hero-kpi">
+        <div class="hero-kpi-main">
+          <div class="hero-kpi-label">총 자산 <span class="hero-day-badge">Day ${dayN}</span></div>
+          <div class="hero-kpi-value">${fmtMoney(totalCapital)}</div>
+          <div class="hero-kpi-return ${colorClass(totalCum)}">
+            ${fmtPctSigned(totalCum)}
+            <span class="hero-kpi-amount">(${totalPnL >= 0 ? '+' : ''}${fmtMoney(totalPnL)})</span>
+          </div>
+          <div class="hero-sparkline-wrap">${buildSparklineSVG(equityValues)}</div>
         </div>
-        <div class="kpi">
-          <div class="kpi-label">최고</div>
-          <div class="kpi-value up">${fmtPctSigned(maxRow.today_pct)}</div>
-          <div class="kpi-meta">${maxRow.name.split(' ')[0]}</div>
+        <div class="hero-sub-row">
+          <div class="hero-sub-kpi">
+            <div class="hero-sub-label">일일수익률</div>
+            <div class="hero-sub-value ${colorClass(dailyAvg)}">${fmtPctSigned(dailyAvg)}</div>
+          </div>
+          <div class="hero-sub-kpi">
+            <div class="hero-sub-label">승률</div>
+            <div class="hero-sub-value">${winRate}%</div>
+          </div>
+          <div class="hero-sub-kpi">
+            <div class="hero-sub-label">MDD</div>
+            <div class="hero-sub-value down">${mdd.toFixed(1)}%</div>
+          </div>
+          <div class="hero-sub-kpi">
+            <div class="hero-sub-label">손익비</div>
+            <div class="hero-sub-value">${pf === Infinity ? '∞' : pf.toFixed(2)}</div>
+          </div>
         </div>
-        <div class="kpi">
-          <div class="kpi-label">총 자산</div>
-          <div class="kpi-value">${fmtMoney(totalCapital)}</div>
-          <div class="kpi-meta ${colorClass(totalCum)}">누적 ${fmtPct(totalCum)}</div>
+      </div>
+      <div class="pnl-split-row">
+        <div class="pnl-split-item">
+          <div class="pnl-split-label">실현 손익</div>
+          <div class="pnl-split-value ${colorClass(realizedPnL)}">${realizedPnL >= 0 ? '+' : ''}${fmtMoney(realizedPnL)}</div>
+          <div class="pnl-split-pct ${colorClass(realizedPct)}">${fmtPctSigned(realizedPct)}</div>
         </div>
-        <div class="kpi">
-          <div class="kpi-label">총 매매</div>
-          <div class="kpi-value">${totalTrades}건</div>
-          <div class="kpi-meta">${totalWins}승 ${totalTrades - totalWins}패</div>
+        <div class="pnl-split-divider"></div>
+        <div class="pnl-split-item">
+          <div class="pnl-split-label">미실현 손익</div>
+          <div class="pnl-split-value ${colorClass(unrealizedPnL)}">${unrealizedPnL >= 0 ? '+' : ''}${fmtMoney(unrealizedPnL)}</div>
+          <div class="pnl-split-pct ${colorClass(unrealizedPct)}">${fmtPctSigned(unrealizedPct)}</div>
         </div>
       </div>
     </div>
@@ -384,7 +500,7 @@ function renderStockDetail(c, totalCount) {
 }
 
 function renderCandidatesTable() {
-  // 5전략 후보 통합 테이블 (전략 컬럼 포함)
+  // 5전략 후보 카드 리스트
   const allRows = [];
   for (const tid of TEAM_IDS) {
     const meta = TEAM_META[tid];
@@ -410,48 +526,37 @@ function renderCandidatesTable() {
     `;
   }
 
-  const trs = allRows.map((c, i) => `
-    <tr class="cand-row" data-idx="${i}">
-      <td class="num right">${i + 1}</td>
-      <td>
-        <b>${stockLink(c.code, c.name || '-')}</b>
-        <div class="cand-code">${stockCodeLink(c.code)}</div>
-      </td>
-      <td>
-        <span class="team-pill" style="background:${c._color}15;color:${c._color};border-color:${c._color}40;">
-          ${c._team.split(' ')[0]}
-        </span>
-      </td>
-      <td class="num right">${(+c.score).toFixed(1)}</td>
-      <td class="num right ${colorClass(c.change_pct)}">${fmtPctSigned(c.change_pct)}</td>
-      <td class="num right">${fmtMoney(c.price)}</td>
-    </tr>
-    <tr class="cand-detail-row" data-idx="${i}" style="display:none;">
-      <td colspan="6">${renderCandDetail(c)}</td>
-    </tr>
-  `).join('');
+  const cards = allRows.map((c, i) => {
+    const scoreW = Math.min(100, Math.max(0, (+c.score || 0) / 135 * 100)).toFixed(0);
+    return `
+      <div class="stock-card" data-idx="${i}">
+        <div class="stock-card-body">
+          <div class="stock-card-left">
+            <div class="stock-card-name">${stockLink(c.code, c.name || '-')} <span class="stock-card-code">${stockCodeLink(c.code)}</span></div>
+            <div class="stock-card-strategy"><span class="team-pill" style="background:${c._color}15;color:${c._color};border-color:${c._color}40;">${c._team.split(' ')[0]}</span></div>
+          </div>
+          <div class="stock-card-right">
+            <div class="stock-card-price">${fmtMoney(c.price)}</div>
+            <div class="stock-card-change ${colorClass(c.change_pct)}">${fmtPctSigned(c.change_pct)}</div>
+          </div>
+        </div>
+        <div class="stock-card-score">
+          <div class="score-gauge" style="width:${scoreW}%;">${(+c.score).toFixed(1)}</div>
+        </div>
+      </div>
+      <div class="stock-card-detail" data-idx="${i}" style="display:none;">
+        ${renderCandDetail(c)}
+      </div>
+    `;
+  }).join('');
 
   return `
     <div class="section">
       <div class="section-header">
         <h2 class="section-title display">📋 내일 후보</h2>
-        <span class="section-subtitle">5전략 · ${allRows.length}종목 (점수순)</span>
+        <span class="section-subtitle">${TEAM_IDS.length}전략 · ${allRows.length}종목 (점수순)</span>
       </div>
-      <div class="table-wrap">
-        <table class="tbl cand-tbl">
-          <thead>
-            <tr>
-              <th class="right">#</th>
-              <th>종목</th>
-              <th>전략</th>
-              <th class="right">점수</th>
-              <th class="right">등락률</th>
-              <th class="right">가격</th>
-            </tr>
-          </thead>
-          <tbody>${trs}</tbody>
-        </table>
-      </div>
+      <div class="stock-card-list">${cards}</div>
     </div>
   `;
 }
@@ -584,6 +689,37 @@ function renderHistorySection() {
   `;
 }
 
+function calcHoldingPeriod(entry_time, exit_time) {
+  if (!entry_time || !exit_time) return '당일';
+  // format: "HH:MM" or "YYYY-MM-DD HH:MM"
+  try {
+    // Simple HH:MM format (same day)
+    if (entry_time.length <= 5 && exit_time.length <= 5) {
+      const [eh, em] = entry_time.split(':').map(Number);
+      const [xh, xm] = exit_time.split(':').map(Number);
+      const diffMin = (xh * 60 + xm) - (eh * 60 + em);
+      if (diffMin <= 0) return '당일';
+      const h = Math.floor(diffMin / 60);
+      const m = diffMin % 60;
+      return h > 0 ? `${h}시간 ${m}분` : `${m}분`;
+    }
+    // Full datetime format
+    const entryDate = new Date(entry_time);
+    const exitDate = new Date(exit_time);
+    const diffMs = exitDate - entryDate;
+    if (isNaN(diffMs) || diffMs <= 0) return '당일';
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    if (diffDays > 0) return `${diffDays}일 ${diffHours}시간`;
+    const diffMin = Math.floor(diffMs / (1000 * 60));
+    const h = Math.floor(diffMin / 60);
+    const m = diffMin % 60;
+    return h > 0 ? `${h}시간 ${m}분` : `${m}분`;
+  } catch {
+    return '당일';
+  }
+}
+
 function renderTradeDetail(results, summary) {
   if (!results || results.length === 0) {
     return `<div class="sacc-detail"><div class="detail-h">매매 결과 없음</div></div>`;
@@ -591,6 +727,7 @@ function renderTradeDetail(results, summary) {
   const sim = summary?.simulation || {};
   const rows = results.map(t => {
     const cls = colorClass(t.return_pct);
+    const holdingPeriod = calcHoldingPeriod(t.entry_time, t.exit_time);
     return `
       <div class="trade-row">
         <div class="trade-name">
@@ -599,7 +736,7 @@ function renderTradeDetail(results, summary) {
         </div>
         <div class="trade-prices">
           <div class="num">${fmtMoney(t.entry_price)} → ${fmtMoney(t.exit_price)}</div>
-          <div class="trade-meta">${t.exit_reason || ''} · ${t.quantity || 0}주</div>
+          <div class="trade-meta">${t.exit_reason || ''} · ${t.quantity || 0}주 · <span class="trade-holding">⏱ ${holdingPeriod}</span></div>
         </div>
         <div class="trade-ret ${cls}">
           ${fmtPctSigned(t.return_pct)}
@@ -625,6 +762,47 @@ function renderTradeDetail(results, summary) {
       </div>
       <div class="detail-h">매매 ${results.length}건</div>
       <div class="trade-list">${rows}</div>
+    </div>
+  `;
+}
+
+// ============ Strategy KPI Row (MDD, Profit Factor, Benchmark) ============
+export function renderStrategyKPIRow() {
+  const mdd = calcMDD();
+  const pf = calcProfitFactor();
+  let totalTrades = 0, totalWins = 0;
+  for (const tid of TEAM_IDS) {
+    const hist = state.history[tid] || [];
+    for (const h of hist) {
+      totalTrades += h.summary?.simulation?.total_trades || 0;
+      totalWins += h.summary?.simulation?.wins || 0;
+    }
+  }
+  const winRate = totalTrades > 0 ? (totalWins / totalTrades * 100).toFixed(1) : '0.0';
+
+  return `
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title display">📊 성과 지표</h2>
+      </div>
+      <div class="strategy-kpi-row">
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">MDD</div>
+          <div class="strategy-kpi-value down">${mdd.toFixed(1)}%</div>
+        </div>
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">손익비 (PF)</div>
+          <div class="strategy-kpi-value">${pf === Infinity ? '∞' : pf.toFixed(2)}</div>
+        </div>
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">총 매매</div>
+          <div class="strategy-kpi-value">${totalTrades}건</div>
+        </div>
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">승률</div>
+          <div class="strategy-kpi-value">${winRate}%</div>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -731,18 +909,18 @@ export function renderArena() {
 }
 
 function bindCandidateTable() {
-  $$('.cand-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const idx = row.dataset.idx;
-      const detail = document.querySelector(`.cand-detail-row[data-idx="${idx}"]`);
+  $$('.stock-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = card.dataset.idx;
+      const detail = document.querySelector(`.stock-card-detail[data-idx="${idx}"]`);
       if (!detail) return;
       const isOpen = detail.style.display !== 'none';
       // 다른 펼침 닫기
-      $$('.cand-detail-row').forEach(d => d.style.display = 'none');
-      $$('.cand-row').forEach(r => r.classList.remove('open'));
+      $$('.stock-card-detail').forEach(d => d.style.display = 'none');
+      $$('.stock-card').forEach(c => c.classList.remove('open'));
       if (!isOpen) {
         detail.style.display = '';
-        row.classList.add('open');
+        card.classList.add('open');
       }
     });
   });

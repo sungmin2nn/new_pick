@@ -1485,3 +1485,355 @@
 .swing-tab:hover:not(.active) {
   background: var(--bg-hover);
 }
+
+/* ========================================================
+   HERO KPI (Robinhood-style)
+   ======================================================== */
+.hero-kpi {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.hero-kpi-main {
+  padding: var(--space-5) var(--space-5) var(--space-4);
+}
+
+.hero-kpi-label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hero-day-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-overlay);
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.hero-kpi-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 2rem;
+  font-weight: var(--fw-extrabold);
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin-bottom: var(--space-1);
+}
+
+.hero-kpi-return {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.hero-kpi-return.up { color: var(--up); }
+.hero-kpi-return.down { color: var(--down); }
+.hero-kpi-return.neutral { color: var(--text-tertiary); }
+
+.hero-kpi-amount {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  opacity: 0.8;
+}
+
+.hero-sparkline-wrap {
+  width: 100%;
+  height: 36px;
+}
+
+.hero-sparkline {
+  width: 100%;
+  height: 36px;
+  display: block;
+}
+
+.hero-sub-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border-subtle);
+  border-top: 1px solid var(--border-default);
+}
+
+.hero-sub-kpi {
+  background: var(--bg-surface);
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+}
+
+.hero-sub-label {
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.hero-sub-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+}
+
+.hero-sub-value.up { color: var(--up); }
+.hero-sub-value.down { color: var(--down); }
+
+/* ========================================================
+   P&L SPLIT ROW (Realized / Unrealized)
+   ======================================================== */
+.pnl-split-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--space-4);
+  overflow: hidden;
+}
+
+.pnl-split-item {
+  padding: var(--space-3) var(--space-4);
+  text-align: center;
+}
+
+.pnl-split-label {
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.pnl-split-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+}
+.pnl-split-value.up { color: var(--up); }
+.pnl-split-value.down { color: var(--down); }
+
+.pnl-split-pct {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-top: 1px;
+}
+.pnl-split-pct.up { color: var(--up); }
+.pnl-split-pct.down { color: var(--down); }
+
+.pnl-split-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-default);
+}
+
+/* ========================================================
+   STOCK CARD LIST (Candidate Cards)
+   ======================================================== */
+.stock-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stock-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition: box-shadow var(--duration-fast), background var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stock-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.stock-card:active {
+  background: var(--bg-overlay);
+}
+
+.stock-card.open {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.stock-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.stock-card-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.stock-card-name {
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: 4px;
+}
+
+.stock-card-name a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.stock-card-code {
+  font-size: 10px;
+}
+
+.stock-card-code a {
+  font-size: 10px;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.stock-card-strategy {
+  margin-top: 2px;
+}
+
+.stock-card-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.stock-card-price {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+
+.stock-card-change {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  margin-top: 2px;
+}
+
+.stock-card-change.up { color: var(--up); }
+.stock-card-change.down { color: var(--down); }
+.stock-card-change.neutral { color: var(--text-tertiary); }
+
+.stock-card-score {
+  width: 100%;
+  height: 20px;
+  background: var(--bg-overlay);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.score-gauge {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  color: var(--text-inverse);
+  min-width: 32px;
+  transition: width 0.3s ease;
+}
+
+.stock-card-detail {
+  margin-bottom: var(--space-2);
+}
+
+.stock-card-detail .sacc-detail {
+  margin: 0;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border: 1px solid var(--border-default);
+  border-top: none;
+}
+
+/* ========================================================
+   TRADE HOLDING PERIOD
+   ======================================================== */
+.trade-holding {
+  color: var(--text-secondary);
+  font-weight: var(--fw-medium);
+}
+
+/* ========================================================
+   STRATEGY KPI ROW (pane-strategy)
+   ======================================================== */
+.strategy-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.strategy-kpi-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+
+.strategy-kpi-label {
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.strategy-kpi-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+}
+
+.strategy-kpi-value.up { color: var(--up); }
+.strategy-kpi-value.down { color: var(--down); }

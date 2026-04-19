@@ -72,7 +72,9 @@ function showMainTab(tab) {
     const labDiv = document.getElementById('strategy-lab-content');
     if (labDiv && !labDiv.innerHTML.trim()) {
       import('./arena.js').then(m => {
-        labDiv.innerHTML = m.renderStrategyPanel ? m.renderStrategyPanel() : '';
+        const kpiHtml = m.renderStrategyKPIRow ? m.renderStrategyKPIRow() : '';
+        const panelHtml = m.renderStrategyPanel ? m.renderStrategyPanel() : '';
+        labDiv.innerHTML = kpiHtml + panelHtml;
         // 전략 Lab 아코디언 바인딩
         labDiv.querySelectorAll('.acc-strat-head').forEach(head => {
           head.addEventListener('click', () => {
