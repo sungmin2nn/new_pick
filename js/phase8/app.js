@@ -361,7 +361,7 @@ async function init() {
   startAutoRefresh();
 
   // Mobile gestures
-  initSwipe();
+  // initSwipe(); // 스와이프 탭 전환 비활성 (필터 탭 수평 스크롤과 충돌)
   initPTR();
 }
 
