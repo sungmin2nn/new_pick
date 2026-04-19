@@ -99,15 +99,14 @@ export async function loadArenaData(force = false) {
       fetchCached(`${DATA_BASE}/healthcheck/health_${d}.json`, force)
     )),
 
-    // 후보: 오늘 → 최근 7일 순서로 폴백 탐색
+    // 후보: 최근 7일치 병렬 fetch → 가장 최근 non-null 사용
     Promise.all(TEAM_IDS.map(async tid => {
       const sid = TEAM_META[tid].strategy;
-      const tryDates = [today, ...histDates];
-      for (const d of tryDates) {
-        const data = await fetchCached(`data/paper_trading/candidates_${d}_${sid}.json`, force);
-        if (data) return [sid, data];
-      }
-      return [sid, null];
+      const results = await Promise.all(
+        histDates.map(d => fetchCached(`data/paper_trading/candidates_${d}_${sid}.json`, force).then(data => ({ date: d, data })))
+      );
+      const found = results.find(r => r.data);
+      return [sid, found ? found.data : null];
     })),
 
     // 매매 이력: 5팀 × 7일 × 2파일 = 70개 동시 fetch
