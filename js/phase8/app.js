@@ -8,9 +8,13 @@ import { initTelegram, refreshTelegram } from './telegram.js';
 import { clearCache } from './cache.js';
 
 // ============ Tab management ============
-const TABS = ['arena', 'telegram', 'bnf'];
+const TABS = ['arena', 'swing', 'strategy'];
 // 하단 네비에서 arena 내부 섹션으로 스크롤하는 가상 탭
 const SECTION_TABS = { candidates: '📋 내일 후보', trades: '📜 매매 내역' };
+
+let equityChartInstance = null;
+let dailyPnlChartInstance = null;
+let strategyChartsBuilt = false;
 
 let currentTab = 'arena';
 
@@ -54,14 +58,31 @@ function showMainTab(tab) {
   if (window.location.hash !== `#${tab}`) {
     history.replaceState(null, '', `#${tab}`);
   }
-  // BNF/볼린저 탭 전환 시 iframe 처리
-  if (tab === 'bnf') {
+  // Swing 탭 전환 시 iframe 처리
+  if (tab === 'swing') {
     setTimeout(() => {
       const iframe = $('#bnf-iframe');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }, 200);
+  }
+  // Strategy 탭 전환 시 차트 + 전략 Lab 렌더
+  if (tab === 'strategy') {
+    const labDiv = document.getElementById('strategy-lab-content');
+    if (labDiv && !labDiv.innerHTML.trim()) {
+      import('./arena.js').then(m => {
+        labDiv.innerHTML = m.renderStrategyPanel ? m.renderStrategyPanel() : '';
+        // 전략 Lab 아코디언 바인딩
+        labDiv.querySelectorAll('.acc-strat-head').forEach(head => {
+          head.addEventListener('click', () => {
+            const strat = head.closest('.acc-strat');
+            if (strat) strat.classList.toggle('open');
+          });
+        });
+      });
+    }
+    buildStrategyCharts();
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -181,6 +202,98 @@ function toggleTheme() {
   applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
+// ============ Strategy Charts (Chart.js) ============
+async function buildStrategyCharts() {
+  if (strategyChartsBuilt) return;
+  if (typeof Chart === 'undefined') return;
+
+  try {
+    const { fetchCached } = await import('./cache.js');
+    const lb = await fetchCached('data/arena/leaderboard.json');
+    if (!lb || !lb.daily_history || lb.daily_history.length === 0) return;
+
+    const history = lb.daily_history;
+    const dates = history.map(d => d.date);
+    const teamIds = Object.keys(history[0]).filter(k => k.startsWith('team_'));
+
+    // Team colors
+    const COLORS = {
+      team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981',
+      team_d: '#F59E0B', team_e: '#8B5CF6', team_f: '#EC4899',
+      team_g: '#14B8A6', team_h: '#F97316', team_i: '#6366F1',
+      team_j: '#84CC16', team_k: '#D946EF', team_l: '#0EA5E9',
+    };
+
+    // --- Equity Curve ---
+    const equityCtx = document.getElementById('equityChart');
+    if (equityCtx) {
+      if (equityChartInstance) equityChartInstance.destroy();
+      const datasets = teamIds.map(tid => ({
+        label: tid.replace('team_', '').toUpperCase(),
+        data: history.map(d => d[tid]?.total_return ?? 0),
+        borderColor: COLORS[tid] || '#6B7280',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+      }));
+      equityChartInstance = new Chart(equityCtx, {
+        type: 'line',
+        data: { labels: dates, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+          },
+          scales: {
+            x: { ticks: { font: { size: 10 }, maxTicksLimit: 7 } },
+            y: { ticks: { font: { size: 10 }, callback: v => v.toFixed(1) + '%' } },
+          },
+        },
+      });
+    }
+
+    // --- Daily P&L Bar ---
+    const pnlCtx = document.getElementById('dailyPnlChart');
+    if (pnlCtx) {
+      if (dailyPnlChartInstance) dailyPnlChartInstance.destroy();
+      const avgReturns = history.map(d => {
+        const vals = teamIds.map(tid => d[tid]?.total_return ?? 0);
+        return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+      });
+      // Daily change (difference from previous day)
+      const dailyPnl = avgReturns.map((v, i) => i === 0 ? v : v - avgReturns[i - 1]);
+
+      dailyPnlChartInstance = new Chart(pnlCtx, {
+        type: 'bar',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: '일별 평균 수익률',
+            data: dailyPnl,
+            backgroundColor: dailyPnl.map(v => v >= 0 ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.7)'),
+            borderRadius: 3,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { font: { size: 10 }, maxTicksLimit: 7 } },
+            y: { ticks: { font: { size: 10 }, callback: v => v.toFixed(1) + '%' } },
+          },
+        },
+      });
+    }
+
+    strategyChartsBuilt = true;
+  } catch (e) {
+    console.warn('[Strategy] 차트 빌드 실패:', e);
+  }
+}
+
 // ============ Init ============
 async function init() {
   // Theme
@@ -207,7 +320,7 @@ async function init() {
 
   // Hash routing
   const hash = window.location.hash.replace('#', '');
-  if (TABS.includes(hash)) showMainTab(hash);
+  if (TABS.includes(hash) || SECTION_TABS[hash]) showMainTab(hash);
 
   // Status bar clock
   setInterval(updateStatusBar, 60 * 1000);

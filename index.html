@@ -52,11 +52,17 @@
       <button class="main-tab active" data-tab="arena">
         🏠 <span>홈</span>
       </button>
-      <button class="main-tab" data-tab="telegram">
-        📨 <span>알림</span>
+      <button class="main-tab" data-tab="candidates">
+        📊 <span>후보</span>
       </button>
-      <button class="main-tab" data-tab="bnf">
-        🎯 <span>BNF</span>
+      <button class="main-tab" data-tab="trades">
+        📋 <span>매매</span>
+      </button>
+      <button class="main-tab" data-tab="swing">
+        💰 <span>스윙</span>
+      </button>
+      <button class="main-tab" data-tab="strategy">
+        ⚡ <span>전략</span>
       </button>
     </div>
   </div>
@@ -94,20 +100,62 @@
         </div>
       </section>
 
-      <!-- ============ BNF Pane (iframe → bnf_dashboard.html) ============ -->
-      <section class="main-pane" id="pane-bnf">
-        <iframe
-          id="bnf-iframe"
-          src="bnf_dashboard.html"
-          title="BNF 낙폭과대 대시보드"
-          style="width:100%; height:calc(100vh - 160px); min-height:700px; border:none; border-radius:var(--radius-lg); background:var(--bg-surface); box-shadow:var(--shadow-card); display:block;"
-        ></iframe>
+      <!-- ============ Swing Pane (BNF + 볼린저 서브탭) ============ -->
+      <section class="main-pane" id="pane-swing">
+        <div class="swing-tabs" style="display:flex;gap:var(--space-2);padding:var(--space-3);position:sticky;top:0;z-index:10;background:var(--bg-base);">
+          <button class="swing-tab active" data-swing="bnf" onclick="switchSwing('bnf')">🎯 BNF</button>
+          <button class="swing-tab" data-swing="bollinger" onclick="switchSwing('bollinger')">📉 볼린저</button>
+        </div>
+        <div id="swing-bnf">
+          <iframe
+            id="bnf-iframe"
+            src="bnf_dashboard.html"
+            title="BNF 낙폭과대 대시보드"
+            style="width:100%; height:calc(100vh - 160px); min-height:700px; border:none; border-radius:var(--radius-lg); background:var(--bg-surface); box-shadow:var(--shadow-card); display:block;"
+          ></iframe>
+        </div>
+        <div id="swing-bollinger" style="display:none;">
+          <iframe
+            id="bollinger-iframe"
+            src="bnf_dashboard.html#bollingerSection"
+            title="볼린저 대시보드"
+            style="width:100%; height:calc(100vh - 160px); min-height:700px; border:none; border-radius:var(--radius-lg); background:var(--bg-surface); box-shadow:var(--shadow-card); display:block;"
+          ></iframe>
+        </div>
         <script>
           (function() {
             var f = document.getElementById('bnf-iframe');
             if (f) f.src = 'bnf_dashboard.html?v=' + Date.now();
           })();
         </script>
+      </section>
+
+      <!-- ============ Strategy Pane ============ -->
+      <section class="main-pane" id="pane-strategy">
+        <div class="page-content">
+          <!-- 에쿼티 커브 차트 -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title display">📈 팀별 수익률 추이</h2>
+            </div>
+            <div class="card" style="padding:var(--space-3);">
+              <canvas id="equityChart" style="height:200px;"></canvas>
+            </div>
+          </div>
+
+          <!-- 일별 P&L 막대 차트 -->
+          <div class="section">
+            <div class="section-header">
+              <h2 class="section-title display">📊 일별 손익</h2>
+            </div>
+            <div class="card" style="padding:var(--space-3);">
+              <canvas id="dailyPnlChart" style="height:120px;"></canvas>
+            </div>
+          </div>
+
+          <!-- 전략 Lab 패널 -->
+          <div id="strategy-lab-content"></div>
+        </div>
       </section>
 
     </div>
@@ -120,16 +168,33 @@
         <span class="icon">🏠</span><span>홈</span>
       </button>
       <button class="bottom-tab" data-tab="candidates">
-        <span class="icon">📊</span><span>페이퍼</span>
+        <span class="icon">📊</span><span>후보</span>
       </button>
       <button class="bottom-tab" data-tab="trades">
-        <span class="icon">📋</span><span>NEW</span>
+        <span class="icon">📋</span><span>매매</span>
       </button>
-      <button class="bottom-tab" data-tab="bnf">
-        <span class="icon">🎯</span><span>BNF</span>
+      <button class="bottom-tab" data-tab="swing">
+        <span class="icon">💰</span><span>스윙</span>
+      </button>
+      <button class="bottom-tab" data-tab="strategy">
+        <span class="icon">⚡</span><span>전략</span>
       </button>
     </div>
   </nav>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+
+  <!-- Swing sub-tab switcher -->
+  <script>
+  function switchSwing(type) {
+    document.getElementById('swing-bnf').style.display = type === 'bnf' ? 'block' : 'none';
+    document.getElementById('swing-bollinger').style.display = type === 'bollinger' ? 'block' : 'none';
+    document.querySelectorAll('.swing-tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.swing === type);
+    });
+  }
+  </script>
 
   <!-- Phase 8 App (ES Module) -->
   <script type="module" src="js/phase8/app.js"></script>

@@ -1459,3 +1459,29 @@
 .tg-stat.down { color: var(--danger); }
 .tg-stat.neutral { color: var(--warning); }
 .tg-stat-divider { color: var(--text-quaternary); }
+
+/* ========================================================
+   SWING SUB-TABS
+   ======================================================== */
+.swing-tab {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  text-align: center;
+  min-height: 44px;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+.swing-tab.active {
+  background: var(--accent);
+  color: var(--text-inverse);
+  border-color: var(--accent);
+}
+.swing-tab:hover:not(.active) {
+  background: var(--bg-hover);
+}

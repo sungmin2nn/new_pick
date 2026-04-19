@@ -629,7 +629,7 @@ function renderTradeDetail(results, summary) {
   `;
 }
 
-function renderStrategyPanel() {
+export function renderStrategyPanel() {
   if (!strategyConfig || !strategyConfig.strategies) return '';
   const all = Object.entries(strategyConfig.strategies);
   const enabled = all.filter(([, e]) => e.enabled);
@@ -715,7 +715,6 @@ export function renderArena() {
       ${renderH2H(rows)}
       ${renderCandidatesTable()}
       ${renderTeamsAccordion(rows)}
-      ${renderStrategyPanel()}
       ${renderSystemMini()}
     `;
     bindAccordion();
