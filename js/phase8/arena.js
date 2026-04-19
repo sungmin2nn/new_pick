@@ -6,6 +6,30 @@ import {
   colorClass, $, $$, getTodayKST, getRecentDates
 } from './ui.js';
 
+// ============ 지표 툴팁 설명 ============
+const METRIC_TIPS = {
+  '일일수익률': '오늘 하루 전체 팀 평균 수익률',
+  '승률': '수익 매매 수 / 전체 매매 수 × 100',
+  'MDD': '최대 낙폭 — 고점 대비 가장 많이 빠진 비율. 낮을수록 안정적',
+  '손익비': '총 수익 / 총 손실. 1 이상이면 수익 > 손실',
+  '샤프 비율': '위험 조정 수익률. 1 이상 양호, 2 이상 우수',
+  '평균 보유': '매수~매도까지 평균 보유 시간',
+  '최고 수익': '단일 매매 중 가장 높은 수익률',
+  '최대 손실': '단일 매매 중 가장 큰 손실률',
+  '실현 손익': '매도 완료된 매매의 확정 손익',
+  '미실현 손익': '보유 중인 종목의 평가 손익 (미확정)',
+  'ELO': '팀 간 경쟁 레이팅. 1000 기준, 높을수록 강팀',
+  '총 매매': '전체 매매 건수',
+  '연승': '최대 연속 수익 기록',
+  '연패': '현재 연속 손실 횟수',
+};
+
+function tip(label) {
+  const desc = METRIC_TIPS[label];
+  if (!desc) return label;
+  return `${label} <span class="metric-tip" onclick="event.stopPropagation();this.classList.toggle('show');" data-tip="${desc}">?</span>`;
+}
+
 // 기본 팀 (strategy_config.json 로드 전 폴백)
 const DEFAULT_TEAM_META = {
   team_a: { name: 'Alpha Momentum', desc: 'MA5 + 거래량 급증', color: '#EF4444', strategy: 'momentum' },
@@ -402,32 +426,32 @@ function renderKPI(rows) {
         </div>
         <div class="hero-sub-row">
           <div class="hero-sub-kpi">
-            <div class="hero-sub-label">일일수익률</div>
+            <div class="hero-sub-label">${tip('일일수익률')}</div>
             <div class="hero-sub-value ${colorClass(dailyAvg)}">${fmtPctSigned(dailyAvg)}</div>
           </div>
           <div class="hero-sub-kpi">
-            <div class="hero-sub-label">승률</div>
+            <div class="hero-sub-label">${tip('승률')}</div>
             <div class="hero-sub-value">${winRate}%</div>
           </div>
           <div class="hero-sub-kpi">
-            <div class="hero-sub-label">MDD</div>
+            <div class="hero-sub-label">${tip('MDD')}</div>
             <div class="hero-sub-value down">${mdd.toFixed(1)}%</div>
           </div>
           <div class="hero-sub-kpi">
-            <div class="hero-sub-label">손익비</div>
+            <div class="hero-sub-label">${tip('손익비')}</div>
             <div class="hero-sub-value">${pf === Infinity ? '∞' : pf.toFixed(2)}</div>
           </div>
         </div>
       </div>
       <div class="pnl-split-row">
         <div class="pnl-split-item">
-          <div class="pnl-split-label">실현 손익</div>
+          <div class="pnl-split-label">${tip('실현 손익')}</div>
           <div class="pnl-split-value ${colorClass(realizedPnL)}">${realizedPnL >= 0 ? '+' : ''}${fmtMoney(realizedPnL)}</div>
           <div class="pnl-split-pct ${colorClass(realizedPct)}">${fmtPctSigned(realizedPct)}</div>
         </div>
         <div class="pnl-split-divider"></div>
         <div class="pnl-split-item">
-          <div class="pnl-split-label">미실현 손익</div>
+          <div class="pnl-split-label">${tip('미실현 손익')}</div>
           <div class="pnl-split-value ${colorClass(unrealizedPnL)}">${unrealizedPnL >= 0 ? '+' : ''}${fmtMoney(unrealizedPnL)}</div>
           <div class="pnl-split-pct ${colorClass(unrealizedPct)}">${fmtPctSigned(unrealizedPct)}</div>
         </div>
@@ -933,35 +957,35 @@ export function renderStrategyKPIRow() {
       </div>
       <div class="strategy-kpi-row">
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">MDD</div>
+          <div class="strategy-kpi-label">${tip('MDD')}</div>
           <div class="strategy-kpi-value down">${mdd.toFixed(1)}%</div>
         </div>
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">손익비 (PF)</div>
+          <div class="strategy-kpi-label">${tip('손익비')}</div>
           <div class="strategy-kpi-value">${pf === Infinity ? '∞' : pf.toFixed(2)}</div>
         </div>
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">총 매매</div>
+          <div class="strategy-kpi-label">${tip('총 매매')}</div>
           <div class="strategy-kpi-value">${totalTrades}건</div>
         </div>
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">승률</div>
+          <div class="strategy-kpi-label">${tip('승률')}</div>
           <div class="strategy-kpi-value">${winRate}%</div>
         </div>
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">샤프 비율</div>
+          <div class="strategy-kpi-label">${tip('샤프 비율')}</div>
           <div class="strategy-kpi-value ${sharpeClass}">${sharpeStr}</div>
         </div>
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">평균 보유</div>
+          <div class="strategy-kpi-label">${tip('평균 보유')}</div>
           <div class="strategy-kpi-value">${fmtHoldingMinutes(avgHold)}</div>
         </div>
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">최고 수익</div>
+          <div class="strategy-kpi-label">${tip('최고 수익')}</div>
           <div class="strategy-kpi-value up">${singleRet.best > 0 ? '+' : ''}${singleRet.best.toFixed(2)}%</div>
         </div>
         <div class="strategy-kpi-item">
-          <div class="strategy-kpi-label">최대 손실</div>
+          <div class="strategy-kpi-label">${tip('최대 손실')}</div>
           <div class="strategy-kpi-value down">${singleRet.worst.toFixed(2)}%</div>
         </div>
       </div>

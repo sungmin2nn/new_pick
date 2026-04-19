@@ -361,6 +361,13 @@ async function init() {
   const themeBtn = $('#theme-toggle');
   if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
 
+  // 툴팁 닫기 (다른 곳 터치 시)
+  document.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('metric-tip')) {
+      document.querySelectorAll('.metric-tip.show').forEach(t => t.classList.remove('show'));
+    }
+  });
+
   // Tab listeners
   $$('.main-tab').forEach(btn => {
     btn.addEventListener('click', () => showMainTab(btn.dataset.tab));
