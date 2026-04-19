@@ -1868,3 +1868,55 @@
 
 .strategy-kpi-value.up { color: var(--up); }
 .strategy-kpi-value.down { color: var(--down); }
+
+/* ========================================================
+   MONTHLY RETURNS GRID
+   ======================================================== */
+.monthly-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.monthly-cell {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--duration-fast);
+}
+.monthly-cell:hover {
+  transform: translateY(-1px);
+}
+
+.monthly-cell-up {
+  border-left: 3px solid var(--up);
+}
+.monthly-cell-down {
+  border-left: 3px solid var(--down);
+}
+
+.monthly-cell-label {
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.monthly-cell-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+}
+.monthly-cell-up .monthly-cell-value {
+  color: var(--up);
+}
+.monthly-cell-down .monthly-cell-value {
+  color: var(--down);
+}

@@ -73,8 +73,9 @@ function showMainTab(tab) {
     if (labDiv && !labDiv.innerHTML.trim()) {
       import('./arena.js').then(m => {
         const kpiHtml = m.renderStrategyKPIRow ? m.renderStrategyKPIRow() : '';
+        const monthlyHtml = m.renderMonthlyReturnsTable ? m.renderMonthlyReturnsTable() : '';
         const panelHtml = m.renderStrategyPanel ? m.renderStrategyPanel() : '';
-        labDiv.innerHTML = kpiHtml + panelHtml;
+        labDiv.innerHTML = kpiHtml + monthlyHtml + panelHtml;
         // 전략 Lab 아코디언 바인딩
         labDiv.querySelectorAll('.acc-strat-head').forEach(head => {
           head.addEventListener('click', () => {
@@ -241,6 +242,12 @@ async function buildStrategyCharts() {
     };
     const NAMES = lb.teams || {};
 
+    // --- Benchmark (KOSPI) data ---
+    let benchmarkData = null;
+    try {
+      benchmarkData = await fetchCached('data/arena/benchmark.json');
+    } catch (e) { /* benchmark 파일 없으면 스킵 */ }
+
     // --- Equity Curve ---
     const equityCtx = document.getElementById('equityChart');
     if (equityCtx && teamIds.length > 0) {
@@ -262,6 +269,27 @@ async function buildStrategyCharts() {
           spanGaps: true,
         };
       });
+
+      // KOSPI 벤치마크 라인 추가 (benchmark.json이 있으면)
+      if (benchmarkData && benchmarkData.daily) {
+        const kospiReturns = history.map(d => {
+          const dateStr = d.date || '';
+          const entry = benchmarkData.daily.find(b => b.date === dateStr);
+          return entry ? entry.return_pct : null;
+        });
+        datasets.push({
+          label: 'KOSPI',
+          data: kospiReturns,
+          borderColor: '#9CA3AF',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [6, 3],
+          pointRadius: 0,
+          tension: 0.3,
+          spanGaps: true,
+        });
+      }
+
       equityChartInstance = new Chart(equityCtx, {
         type: 'line',
         data: { labels: dates, datasets },

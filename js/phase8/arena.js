@@ -163,6 +163,10 @@ function buildTeamRows() {
       wins: pf.total_wins ?? 0,
       trades: pf.total_trades ?? 0,
       win_rate: wr,
+      max_drawdown_pct: pf.max_drawdown_pct ?? 0,
+      max_win_streak: pf.max_win_streak ?? 0,
+      loss_streak: pf.loss_streak ?? 0,
+      win_streak: pf.win_streak ?? 0,
     };
   });
 }
@@ -200,6 +204,115 @@ function calcProfitFactor() {
     }
   }
   return totalLoss > 0 ? totalProfit / totalLoss : totalProfit > 0 ? Infinity : 0;
+}
+
+// ============ Sharpe Ratio ============
+function calcSharpeRatio() {
+  const history = state.leaderboard?.daily_history || [];
+  if (history.length < 2) return 0;
+  // 팀 평균 total_return per day → daily returns (차분)
+  const avgReturns = history.map(d => {
+    const ranking = d.ranking || [];
+    if (ranking.length === 0) return 0;
+    return ranking.reduce((s, r) => s + (r.total_return || 0), 0) / ranking.length;
+  });
+  const dailyReturns = avgReturns.map((v, i) => i === 0 ? v : v - avgReturns[i - 1]);
+  if (dailyReturns.length < 2) return 0;
+  const mean = dailyReturns.reduce((s, v) => s + v, 0) / dailyReturns.length;
+  const variance = dailyReturns.reduce((s, v) => s + (v - mean) ** 2, 0) / (dailyReturns.length - 1);
+  const std = Math.sqrt(variance);
+  if (std === 0) return mean > 0 ? Infinity : 0;
+  const riskFreeDaily = 3.5 / 250; // 3.5% 연 → 일
+  return ((mean - riskFreeDaily) / std) * Math.sqrt(250);
+}
+
+// ============ 평균 보유기간 (분 단위) ============
+function calcAvgHoldingMinutes() {
+  let totalMin = 0, count = 0;
+  for (const tid of TEAM_IDS) {
+    const hist = state.history[tid] || [];
+    for (const h of hist) {
+      const results = h.trades?.results || [];
+      for (const t of results) {
+        const mins = getHoldingMinutes(t.entry_time, t.exit_time);
+        if (mins > 0) { totalMin += mins; count++; }
+      }
+    }
+  }
+  return count > 0 ? totalMin / count : 0;
+}
+
+function getHoldingMinutes(entry_time, exit_time) {
+  if (!entry_time || !exit_time) return 0;
+  try {
+    if (entry_time.length <= 5 && exit_time.length <= 5) {
+      const [eh, em] = entry_time.split(':').map(Number);
+      const [xh, xm] = exit_time.split(':').map(Number);
+      const diff = (xh * 60 + xm) - (eh * 60 + em);
+      return diff > 0 ? diff : 0;
+    }
+    const entryDate = new Date(entry_time);
+    const exitDate = new Date(exit_time);
+    const diffMs = exitDate - entryDate;
+    return !isNaN(diffMs) && diffMs > 0 ? Math.floor(diffMs / 60000) : 0;
+  } catch { return 0; }
+}
+
+function fmtHoldingMinutes(mins) {
+  if (mins <= 0) return '-';
+  const h = Math.floor(mins / 60);
+  const m = Math.round(mins % 60);
+  return h > 0 ? `${h}시간 ${m}분` : `${m}분`;
+}
+
+// ============ 최대 단일 수익/손실 ============
+function calcMaxSingleReturn() {
+  let maxReturn = -Infinity, minReturn = Infinity;
+  for (const tid of TEAM_IDS) {
+    const hist = state.history[tid] || [];
+    for (const h of hist) {
+      const results = h.trades?.results || [];
+      for (const t of results) {
+        const r = t.return_pct ?? 0;
+        if (r > maxReturn) maxReturn = r;
+        if (r < minReturn) minReturn = r;
+      }
+    }
+  }
+  return {
+    best: maxReturn === -Infinity ? 0 : maxReturn,
+    worst: minReturn === Infinity ? 0 : minReturn,
+  };
+}
+
+// ============ 월별 수익률 ============
+function calcMonthlyReturns() {
+  const history = state.leaderboard?.daily_history || [];
+  if (history.length === 0) return [];
+  // 팀 평균 total_return per day → daily returns
+  const avgReturns = history.map(d => {
+    const ranking = d.ranking || [];
+    if (ranking.length === 0) return 0;
+    return ranking.reduce((s, r) => s + (r.total_return || 0), 0) / ranking.length;
+  });
+  const dailyReturns = avgReturns.map((v, i) => i === 0 ? v : v - avgReturns[i - 1]);
+
+  // 월별 그룹핑
+  const monthMap = {};
+  history.forEach((d, i) => {
+    const dateStr = d.date || '';
+    if (dateStr.length < 6) return;
+    const monthKey = dateStr.slice(0, 6); // YYYYMM
+    if (!monthMap[monthKey]) monthMap[monthKey] = 0;
+    monthMap[monthKey] += dailyReturns[i] || 0;
+  });
+
+  return Object.entries(monthMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, ret]) => ({
+      label: `${key.slice(0, 4)}.${key.slice(4, 6)}`,
+      return_pct: ret,
+    }));
 }
 
 function calcRealizedPnL() {
@@ -421,6 +534,14 @@ function renderTeamsAccordion(rows) {
                 <div class="mini-kpi-label">매매</div>
                 <div class="mini-kpi-value">${t.wins}/${t.trades}</div>
                 <div class="mini-kpi-meta">승률 ${t.win_rate}%</div>
+              </div>
+              <div class="mini-kpi">
+                <div class="mini-kpi-label">MDD</div>
+                <div class="mini-kpi-value down">${t.max_drawdown_pct === 0 ? '0.0' : (-Math.abs(t.max_drawdown_pct)).toFixed(1)}%</div>
+              </div>
+              <div class="mini-kpi">
+                <div class="mini-kpi-label">연승 / 연패</div>
+                <div class="mini-kpi-value"><span class="up">${t.max_win_streak}</span> / <span class="down">${t.loss_streak}</span></div>
               </div>
             </div>
             ${historyBody}
@@ -790,6 +911,9 @@ function renderTradeDetail(results, summary) {
 export function renderStrategyKPIRow() {
   const mdd = calcMDD();
   const pf = calcProfitFactor();
+  const sharpe = calcSharpeRatio();
+  const avgHold = calcAvgHoldingMinutes();
+  const singleRet = calcMaxSingleReturn();
   let totalTrades = 0, totalWins = 0;
   for (const tid of TEAM_IDS) {
     const hist = state.history[tid] || [];
@@ -799,6 +923,8 @@ export function renderStrategyKPIRow() {
     }
   }
   const winRate = totalTrades > 0 ? (totalWins / totalTrades * 100).toFixed(1) : '0.0';
+  const sharpeStr = sharpe === Infinity ? '∞' : sharpe.toFixed(2);
+  const sharpeClass = sharpe >= 1 ? 'up' : sharpe >= 0 ? '' : 'down';
 
   return `
     <div class="section">
@@ -822,9 +948,54 @@ export function renderStrategyKPIRow() {
           <div class="strategy-kpi-label">승률</div>
           <div class="strategy-kpi-value">${winRate}%</div>
         </div>
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">샤프 비율</div>
+          <div class="strategy-kpi-value ${sharpeClass}">${sharpeStr}</div>
+        </div>
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">평균 보유</div>
+          <div class="strategy-kpi-value">${fmtHoldingMinutes(avgHold)}</div>
+        </div>
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">최고 수익</div>
+          <div class="strategy-kpi-value up">${singleRet.best > 0 ? '+' : ''}${singleRet.best.toFixed(2)}%</div>
+        </div>
+        <div class="strategy-kpi-item">
+          <div class="strategy-kpi-label">최대 손실</div>
+          <div class="strategy-kpi-value down">${singleRet.worst.toFixed(2)}%</div>
+        </div>
       </div>
     </div>
   `;
+}
+
+// ============ 월별 수익률 테이블 ============
+export function renderMonthlyReturnsTable() {
+  const monthly = calcMonthlyReturns();
+  if (monthly.length === 0) {
+    return `
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title display">📅 월별 수익률</h2>
+        </div>
+        <div class="empty"><div class="empty-icon">📭</div><div class="empty-text">데이터 없음</div></div>
+      </div>`;
+  }
+  const cells = monthly.map(m => {
+    const cls = m.return_pct >= 0 ? 'monthly-cell-up' : 'monthly-cell-down';
+    return `<div class="monthly-cell ${cls}">
+      <div class="monthly-cell-label">${m.label}</div>
+      <div class="monthly-cell-value">${m.return_pct >= 0 ? '+' : ''}${m.return_pct.toFixed(2)}%</div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title display">📅 월별 수익률</h2>
+      </div>
+      <div class="monthly-grid">${cells}</div>
+    </div>`;
 }
 
 export function renderStrategyPanel() {

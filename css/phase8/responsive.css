@@ -321,6 +321,26 @@
   .strategy-kpi-value {
     font-size: var(--fs-sm);
   }
+
+  /* Monthly returns grid mobile */
+  .monthly-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+  .monthly-cell {
+    padding: var(--space-2);
+  }
+  .monthly-cell-label {
+    font-size: 9px;
+  }
+  .monthly-cell-value {
+    font-size: var(--fs-xs);
+  }
+
+  /* team detail grid: 2x2 on mobile */
+  .team-detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ========== Tablet (769px ~ 1024px) ========== */
