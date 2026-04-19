@@ -99,9 +99,15 @@ export async function loadArenaData(force = false) {
       fetchCached(`${DATA_BASE}/healthcheck/health_${d}.json`, force)
     )),
 
-    Promise.all(TEAM_IDS.map(tid => {
+    // 후보: 오늘 → 최근 7일 순서로 폴백 탐색
+    Promise.all(TEAM_IDS.map(async tid => {
       const sid = TEAM_META[tid].strategy;
-      return fetchCached(`data/paper_trading/candidates_${today}_${sid}.json`, force).then(d => [sid, d]);
+      const tryDates = [today, ...histDates];
+      for (const d of tryDates) {
+        const data = await fetchCached(`data/paper_trading/candidates_${d}_${sid}.json`, force);
+        if (data) return [sid, data];
+      }
+      return [sid, null];
     })),
 
     // 매매 이력: 5팀 × 7일 × 2파일 = 70개 동시 fetch
