@@ -213,30 +213,46 @@ async function buildStrategyCharts() {
     if (!lb || !lb.daily_history || lb.daily_history.length === 0) return;
 
     const history = lb.daily_history;
-    const dates = history.map(d => d.date);
-    const teamIds = Object.keys(history[0]).filter(k => k.startsWith('team_'));
+    const dates = history.map(d => {
+      const s = d.date;
+      return s ? s.slice(4,6) + '/' + s.slice(6,8) : '';
+    });
 
-    // Team colors
+    // ranking 배열에서 팀 ID 수집
+    const teamIdSet = new Set();
+    history.forEach(d => {
+      (d.ranking || []).forEach(r => { if (r.team_id) teamIdSet.add(r.team_id); });
+    });
+    const teamIds = [...teamIdSet].sort();
+
     const COLORS = {
       team_a: '#EF4444', team_b: '#3B82F6', team_c: '#10B981',
       team_d: '#F59E0B', team_e: '#8B5CF6', team_f: '#EC4899',
       team_g: '#14B8A6', team_h: '#F97316', team_i: '#6366F1',
-      team_j: '#84CC16', team_k: '#D946EF', team_l: '#0EA5E9',
     };
+    const NAMES = lb.teams || {};
 
     // --- Equity Curve ---
     const equityCtx = document.getElementById('equityChart');
-    if (equityCtx) {
+    if (equityCtx && teamIds.length > 0) {
       if (equityChartInstance) equityChartInstance.destroy();
-      const datasets = teamIds.map(tid => ({
-        label: tid.replace('team_', '').toUpperCase(),
-        data: history.map(d => d[tid]?.total_return ?? 0),
-        borderColor: COLORS[tid] || '#6B7280',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        pointRadius: 0,
-        tension: 0.3,
-      }));
+      const datasets = teamIds.map(tid => {
+        const teamName = NAMES[tid]?.team_name?.split(' ')[0] || tid;
+        return {
+          label: teamName,
+          data: history.map(d => {
+            const r = (d.ranking || []).find(x => x.team_id === tid);
+            return r ? r.total_return : null;
+          }),
+          borderColor: COLORS[tid] || '#6B7280',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: COLORS[tid] || '#6B7280',
+          tension: 0.3,
+          spanGaps: true,
+        };
+      });
       equityChartInstance = new Chart(equityCtx, {
         type: 'line',
         data: { labels: dates, datasets },
@@ -244,11 +260,14 @@ async function buildStrategyCharts() {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, padding: 8 } },
+            tooltip: {
+              callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y >= 0 ? '+' : ''}${c.parsed.y.toFixed(2)}%` }
+            }
           },
           scales: {
-            x: { ticks: { font: { size: 10 }, maxTicksLimit: 7 } },
-            y: { ticks: { font: { size: 10 }, callback: v => v.toFixed(1) + '%' } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 }, callback: v => v.toFixed(1) + '%' } },
           },
         },
       });
@@ -256,13 +275,13 @@ async function buildStrategyCharts() {
 
     // --- Daily P&L Bar ---
     const pnlCtx = document.getElementById('dailyPnlChart');
-    if (pnlCtx) {
+    if (pnlCtx && history.length > 0) {
       if (dailyPnlChartInstance) dailyPnlChartInstance.destroy();
       const avgReturns = history.map(d => {
-        const vals = teamIds.map(tid => d[tid]?.total_return ?? 0);
-        return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+        const ranking = d.ranking || [];
+        if (ranking.length === 0) return 0;
+        return ranking.reduce((s, r) => s + (r.total_return || 0), 0) / ranking.length;
       });
-      // Daily change (difference from previous day)
       const dailyPnl = avgReturns.map((v, i) => i === 0 ? v : v - avgReturns[i - 1]);
 
       dailyPnlChartInstance = new Chart(pnlCtx, {
@@ -270,19 +289,23 @@ async function buildStrategyCharts() {
         data: {
           labels: dates,
           datasets: [{
-            label: '일별 평균 수익률',
+            label: '일별 평균',
             data: dailyPnl,
             backgroundColor: dailyPnl.map(v => v >= 0 ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.7)'),
-            borderRadius: 3,
+            borderRadius: 4,
+            barPercentage: 0.6,
           }],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: c => `${c.parsed.y >= 0 ? '+' : ''}${c.parsed.y.toFixed(2)}%` } }
+          },
           scales: {
-            x: { ticks: { font: { size: 10 }, maxTicksLimit: 7 } },
-            y: { ticks: { font: { size: 10 }, callback: v => v.toFixed(1) + '%' } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 }, callback: v => v.toFixed(1) + '%' } },
           },
         },
       });
