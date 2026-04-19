@@ -17,11 +17,22 @@ NTB_ROOT = Path(__file__).parent.parent.parent
 ARENA_DIR = NTB_ROOT / "data" / "arena"
 CONFIG_PATH = ARENA_DIR / "strategy_config.json"
 
-# strategy-lab 경로: 환경변수 우선, 없으면 형제 디렉토리 탐색
-STRATEGY_LAB_ROOT = Path(os.environ.get(
-    "STRATEGY_LAB_ROOT",
-    str(NTB_ROOT.parent / "strategy-lab")
-))
+# strategy-lab 경로: 환경변수 → 하위 디렉토리 → 형제 디렉토리 순으로 탐색
+def _find_strategy_lab():
+    env = os.environ.get("STRATEGY_LAB_ROOT")
+    if env and Path(env).exists():
+        return Path(env)
+    # GitHub Actions: checkout path로 NTB_ROOT/strategy-lab에 위치
+    sub = NTB_ROOT / "strategy-lab"
+    if sub.exists():
+        return sub
+    # 로컬: 형제 디렉토리
+    sibling = NTB_ROOT.parent / "strategy-lab"
+    if sibling.exists():
+        return sibling
+    return sibling  # 폴백
+
+STRATEGY_LAB_ROOT = _find_strategy_lab()
 
 
 def load_config() -> Optional[dict]:
