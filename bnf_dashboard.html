@@ -96,9 +96,9 @@ tr:hover{background:rgba(0,198,190,.02)}
 .rule-label.bb-label{color:#6366f1}
 
 /* === Chart Modal === */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;justify-content:center;align-items:center;padding:16px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999999;justify-content:center;align-items:flex-start;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal-overlay.open{display:flex}
-.modal-box{background:#fff;border-radius:14px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box{background:#fff;border-radius:14px;width:100%;max-width:720px;margin:20px auto 80px;box-shadow:0 20px 60px rgba(0,0,0,.3);flex-shrink:0}
 .modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #e5e7eb}
 .modal-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .modal-close{width:32px;height:32px;border:none;background:#f0f2f5;border-radius:8px;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center}
@@ -712,6 +712,11 @@ function openStockChart(code, name, strategy, extraData) {
   document.getElementById('modalNaver').href = `https://m.stock.naver.com/domestic/stock/${code}`;
   modal.classList.add('open');
 
+  // iframe 내부일 때 parent에게 하단 네비 숨기기 요청
+  if (window.self !== window.top) {
+    try { window.parent.postMessage({ type: 'bnf-modal', open: true }, '*'); } catch(e) {}
+  }
+
   // Clear previous chart
   const container = document.getElementById('modalChart');
   container.innerHTML = '';
@@ -722,6 +727,10 @@ function openStockChart(code, name, strategy, extraData) {
 function closeModal() {
   document.getElementById('chartModal').classList.remove('open');
   if (lwChart) { lwChart.remove(); lwChart = null; }
+  // iframe 내부일 때 parent에게 하단 네비 복원 요청
+  if (window.self !== window.top) {
+    try { window.parent.postMessage({ type: 'bnf-modal', open: false }, '*'); } catch(e) {}
+  }
 }
 
 // Close on overlay click

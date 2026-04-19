@@ -134,5 +134,15 @@
   <!-- Phase 8 App (ES Module) -->
   <script type="module" src="js/phase8/app.js"></script>
 
+  <!-- iframe 내부 모달 열릴 때 하단 네비 숨김 -->
+  <script>
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'bnf-modal') {
+      var nav = document.querySelector('.bottom-nav');
+      if (nav) nav.style.display = e.data.open ? 'none' : '';
+    }
+  });
+  </script>
+
 </body>
 </html>
