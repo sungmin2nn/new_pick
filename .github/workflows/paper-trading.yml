@@ -197,6 +197,62 @@ jobs:
                 print('헬스체크 알림 전송')
         except Exception as e:
             print(f'헬스체크 알림 오류: {e}')
+
+        # MDD 급락 경고
+        try:
+            import json
+            from pathlib import Path
+            MDD_THRESHOLD = -15.0
+            for tid in ['team_a','team_b','team_c','team_d','team_e','team_f','team_g','team_h','team_i']:
+                pf_path = Path(f'data/arena/{tid}/portfolio.json')
+                if not pf_path.exists(): continue
+                pf = json.loads(pf_path.read_text())
+                mdd = pf.get('max_drawdown_pct', 0)
+                ret = pf.get('total_return_pct', 0)
+                name = pf.get('team_id', tid)
+                if mdd >= abs(MDD_THRESHOLD) or ret <= MDD_THRESHOLD:
+                    msg = f'🚨 <b>MDD 경고: {name}</b>\nMDD: -{mdd:.1f}%\n누적: {ret:+.1f}%\n자본: {pf.get(\"current_capital\",0):,.0f}원'
+                    notifier.send_message(msg, msg_type='error_alert')
+                    print(f'MDD 경고 발송: {name} MDD=-{mdd:.1f}%')
+        except Exception as e:
+            print(f'MDD 경고 오류: {e}')
+
+        # 일일 리포트 요약
+        try:
+            import json
+            from pathlib import Path
+            teams = []
+            for tid in ['team_a','team_b','team_c','team_d','team_e','team_f','team_g','team_h','team_i']:
+                pf_path = Path(f'data/arena/{tid}/portfolio.json')
+                if not pf_path.exists(): continue
+                pf = json.loads(pf_path.read_text())
+                if pf.get('trading_days', 0) == 0: continue
+                wr = round(pf['total_wins']/pf['total_trades']*100) if pf['total_trades'] > 0 else 0
+                teams.append((tid, pf.get('total_return_pct',0), wr, pf.get('current_capital',0), pf.get('trading_days',0)))
+
+            if teams:
+                teams.sort(key=lambda x: -x[1])
+                total_cap = sum(t[3] for t in teams)
+                total_init = 10_000_000 * len(teams)
+                total_ret = (total_cap - total_init) / total_init * 100 if total_init > 0 else 0
+
+                lines = ['📊 <b>일일 리포트</b>', f'날짜: {today}', f'총 자산: {total_cap:,.0f}원 ({total_ret:+.1f}%)', '']
+                medals = ['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣']
+                for i, (tid, ret, wr, cap, days) in enumerate(teams):
+                    m = medals[i] if i < len(medals) else f'{i+1}.'
+                    lines.append(f'{m} {tid}: {ret:+.1f}% 승률{wr}% ({days}일)')
+
+                # BNF 현황
+                bnf_path = Path('data/bnf/positions.json')
+                if bnf_path.exists():
+                    bnf = json.loads(bnf_path.read_text())
+                    bs = bnf.get('stats', {})
+                    lines.append(f'\n🎯 BNF: {bs.get(\"total_return\",0):+.1f}% 승률{bs.get(\"win_rate\",0):.0f}% 포지션{bs.get(\"open_positions\",0)}개')
+
+                notifier.send_message('\n'.join(lines), msg_type='daily_summary')
+                print('일일 리포트 전송')
+        except Exception as e:
+            print(f'일일 리포트 오류: {e}')
         "
 
     - name: Send Error Alert (on failure)
