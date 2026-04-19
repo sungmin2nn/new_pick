@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-04-15T07:32:09",
+  "updated_at": "2026-04-19T12:14:21",
   "strategies": {
     "momentum": {
       "enabled": true,
@@ -18,7 +18,7 @@
       "top_n": 5
     },
     "largecap_contrarian": {
-      "enabled": true,
+      "enabled": false,
       "source": "ntb",
       "module_path": "paper_trading.strategies.largecap_contrarian",
       "class_name": "LargecapContrarianStrategy",
@@ -123,18 +123,18 @@
       "top_n": 5
     },
     "sector_rotation": {
-      "enabled": false,
+      "enabled": true,
       "source": "lab",
       "module_path": "strategies.sector_rotation",
       "class_name": "SectorRotationStrategy",
-      "team_id": null,
+      "team_id": "team_h",
       "team_name": "Theta Sector",
       "emoji": "🔷",
       "description": "섹터 로테이션 (KOSPI 업종)",
       "category": "theme",
       "risk_level": "medium",
       "initial_capital": 10000000,
-      "activated_at": null,
+      "activated_at": "2026-04-19",
       "top_n": 5
     },
     "foreign_flow_momentum": {
@@ -153,18 +153,18 @@
       "top_n": 5
     },
     "turtle_breakout_short": {
-      "enabled": false,
+      "enabled": true,
       "source": "lab",
       "module_path": "strategies.turtle_breakout_short",
       "class_name": "TurtleBreakoutShortStrategy",
-      "team_id": null,
+      "team_id": "team_g",
       "team_name": "Kappa Turtle",
       "emoji": "🐢",
       "description": "단축 터틀 돌파 (5/10일 신고가)",
       "category": "breakout",
       "risk_level": "medium",
       "initial_capital": 10000000,
-      "activated_at": null,
+      "activated_at": "2026-04-19",
       "top_n": 5
     },
     "kospi_intraday_momentum": {
@@ -259,8 +259,6 @@
     }
   },
   "team_id_pool": [
-    "team_g",
-    "team_h",
     "team_i",
     "team_j",
     "team_k",
