@@ -526,10 +526,23 @@ function renderCandidatesTable() {
     `;
   }
 
-  const cards = allRows.map((c, i) => {
+  // 전략별 그룹핑
+  const teamGroups = {};
+  for (const c of allRows) {
+    const key = c._tid;
+    if (!teamGroups[key]) teamGroups[key] = { name: c._team, color: c._color, items: [] };
+    teamGroups[key].items.push(c);
+  }
+
+  // 전략 필터 탭
+  const teamTabs = Object.entries(teamGroups).map(([tid, g]) =>
+    `<button class="cand-filter-tab" data-filter="${tid}" style="border-color:${g.color}40;color:${g.color};">${g.name.split(' ')[0]} <span class="cand-filter-count">${g.items.length}</span></button>`
+  ).join('');
+
+  const renderCard = (c, i) => {
     const scoreW = Math.min(100, Math.max(0, (+c.score || 0) / 135 * 100)).toFixed(0);
     return `
-      <div class="stock-card" data-idx="${i}">
+      <div class="stock-card" data-idx="${i}" data-team="${c._tid}">
         <div class="stock-card-body">
           <div class="stock-card-left">
             <div class="stock-card-name">${stockLink(c.code, c.name || '-')} <span class="stock-card-code">${stockCodeLink(c.code)}</span></div>
@@ -546,17 +559,24 @@ function renderCandidatesTable() {
       </div>
       <div class="stock-card-detail" data-idx="${i}" style="display:none;">
         ${renderCandDetail(c)}
-      </div>
-    `;
-  }).join('');
+      </div>`;
+  };
+
+  const cards = allRows.map((c, i) => renderCard(c, i)).join('');
+  const DEFAULT_SHOW = 10;
 
   return `
     <div class="section">
       <div class="section-header">
         <h2 class="section-title display">📋 내일 후보</h2>
-        <span class="section-subtitle">${TEAM_IDS.length}전략 · ${allRows.length}종목 (점수순)</span>
+        <span class="section-subtitle">${Object.keys(teamGroups).length}전략 · ${allRows.length}종목</span>
       </div>
-      <div class="stock-card-list">${cards}</div>
+      <div class="cand-filter-bar" style="display:flex;gap:6px;overflow-x:auto;padding:0 0 var(--space-2);-webkit-overflow-scrolling:touch;">
+        <button class="cand-filter-tab active" data-filter="all">전체 <span class="cand-filter-count">${allRows.length}</span></button>
+        ${teamTabs}
+      </div>
+      <div class="stock-card-list" id="candCardList">${cards}</div>
+      ${allRows.length > DEFAULT_SHOW ? `<button class="cand-show-more" id="candShowMore" style="display:block;width:100%;padding:var(--space-3);border:1px solid var(--border-default);border-radius:var(--radius-md);background:transparent;color:var(--text-secondary);font-size:var(--fs-sm);font-weight:600;cursor:pointer;margin-top:var(--space-2);">더보기 (${allRows.length - DEFAULT_SHOW}개)</button>` : ''}
     </div>
   `;
 }
@@ -908,13 +928,72 @@ export function renderArena() {
 }
 
 function bindCandidateTable() {
+  const DEFAULT_SHOW = 10;
+  let currentFilter = 'all';
+  let showAll = false;
+
+  function applyFilter() {
+    const cards = $$('.stock-card');
+    const details = $$('.stock-card-detail');
+    let visibleCount = 0;
+
+    cards.forEach((card, i) => {
+      const team = card.dataset.team;
+      const matchFilter = currentFilter === 'all' || team === currentFilter;
+      const withinLimit = showAll || visibleCount < DEFAULT_SHOW;
+
+      if (matchFilter && withinLimit) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+      // 상세도 숨기기
+      if (details[i]) details[i].style.display = 'none';
+      card.classList.remove('open');
+    });
+
+    // 더보기 버튼
+    const moreBtn = $('#candShowMore');
+    if (moreBtn) {
+      const totalMatch = [...cards].filter(c => currentFilter === 'all' || c.dataset.team === currentFilter).length;
+      if (showAll || totalMatch <= DEFAULT_SHOW) {
+        moreBtn.style.display = 'none';
+      } else {
+        moreBtn.style.display = 'block';
+        moreBtn.textContent = `더보기 (${totalMatch - DEFAULT_SHOW}개)`;
+      }
+    }
+  }
+
+  // 필터 탭 클릭
+  $$('.cand-filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.cand-filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = tab.dataset.filter;
+      showAll = false;
+      applyFilter();
+    });
+  });
+
+  // 더보기 버튼
+  const moreBtn = $('#candShowMore');
+  if (moreBtn) {
+    moreBtn.addEventListener('click', () => {
+      showAll = true;
+      applyFilter();
+    });
+  }
+
+  // 카드 클릭 → 상세 펼침
   $$('.stock-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a')) return; // 링크 클릭은 패스
       const idx = card.dataset.idx;
       const detail = document.querySelector(`.stock-card-detail[data-idx="${idx}"]`);
       if (!detail) return;
       const isOpen = detail.style.display !== 'none';
-      // 다른 펼침 닫기
       $$('.stock-card-detail').forEach(d => d.style.display = 'none');
       $$('.stock-card').forEach(c => c.classList.remove('open'));
       if (!isOpen) {
@@ -923,6 +1002,9 @@ function bindCandidateTable() {
       }
     });
   });
+
+  // 초기 적용 (상위 10개만)
+  applyFilter();
 }
 
 // ============ Accordion event binding ============
