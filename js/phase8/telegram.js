@@ -2,7 +2,7 @@
  * 일별 발송 이력 조회 + 날짜 네비게이션 + 아코디언 상세
  */
 
-import { $, $$, el, fmtDate } from './ui.js';
+import { $, $$, fmtDate } from './ui.js';
 import { fetchCached } from './cache.js';
 
 // ============ State ============

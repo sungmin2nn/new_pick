@@ -147,11 +147,13 @@ function buildTeamRows() {
     const lbTeam = state.leaderboard?.teams?.[tid] || {};
     const todayRank = todayHist?.ranking?.find(r => r.team_id === tid);
     const wr = pf.total_trades > 0 ? Math.round(pf.total_wins / pf.total_trades * 100) : 0;
+    const initCap = pf.initial_capital ?? strategyConfig?.strategies?.[meta.strategy]?.initial_capital ?? 10000000;
     return {
       tid, name: meta.name, desc: meta.desc, color: meta.color,
       today_pct: todayRank?.total_return ?? 0,
       cum_pct: pf.total_return_pct ?? 0,
-      capital: pf.current_capital ?? 10000000,
+      capital: pf.current_capital ?? initCap,
+      initial_capital: initCap,
       elo: lbTeam.elo ?? 1000,
       wins: pf.total_wins ?? 0,
       trades: pf.total_trades ?? 0,
@@ -166,7 +168,8 @@ function renderKPI(rows) {
   const sorted = [...rows].sort((a, b) => b.today_pct - a.today_pct);
   const maxRow = sorted[0];
   const totalCapital = rows.reduce((s, t) => s + t.capital, 0);
-  const totalCum = ((totalCapital - 10000000 * rows.length) / (10000000 * rows.length)) * 100;
+  const totalInitial = rows.reduce((s, t) => s + t.initial_capital, 0);
+  const totalCum = totalInitial > 0 ? ((totalCapital - totalInitial) / totalInitial) * 100 : 0;
   const dayN = state.leaderboard?.daily_history?.length ?? 0;
   const totalTrades = rows.reduce((s, t) => s + t.trades, 0);
   const totalWins = rows.reduce((s, t) => s + t.wins, 0);
@@ -175,7 +178,7 @@ function renderKPI(rows) {
     <div class="section">
       <div class="kpi-grid">
         <div class="kpi">
-          <div class="kpi-label">5팀 평균</div>
+          <div class="kpi-label">${rows.length}팀 평균</div>
           <div class="kpi-value ${colorClass(dailyAvg)}">${fmtPctSigned(dailyAvg)}</div>
           <div class="kpi-meta">Day ${dayN}</div>
         </div>
@@ -279,7 +282,9 @@ function renderTeamsAccordion(rows) {
             <div class="acc-summary">${t.desc} · ELO ${t.elo}</div>
           </div>
           <div class="team-ret-block">
-            <div class="ret ${colorClass(t.today_pct)}">${fmtPctSigned(t.today_pct)}</div>
+            ${t.trades === 0 && t.today_pct === 0
+              ? '<div class="ret neutral" style="font-size:12px;color:var(--text-tertiary);">시그널 대기</div>'
+              : `<div class="ret ${colorClass(t.today_pct)}">${fmtPctSigned(t.today_pct)}</div>`}
             <div class="cum">누적 ${fmtPct(t.cum_pct)}</div>
           </div>
         </div>
@@ -307,7 +312,7 @@ function renderTeamsAccordion(rows) {
   return `
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title display">🏆 5팀</h2>
+        <h2 class="section-title display">🏆 ${sorted.length}팀</h2>
         <span class="section-subtitle">순위 · 매매 이력</span>
       </div>
       <div class="acc-list">${cards}</div>
@@ -698,19 +703,27 @@ export function renderArena() {
   const container = $('#arena-content');
   if (!container) return;
 
-  const rows = buildTeamRows();
-
-  container.innerHTML = `
-    ${renderKPI(rows)}
-    ${renderH2H(rows)}
-    ${renderCandidatesTable()}
-    ${renderTeamsAccordion(rows)}
-    ${renderStrategyPanel()}
-    ${renderSystemMini()}
-  `;
-
-  bindAccordion();
-  bindCandidateTable();
+  try {
+    const rows = buildTeamRows();
+    container.innerHTML = `
+      ${renderKPI(rows)}
+      ${renderH2H(rows)}
+      ${renderCandidatesTable()}
+      ${renderTeamsAccordion(rows)}
+      ${renderStrategyPanel()}
+      ${renderSystemMini()}
+    `;
+    bindAccordion();
+    bindCandidateTable();
+  } catch (e) {
+    console.error('[Arena] 렌더링 오류:', e);
+    container.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-text">대시보드 렌더링 중 오류가 발생했습니다</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:8px;">${e.message}</div>
+      </div>`;
+  }
 }
 
 function bindCandidateTable() {
@@ -758,11 +771,25 @@ function bindAccordion() {
 
 // ============ Init / Refresh ============
 export async function initArena() {
-  await loadArenaData();
-  renderArena();
+  try {
+    await loadArenaData();
+    renderArena();
+  } catch (e) {
+    console.error('[Arena] 초기화 실패:', e);
+    const c = $('#arena-content');
+    if (c) c.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">데이터를 불러오지 못했습니다</div></div>';
+  }
 }
 
 export async function refreshArena() {
-  await loadArenaData(true);
-  renderArena();
+  const btn = document.getElementById('refresh-btn');
+  if (btn) { btn.textContent = '⟳'; btn.classList.add('spinning'); }
+  try {
+    await loadArenaData(true);
+    renderArena();
+  } catch (e) {
+    console.error('[Arena] 새로고침 실패:', e);
+  } finally {
+    if (btn) { btn.textContent = '↻'; btn.classList.remove('spinning'); }
+  }
 }

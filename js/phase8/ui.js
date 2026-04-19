@@ -122,16 +122,3 @@ export function getRecentDates(n) {
   return out;
 }
 
-// ============ Render helpers ============
-export function showSection(id) {
-  $$('.sub-pane').forEach(p => p.classList.remove('active'));
-  const pane = document.getElementById(id);
-  if (pane) pane.classList.add('active');
-}
-
-export function activateTab(btn, group = '.sub-tab') {
-  if (!btn) return;
-  const target = btn.closest('.sub-tabs') || document;
-  $$(group, target).forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
