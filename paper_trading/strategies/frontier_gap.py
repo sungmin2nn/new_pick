@@ -156,31 +156,28 @@ class FrontierGapStrategy(BaseStrategy):
             print(f"  [KRX OpenAPI] {len(all_stocks)}개")
             return all_stocks
 
-        # 2차: pykrx 폴백
-        print("  KRX OpenAPI 데이터 없음 → pykrx 폴백")
+        # 2차: naver_market 폴백 (모멘텀 전략과 동일)
+        print("  KRX OpenAPI 데이터 없음 → naver 폴백")
         try:
-            from pykrx import stock as pykrx_stock
+            from naver_market import stock as naver_stock
             for mkt in ['KOSPI', 'KOSDAQ']:
                 try:
-                    tickers = pykrx_stock.get_market_ohlcv_by_ticker(date, market=mkt)
-                    if tickers.empty:
+                    df = naver_stock.get_market_ohlcv_by_ticker(date, market=mkt)
+                    if df is None or df.empty:
                         continue
-                    for code, row in tickers.iterrows():
+                    for code, row in df.iterrows():
                         try:
                             open_p = float(row.get('시가', 0))
                             close_p = float(row.get('종가', 0))
                             if open_p == 0 or close_p == 0:
                                 continue
-                            prev_close = close_p - float(row.get('등락률', 0)) / 100 * close_p
-                            # pykrx 등락률은 % 단위
                             chg_pct = float(row.get('등락률', 0))
-                            if close_p != 0 and chg_pct != 0:
-                                prev_close = close_p / (1 + chg_pct / 100)
+                            prev_close = close_p / (1 + chg_pct / 100) if chg_pct != 0 else close_p
                             if prev_close <= 0:
                                 continue
                             gap_pct = (open_p - prev_close) / prev_close * 100
                             all_stocks.append({
-                                'code': code, 'name': '',
+                                'code': code, 'name': row.get('종목명', ''),
                                 'open': int(open_p), 'close': int(close_p),
                                 'prev_close': int(prev_close), 'gap_pct': gap_pct,
                                 'change_pct': chg_pct,
@@ -192,12 +189,12 @@ class FrontierGapStrategy(BaseStrategy):
                         except Exception:
                             continue
                 except Exception as e:
-                    print(f"  pykrx {mkt} 오류: {e}")
+                    print(f"  naver {mkt} 오류: {e}")
 
             if all_stocks:
-                print(f"  [pykrx 폴백] {len(all_stocks)}개")
+                print(f"  [naver 폴백] {len(all_stocks)}개")
         except ImportError:
-            print("  pykrx 미설치")
+            print("  naver_market 미설치")
 
         return all_stocks
 
