@@ -1039,6 +1039,140 @@ export function renderMonthlyReturnsTable() {
     </div>`;
 }
 
+// 전략별 규칙 설명
+const STRATEGY_RULES = {
+  momentum: {
+    name: 'Alpha Momentum',
+    signal: 'MA5 위 + 거래량 5일평균 3배 급증',
+    entry: '시초가 매수 (09:00~09:05)',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '가격 ≥3,000원 / 거래대금 ≥30억 / 등락률 +3~15%',
+    scoring: '등락률(35) + 거래대금(30) + 거래량급증(20) + 가격대(15) = 100점',
+  },
+  largecap_contrarian: {
+    name: 'Beta Contrarian',
+    signal: 'RSI(14) ≤ 35 과매도 + 대형주',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '시총 ≥1조 / 거래대금 ≥50억 / 하락률 -1.5% 이상 / KOSPI -2% 시 진입 차단',
+    scoring: '시총(30) + 하락폭(25) + 거래대금(20) + 가격대(15) + 변동성(10) = 100점',
+  },
+  dart_disclosure: {
+    name: 'Gamma Disclosure',
+    signal: 'DART 호재 공시 (전일 18시~당일 08:30)',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '시총 1,000억~10조 / 거래대금 ≥10억',
+    scoring: '공시점수(40) + 등락률(25) + 거래대금(20) + 시총(15) = 100점',
+  },
+  theme_policy: {
+    name: 'Delta Theme',
+    signal: '네이버 실시간 급상승 테마 TOP10 관련주',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '테마 등락률 >0.5% / 활성 테마 종목',
+    scoring: '테마관련도(40) + 등락률(25) + 거래대금(20) + 테마강도(15) = 100점',
+  },
+  frontier_gap: {
+    name: 'Echo Frontier',
+    signal: '시초가 갭 +2~5% + 거래량 5일평균 2배',
+    entry: '시초가 매수 (골든타임 09:00~09:30)',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '가격 ≥3,000원 / 거래대금 ≥50억 / 갭 5% 초과 제외 (exhaustion)',
+    scoring: '갭크기(40) + 거래량배수(35) + 거래대금(15) + 가격대(10) = 100점',
+  },
+  hybrid_alpha_delta: {
+    name: 'Alpha-Delta Hybrid',
+    signal: '모멘텀 + 테마 전략의 가중평균 조합',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '두 전략 모두 통과한 종목 우선',
+    scoring: '모멘텀점수(50%) + 테마점수(50%) 가중평균',
+  },
+  volatility_breakout_lw: {
+    name: 'Zeta Volatility',
+    signal: '전일 변동폭 × K(0.5) 돌파 + 거래량 1.5배',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '시총 ≥500억 / 거래대금 ≥50억',
+    scoring: '돌파강도(45) + 거래량폭발(30) + 거래대금(15) + 가격대(10) = 100점',
+  },
+  turtle_breakout_short: {
+    name: 'Kappa Turtle',
+    signal: '5일 신고가 돌파 + 거래량 1.5배 동반',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '양봉 ≥1.0% / 시총 ≥1,000억 / 거래대금 ≥50억',
+    scoring: '신고가갱신강도(35) + 거래량폭발(30) + 거래대금(20) + 모멘텀(15) = 100점',
+  },
+  sector_rotation: {
+    name: 'Theta Sector',
+    signal: 'KOSPI 강세 업종 TOP5 → 시총 상위 대장주',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: 'KOSPI 종목만 / 등락률 ≥0.5% / 시총 ≥1,000억',
+    scoring: '섹터강세(35) + 종목모멘텀(30) + 시총순위(20) + 거래량(15) = 100점',
+  },
+  eod_reversal_korean: {
+    name: 'Eta Reversal',
+    signal: '당일 -3~8% 하락 + 저점 30% 회복',
+    entry: '종가 근접 매수',
+    exit_profit: '다음날 시초가 매도',
+    exit_loss: '-5% 손절',
+    exit_deadline: '1일 보유',
+    filter: '시총 ≥1,000억 / 거래대금 ≥50억',
+    scoring: '손실크기(30) + 저점회복(35) + 거래대금(20) + 시총(15) = 100점',
+  },
+  foreign_flow_momentum: {
+    name: 'Iota Flow',
+    signal: '외국인 3일 연속 순매수 + 가격 상승',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-3% 손절',
+    exit_deadline: '2일 보유',
+    filter: '시총 ≥2,000억 / 거래대금 ≥100억 / 시총 상위 100',
+    scoring: '연속순매수(35) + 순매수규모(30) + 가격모멘텀(20) + 거래대금(15) = 100점',
+  },
+  bollinger_reversal: {
+    name: 'Pi Bollinger (단타)',
+    signal: 'BB(15) %B < 0.2 + RSI(14) < 30 + 양봉',
+    entry: '시초가 매수',
+    exit_profit: '+5% 익절',
+    exit_loss: '-2% 손절',
+    exit_deadline: '14:30 강제 청산',
+    filter: '시총 ≥1,000억 / 거래대금 ≥30억',
+    scoring: '%B(35) + 반등강도(30) + 거래량(20) + 거래대금(15) = 100점',
+  },
+  overnight_etf_reversal: {
+    name: 'Omicron ETF',
+    signal: 'KOSPI200 ETF 종가매수 → 다음날 시초가 매도',
+    entry: '종가 매수 (ETF)',
+    exit_profit: '다음날 시초가 매도',
+    exit_loss: '-3% 손절',
+    exit_deadline: 'Overnight (16h)',
+    filter: 'ETF만 (KODEX/TIGER/KINDEX 등) / 당일 약세(-0.3%)',
+    scoring: '당일약세(35) + 거래대금(25) + 시총(20) + KOSPI200추종(20) = 100점',
+  },
+};
+
 export function renderStrategyPanel() {
   if (!strategyConfig || !strategyConfig.strategies) return '';
   const all = Object.entries(strategyConfig.strategies);
@@ -1054,6 +1188,18 @@ export function renderStrategyPanel() {
     const teamColor = entry.team_id ? (TEAM_COLORS[entry.team_id] || '#6B7280') : '#9CA3AF';
     const activatedStr = entry.activated_at || '-';
     const capitalStr = entry.initial_capital ? (entry.initial_capital / 10000).toLocaleString() + '만' : '-';
+
+    const rules = STRATEGY_RULES[sid];
+    const rulesHtml = rules ? `
+            <div class="detail-h" style="margin-top:var(--space-3);">매매 규칙</div>
+            <div class="detail-row"><span>📡 시그널</span><span>${rules.signal}</span></div>
+            <div class="detail-row"><span>🟢 진입</span><span>${rules.entry}</span></div>
+            <div class="detail-row"><span>🎯 익절</span><span>${rules.exit_profit}</span></div>
+            <div class="detail-row"><span>🛑 손절</span><span>${rules.exit_loss}</span></div>
+            <div class="detail-row"><span>⏰ 마감</span><span>${rules.exit_deadline}</span></div>
+            <div class="detail-row"><span>🔍 필터</span><span style="font-size:10px;">${rules.filter}</span></div>
+            <div class="detail-row"><span>📊 스코어링</span><span style="font-size:10px;">${rules.scoring}</span></div>
+    ` : '';
 
     return `
       <div class="acc-strat" style="border-left-color:${teamColor};${on ? '' : 'opacity:0.6;'}">
@@ -1076,6 +1222,7 @@ export function renderStrategyPanel() {
             <div class="detail-row"><span>초기 자본</span><span class="num">${capitalStr}</span></div>
             <div class="detail-row"><span>Top N</span><span class="num">${entry.top_n ?? '-'}</span></div>
             <div class="detail-row"><span>배정 팀</span><span>${entry.team_id || '미배정'}</span></div>
+            ${rulesHtml}
           </div>
         </div>
       </div>
