@@ -205,12 +205,19 @@ function toggleTheme() {
 // ============ Strategy Charts (Chart.js) ============
 async function buildStrategyCharts() {
   if (strategyChartsBuilt) return;
-  if (typeof Chart === 'undefined') return;
+  if (typeof Chart === 'undefined') {
+    console.warn('[Chart] Chart.js 미로드');
+    return;
+  }
 
   try {
     const { fetchCached } = await import('./cache.js');
     const lb = await fetchCached('data/arena/leaderboard.json');
-    if (!lb || !lb.daily_history || lb.daily_history.length === 0) return;
+    console.log('[Chart] leaderboard:', lb ? `${(lb.daily_history||[]).length}일` : 'null');
+    if (!lb || !lb.daily_history || lb.daily_history.length === 0) {
+      console.warn('[Chart] daily_history 없음');
+      return;
+    }
 
     const history = lb.daily_history;
     const dates = history.map(d => {
