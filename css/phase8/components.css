@@ -1967,3 +1967,31 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* ========================================================
+   SCORE GAUGE INLINE (for table cells)
+   ======================================================== */
+.score-gauge-inline {
+  display: inline-block;
+  height: 18px;
+  line-height: 18px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-deep) 100%);
+  color: var(--text-inverse);
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  font-family: var(--font-mono);
+  padding: 0 6px;
+  border-radius: var(--radius-sm);
+  min-width: 36px;
+  text-align: center;
+}
+
+/* Sortable header */
+.cand-sort {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.cand-sort:active {
+  background: var(--bg-overlay);
+}

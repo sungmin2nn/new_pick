@@ -684,31 +684,28 @@ function renderCandidatesTable() {
     `<button class="cand-filter-tab" data-filter="${tid}" style="border-color:${g.color}40;color:${g.color};">${g.name.split(' ')[0]} <span class="cand-filter-count">${g.items.length}</span></button>`
   ).join('');
 
-  const renderCard = (c, i) => {
+  const DEFAULT_SHOW = 10;
+
+  const trs = allRows.map((c, i) => {
     const scoreW = Math.min(100, Math.max(0, (+c.score || 0) / 135 * 100)).toFixed(0);
     return `
-      <div class="stock-card" data-idx="${i}" data-team="${c._tid}">
-        <div class="stock-card-body">
-          <div class="stock-card-left">
-            <div class="stock-card-name">${stockLink(c.code, c.name || '-')} <span class="stock-card-code">${stockCodeLink(c.code)}</span></div>
-            <div class="stock-card-strategy"><span class="team-pill" style="background:${c._color}15;color:${c._color};border-color:${c._color}40;">${c._team.split(' ')[0]}</span></div>
-          </div>
-          <div class="stock-card-right">
-            <div class="stock-card-price">${fmtMoney(c.price)}</div>
-            <div class="stock-card-change ${colorClass(c.change_pct)}">${fmtPctSigned(c.change_pct)}</div>
-          </div>
-        </div>
-        <div class="stock-card-score">
-          <div class="score-gauge" style="width:${scoreW}%;">${(+c.score).toFixed(1)}</div>
-        </div>
-      </div>
-      <div class="stock-card-detail" data-idx="${i}" style="display:none;">
-        ${renderCandDetail(c)}
-      </div>`;
-  };
-
-  const cards = allRows.map((c, i) => renderCard(c, i)).join('');
-  const DEFAULT_SHOW = 10;
+      <tr class="cand-row" data-idx="${i}" data-team="${c._tid}" data-score="${c.score||0}" data-change="${c.change_pct||0}" data-price="${c.price||0}">
+        <td class="num right">${i + 1}</td>
+        <td>
+          <b>${stockLink(c.code, c.name || '-')}</b>
+          <div class="cand-code">${stockCodeLink(c.code)}</div>
+        </td>
+        <td><span class="team-pill" style="background:${c._color}15;color:${c._color};border-color:${c._color}40;">${c._team.split(' ')[0]}</span></td>
+        <td class="num right">
+          <div class="score-gauge-inline" style="width:${scoreW}%;">${(+c.score).toFixed(1)}</div>
+        </td>
+        <td class="num right ${colorClass(c.change_pct)}">${fmtPctSigned(c.change_pct)}</td>
+        <td class="num right">${fmtMoney(c.price)}</td>
+      </tr>
+      <tr class="cand-detail-row" data-idx="${i}" style="display:none;">
+        <td colspan="6">${renderCandDetail(c)}</td>
+      </tr>`;
+  }).join('');
 
   return `
     <div class="section">
@@ -720,7 +717,21 @@ function renderCandidatesTable() {
         <button class="cand-filter-tab active" data-filter="all">전체 <span class="cand-filter-count">${allRows.length}</span></button>
         ${teamTabs}
       </div>
-      <div class="stock-card-list" id="candCardList">${cards}</div>
+      <div class="table-wrap">
+        <table class="tbl cand-tbl" id="candTable">
+          <thead>
+            <tr>
+              <th class="right cand-sort" data-sort="idx">#</th>
+              <th class="cand-sort" data-sort="name">종목</th>
+              <th class="cand-sort" data-sort="team">전략</th>
+              <th class="right cand-sort" data-sort="score">점수 ▼</th>
+              <th class="right cand-sort" data-sort="change">등락률</th>
+              <th class="right cand-sort" data-sort="price">가격</th>
+            </tr>
+          </thead>
+          <tbody id="candBody">${trs}</tbody>
+        </table>
+      </div>
       ${allRows.length > DEFAULT_SHOW ? `<button class="cand-show-more" id="candShowMore" style="display:block;width:100%;padding:var(--space-3);border:1px solid var(--border-default);border-radius:var(--radius-md);background:transparent;color:var(--text-secondary);font-size:var(--fs-sm);font-weight:600;cursor:pointer;margin-top:var(--space-2);">더보기 (${allRows.length - DEFAULT_SHOW}개)</button>` : ''}
     </div>
   `;
@@ -1126,32 +1137,34 @@ function bindCandidateTable() {
   const DEFAULT_SHOW = 10;
   let currentFilter = 'all';
   let showAll = false;
+  let sortKey = 'score';
+  let sortAsc = false; // 기본 내림차순
+
+  function getRows() { return [...$$('#candBody .cand-row')]; }
 
   function applyFilter() {
-    const cards = $$('.stock-card');
-    const details = $$('.stock-card-detail');
+    const rows = getRows();
     let visibleCount = 0;
 
-    cards.forEach((card, i) => {
-      const team = card.dataset.team;
+    rows.forEach(row => {
+      const team = row.dataset.team;
       const matchFilter = currentFilter === 'all' || team === currentFilter;
       const withinLimit = showAll || visibleCount < DEFAULT_SHOW;
+      const detail = document.querySelector(`.cand-detail-row[data-idx="${row.dataset.idx}"]`);
 
       if (matchFilter && withinLimit) {
-        card.style.display = '';
+        row.style.display = '';
         visibleCount++;
       } else {
-        card.style.display = 'none';
+        row.style.display = 'none';
       }
-      // 상세도 숨기기
-      if (details[i]) details[i].style.display = 'none';
-      card.classList.remove('open');
+      if (detail) detail.style.display = 'none';
+      row.classList.remove('open');
     });
 
-    // 더보기 버튼
     const moreBtn = $('#candShowMore');
     if (moreBtn) {
-      const totalMatch = [...cards].filter(c => currentFilter === 'all' || c.dataset.team === currentFilter).length;
+      const totalMatch = rows.filter(r => currentFilter === 'all' || r.dataset.team === currentFilter).length;
       if (showAll || totalMatch <= DEFAULT_SHOW) {
         moreBtn.style.display = 'none';
       } else {
@@ -1161,7 +1174,65 @@ function bindCandidateTable() {
     }
   }
 
-  // 필터 탭 클릭
+  function applySort() {
+    const tbody = $('#candBody');
+    if (!tbody) return;
+    const rows = getRows();
+    const details = [...$$('#candBody .cand-detail-row')];
+
+    // 정렬용 값 추출
+    rows.sort((a, b) => {
+      let va, vb;
+      switch (sortKey) {
+        case 'name': va = a.querySelector('b')?.textContent || ''; vb = b.querySelector('b')?.textContent || ''; return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        case 'team': va = a.querySelector('.team-pill')?.textContent || ''; vb = b.querySelector('.team-pill')?.textContent || ''; return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        case 'score': va = +a.dataset.score || 0; vb = +b.dataset.score || 0; break;
+        case 'change': va = +a.dataset.change || 0; vb = +b.dataset.change || 0; break;
+        case 'price': va = +a.dataset.price || 0; vb = +b.dataset.price || 0; break;
+        default: va = +a.dataset.idx; vb = +b.dataset.idx; break;
+      }
+      return sortAsc ? va - vb : vb - va;
+    });
+
+    // DOM 재배치 (행 + 상세행 쌍으로)
+    rows.forEach((row, i) => {
+      const idx = row.dataset.idx;
+      const detail = details.find(d => d.dataset.idx === idx);
+      tbody.appendChild(row);
+      if (detail) tbody.appendChild(detail);
+      // 순번 업데이트
+      const numCell = row.querySelector('.num.right');
+      if (numCell && numCell === row.cells[0]) numCell.textContent = i + 1;
+    });
+
+    // 헤더 정렬 표시
+    $$('.cand-sort').forEach(th => {
+      const key = th.dataset.sort;
+      th.textContent = th.textContent.replace(/ [▲▼]/g, '');
+      if (key === sortKey) {
+        th.textContent += sortAsc ? ' ▲' : ' ▼';
+      }
+    });
+
+    applyFilter();
+  }
+
+  // 정렬 클릭
+  $$('.cand-sort').forEach(th => {
+    th.style.cursor = 'pointer';
+    th.addEventListener('click', () => {
+      const key = th.dataset.sort;
+      if (sortKey === key) {
+        sortAsc = !sortAsc;
+      } else {
+        sortKey = key;
+        sortAsc = key === 'name' || key === 'team'; // 텍스트는 오름차순 기본
+      }
+      applySort();
+    });
+  });
+
+  // 필터 탭
   $$('.cand-filter-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       $$('.cand-filter-tab').forEach(t => t.classList.remove('active'));
@@ -1172,33 +1243,29 @@ function bindCandidateTable() {
     });
   });
 
-  // 더보기 버튼
+  // 더보기
   const moreBtn = $('#candShowMore');
   if (moreBtn) {
-    moreBtn.addEventListener('click', () => {
-      showAll = true;
-      applyFilter();
-    });
+    moreBtn.addEventListener('click', () => { showAll = true; applyFilter(); });
   }
 
-  // 카드 클릭 → 상세 펼침
-  $$('.stock-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('a')) return; // 링크 클릭은 패스
-      const idx = card.dataset.idx;
-      const detail = document.querySelector(`.stock-card-detail[data-idx="${idx}"]`);
+  // 행 클릭 → 아코디언
+  $$('.cand-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('a')) return;
+      const idx = row.dataset.idx;
+      const detail = document.querySelector(`.cand-detail-row[data-idx="${idx}"]`);
       if (!detail) return;
       const isOpen = detail.style.display !== 'none';
-      $$('.stock-card-detail').forEach(d => d.style.display = 'none');
-      $$('.stock-card').forEach(c => c.classList.remove('open'));
+      $$('.cand-detail-row').forEach(d => d.style.display = 'none');
+      $$('.cand-row').forEach(r => r.classList.remove('open'));
       if (!isOpen) {
         detail.style.display = '';
-        card.classList.add('open');
+        row.classList.add('open');
       }
     });
   });
 
-  // 초기 적용 (상위 10개만)
   applyFilter();
 }
 
