@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BNF Trading Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -93,6 +94,24 @@ tr:hover{background:rgba(0,198,190,.02)}
 .rule-row{display:flex;gap:8px}
 .rule-label{color:#00a39c;font-weight:600;min-width:80px;flex-shrink:0}
 .rule-label.bb-label{color:#6366f1}
+
+/* === Chart Modal === */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;justify-content:center;align-items:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:14px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #e5e7eb}
+.modal-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.modal-close{width:32px;height:32px;border:none;background:#f0f2f5;border-radius:8px;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:#e5e7eb}
+.modal-body{padding:14px 18px}
+.modal-chart{width:100%;height:320px;border-radius:8px;overflow:hidden;background:#131722}
+.modal-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px}
+.modal-legend-item{display:flex;align-items:center;gap:4px}
+.modal-legend-dot{width:16px;height:2px;border-radius:1px}
+.modal-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;font-size:12px}
+.modal-info-item{display:flex;justify-content:space-between;padding:6px 10px;background:#f8fafb;border-radius:6px}
+.modal-info-label{color:#6b7280}
+.modal-info-val{font-weight:700;font-variant-numeric:tabular-nums}
 
 /* === Responsive === */
 @media(max-width:600px){
@@ -245,6 +264,21 @@ if(window.self!==window.top){document.documentElement.classList.add('in-iframe')
   </div>
 </div>
 
+<!-- Stock Chart Modal -->
+<div class="modal-overlay" id="chartModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">-</div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-chart" id="modalChart"></div>
+      <div class="modal-legend" id="modalLegend"></div>
+      <div class="modal-info" id="modalInfo"></div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /container -->
 
 <script>
@@ -282,7 +316,7 @@ const fmt = n => n.toLocaleString();
 const fmtSign = n => (n >= 0 ? '+' : '') + fmt(n);
 const fmtPct = n => (n >= 0 ? '+' : '') + n.toFixed(1) + '%';
 const pnlCls = n => n > 0 ? 'pos-c' : n < 0 ? 'neg-c' : 'zero-c';
-const link = (code, name) => `<a href="https://m.stock.naver.com/domestic/stock/${code}" target="_blank">${name} <span style="color:#00a39c;font-size:10px">${code}</span></a>`;
+const link = (code, name) => `<a href="https://m.stock.naver.com/domestic/stock/${code}" target="_blank" onclick="event.stopPropagation()">${name} <span style="color:#00a39c;font-size:10px">${code}</span></a>`;
 
 // ============ S1: Hero ============
 function renderHero(pos, bbPos) {
@@ -401,7 +435,8 @@ function posCard(p, type, stopPct, tpPct) {
   const tagClass = type === 'bnf' ? 'tag-bnf' : 'tag-bb';
   const tagName = type === 'bnf' ? '낙폭' : '볼린저';
 
-  return `<div class="pos-card ${cls}">
+  const chartExtra = JSON.stringify({ avg_price: p.avg_price||0, entry_date: p.entry_date||'', high_20d: 0 }).replace(/'/g, "\\'");
+  return `<div class="pos-card ${cls}" style="cursor:pointer" onclick="openStockChart('${p.code}','${p.name}','${type}',${chartExtra.replace(/"/g,'&quot;')})">
     <div class="pos-top">
       <div class="pos-name">${p.name}<small>${p.code}</small> <span class="tag ${tagClass}" style="font-size:9px;padding:1px 6px;">${tagName}</span></div>
       <div class="pos-pnl ${pnlCls(pnlPct)}">${fmtPct(pnlPct)}</div>
@@ -525,7 +560,7 @@ function renderBnfCandidates(cand, pos) {
 
   tbody.innerHTML = list.map((c, i) => {
     const d5 = c.drop_5d||0, d10 = c.drop_10d||0, dh = c.drop_from_high||0;
-    return `<tr>
+    return `<tr style="cursor:pointer" onclick="openStockChart('${c.code}','${c.name}','bnf',${JSON.stringify({high_20d:c.high_20d||0}).replace(/"/g,'&quot;')})">
       <td>${i+1}</td>
       <td>${link(c.code, c.name)}</td>
       <td class="r">${fmt(c.price||0)}</td>
@@ -548,7 +583,7 @@ function renderBbCandidates(cand, pos) {
   const list = cand.candidates.filter(c => !ownedCodes.includes(c.code));
   if (!list.length) { tbody.innerHTML = '<tr><td colspan="8" class="no-data">모든 후보가 보유 중입니다</td></tr>'; return; }
 
-  tbody.innerHTML = list.map((c, i) => `<tr>
+  tbody.innerHTML = list.map((c, i) => `<tr style="cursor:pointer" onclick="openStockChart('${c.code}','${c.name}','bb',${JSON.stringify({percent_b:c.percent_b||0,rsi:c.rsi||0}).replace(/"/g,'&quot;')})">
     <td>${i+1}</td>
     <td>${link(c.code, c.name)}</td>
     <td class="r">${fmt(c.price||0)}</td>
@@ -628,8 +663,9 @@ function drawTradeTable() {
 
   tbody.innerHTML = page.map(t => {
     const tagCls = t.strategy === '볼린저' ? 'tag-bb' : 'tag-bnf';
+    const stType = t.strategy === '볼린저' ? 'bb' : 'bnf';
     const retPct = t.return_pct || 0;
-    return `<tr>
+    return `<tr style="cursor:pointer" onclick="openStockChart('${t.code}','${t.name}','${stType}',{avg_price:${t.entry_price||0},entry_date:'${t.entry_date||''}'})">
       <td>${link(t.code, t.name)}</td>
       <td><span class="tag ${tagCls}" style="font-size:9px;padding:1px 6px;">${t.strategy}</span></td>
       <td class="r">${(t.entry_date||'').slice(5)}</td>
@@ -655,6 +691,197 @@ function toggleAccord(id) {
   const arrow = document.getElementById('arrow' + id.replace('accord', ''));
   body.classList.toggle('open');
   if (arrow) arrow.classList.toggle('open');
+}
+
+// ============ Stock Chart Modal ============
+let lwChart = null;
+
+function openStockChart(code, name, strategy, extraData) {
+  const modal = document.getElementById('chartModal');
+  const tagCls = strategy === 'bb' ? 'tag-bb' : 'tag-bnf';
+  const tagName = strategy === 'bb' ? '볼린저' : '낙폭과대';
+  document.getElementById('modalTitle').innerHTML =
+    `${name} <span class="tag ${tagCls}" style="font-size:10px;padding:2px 8px;">${tagName}</span>`;
+  modal.classList.add('open');
+
+  // Clear previous chart
+  const container = document.getElementById('modalChart');
+  container.innerHTML = '';
+
+  fetchStockChart(code, name, strategy, extraData, container);
+}
+
+function closeModal() {
+  document.getElementById('chartModal').classList.remove('open');
+  if (lwChart) { lwChart.remove(); lwChart = null; }
+}
+
+// Close on overlay click
+document.getElementById('chartModal')?.addEventListener('click', e => {
+  if (e.target.classList.contains('modal-overlay')) closeModal();
+});
+
+async function fetchStockChart(code, name, strategy, extra, container) {
+  const data = await fetchJSON(`data/bnf/stock_charts/${code}.json`);
+
+  if (!data || !data.ohlcv || !data.ohlcv.length) {
+    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6b7280;font-size:13px;">차트 데이터가 아직 없습니다. 다음 워크플로우 실행 후 반영됩니다.</div>';
+    document.getElementById('modalLegend').innerHTML = '';
+    document.getElementById('modalInfo').innerHTML = '';
+    return;
+  }
+
+  const ohlcv = data.ohlcv;
+  const lastClose = ohlcv[ohlcv.length - 1].close;
+
+  // Create lightweight chart
+  lwChart = LightweightCharts.createChart(container, {
+    width: container.clientWidth,
+    height: 320,
+    layout: { background: { color: '#131722' }, textColor: '#d1d4dc', fontSize: 11 },
+    grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: '#2b2b43' },
+    timeScale: { borderColor: '#2b2b43', timeVisible: false },
+  });
+
+  // Candlestick series
+  const candleSeries = lwChart.addCandlestickSeries({
+    upColor: '#ef4444', downColor: '#3b82f6',
+    borderUpColor: '#ef4444', borderDownColor: '#3b82f6',
+    wickUpColor: '#ef4444', wickDownColor: '#3b82f6',
+  });
+  candleSeries.setData(ohlcv.map(d => ({
+    time: d.date, open: d.open, high: d.high, low: d.low, close: d.close,
+  })));
+
+  // Volume
+  const volSeries = lwChart.addHistogramSeries({
+    priceFormat: { type: 'volume' },
+    priceScaleId: 'vol',
+  });
+  lwChart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
+  volSeries.setData(ohlcv.map(d => ({
+    time: d.date, value: d.volume,
+    color: d.close >= d.open ? '#ef444433' : '#3b82f633',
+  })));
+
+  // Strategy reference lines & markers
+  const lines = [];
+  const legends = [];
+  const infoItems = [];
+
+  if (strategy === 'bnf') {
+    const high20d = extra.high_20d || Math.max(...ohlcv.map(d => d.high));
+    const entryLine = Math.round(high20d * 0.75); // -25% threshold
+    const avgPrice = extra.avg_price || lastClose;
+    const tpPrice = Math.round(avgPrice * 1.10);
+    const slPrice = Math.round(avgPrice * 0.97);
+
+    lines.push({ price: high20d, color: '#fbbf24', style: 2, width: 1, title: '20일 고점' });
+    lines.push({ price: entryLine, color: '#22c55e', style: 2, width: 1, title: '진입기준 (-25%)' });
+    if (extra.avg_price) {
+      lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: '매수가' });
+      lines.push({ price: tpPrice, color: '#3b82f6', style: 2, width: 1, title: '익절 (+10%)' });
+      lines.push({ price: slPrice, color: '#ef4444', style: 2, width: 1, title: '손절 (-3%)' });
+    }
+
+    legends.push({ color: '#fbbf24', label: '20일 고점' });
+    legends.push({ color: '#22c55e', label: '진입기준 (-25%)' });
+    if (extra.avg_price) {
+      legends.push({ color: '#ffffff', label: '매수가' });
+      legends.push({ color: '#3b82f6', label: '익절 +10%' });
+      legends.push({ color: '#ef4444', label: '손절 -3%' });
+    }
+
+    infoItems.push({ label: '20일 고점', val: fmt(high20d) + '원' });
+    infoItems.push({ label: '현재가', val: fmt(lastClose) + '원', cls: pnlCls(lastClose - high20d) });
+    infoItems.push({ label: '고점 대비', val: '-' + ((high20d - lastClose) / high20d * 100).toFixed(1) + '%', cls: 'neg-c' });
+    if (extra.avg_price) {
+      const pnlPct = ((lastClose - avgPrice) / avgPrice * 100);
+      infoItems.push({ label: '수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
+    }
+
+  } else { // bollinger
+    const closes = ohlcv.map(d => d.close);
+    const period = 15;
+    if (closes.length >= period) {
+      // Calculate BB for each point and draw as line series
+      const bbUpper = [], bbMiddle = [], bbLower = [];
+      for (let i = period - 1; i < closes.length; i++) {
+        const slice = closes.slice(i - period + 1, i + 1);
+        const mean = slice.reduce((a,b) => a+b, 0) / period;
+        const std = Math.sqrt(slice.reduce((a,b) => a + (b-mean)**2, 0) / period);
+        const date = ohlcv[i].date;
+        bbUpper.push({ time: date, value: Math.round(mean + 2 * std) });
+        bbMiddle.push({ time: date, value: Math.round(mean) });
+        bbLower.push({ time: date, value: Math.round(mean - 2 * std) });
+      }
+
+      const upperSeries = lwChart.addLineSeries({ color: '#ef444466', lineWidth: 1, lineStyle: 2 });
+      upperSeries.setData(bbUpper);
+      const midSeries = lwChart.addLineSeries({ color: '#fbbf2466', lineWidth: 1, lineStyle: 2 });
+      midSeries.setData(bbMiddle);
+      const lowerSeries = lwChart.addLineSeries({ color: '#22c55e66', lineWidth: 1, lineStyle: 2 });
+      lowerSeries.setData(bbLower);
+
+      legends.push({ color: '#ef4444', label: 'BB 상단' });
+      legends.push({ color: '#fbbf24', label: 'BB 중심 (SMA15)' });
+      legends.push({ color: '#22c55e', label: 'BB 하단' });
+    }
+
+    const avgPrice = extra.avg_price || lastClose;
+    if (extra.avg_price) {
+      lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: '매수가' });
+      lines.push({ price: Math.round(avgPrice * 1.07), color: '#3b82f6', style: 2, width: 1, title: '익절 (+7%)' });
+      lines.push({ price: Math.round(avgPrice * 0.94), color: '#ef4444', style: 2, width: 1, title: '손절 (-6%)' });
+      legends.push({ color: '#ffffff', label: '매수가' });
+      legends.push({ color: '#3b82f6', label: '익절 +7%' });
+      legends.push({ color: '#ef4444', label: '손절 -6%' });
+    }
+
+    infoItems.push({ label: '현재가', val: fmt(lastClose) + '원' });
+    if (extra.percent_b !== undefined) infoItems.push({ label: '%B', val: extra.percent_b.toFixed(3), cls: extra.percent_b < 0.2 ? 'pos-c' : '' });
+    if (extra.rsi !== undefined) infoItems.push({ label: 'RSI', val: extra.rsi.toFixed(1), cls: extra.rsi <= 30 ? 'pos-c' : '' });
+    if (extra.avg_price) {
+      const pnlPct = ((lastClose - avgPrice) / avgPrice * 100);
+      infoItems.push({ label: '수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
+    }
+  }
+
+  // Draw price lines
+  lines.forEach(l => {
+    candleSeries.createPriceLine({
+      price: l.price, color: l.color,
+      lineWidth: l.width, lineStyle: l.style,
+      axisLabelVisible: true, title: l.title,
+    });
+  });
+
+  // Entry/Exit markers
+  if (extra.entry_date) {
+    candleSeries.setMarkers([{
+      time: extra.entry_date, position: 'belowBar', color: '#22c55e',
+      shape: 'arrowUp', text: '매수',
+    }]);
+  }
+
+  lwChart.timeScale().fitContent();
+
+  // Render legend
+  document.getElementById('modalLegend').innerHTML = legends.map(l =>
+    `<div class="modal-legend-item"><div class="modal-legend-dot" style="background:${l.color}"></div>${l.label}</div>`
+  ).join('');
+
+  // Render info
+  document.getElementById('modalInfo').innerHTML = infoItems.map(i =>
+    `<div class="modal-info-item"><span class="modal-info-label">${i.label}</span><span class="modal-info-val ${i.cls||''}">${i.val}</span></div>`
+  ).join('');
+
+  // Resize handler
+  new ResizeObserver(() => {
+    if (lwChart) lwChart.applyOptions({ width: container.clientWidth });
+  }).observe(container);
 }
 
 // ============ Init ============

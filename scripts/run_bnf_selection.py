@@ -194,6 +194,9 @@ def main():
 
     save_result(date_str, iso_date, today, candidates)
 
+    # 후보 + 보유 종목의 OHLCV 차트 데이터 저장
+    save_stock_charts(candidates, start_str, end_str)
+
 
 def save_result(date_str: str, iso_date: str, today: datetime, candidates: list):
     """결과 저장 (latest + daily)"""
@@ -222,6 +225,50 @@ def save_result(date_str: str, iso_date: str, today: datetime, candidates: list)
 
     print(f"\n저장: {latest_path}")
     print(f"저장: {daily_path}")
+
+
+def save_stock_charts(candidates, start_str, end_str):
+    """후보 + 보유 종목의 OHLCV를 개별 JSON으로 저장"""
+    chart_dir = DATA_DIR / "stock_charts"
+    chart_dir.mkdir(parents=True, exist_ok=True)
+
+    # 후보 종목 코드
+    codes = {c["code"]: c["name"] for c in candidates}
+
+    # 보유 종목도 추가
+    pos_file = DATA_DIR / "positions.json"
+    if pos_file.exists():
+        try:
+            with open(pos_file, "r", encoding="utf-8") as f:
+                pos_data = json.load(f)
+            for p in pos_data.get("positions", []):
+                if p.get("state") != "CLOSED":
+                    codes[p["code"]] = p["name"]
+        except Exception:
+            pass
+
+    print(f"\n[차트 데이터] {len(codes)}종목 OHLCV 저장")
+    for code, name in codes.items():
+        try:
+            df = pykrx_stock.get_market_ohlcv_by_date(start_str, end_str, code)
+            if df.empty:
+                continue
+            ohlcv = []
+            for idx, row in df.iterrows():
+                ohlcv.append({
+                    "date": idx.strftime("%Y-%m-%d"),
+                    "open": int(row["시가"]),
+                    "high": int(row["고가"]),
+                    "low": int(row["저가"]),
+                    "close": int(row["종가"]),
+                    "volume": int(row["거래량"]),
+                })
+            chart_data = {"code": code, "name": name, "ohlcv": ohlcv}
+            with open(chart_dir / f"{code}.json", "w", encoding="utf-8") as f:
+                json.dump(chart_data, f, ensure_ascii=False)
+            print(f"  {name}({code}): {len(ohlcv)}일")
+        except Exception as e:
+            print(f"  {name}({code}): 실패 - {e}")
 
 
 if __name__ == "__main__":
