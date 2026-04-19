@@ -197,6 +197,23 @@
     document.querySelectorAll('.swing-tab').forEach(function(t) {
       t.classList.toggle('active', t.dataset.swing === type);
     });
+    // 볼린저 탭 클릭 시 iframe 내부 볼린저 섹션으로 스크롤
+    if (type === 'bollinger') {
+      var iframe = document.getElementById('bollinger-iframe');
+      if (iframe) {
+        // iframe이 아직 로드 안 됐으면 src에 hash 추가
+        if (!iframe.src.includes('#bollingerSection')) {
+          iframe.src = 'bnf_dashboard.html?v=' + Date.now() + '#bollingerSection';
+        }
+        // 이미 로드됐으면 내부 스크롤
+        setTimeout(function() {
+          try {
+            var el = iframe.contentDocument.getElementById('bollingerSection');
+            if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+          } catch(e) {}
+        }, 500);
+      }
+    }
   }
   </script>
 

@@ -934,11 +934,19 @@ async function fetchStockChart(code, name, strategy, extra, container) {
 // ============ Init ============
 document.addEventListener('DOMContentLoaded', loadAll);
 
-// Hash scroll (for iframe)
+// Hash scroll (for iframe) — 데이터 로드 후 스크롤
 window.addEventListener('load', () => {
   if (window.location.hash) {
-    const el = document.querySelector(window.location.hash);
-    if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    const hash = window.location.hash;
+    // 데이터 로드 완료 대기 후 스크롤 (1초 + 2초 재시도)
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }, 1000);
+    setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }, 2500);
   }
 });
 </script>
