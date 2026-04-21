@@ -422,11 +422,11 @@ function renderKPI(rows) {
     <div class="section">
       <div class="hero-kpi">
         <div class="hero-kpi-main">
-          <div class="hero-kpi-label">총 자산 <span class="hero-day-badge">Day ${dayN}</span></div>
-          <div class="hero-kpi-value">${fmtMoney(totalCapital)}</div>
+          <div class="hero-kpi-label">누적 손익 (원금 제외) <span class="hero-day-badge">Day ${dayN}</span></div>
+          <div class="hero-kpi-value ${colorClass(totalPnL)}">${totalPnL >= 0 ? '+' : ''}${fmtMoney(totalPnL)}</div>
           <div class="hero-kpi-return ${colorClass(totalCum)}">
             ${fmtPctSigned(totalCum)}
-            <span class="hero-kpi-amount">(${totalPnL >= 0 ? '+' : ''}${fmtMoney(totalPnL)})</span>
+            <span class="hero-kpi-amount">평가자산 ${fmtMoney(totalCapital)}</span>
           </div>
           <div class="hero-sparkline-wrap">${buildSparklineSVG(equityValues)}</div>
         </div>
