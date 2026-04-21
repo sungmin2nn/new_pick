@@ -142,7 +142,7 @@ if(window.self!==window.top){document.documentElement.classList.add('in-iframe')
 <div class="hero" id="hero">
   <div class="hero-main">
     <div class="hero-value" id="heroValue">-</div>
-    <div class="hero-label">총 평가자산</div>
+    <div class="hero-label">누적 손익 (원금 제외)</div>
     <div class="hero-sub" id="heroSub">-</div>
   </div>
   <div class="hero-strategies">
@@ -332,15 +332,16 @@ function renderHero(pos, bbPos) {
   const bnfCap = bs.current_capital || CAP;
   const bbCap = bbs.current_capital || CAP;
   const totalAsset = bnfCap + bbCap;
+  const netPnl = totalAsset - CAP * 2;                  // 원금 제외 순수익
   const totalPnl = (bs.realized_pnl || 0) + (bs.unrealized_pnl || 0) + (bbs.realized_pnl || 0) + (bbs.unrealized_pnl || 0);
-  const totalRetPct = ((totalAsset - CAP * 2) / (CAP * 2) * 100);
+  const totalRetPct = (netPnl / (CAP * 2) * 100);
 
   const el = document.getElementById('heroValue');
-  el.textContent = fmt(totalAsset) + '원';
-  el.className = 'hero-value ' + pnlCls(totalPnl);
+  el.textContent = fmtSign(netPnl) + '원';              // 원금 제외 표시
+  el.className = 'hero-value ' + pnlCls(netPnl);
 
   document.getElementById('heroSub').innerHTML =
-    `일일 손익 <strong class="${pnlCls(totalPnl)}">${fmtSign(totalPnl)}원</strong> · 총 수익률 <strong class="${pnlCls(totalRetPct)}">${fmtPct(totalRetPct)}</strong>`;
+    `일일 손익 <strong class="${pnlCls(totalPnl)}">${fmtSign(totalPnl)}원</strong> · 총 수익률 <strong class="${pnlCls(totalRetPct)}">${fmtPct(totalRetPct)}</strong> · 평가자산 ${fmt(totalAsset)}원`;
 
   const bnfRet = bs.total_return || 0;
   const bbRet = bbs.total_return || 0;
