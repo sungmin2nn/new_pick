@@ -113,8 +113,14 @@ class FrontierGapStrategy(BaseStrategy):
         return self.candidates
 
     def _fetch_all_stocks(self, date: str, krx) -> List[Dict]:
-        """KRX OpenAPI로 fetch, 빈 결과면 pykrx 폴백"""
+        """KRX OpenAPI로 fetch, 빈 결과면 pykrx 폴백 (momentum과 동일 방식)"""
         all_stocks = []
+
+        # 진단 카운터
+        raw_rows = 0
+        skip_open_zero = 0
+        skip_close_zero = 0
+        skip_prev_invalid = 0
 
         # 1차: KRX OpenAPI
         try:
@@ -130,13 +136,24 @@ class FrontierGapStrategy(BaseStrategy):
                 if df is None or df.empty:
                     continue
                 for code, row in df.iterrows():
+                    raw_rows += 1
                     try:
                         open_p = float(row.get('시가', 0))
                         close_p = float(row.get('종가', 0))
-                        if open_p == 0 or close_p == 0:
+                        if close_p == 0:
+                            skip_close_zero += 1
+                            continue
+                        # 시가 누락 시 등락률로 prev_close 역산 후 이 종목만 skip (정확한 gap 불가)
+                        if open_p == 0:
+                            skip_open_zero += 1
                             continue
                         prev_close = close_p - float(row.get('전일대비', 0))
                         if prev_close <= 0:
+                            # 전일대비 없으면 등락률로 역산 시도
+                            chg_pct = float(row.get('등락률', 0))
+                            prev_close = close_p / (1 + chg_pct / 100) if chg_pct != 0 else close_p
+                        if prev_close <= 0:
+                            skip_prev_invalid += 1
                             continue
                         gap_pct = (open_p - prev_close) / prev_close * 100
                         all_stocks.append({
@@ -152,49 +169,61 @@ class FrontierGapStrategy(BaseStrategy):
                     except Exception:
                         continue
 
+        # 진단 로그: KRX에서 행은 받았지만 전부 skip 되었을 때 원인 파악
+        if raw_rows > 0 and not all_stocks:
+            print(f"  [KRX 진단] raw={raw_rows} skip_open0={skip_open_zero} "
+                  f"skip_close0={skip_close_zero} skip_prev={skip_prev_invalid}")
+
         if all_stocks:
             print(f"  [KRX OpenAPI] {len(all_stocks)}개")
             return all_stocks
 
-        # 2차: naver_market 폴백 (모멘텀 전략과 동일)
-        print("  KRX OpenAPI 데이터 없음 → naver 폴백")
+        # 2차: pykrx 폴백 (momentum과 동일 — CI 환경에서 안정)
+        print("  KRX OpenAPI 데이터 없음 → pykrx 폴백")
         try:
-            from naver_market import stock as naver_stock
-            for mkt in ['KOSPI', 'KOSDAQ']:
-                try:
-                    df = naver_stock.get_market_ohlcv_by_ticker(date, market=mkt)
-                    if df is None or df.empty:
-                        continue
-                    for code, row in df.iterrows():
-                        try:
-                            open_p = float(row.get('시가', 0))
-                            close_p = float(row.get('종가', 0))
-                            if open_p == 0 or close_p == 0:
-                                continue
-                            chg_pct = float(row.get('등락률', 0))
-                            prev_close = close_p / (1 + chg_pct / 100) if chg_pct != 0 else close_p
-                            if prev_close <= 0:
-                                continue
-                            gap_pct = (open_p - prev_close) / prev_close * 100
-                            all_stocks.append({
-                                'code': code, 'name': row.get('종목명', ''),
-                                'open': int(open_p), 'close': int(close_p),
-                                'prev_close': int(prev_close), 'gap_pct': gap_pct,
-                                'change_pct': chg_pct,
-                                'volume': int(row.get('거래량', 0)),
-                                'trading_value': int(row.get('거래대금', 0)),
-                                'market_cap': int(row.get('시가총액', 0)),
-                                'market': mkt,
-                            })
-                        except Exception:
-                            continue
-                except Exception as e:
-                    print(f"  naver {mkt} 오류: {e}")
-
-            if all_stocks:
-                print(f"  [naver 폴백] {len(all_stocks)}개")
+            from pykrx import stock as pykrx_stock
         except ImportError:
-            print("  naver_market 미설치")
+            print("  pykrx 미설치")
+            return all_stocks
+
+        for market in ['KOSPI', 'KOSDAQ']:
+            try:
+                df = pykrx_stock.get_market_ohlcv_by_ticker(date, market=market)
+                if df is None or df.empty:
+                    continue
+                for code in df.index:
+                    try:
+                        row = df.loc[code]
+                        open_p = float(row.get('시가', 0))
+                        close_p = float(row.get('종가', 0))
+                        if open_p == 0 or close_p == 0:
+                            continue
+                        chg_pct = float(row.get('등락률', 0))
+                        prev_close = close_p / (1 + chg_pct / 100) if chg_pct != 0 else close_p
+                        if prev_close <= 0:
+                            continue
+                        gap_pct = (open_p - prev_close) / prev_close * 100
+                        try:
+                            name = pykrx_stock.get_market_ticker_name(code)
+                        except Exception:
+                            name = ''
+                        all_stocks.append({
+                            'code': code, 'name': name or '',
+                            'open': int(open_p), 'close': int(close_p),
+                            'prev_close': int(prev_close), 'gap_pct': gap_pct,
+                            'change_pct': chg_pct,
+                            'volume': int(row.get('거래량', 0)),
+                            'trading_value': int(row.get('거래대금', 0)),
+                            'market_cap': 0,
+                            'market': market,
+                        })
+                    except Exception:
+                        continue
+            except Exception as e:
+                print(f"  pykrx {market} 오류: {e}")
+
+        if all_stocks:
+            print(f"  [pykrx 폴백] {len(all_stocks)}개")
 
         return all_stocks
 
