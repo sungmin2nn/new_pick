@@ -387,6 +387,12 @@ class BollingerSelector:
         start_str = start_dt.strftime("%Y%m%d")
         end_str = end_dt.strftime("%Y%m%d")
 
+        # 진단 카운터 (필터 단계별 탈락 수 추적)
+        skip_insufficient_data = 0
+        skip_percent_b = 0
+        skip_rsi = 0
+        skip_volume = 0
+
         total = len(stocks)
         for idx, s in enumerate(stocks, 1):
             if idx % 50 == 0:
@@ -404,6 +410,7 @@ class BollingerSelector:
                 if df is None or df.empty:
                     df = pykrx_stock.get_market_ohlcv_by_date(start_str, end_str, s["code"])
                 if df.empty or len(df) < BB_PERIOD + 1:
+                    skip_insufficient_data += 1
                     continue
 
                 closes = df["종가"].astype(float).values
@@ -414,6 +421,7 @@ class BollingerSelector:
 
                 # %B 필터
                 if percent_b >= PERCENT_B_THRESHOLD:
+                    skip_percent_b += 1
                     continue
 
                 # RSI 계산
@@ -421,6 +429,7 @@ class BollingerSelector:
 
                 # RSI 필터
                 if rsi > RSI_THRESHOLD:
+                    skip_rsi += 1
                     continue
 
                 # 거래량 5일 평균 대비 비율
@@ -436,6 +445,7 @@ class BollingerSelector:
 
                 # 거래량 필터
                 if vol_ratio < VOLUME_RATIO_THRESHOLD:
+                    skip_volume += 1
                     continue
 
                 # 후보 추가
@@ -465,6 +475,16 @@ class BollingerSelector:
             except Exception as e:
                 logger.debug(f"지표 계산 실패 ({s['code']}): {e}")
                 continue
+
+        # 진단 로그: 필터 단계별 탈락 수
+        logger.info(
+            f"[필터 진단] total={total} "
+            f"data부족={skip_insufficient_data} "
+            f"%B>={PERCENT_B_THRESHOLD}={skip_percent_b} "
+            f"RSI>{RSI_THRESHOLD}={skip_rsi} "
+            f"거래량<{VOLUME_RATIO_THRESHOLD}x={skip_volume} "
+            f"→ 통과={len(candidates)}"
+        )
 
         return candidates
 
