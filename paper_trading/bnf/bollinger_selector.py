@@ -57,7 +57,7 @@ except ImportError:
 # ─── 선정 기준 상수 (1년 백테스트 최적화 결과) ───
 BB_PERIOD = 15           # 볼린저밴드 기간 (20→15, 더 민감)
 BB_STD_MULT = 2          # 표준편차 배수
-PERCENT_B_THRESHOLD = 0.2  # %B 임계값 (하단 20% 이하, 엄격)
+PERCENT_B_THRESHOLD = 0.3  # %B 임계값 (하단 30% 이하) — 04-21 진단 결과 0.2는 315개 중 1개만 통과해 완화
 RSI_PERIOD = 14          # RSI 기간
 RSI_THRESHOLD = 30       # RSI 과매도 기준 (30 이하, 엄격)
 VOLUME_RATIO_THRESHOLD = 1.0  # 거래량 기준 (평균 이상)
