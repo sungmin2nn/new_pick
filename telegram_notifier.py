@@ -24,6 +24,7 @@ class TelegramNotifier:
         "buy_signal": {"emoji": "🟢", "label": "매수 신호"},
         "sell_profit": {"emoji": "🎯", "label": "익절 신호"},
         "sell_loss": {"emoji": "🛑", "label": "손절 신호"},
+        "sell_batch": {"emoji": "📈", "label": "장중 매매 신호"},
         "daily_summary": {"emoji": "📊", "label": "일일 현황"},
         "error_alert": {"emoji": "🚨", "label": "오류 알림"},
         "custom": {"emoji": "📢", "label": "커스텀 알림"},
@@ -146,6 +147,79 @@ class TelegramNotifier:
 <i>⏰ {now}</i>
 """
         return self.send_message(message.strip(), msg_type=f"sell_{signal_type}")
+
+    def send_sell_signals_batch(self, signals: List[Dict]) -> bool:
+        """익절/손절 신호를 한 건으로 취합 발송 + 중복 방지"""
+        if not signals:
+            return False
+
+        # 중복 방지: 오늘 이미 발송한 종목 제외
+        sent_codes = self._get_today_sent_codes()
+        new_signals = [s for s in signals if s.get('code', '') not in sent_codes]
+
+        if not new_signals:
+            print(f"모든 {len(signals)}건 이미 발송됨 - 생략")
+            return False
+
+        kst = timezone(timedelta(hours=9))
+        now = datetime.now(kst).strftime("%Y-%m-%d %H:%M")
+
+        profits = [s for s in new_signals if s['signal_type'] == 'profit']
+        losses = [s for s in new_signals if s['signal_type'] == 'loss']
+
+        lines = [f"<b>📈 장중 매매 신호</b> ({len(new_signals)}건)", ""]
+
+        if profits:
+            lines.append(f"<b>🎯 익절 ({len(profits)}건)</b>")
+            for s in profits:
+                pnl_sign = "+" if s['pnl_pct'] >= 0 else ""
+                lines.append(
+                    f"  • {s['name']}({s['code']}) "
+                    f"{s['price']:,}원 🟢{pnl_sign}{s['pnl_pct']:.2f}%"
+                )
+            lines.append("")
+
+        if losses:
+            lines.append(f"<b>🛑 손절 ({len(losses)}건)</b>")
+            for s in losses:
+                pnl_sign = "+" if s['pnl_pct'] >= 0 else ""
+                lines.append(
+                    f"  • {s['name']}({s['code']}) "
+                    f"{s['price']:,}원 🔴{pnl_sign}{s['pnl_pct']:.2f}%"
+                )
+            lines.append("")
+
+        lines.append(f"<i>⏰ {now}</i>")
+
+        msg_type = "sell_batch"
+        message = "\n".join(lines)
+        return self.send_message(message, msg_type=msg_type)
+
+    def _get_today_sent_codes(self) -> set:
+        """오늘 이미 익절/손절 발송한 종목코드 set 반환"""
+        kst = timezone(timedelta(hours=9))
+        today = datetime.now(kst).strftime("%Y-%m-%d")
+        log_file = os.path.join(self.LOG_DIR, f"{today}.jsonl")
+
+        sent = set()
+        if not os.path.exists(log_file):
+            return sent
+
+        try:
+            with open(log_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    entry = json.loads(line)
+                    if entry.get('type') in ('sell_profit', 'sell_loss', 'sell_batch') and entry.get('success'):
+                        # 메시지에서 종목코드 추출 (괄호 안 6자리 숫자)
+                        import re
+                        codes = re.findall(r'\((\d{6})\)', entry.get('message', ''))
+                        sent.update(codes)
+        except Exception:
+            pass
+        return sent
 
     def send_daily_summary(self, data: Dict[str, Any]) -> bool:
         """일일 요약 알림"""

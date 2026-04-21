@@ -124,7 +124,7 @@ jobs:
         except Exception as e:
             print(f'알림 오류: {e}')
 
-        # 장중 익절/손절 알림 (기존)
+        # 장중 익절/손절 알림 (취합 발송 + 중복 방지)
         try:
             from datetime import datetime, timezone, timedelta
             kst = timezone(timedelta(hours=9))
@@ -133,15 +133,21 @@ jobs:
             with open(f'data/paper_trading/status_{today}.json') as f:
                 data = json.load(f)
 
+            signals = []
             for s in data.get('stocks', []):
-                if s['status'] == 'profit_hit':
-                    notifier.send_sell_signal(
-                        s['name'], s.get('code', ''),
-                        s.get('current_price', 0), 'profit', s.get('current_pct', 0))
-                elif s['status'] == 'loss_hit':
-                    notifier.send_sell_signal(
-                        s['name'], s.get('code', ''),
-                        s.get('current_price', 0), 'loss', s.get('current_pct', 0))
+                if s['status'] in ('profit_hit', 'loss_hit'):
+                    signals.append({
+                        'name': s['name'],
+                        'code': s.get('code', ''),
+                        'price': s.get('current_price', 0),
+                        'signal_type': 'profit' if s['status'] == 'profit_hit' else 'loss',
+                        'pnl_pct': s.get('current_pct', 0),
+                    })
+            if signals:
+                notifier.send_sell_signals_batch(signals)
+                print(f'매매 신호 {len(signals)}건 취합 발송')
+            else:
+                print('매매 신호 없음')
         except Exception as e:
             print(f'장중 알림 오류: {e}')
         "
