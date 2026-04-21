@@ -790,22 +790,25 @@ async function fetchStockChart(code, name, strategy, extra, container) {
   let strategyDesc = '';
 
   if (strategy === 'bnf') {
-    const high20d = extra.high_20d || Math.max(...ohlcv.map(d => d.high));
-    const entryLine = Math.round(high20d * 0.75); // -25% threshold
+    // Fix 2: 최근 20일 구간에서만 고점 계산 (전체 차트 최고값 대신)
+    const recent20 = ohlcv.slice(-20);
+    const high20d = extra.high_20d || (recent20.length ? Math.max(...recent20.map(d => d.high)) : lastClose);
+    const entryLine = Math.round(high20d * 0.75); // 20일 고점 대비 -25%
     const avgPrice = extra.avg_price || lastClose;
     const tpPrice = Math.round(avgPrice * 1.10);
     const slPrice = Math.round(avgPrice * 0.97);
 
     lines.push({ price: high20d, color: '#fbbf24', style: 2, width: 1, title: '20일 고점' });
-    lines.push({ price: entryLine, color: '#22c55e', style: 2, width: 1, title: '진입기준 (-25%)' });
+    // Fix 3: 라벨 명확화 — "20일고점 -25%"로 기준 명시
+    lines.push({ price: entryLine, color: '#22c55e', style: 2, width: 1, title: '진입선 (20일고점 -25%)' });
     if (extra.avg_price) {
-      lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: '매수가' });
+      lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: `매수가 ${fmt(avgPrice)}원` });
       lines.push({ price: tpPrice, color: '#3b82f6', style: 2, width: 1, title: '익절 (+10%)' });
       lines.push({ price: slPrice, color: '#ef4444', style: 2, width: 1, title: '손절 (-3%)' });
     }
 
     legends.push({ color: '#fbbf24', label: '20일 고점', dashed: true });
-    legends.push({ color: '#22c55e', label: '진입기준 (-25%)', dashed: true });
+    legends.push({ color: '#22c55e', label: '진입선 (20일고점 -25%)', dashed: true });
     if (extra.avg_price) {
       legends.push({ color: '#ffffff', label: '매수가', dashed: false });
       legends.push({ color: '#3b82f6', label: '익절 +10%', dashed: true });
@@ -868,7 +871,7 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     const tpBb = Math.round(avgPrice * 1.07);
     const slBb = Math.round(avgPrice * 0.94);
     if (extra.avg_price) {
-      lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: '매수가' });
+      lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: `매수가 ${fmt(avgPrice)}원` });
       lines.push({ price: tpBb, color: '#3b82f6', style: 2, width: 1, title: '익절 (+7%)' });
       lines.push({ price: slBb, color: '#ef4444', style: 2, width: 1, title: '손절 (-6%)' });
       legends.push({ color: '#ffffff', label: '매수가', dashed: false });
@@ -898,11 +901,24 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     });
   });
 
-  // Entry/Exit markers
+  // Fix 1: 매수 마커 위치를 매수가 기준으로 스마트하게 배치
+  // - 매수가가 그날 캔들 고가보다 높으면 aboveBar (화살표 ↓, 캔들 위에서 아래 방향)
+  // - 매수가가 그날 캔들 저가보다 낮으면 belowBar (화살표 ↑, 캔들 아래에서 위 방향)
+  // - 캔들 범위 안이면 belowBar 기본
+  // 화살표 텍스트에 매수가를 명시해 하얀 가로선과의 연결 명확히 함
   if (extra.entry_date) {
+    const entryBar = ohlcv.find(d => d.date === extra.entry_date);
+    const avgP = extra.avg_price || 0;
+    let position = 'belowBar';
+    let shape = 'arrowUp';
+    if (entryBar && avgP) {
+      if (avgP > entryBar.high) { position = 'aboveBar'; shape = 'arrowDown'; }
+      else if (avgP < entryBar.low) { position = 'belowBar'; shape = 'arrowUp'; }
+    }
+    const priceLabel = avgP ? ` @${fmt(avgP)}` : '';
     candleSeries.setMarkers([{
-      time: extra.entry_date, position: 'belowBar', color: '#22c55e',
-      shape: 'arrowUp', text: '매수',
+      time: extra.entry_date, position, color: '#22c55e',
+      shape, text: '매수' + priceLabel,
     }]);
   }
 
