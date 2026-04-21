@@ -1,0 +1,48 @@
+{
+  "id": "sector_rotation",
+  "name": "섹터 로테이션 (KOSPI 업종)",
+  "version": "0.1.0",
+  "category": "theme",
+  "risk_level": "medium",
+  "hypothesis": "당일 강세 업종의 시가총액 상위 종목은 추가 상승 가능성이 높다",
+  "rationale": "업종 모멘텀은 개별 종목 모멘텀보다 안정적이며, 기관/외국인 자금 유입은 보통 섹터 단위로 들어온다. 강세 섹터 → 시총 상위 종목 → 거래량 동반 종목 순으로 좁혀가면 단타 진입에 유리.",
+  "expected_edge": "섹터 자금 유입의 일시적 추세, 대장주 효과",
+  "sources": [
+    {
+      "type": "official_doc",
+      "title": "KRX 업종 지수 일별 시세 (idx/kospi_dd_trd)",
+      "author": "",
+      "url": "",
+      "published_date": "",
+      "accessed_date": "2026-04-11",
+      "trust_level": "verified",
+      "notes": "KRX OpenAPI 공식 엔드포인트."
+    },
+    {
+      "type": "handoff_guide",
+      "title": "news-trading-bot-handoff.md Section 6.2",
+      "author": "",
+      "url": "",
+      "published_date": "",
+      "accessed_date": "2026-04-11",
+      "trust_level": "high",
+      "notes": "신규 전략 후보로 명시 (Sector Rotation)."
+    }
+  ],
+  "data_requirements": [
+    "KRX_OHLCV",
+    "KRX_INDEX"
+  ],
+  "min_history_days": 1,
+  "requires_intraday": false,
+  "target_basket_size": 5,
+  "target_holding_days": 1,
+  "target_market": "KOSPI",
+  "differs_from_existing": "Delta Theme와 다름: Delta는 naver 테마(당일) + KRX 업종(과거) 혼합 사용, 매핑 정합성 약함. 본 전략은 KRX 업종 지수만 단일 소스로 사용하여 섹터 → 시총 → 거래량 3단계 깔때기를 적용. 데이터 소스가 일관되어 백테스트 재현성이 높고, 분봉 불필요.",
+  "novelty_score": 6,
+  "status": "draft",
+  "created_at": "2026-04-11T04:33:42",
+  "updated_at": "2026-04-11T04:33:42",
+  "author": "claude-code-session",
+  "notes": "섹터 N개와 섹터 내 종목 N개 파라미터 튜닝 여지 큼."
+}

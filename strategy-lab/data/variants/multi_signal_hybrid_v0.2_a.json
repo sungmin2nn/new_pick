@@ -1,0 +1,15 @@
+{
+  "variant_id": "multi_signal_hybrid_v0.2_a",
+  "parent_strategy_id": "multi_signal_hybrid",
+  "version": "0.2.0",
+  "label": "진입 조건 완화 힌트",
+  "strategy_param_overrides": {
+    "ENTRY_RELAXATION_HINT": true
+  },
+  "exit_rule_overrides": {},
+  "addresses_hypotheses": [
+    "시그널 미발생 — 조건 완화 필요"
+  ],
+  "tuning_rationale": "거래 0건 → 진입 필터가 과도하게 엄격하거나 데이터 의존 실패. 해당 전략의 threshold를 단계적으로 완화해 검증 필요. 이 힌트는 사용자 검토용 플래그 (자동 완화는 보류).",
+  "created_at": "2026-04-17T17:53:23"
+}

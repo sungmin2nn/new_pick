@@ -1,0 +1,47 @@
+{
+  "id": "turtle_breakout_short",
+  "name": "단축 터틀 돌파 (5/10일 신고가)",
+  "version": "0.1.0",
+  "category": "breakout",
+  "risk_level": "medium",
+  "hypothesis": "N일 신고가 돌파 + 거래량 동반 종목은 추세 지속 가능성",
+  "rationale": "Richard Dennis & Bill Eckhardt의 Turtle Trading System(1980s)을 단타에 적응. 원본은 20/55일 신고가지만 단타에는 5/10일 단축 사용. 현대 시장에서 단축 버전은 알파 약화 가능성이 있어 backtest 검증 필수. 신고가 자체는 모멘텀 추세의 가장 단순하고 robust한 시그널.",
+  "expected_edge": "신고가 갱신 + 거래량 동반의 추세 추종 효과",
+  "sources": [
+    {
+      "type": "book",
+      "title": "Way of the Turtle",
+      "author": "Curtis Faith",
+      "url": "",
+      "published_date": "2007",
+      "accessed_date": "2026-04-11",
+      "trust_level": "verified",
+      "notes": "Turtle Trading System 원본 정리. Richard Dennis 시스템."
+    },
+    {
+      "type": "blog_en",
+      "title": "Modern Turtle Trading Strategy: Updated Rules & Backtest",
+      "author": "",
+      "url": "https://tosindicators.com/research/modern-turtle-trading-strategy-rules-and-backtest",
+      "published_date": "",
+      "accessed_date": "2026-04-11",
+      "trust_level": "high",
+      "notes": "현대 시장에서 System 2 (55일)가 System 1 (20일)보다 우수. 단축 버전 주의."
+    }
+  ],
+  "data_requirements": [
+    "KRX_OHLCV"
+  ],
+  "min_history_days": 15,
+  "requires_intraday": false,
+  "target_basket_size": 5,
+  "target_holding_days": 1,
+  "target_market": "KOSPI+KOSDAQ",
+  "differs_from_existing": "Echo Frontier와 다름: Echo는 시초가 갭 비율, 본 전략은 N일 신고가 돌파. Volatility BO와 다름: VB는 전일 변동폭 K배, 본 전략은 절대 신고가. Alpha Momentum과 다름: Alpha는 MA5 위 + 거래량 3배 (스무딩), 본 전략은 N일 신고가 돌파 (단순 신기록). Donchian Channel 클래식 전략의 단축 버전.",
+  "novelty_score": 6,
+  "status": "draft",
+  "created_at": "2026-04-11T04:47:42",
+  "updated_at": "2026-04-11T04:47:42",
+  "author": "claude-code-session",
+  "notes": "N=5, 10 두 가지 파라미터 시험 가능. 단축 버전이라 alpha 약화 위험."
+}

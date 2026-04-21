@@ -1,0 +1,31 @@
+{
+  "id": "disc_20260411_063401_fceaa4",
+  "title": "Short Covering Momentum (공매도 잔고 감소 기반)",
+  "source_type": "paper",
+  "source_url": "https://www.e-kjfs.org/journal/view.php?doi=10.26845/KJFS.2021.02.50.1.001",
+  "source_author": "Korean Journal of Financial Studies 2021",
+  "source_published": "2021",
+  "trust_level": "verified",
+  "category_guess": "statistical",
+  "risk_level_guess": "medium",
+  "hypothesis": "공매도 잔고가 급격히 감소(short covering)하는 종목은 단기 상승 모멘텀 있음",
+  "rationale": "Korean Journal of Financial Studies 2021 논문 'Price Movements around Short Covering Trades' 학술 검증. 공매도 포지션 청산 과정에서 매수 압력 발생 → 가격 상승. 2025년 3월 31일 한국 공매도 금지 해제로 데이터 신선도 ↑.",
+  "expected_edge": "short covering 의무 매수로 인한 상승 압력 (정보 비대칭)",
+  "differs_from_existing_guess": "foreign_flow_momentum은 외국인 순매수 추적, 본 전략은 '공매도 잔고 감소율'. 데이터 소스(KRX 공매도 잔고) 신규. 시그널 방향도 역방향 — short squeeze 메커니즘.",
+  "data_requirements": [
+    "KRX_SHORT_INTEREST",
+    "KRX_OHLCV"
+  ],
+  "requires_intraday": false,
+  "target_holding_days": 2,
+  "novelty_score": 9,
+  "raw_snippet": "Day trading short-selling is pervasive in the Korean stock market, accounting for 42% of total shorted shares. Traders who short stocks in the morning and hold the position longer earn higher profit. Short covering 시점 가격 상승 패턴 학술 검증.",
+  "status": "approved",
+  "discovered_at": "2026-04-11T06:34:01",
+  "discovered_by": "claude-code-session",
+  "reviewed_at": "2026-04-11T06:34:24",
+  "reviewer": "user",
+  "review_notes": "학술 검증 + 2025 공매도 해제로 신선한 시그널",
+  "coded_at": "",
+  "coded_file": ""
+}

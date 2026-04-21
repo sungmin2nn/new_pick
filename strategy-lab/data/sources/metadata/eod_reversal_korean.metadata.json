@@ -1,0 +1,37 @@
+{
+  "id": "eod_reversal_korean",
+  "name": "당일 EOD 리버설 (Baltussen 한국 적용)",
+  "version": "0.1.0",
+  "category": "contrarian",
+  "risk_level": "high",
+  "hypothesis": "당일 큰 폭 하락 종목은 장 마감 직전 또는 다음날 시초가에 reversal 가능성",
+  "rationale": "Baltussen, Da, Soebhag의 End-of-Day Reversal 논문 (Notre Dame)에서 미국 시장 인트라데이 패자가 마지막 30분에 평균 0.24% reversal 발생을 검증. 공매도자의 overnight margin 부담으로 마지막 30분에 short cover. 한국은 공매도 제약 강함 → 메커니즘 다를 수 있으나 검증 가치 있음.",
+  "expected_edge": "단기 oversold 종목의 mean reversion + 공매도 cover 추정",
+  "sources": [
+    {
+      "type": "paper",
+      "title": "End-of-Day Reversal",
+      "author": "Baltussen, G., Da, Z., Soebhag, A.",
+      "url": "https://www3.nd.edu/~zda/EOD.pdf",
+      "published_date": "",
+      "accessed_date": "2026-04-11",
+      "trust_level": "verified",
+      "notes": "Notre Dame working paper. 미국 시장 검증, 한국 적용은 backtest 필요."
+    }
+  ],
+  "data_requirements": [
+    "KRX_OHLCV"
+  ],
+  "min_history_days": 2,
+  "requires_intraday": true,
+  "target_basket_size": 5,
+  "target_holding_days": 1,
+  "target_market": "KOSPI+KOSDAQ",
+  "differs_from_existing": "Beta Contrarian과 다름: Beta는 RSI 다일 평균(대형주). BNF와 다름: BNF는 3거래일 -10% 누적 분할매수. 본 전략은 단일일 큰 폭 하락 → 단기 reversion. 시간 차원(1일 vs 3일)과 출처(학술 EODR vs 경험적 BNF)가 본질적으로 다름.",
+  "novelty_score": 8,
+  "status": "draft",
+  "created_at": "2026-04-11T04:47:42",
+  "updated_at": "2026-04-11T04:47:42",
+  "author": "claude-code-session",
+  "notes": "한국 시장 검증 필수. 미국과 메커니즘 다를 수 있음. 분봉 가용 시 정확히 마지막 30분 진입, 그 외엔 종가 진입 + 다음날 시초가 청산 근사."
+}

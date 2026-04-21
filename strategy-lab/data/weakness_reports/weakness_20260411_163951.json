@@ -1,0 +1,119 @@
+{
+  "generated_at": "2026-04-11T16:39:51",
+  "total": 1,
+  "reports": [
+    {
+      "strategy_id": "eod_reversal_korean",
+      "strategy_name": "당일 EOD 리버설 (Baltussen 한국 적용)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "loss_pattern": {
+        "total_trades": 48,
+        "wins": 10,
+        "losses": 38,
+        "loss_ratio": 0.792,
+        "exit_type_distribution": {
+          "close": 12,
+          "loss": 35,
+          "profit": 1
+        },
+        "avg_win_pct": 1.27,
+        "avg_loss_pct": -2.81,
+        "asymmetry": 2.21,
+        "max_consecutive_losses": 17,
+        "stop_wall_detected": true,
+        "stop_wall_level_pct": -3.0,
+        "stop_wall_ratio": 0.921
+      },
+      "timing_pattern": {
+        "total_days": 10,
+        "winning_days": 1,
+        "losing_days": 9,
+        "worst_day": {
+          "date": "20260331",
+          "return_pct": -3.0
+        },
+        "best_day": {
+          "date": "20260330",
+          "return_pct": 0.69
+        },
+        "weekday_avg_return_pct": {
+          "0": -1.16,
+          "1": -2.68,
+          "2": -0.62,
+          "3": -2.84,
+          "4": -2.65
+        },
+        "loss_concentration": 0.9
+      },
+      "name_bias": {
+        "unique_names": 44,
+        "total_trades": 48,
+        "diversity_ratio": 0.917,
+        "top_repeated": [
+          {
+            "name": "한미반도체",
+            "count": 2,
+            "avg_return_pct": -1.3,
+            "win_rate": 0.5
+          },
+          {
+            "name": "SK가스",
+            "count": 2,
+            "avg_return_pct": -1.59,
+            "win_rate": 0.0
+          },
+          {
+            "name": "SK오션플랜트",
+            "count": 2,
+            "avg_return_pct": -3.0,
+            "win_rate": 0.0
+          },
+          {
+            "name": "리센스메디컬",
+            "count": 2,
+            "avg_return_pct": -3.0,
+            "win_rate": 0.0
+          },
+          {
+            "name": "현대차",
+            "count": 1,
+            "avg_return_pct": 0.21,
+            "win_rate": 1.0
+          }
+        ],
+        "low_diversity": false
+      },
+      "market_context": {
+        "available": true,
+        "own_return_pct": -19.59,
+        "peer_count": 3,
+        "peer_avg_return_pct": 27.35,
+        "peer_median_return_pct": 31.93,
+        "rank_among_peers": "4/4",
+        "relative_gap_pct": -46.94,
+        "underperformed_peers": true
+      },
+      "score_correlation": {
+        "available": true,
+        "n": 48,
+        "pearson_corr": 0.174,
+        "top_half_avg_return": -1.86,
+        "bottom_half_avg_return": -2.07,
+        "scoring_effective": false
+      },
+      "hypotheses": [
+        "손절 벽 감지: 전체 손실의 92%가 -3.0% 수준에 집중 — 손절 폭이 너무 타이트해 노이즈에 반복 피격",
+        "평균 손실이 평균 수익의 2.2배 — 승률로 만회해야 하지만 승률 10/48 부족",
+        "17연속 손실 발생 — 시장 체제 변화 대응 로직 부재 (regime filter 필요 가능)",
+        "selection score와 수익률 상관 +0.17 — 선정 로직이 실제 성과를 예측하지 못함 (스코어 공식 재설계 필요)",
+        "peer 평균 대비 -46.94%p 열위 (4/4) — 같은 기간 다른 전략은 작동 → 본 전략 고유 문제",
+        "거래일의 90%가 손실일 — 엔트리 타이밍 자체가 시장 방향과 반대",
+        "최악일 20260331 -3.00% — 단일 이벤트 영향 크므로 포지션 사이즈/분산 조정 고려"
+      ],
+      "severity_notes": [],
+      "analyzed_at": "2026-04-11T16:39:51"
+    }
+  ]
+}

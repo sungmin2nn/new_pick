@@ -1,0 +1,816 @@
+{
+  "generated_at": "2026-04-11T16:31:38",
+  "criteria": {
+    "low_return_pct": 3.0,
+    "deep_drawdown_pct": -10.0,
+    "low_win_rate": 0.45,
+    "low_profit_factor": 1.2,
+    "low_sharpe": 0.5,
+    "max_sharpe_sanity": 15.0,
+    "inactive_if_no_trades": true,
+    "multi_period_min_periods": 2,
+    "multi_period_fail_ratio": 0.5
+  },
+  "summary": {
+    "total": 10,
+    "underperformers": 4,
+    "by_severity": {
+      "none": 6,
+      "inactive": 3,
+      "severe": 1
+    }
+  },
+  "multi_period_fails": [],
+  "per_strategy": [
+    {
+      "strategy_id": "eod_reversal_korean",
+      "strategy_name": "당일 EOD 리버설 (Baltussen 한국 적용)",
+      "total_periods": 1,
+      "underperform_periods": 1,
+      "inactive_periods": 0,
+      "multi_period_fail": false,
+      "avg_weakness_score": 83.4,
+      "worst_severity": "severe",
+      "per_period": [
+        {
+          "strategy_id": "eod_reversal_korean",
+          "strategy_name": "당일 EOD 리버설 (Baltussen 한국 적용)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": true,
+          "severity": "severe",
+          "flags": [
+            "low_return",
+            "deep_drawdown",
+            "low_win_rate",
+            "low_profit_factor",
+            "low_sharpe"
+          ],
+          "reasons": [
+            "수익률 -19.59% < 기준 3.0%",
+            "MDD -20.12% < 기준 -10.0%",
+            "승률 20.8% < 기준 45%",
+            "PF 0.12 < 기준 1.20",
+            "Sharpe -23.46 < 기준 0.50"
+          ],
+          "total_return_pct": -19.59,
+          "sharpe_ratio": -23.46,
+          "win_rate": 0.2083,
+          "max_drawdown_pct": -20.12,
+          "num_trades": 48,
+          "profit_factor": 0.12,
+          "trading_days": 10,
+          "weakness_score": 83.4,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "news_catalyst_timing",
+      "strategy_name": "뉴스 카탈리스트 타이밍",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 1,
+      "multi_period_fail": false,
+      "avg_weakness_score": 50.0,
+      "worst_severity": "inactive",
+      "per_period": [
+        {
+          "strategy_id": "news_catalyst_timing",
+          "strategy_name": "뉴스 카탈리스트 타이밍",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": true,
+          "severity": "inactive",
+          "flags": [
+            "inactive"
+          ],
+          "reasons": [
+            "거래 없음 — 시그널 조건이 너무 엄격하거나 데이터 의존 실패"
+          ],
+          "total_return_pct": 0.0,
+          "sharpe_ratio": 0.0,
+          "win_rate": 0.0,
+          "max_drawdown_pct": 0.0,
+          "num_trades": 0,
+          "profit_factor": 0.0,
+          "trading_days": 10,
+          "weakness_score": 50.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "multi_signal_hybrid",
+      "strategy_name": "다중 신호 결합 (DART + 수급 + 거래량)",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 1,
+      "multi_period_fail": false,
+      "avg_weakness_score": 50.0,
+      "worst_severity": "inactive",
+      "per_period": [
+        {
+          "strategy_id": "multi_signal_hybrid",
+          "strategy_name": "다중 신호 결합 (DART + 수급 + 거래량)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": true,
+          "severity": "inactive",
+          "flags": [
+            "inactive"
+          ],
+          "reasons": [
+            "거래 없음 — 시그널 조건이 너무 엄격하거나 데이터 의존 실패"
+          ],
+          "total_return_pct": 0.0,
+          "sharpe_ratio": 0.0,
+          "win_rate": 0.0,
+          "max_drawdown_pct": 0.0,
+          "num_trades": 0,
+          "profit_factor": 0.0,
+          "trading_days": 10,
+          "weakness_score": 50.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "overnight_etf_reversal",
+      "strategy_name": "ETF Overnight 리버설 (학술 검증)",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 1,
+      "multi_period_fail": false,
+      "avg_weakness_score": 50.0,
+      "worst_severity": "inactive",
+      "per_period": [
+        {
+          "strategy_id": "overnight_etf_reversal",
+          "strategy_name": "ETF Overnight 리버설 (학술 검증)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": true,
+          "severity": "inactive",
+          "flags": [
+            "inactive"
+          ],
+          "reasons": [
+            "거래 없음 — 시그널 조건이 너무 엄격하거나 데이터 의존 실패"
+          ],
+          "total_return_pct": 0.0,
+          "sharpe_ratio": 0.0,
+          "win_rate": 0.0,
+          "max_drawdown_pct": 0.0,
+          "num_trades": 0,
+          "profit_factor": 0.0,
+          "trading_days": 10,
+          "weakness_score": 50.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "volatility_breakout_lw",
+      "strategy_name": "변동성 돌파 (Larry Williams)",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 0,
+      "multi_period_fail": false,
+      "avg_weakness_score": 0.0,
+      "worst_severity": "none",
+      "per_period": [
+        {
+          "strategy_id": "volatility_breakout_lw",
+          "strategy_name": "변동성 돌파 (Larry Williams)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": false,
+          "severity": "none",
+          "flags": [],
+          "reasons": [],
+          "total_return_pct": 40.24,
+          "sharpe_ratio": 41.11,
+          "win_rate": 0.88,
+          "max_drawdown_pct": 0.0,
+          "num_trades": 50,
+          "profit_factor": 12.18,
+          "trading_days": 10,
+          "weakness_score": 0.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "sector_rotation",
+      "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 0,
+      "multi_period_fail": false,
+      "avg_weakness_score": 0.0,
+      "worst_severity": "none",
+      "per_period": [
+        {
+          "strategy_id": "sector_rotation",
+          "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": false,
+          "severity": "none",
+          "flags": [],
+          "reasons": [],
+          "total_return_pct": 31.93,
+          "sharpe_ratio": 33.59,
+          "win_rate": 0.84,
+          "max_drawdown_pct": 0.0,
+          "num_trades": 50,
+          "profit_factor": 8.53,
+          "trading_days": 10,
+          "weakness_score": 0.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "opening_30min_volume_burst",
+      "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 0,
+      "multi_period_fail": false,
+      "avg_weakness_score": 0.0,
+      "worst_severity": "none",
+      "per_period": [
+        {
+          "strategy_id": "opening_30min_volume_burst",
+          "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": false,
+          "severity": "none",
+          "flags": [],
+          "reasons": [],
+          "total_return_pct": 30.67,
+          "sharpe_ratio": 47.83,
+          "win_rate": 0.76,
+          "max_drawdown_pct": 0.0,
+          "num_trades": 50,
+          "profit_factor": 5.26,
+          "trading_days": 10,
+          "weakness_score": 0.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "foreign_flow_momentum",
+      "strategy_name": "외국인 수급 모멘텀",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 0,
+      "multi_period_fail": false,
+      "avg_weakness_score": 0.0,
+      "worst_severity": "none",
+      "per_period": [
+        {
+          "strategy_id": "foreign_flow_momentum",
+          "strategy_name": "외국인 수급 모멘텀",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": false,
+          "severity": "none",
+          "flags": [],
+          "reasons": [],
+          "total_return_pct": 24.42,
+          "sharpe_ratio": 26.26,
+          "win_rate": 0.7708,
+          "max_drawdown_pct": 0.0,
+          "num_trades": 48,
+          "profit_factor": 4.82,
+          "trading_days": 10,
+          "weakness_score": 0.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "turtle_breakout_short",
+      "strategy_name": "단축 터틀 돌파 (5/10일 신고가)",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 0,
+      "multi_period_fail": false,
+      "avg_weakness_score": 0.0,
+      "worst_severity": "none",
+      "per_period": [
+        {
+          "strategy_id": "turtle_breakout_short",
+          "strategy_name": "단축 터틀 돌파 (5/10일 신고가)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": false,
+          "severity": "none",
+          "flags": [],
+          "reasons": [],
+          "total_return_pct": 21.01,
+          "sharpe_ratio": 16.91,
+          "win_rate": 0.64,
+          "max_drawdown_pct": -1.39,
+          "num_trades": 50,
+          "profit_factor": 2.96,
+          "trading_days": 10,
+          "weakness_score": 0.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "strategy_id": "kospi_intraday_momentum",
+      "strategy_name": "KOSPI 인트라데이 모멘텀 (학술 MIM)",
+      "total_periods": 1,
+      "underperform_periods": 0,
+      "inactive_periods": 0,
+      "multi_period_fail": false,
+      "avg_weakness_score": 0.0,
+      "worst_severity": "none",
+      "per_period": [
+        {
+          "strategy_id": "kospi_intraday_momentum",
+          "strategy_name": "KOSPI 인트라데이 모멘텀 (학술 MIM)",
+          "period_label": "1w",
+          "start_date": "20260329",
+          "end_date": "20260410",
+          "is_underperformer": false,
+          "severity": "none",
+          "flags": [],
+          "reasons": [],
+          "total_return_pct": 9.89,
+          "sharpe_ratio": 9.97,
+          "win_rate": 0.5,
+          "max_drawdown_pct": -1.37,
+          "num_trades": 50,
+          "profit_factor": 1.66,
+          "trading_days": 10,
+          "weakness_score": 0.0,
+          "evaluated_at": "2026-04-11T16:31:38",
+          "criteria_snapshot": {
+            "low_return_pct": 3.0,
+            "deep_drawdown_pct": -10.0,
+            "low_win_rate": 0.45,
+            "low_profit_factor": 1.2,
+            "low_sharpe": 0.5,
+            "max_sharpe_sanity": 15.0,
+            "inactive_if_no_trades": true,
+            "multi_period_min_periods": 2,
+            "multi_period_fail_ratio": 0.5
+          }
+        }
+      ]
+    }
+  ],
+  "reports": [
+    {
+      "strategy_id": "volatility_breakout_lw",
+      "strategy_name": "변동성 돌파 (Larry Williams)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": false,
+      "severity": "none",
+      "flags": [],
+      "reasons": [],
+      "total_return_pct": 40.24,
+      "sharpe_ratio": 41.11,
+      "win_rate": 0.88,
+      "max_drawdown_pct": 0.0,
+      "num_trades": 50,
+      "profit_factor": 12.18,
+      "trading_days": 10,
+      "weakness_score": 0.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "sector_rotation",
+      "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": false,
+      "severity": "none",
+      "flags": [],
+      "reasons": [],
+      "total_return_pct": 31.93,
+      "sharpe_ratio": 33.59,
+      "win_rate": 0.84,
+      "max_drawdown_pct": 0.0,
+      "num_trades": 50,
+      "profit_factor": 8.53,
+      "trading_days": 10,
+      "weakness_score": 0.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "opening_30min_volume_burst",
+      "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": false,
+      "severity": "none",
+      "flags": [],
+      "reasons": [],
+      "total_return_pct": 30.67,
+      "sharpe_ratio": 47.83,
+      "win_rate": 0.76,
+      "max_drawdown_pct": 0.0,
+      "num_trades": 50,
+      "profit_factor": 5.26,
+      "trading_days": 10,
+      "weakness_score": 0.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "foreign_flow_momentum",
+      "strategy_name": "외국인 수급 모멘텀",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": false,
+      "severity": "none",
+      "flags": [],
+      "reasons": [],
+      "total_return_pct": 24.42,
+      "sharpe_ratio": 26.26,
+      "win_rate": 0.7708,
+      "max_drawdown_pct": 0.0,
+      "num_trades": 48,
+      "profit_factor": 4.82,
+      "trading_days": 10,
+      "weakness_score": 0.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "turtle_breakout_short",
+      "strategy_name": "단축 터틀 돌파 (5/10일 신고가)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": false,
+      "severity": "none",
+      "flags": [],
+      "reasons": [],
+      "total_return_pct": 21.01,
+      "sharpe_ratio": 16.91,
+      "win_rate": 0.64,
+      "max_drawdown_pct": -1.39,
+      "num_trades": 50,
+      "profit_factor": 2.96,
+      "trading_days": 10,
+      "weakness_score": 0.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "kospi_intraday_momentum",
+      "strategy_name": "KOSPI 인트라데이 모멘텀 (학술 MIM)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": false,
+      "severity": "none",
+      "flags": [],
+      "reasons": [],
+      "total_return_pct": 9.89,
+      "sharpe_ratio": 9.97,
+      "win_rate": 0.5,
+      "max_drawdown_pct": -1.37,
+      "num_trades": 50,
+      "profit_factor": 1.66,
+      "trading_days": 10,
+      "weakness_score": 0.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "news_catalyst_timing",
+      "strategy_name": "뉴스 카탈리스트 타이밍",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": true,
+      "severity": "inactive",
+      "flags": [
+        "inactive"
+      ],
+      "reasons": [
+        "거래 없음 — 시그널 조건이 너무 엄격하거나 데이터 의존 실패"
+      ],
+      "total_return_pct": 0.0,
+      "sharpe_ratio": 0.0,
+      "win_rate": 0.0,
+      "max_drawdown_pct": 0.0,
+      "num_trades": 0,
+      "profit_factor": 0.0,
+      "trading_days": 10,
+      "weakness_score": 50.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "multi_signal_hybrid",
+      "strategy_name": "다중 신호 결합 (DART + 수급 + 거래량)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": true,
+      "severity": "inactive",
+      "flags": [
+        "inactive"
+      ],
+      "reasons": [
+        "거래 없음 — 시그널 조건이 너무 엄격하거나 데이터 의존 실패"
+      ],
+      "total_return_pct": 0.0,
+      "sharpe_ratio": 0.0,
+      "win_rate": 0.0,
+      "max_drawdown_pct": 0.0,
+      "num_trades": 0,
+      "profit_factor": 0.0,
+      "trading_days": 10,
+      "weakness_score": 50.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "overnight_etf_reversal",
+      "strategy_name": "ETF Overnight 리버설 (학술 검증)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": true,
+      "severity": "inactive",
+      "flags": [
+        "inactive"
+      ],
+      "reasons": [
+        "거래 없음 — 시그널 조건이 너무 엄격하거나 데이터 의존 실패"
+      ],
+      "total_return_pct": 0.0,
+      "sharpe_ratio": 0.0,
+      "win_rate": 0.0,
+      "max_drawdown_pct": 0.0,
+      "num_trades": 0,
+      "profit_factor": 0.0,
+      "trading_days": 10,
+      "weakness_score": 50.0,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    },
+    {
+      "strategy_id": "eod_reversal_korean",
+      "strategy_name": "당일 EOD 리버설 (Baltussen 한국 적용)",
+      "period_label": "1w",
+      "start_date": "20260329",
+      "end_date": "20260410",
+      "is_underperformer": true,
+      "severity": "severe",
+      "flags": [
+        "low_return",
+        "deep_drawdown",
+        "low_win_rate",
+        "low_profit_factor",
+        "low_sharpe"
+      ],
+      "reasons": [
+        "수익률 -19.59% < 기준 3.0%",
+        "MDD -20.12% < 기준 -10.0%",
+        "승률 20.8% < 기준 45%",
+        "PF 0.12 < 기준 1.20",
+        "Sharpe -23.46 < 기준 0.50"
+      ],
+      "total_return_pct": -19.59,
+      "sharpe_ratio": -23.46,
+      "win_rate": 0.2083,
+      "max_drawdown_pct": -20.12,
+      "num_trades": 48,
+      "profit_factor": 0.12,
+      "trading_days": 10,
+      "weakness_score": 83.4,
+      "evaluated_at": "2026-04-11T16:31:38",
+      "criteria_snapshot": {
+        "low_return_pct": 3.0,
+        "deep_drawdown_pct": -10.0,
+        "low_win_rate": 0.45,
+        "low_profit_factor": 1.2,
+        "low_sharpe": 0.5,
+        "max_sharpe_sanity": 15.0,
+        "inactive_if_no_trades": true,
+        "multi_period_min_periods": 2,
+        "multi_period_fail_ratio": 0.5
+      }
+    }
+  ]
+}

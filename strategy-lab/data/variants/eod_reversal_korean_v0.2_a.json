@@ -1,0 +1,16 @@
+{
+  "variant_id": "eod_reversal_korean_v0.2_a",
+  "parent_strategy_id": "eod_reversal_korean",
+  "version": "0.2.0",
+  "label": "손절 -7% + 익절 +10% (복합 완화)",
+  "strategy_param_overrides": {},
+  "exit_rule_overrides": {
+    "loss_target": -7.0,
+    "profit_target": 10.0
+  },
+  "addresses_hypotheses": [
+    "손절 벽 + 승/손 비대칭 동시 해결 — 진폭 확장"
+  ],
+  "tuning_rationale": "손절 벽과 비대칭이 함께 관찰되면 진폭 자체가 좁음. 손절 -7% + 익절 +10%로 넓혀서 reversal 기회 허용 + 승자 수익 극대화.",
+  "created_at": "2026-04-11T16:51:10"
+}

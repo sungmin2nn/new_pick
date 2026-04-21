@@ -1,0 +1,122 @@
+{
+  "parent_strategy_id": "eod_reversal_korean",
+  "start_date": "20260329",
+  "end_date": "20260410",
+  "winner_label": "eod_reversal_korean (v0.1 원본)",
+  "winner_variant_id": null,
+  "baseline_score": -62.1,
+  "winner_score": -62.1,
+  "improvement_pct": -61.23,
+  "results": [
+    {
+      "label": "eod_reversal_korean (v0.1 원본)",
+      "variant_id": null,
+      "is_baseline": true,
+      "metrics": {
+        "total_return_pct": -19.59,
+        "sharpe_ratio": -23.46,
+        "max_drawdown_pct": -20.12,
+        "win_rate": 0.2083,
+        "num_trades": 48,
+        "profit_factor": 0.12
+      },
+      "adoption_score": -62.1,
+      "complexity": 0,
+      "error": null
+    },
+    {
+      "label": "eod_reversal_korean_v0.2_a",
+      "variant_id": "eod_reversal_korean_v0.2_a",
+      "is_baseline": false,
+      "metrics": {
+        "total_return_pct": -26.37,
+        "sharpe_ratio": -16.13,
+        "max_drawdown_pct": -26.86,
+        "win_rate": 0.2708,
+        "num_trades": 48,
+        "profit_factor": 0.19
+      },
+      "adoption_score": -62.29,
+      "complexity": 2,
+      "error": null
+    },
+    {
+      "label": "eod_reversal_korean_v0.2_b",
+      "variant_id": "eod_reversal_korean_v0.2_b",
+      "is_baseline": false,
+      "metrics": {
+        "total_return_pct": -22.56,
+        "sharpe_ratio": -16.72,
+        "max_drawdown_pct": -23.07,
+        "win_rate": 0.3125,
+        "num_trades": 48,
+        "profit_factor": 0.22
+      },
+      "adoption_score": -61.88,
+      "complexity": 1,
+      "error": null
+    },
+    {
+      "label": "eod_reversal_korean_v0.2_c",
+      "variant_id": "eod_reversal_korean_v0.2_c",
+      "is_baseline": false,
+      "metrics": {
+        "total_return_pct": -26.34,
+        "sharpe_ratio": -18.81,
+        "max_drawdown_pct": -26.83,
+        "win_rate": 0.3125,
+        "num_trades": 48,
+        "profit_factor": 0.19
+      },
+      "adoption_score": -61.88,
+      "complexity": 1,
+      "error": null
+    },
+    {
+      "label": "eod_reversal_korean_v0.2_d",
+      "variant_id": "eod_reversal_korean_v0.2_d",
+      "is_baseline": false,
+      "metrics": {
+        "total_return_pct": -25.73,
+        "sharpe_ratio": -17.34,
+        "max_drawdown_pct": -26.22,
+        "win_rate": 0.3125,
+        "num_trades": 48,
+        "profit_factor": 0.2
+      },
+      "adoption_score": -61.88,
+      "complexity": 1,
+      "error": null
+    },
+    {
+      "label": "eod_reversal_korean_v0.2_e",
+      "variant_id": "eod_reversal_korean_v0.2_e",
+      "is_baseline": false,
+      "metrics": {
+        "total_return_pct": -19.24,
+        "sharpe_ratio": -21.89,
+        "max_drawdown_pct": -19.78,
+        "win_rate": 0.2083,
+        "num_trades": 48,
+        "profit_factor": 0.14
+      },
+      "adoption_score": -61.23,
+      "complexity": 1,
+      "error": null
+    }
+  ],
+  "criteria_snapshot": {
+    "weight_return": 0.4,
+    "weight_sharpe": 0.25,
+    "weight_mdd": 0.15,
+    "weight_win_rate": 0.1,
+    "weight_profit_factor": 0.1,
+    "max_sharpe_sanity": 15.0,
+    "min_improvement_pct": 2.0,
+    "min_trades": 5
+  },
+  "decided_at": "2026-04-11T17:09:49",
+  "notes": [
+    "variant 우위이나 개선폭 -61.23% < 최소 2.0% — 안정성 우선 원본 유지"
+  ]
+}

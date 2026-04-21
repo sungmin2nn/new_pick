@@ -1,0 +1,47 @@
+{
+  "id": "opening_30min_volume_burst",
+  "name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+  "version": "0.1.0",
+  "category": "breakout",
+  "risk_level": "high",
+  "hypothesis": "개장 직후 거래대금 폭발 + 양봉 종목은 일중 추세 지속",
+  "rationale": "한국 시장은 09:00~09:30 거래대금이 일중 38% 형성되는 골든타임 효과가 있음. 이 시간대 거래대금 폭발은 강한 시장 관심을 의미하며, 양봉 동반 시 추세 지속. 관행적 지식이지만 Park & Yang (2022) MIM 논문에서도 변동성 높은 첫 30분의 예측력(R² 3.3%)이 검증됨.",
+  "expected_edge": "한국 시장 고유의 개장 골든타임 거래대금 집중 효과",
+  "sources": [
+    {
+      "type": "blog_ko",
+      "title": "주식투자/단타매매 기법",
+      "author": "",
+      "url": "https://namu.wiki/w/주식투자/단타매매%20기법",
+      "published_date": "",
+      "accessed_date": "2026-04-11",
+      "trust_level": "medium",
+      "notes": "나무위키. 다수 trader 검증된 단타 관행 요약."
+    },
+    {
+      "type": "paper",
+      "title": "Market Intraday Momentum (KOSPI evidence)",
+      "author": "Park & Yang",
+      "url": "https://www.mdpi.com/1911-8074/15/11/523",
+      "published_date": "2022",
+      "accessed_date": "2026-04-11",
+      "trust_level": "verified",
+      "notes": "첫 30분 시그널 R² 3.3% 검증 (변동성 ↑ 시)."
+    }
+  ],
+  "data_requirements": [
+    "KRX_OHLCV"
+  ],
+  "min_history_days": 5,
+  "requires_intraday": false,
+  "target_basket_size": 5,
+  "target_holding_days": 1,
+  "target_market": "KOSPI+KOSDAQ",
+  "differs_from_existing": "Echo Frontier와 다름: Echo는 가격 갭(2~5%)이 시그널, 본 전략은 거래대금 surge가 시그널. Volatility BO와 다름: VB는 가격 변동폭, 본 전략은 거래량/거래대금 변동. Alpha Momentum과 다름: Alpha는 5일 평균 + 거래량 3배 (스무딩), 본 전략은 단일일 거래대금 폭발 강도 자체. 근거: 한국 시장 골든타임 관행 + MIM 학술.",
+  "novelty_score": 7,
+  "status": "draft",
+  "created_at": "2026-04-11T04:47:42",
+  "updated_at": "2026-04-11T04:47:42",
+  "author": "claude-code-session",
+  "notes": "분봉 데이터 사용 가능 시 정밀도 ↑ (6일 한계)."
+}

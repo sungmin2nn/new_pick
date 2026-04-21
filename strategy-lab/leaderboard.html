@@ -1,0 +1,2479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strategy Lab — Leaderboard</title>
+  <meta name="description" content="단타 전략 실험실 — 16개 전략의 백테스트 성과 리더보드. Max 20x 구독료만으로 운영.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+  <script src="./data/leaderboard_data.js?t=1"></script>
+  <script src="./data/leaderboard_realistic.js?t=1"></script>
+  <script src="./data/leaderboard_ensembles.js?t=1"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'system-ui', 'sans-serif'],
+            display: ['Geist', 'Pretendard', 'system-ui', 'sans-serif'],
+            mono: ['Geist Mono', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            cyan: {
+              400: '#22d3ee',
+              500: '#06b6d4',
+              600: '#0891b2',
+            }
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', 'Geist', system-ui, sans-serif;
+      background: #0a0a0a;
+      color: #e4e4e7;
+      -webkit-font-smoothing: antialiased;
+    }
+    .break-keep { word-break: keep-all; }
+    .font-display { font-family: 'Geist', 'Pretendard', system-ui, sans-serif; }
+    .font-mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+    }
+    .glass-strong {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    /* Cyan theme accents */
+    .accent { color: #22d3ee; }
+    .accent-bg { background: rgba(6, 182, 212, 0.1); }
+    .accent-border { border-color: rgba(6, 182, 212, 0.3); }
+
+    /* Mesh gradient hero */
+    .mesh-bg {
+      background-image:
+        radial-gradient(at 20% 10%, rgba(6, 182, 212, 0.18) 0px, transparent 50%),
+        radial-gradient(at 80% 30%, rgba(34, 211, 238, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 90%, rgba(8, 145, 178, 0.1) 0px, transparent 50%);
+    }
+
+    /* Status colors */
+    .ret-positive { color: #34d399; }
+    .ret-negative { color: #f87171; }
+    .ret-neutral { color: #a1a1aa; }
+
+    /* Medal */
+    .medal-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #1f2937; }
+    .medal-2 { background: linear-gradient(135deg, #d4d4d8, #a1a1aa); color: #1f2937; }
+    .medal-3 { background: linear-gradient(135deg, #f97316, #c2410c); color: #fff; }
+    .medal-default { background: rgba(255,255,255,0.05); color: #a1a1aa; }
+
+    /* Promotion badges */
+    .promo-promoted {
+      background: rgba(52, 211, 153, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+    .promo-watchlist {
+      background: rgba(251, 191, 36, 0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+    .promo-rejected {
+      background: rgba(248, 113, 113, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+    .promo-pending {
+      background: rgba(161, 161, 170, 0.1);
+      color: #a1a1aa;
+      border: 1px solid rgba(161, 161, 170, 0.25);
+    }
+    .promo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    /* Progress bar */
+    .progress-track {
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      height: 4px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #06b6d4, #22d3ee);
+      border-radius: 999px;
+      transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .progress-fill.negative {
+      background: linear-gradient(90deg, #ef4444, #f87171);
+    }
+
+    /* Filter button */
+    /* Top tab navigation (Phase 7 통합) */
+    .tab-nav {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding-top: 0.75rem;
+    }
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #71717a;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+    }
+    .tab-btn iconify-icon { font-size: 1.1rem; }
+    .tab-btn:hover { color: #e4e4e7; }
+    .tab-btn.active {
+      color: #22d3ee;
+      border-bottom-color: #22d3ee;
+    }
+    .tab-pane.hidden { display: none; }
+    .tab-pane { animation: fadeInPane 0.25s ease-out; }
+    @keyframes fadeInPane {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: all 0.25s;
+      color: #a1a1aa;
+      border: 1px solid transparent;
+      background: rgba(255,255,255,0.02);
+    }
+    .filter-btn:hover { color: #e4e4e7; }
+    .filter-btn.active {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #22d3ee;
+    }
+
+    /* Table */
+    table.lb {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.lb th, table.lb td {
+      padding: 0.85rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.82rem;
+    }
+    table.lb th {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s;
+    }
+    table.lb th:hover { color: #22d3ee; }
+    table.lb tr.row {
+      transition: background 0.15s;
+    }
+    table.lb tr.row:hover {
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* Strategy detail card */
+    .detail-card {
+      transition: all 0.3s;
+    }
+
+    /* Empty state */
+    .empty {
+      padding: 4rem 2rem;
+      text-align: center;
+      border: 1px dashed rgba(255,255,255,0.1);
+      border-radius: 16px;
+    }
+
+    /* Accordion (expandable row) */
+    table.lb tr.row {
+      cursor: pointer;
+    }
+    table.lb tr.row .expand-icon {
+      display: inline-block;
+      transition: transform 0.25s;
+      margin-right: 0.25rem;
+      color: #71717a;
+      font-size: 0.75rem;
+    }
+    table.lb tr.row.expanded .expand-icon {
+      transform: rotate(90deg);
+      color: #22d3ee;
+    }
+    tr.detail-row {
+      display: none;
+    }
+    tr.detail-row.open {
+      display: table-row;
+    }
+    tr.detail-row > td {
+      padding: 1.25rem 1.5rem 1.75rem 3rem;
+      background: rgba(0,0,0,0.3);
+      border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+    }
+
+    /* Trade history subtable */
+    table.trade-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+    table.trade-table th, table.trade-table td {
+      padding: 0.45rem 0.65rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      white-space: nowrap;
+    }
+    table.trade-table th {
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(6, 182, 212, 0.05);
+    }
+    table.trade-table td.num {
+      font-family: 'Geist Mono', ui-monospace, monospace;
+      text-align: right;
+    }
+    table.trade-table tr.day-separator td {
+      padding-top: 0.9rem;
+      border-top: 1px solid rgba(6, 182, 212, 0.12);
+      background: rgba(6, 182, 212, 0.04);
+      font-weight: 600;
+      color: #22d3ee;
+      font-size: 0.68rem;
+    }
+    .exit-profit { color: #34d399; font-weight: 600; }
+    .exit-loss   { color: #f87171; font-weight: 600; }
+    .exit-close  { color: #a1a1aa; }
+    .score-detail-tag {
+      display: inline-block;
+      padding: 0.05rem 0.4rem;
+      margin: 0 0.15rem 0.15rem 0;
+      border-radius: 4px;
+      background: rgba(6, 182, 212, 0.08);
+      color: #22d3ee;
+      font-size: 0.6rem;
+      font-family: 'Geist Mono', ui-monospace, monospace;
+    }
+
+    /* Tooltip trigger (icon container) */
+    .has-tip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .has-tip .tip-icon {
+      color: #525b66;
+      font-size: 0.7rem;
+      cursor: help;
+      transition: color 0.15s;
+    }
+    .has-tip:hover .tip-icon {
+      color: #22d3ee;
+    }
+    /* 원본 tip-box는 데이터 소스로만 사용 (화면에 직접 표시 X) */
+    .has-tip .tip-box {
+      display: none;
+    }
+
+    /* Portal tooltip — body에 직접 붙어서 어떤 overflow도 영향 없음 */
+    #g-tooltip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 240px;
+      max-width: 340px;
+      padding: 0.75rem 1rem;
+      background: #18181b;
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      border-radius: 10px;
+      box-shadow: 0 16px 40px -12px rgba(0,0,0,0.7);
+      font-size: 0.72rem;
+      font-family: 'Pretendard', 'Geist', system-ui, sans-serif;
+      font-weight: normal;
+      color: #d4d4d8;
+      line-height: 1.55;
+      text-align: left;
+      text-transform: none;
+      letter-spacing: normal;
+      z-index: 10000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease-out;
+      white-space: normal;
+    }
+    #g-tooltip.visible {
+      opacity: 1;
+    }
+    #g-tooltip .tip-en {
+      color: #22d3ee;
+      font-family: 'Geist Mono', ui-monospace, monospace;
+      font-size: 0.65rem;
+      margin-bottom: 0.3rem;
+    }
+    #g-tooltip .tip-desc {
+      color: #e4e4e7;
+      margin-bottom: 0.35rem;
+    }
+    #g-tooltip .tip-example {
+      color: #a1a1aa;
+      font-size: 0.65rem;
+      padding-top: 0.3rem;
+      margin-top: 0.3rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    #g-tooltip .tip-example::before {
+      content: '예: ';
+      color: #22d3ee;
+    }
+
+    /* Glossary section */
+    .glossary-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: all 0.2s;
+    }
+    .glossary-card:hover {
+      border-color: rgba(6, 182, 212, 0.25);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .glossary-card h4 {
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+    .glossary-card .en {
+      color: #22d3ee;
+      font-family: 'Geist Mono', ui-monospace, monospace;
+      font-size: 0.7rem;
+      margin-bottom: 0.75rem;
+    }
+    .glossary-card .desc {
+      font-size: 0.85rem;
+      color: #d4d4d8;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+    }
+    .glossary-card .example {
+      font-size: 0.72rem;
+      color: #a1a1aa;
+      padding: 0.6rem 0.8rem;
+      background: rgba(0,0,0,0.25);
+      border-left: 2px solid #22d3ee;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    .glossary-card .interpret {
+      font-size: 0.72rem;
+      color: #fbbf24;
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      border-top: 1px dashed rgba(255,255,255,0.08);
+    }
+    .glossary-tab {
+      padding: 0.6rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #a1a1aa;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .glossary-tab:hover { color: #e4e4e7; }
+    .glossary-tab.active {
+      background: rgba(6, 182, 212, 0.1);
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #22d3ee;
+    }
+    .glossary-panel { display: none; }
+    .glossary-panel.active { display: grid; }
+
+    /* Fade in */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(0.75rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="sticky top-0 z-40 backdrop-blur-lg bg-black/70 border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between flex-wrap gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl accent-bg accent-border border flex items-center justify-center">
+          <iconify-icon icon="solar:test-tube-bold-duotone" class="text-xl accent"></iconify-icon>
+        </div>
+        <div>
+          <div class="font-display font-bold text-white">Strategy Lab</div>
+          <div class="text-[10px] font-mono text-zinc-500">cyan-themed leaderboard</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-xs">
+        <a href="https://github.com" class="text-zinc-400 hover:text-white transition flex items-center gap-1">
+          <iconify-icon icon="solar:code-2-bold-duotone"></iconify-icon>
+          GitHub
+        </a>
+        <span class="text-zinc-700">·</span>
+        <span id="last-updated" class="text-zinc-500">--</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-16">
+
+    <!-- Hero -->
+    <section class="fade-in">
+      <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 mb-6">
+        <span class="relative flex w-2 h-2">
+          <span class="absolute inline-flex w-full h-full rounded-full bg-cyan-400 animate-ping opacity-75"></span>
+          <span class="relative inline-flex w-2 h-2 rounded-full bg-cyan-400"></span>
+        </span>
+        <span class="text-xs text-zinc-300">Phase 3 Backtest Complete</span>
+      </div>
+
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] break-keep">
+        <span class="text-white">단타 전략 랩</span><br>
+        <span class="text-zinc-500">성과 리더보드</span>
+      </h1>
+
+      <p class="mt-6 text-lg text-zinc-400 leading-relaxed max-w-2xl break-keep">
+        16개 단타 전략을 실측 데이터로 백테스트한 결과를 성과 순으로 정렬합니다.
+        모든 전략은 news-trading-bot의 BaseStrategy 패턴, 동일한 시뮬 조건(시초가 매수 / +5% 익절 / -3% 손절 / 종가 청산)에서 비교됩니다.
+      </p>
+
+      <!-- Summary stats -->
+      <div class="mt-10 grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div class="glass rounded-2xl p-5">
+          <div class="text-xs text-zinc-500 uppercase tracking-wider">전략 수</div>
+          <div class="mt-2 font-display font-bold text-3xl text-white" id="stat-strategies">--</div>
+          <div class="text-xs text-zinc-500 mt-1">백테스트 완료</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <div class="text-xs text-zinc-500 uppercase tracking-wider">평균 수익률</div>
+          <div class="mt-2 font-display font-bold text-3xl text-white" id="stat-avg-return">--</div>
+          <div class="text-xs text-zinc-500 mt-1">선택 기간</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <div class="text-xs text-zinc-500 uppercase tracking-wider">최고 수익률</div>
+          <div class="mt-2 font-display font-bold text-3xl ret-positive" id="stat-best-return">--</div>
+          <div class="text-xs text-zinc-500 mt-1" id="stat-best-strategy">--</div>
+        </div>
+        <div class="glass rounded-2xl p-5 promo-promoted" style="border-width: 1px;">
+          <div class="text-xs uppercase tracking-wider flex items-center gap-1">
+            <iconify-icon icon="solar:medal-ribbon-star-bold-duotone"></iconify-icon>
+            <span class="has-tip">PROMOTED
+              <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+              <span class="tip-box">
+                <div class="tip-en">Promoted Strategies</div>
+                <div class="tip-desc">모든 승급 기준(수익률/Sharpe/승률/MDD/거래수/PF)을 통과한 전략 수. 실제 news-trading-bot에 통합 가능한 후보.</div>
+                <div class="tip-example">⏳ PENDING(데이터 부족) / ✅ WATCHLIST(관찰) / 🏆 PROMOTED(승급) / ❌ REJECTED(탈락)</div>
+              </span>
+            </span>
+          </div>
+          <div class="mt-2 font-display font-bold text-3xl" id="stat-promoted">--</div>
+          <div class="text-xs mt-1 opacity-70">통합 후보</div>
+        </div>
+        <div class="glass rounded-2xl p-5">
+          <div class="text-xs text-zinc-500 uppercase tracking-wider">평균 Sharpe</div>
+          <div class="mt-2 font-display font-bold text-3xl text-white" id="stat-avg-sharpe">--</div>
+          <div class="text-xs text-zinc-500 mt-1">위험조정수익률</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav mt-12 flex flex-wrap gap-1 border-b border-white/10">
+      <button class="tab-btn active" data-tab="leaderboard">
+        <iconify-icon icon="solar:cup-star-bold-duotone"></iconify-icon>
+        <span>리더보드</span>
+      </button>
+      <button class="tab-btn" data-tab="analysis">
+        <iconify-icon icon="solar:chart-square-bold-duotone"></iconify-icon>
+        <span>분석</span>
+      </button>
+      <button class="tab-btn" data-tab="guide">
+        <iconify-icon icon="solar:book-bookmark-bold-duotone"></iconify-icon>
+        <span>가이드</span>
+      </button>
+      <button class="tab-btn" data-tab="reference">
+        <iconify-icon icon="solar:document-text-bold-duotone"></iconify-icon>
+        <span>참고</span>
+      </button>
+    </nav>
+
+    <!-- ============================================ -->
+    <!-- TAB: 리더보드 (Filters + Table + Detail)     -->
+    <!-- ============================================ -->
+    <div class="tab-pane" data-pane="leaderboard">
+
+    <!-- Filters -->
+    <section class="mt-8">
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3">기간 선택</div>
+      <div id="period-filters" class="flex flex-wrap gap-2">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3 mt-6">카테고리</div>
+      <div id="category-filters" class="flex flex-wrap gap-2">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3 mt-6">정렬 기준</div>
+      <div id="sort-filters" class="flex flex-wrap gap-2">
+        <button class="filter-btn active" data-sort="total_return_pct">수익률</button>
+        <button class="filter-btn" data-sort="sharpe_ratio">Sharpe</button>
+        <button class="filter-btn" data-sort="sortino_ratio">Sortino</button>
+        <button class="filter-btn" data-sort="calmar_ratio">Calmar</button>
+        <button class="filter-btn" data-sort="win_rate">승률</button>
+        <button class="filter-btn" data-sort="profit_factor">Profit Factor</button>
+        <button class="filter-btn" data-sort="max_drawdown_pct">MDD</button>
+        <button class="filter-btn" data-sort="novelty_score">참신성</button>
+      </div>
+    </section>
+
+    <!-- Leaderboard table -->
+    <section class="mt-10">
+      <div class="glass rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-2">
+            <iconify-icon icon="solar:medal-ribbon-star-bold-duotone" class="accent text-xl"></iconify-icon>
+            <h2 class="font-bold text-white">Leaderboard</h2>
+          </div>
+          <span class="text-xs text-zinc-500" id="period-label">--</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="lb">
+            <thead>
+              <tr>
+                <th class="w-12">#</th>
+                <th>
+                  <span class="has-tip">Strategy
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Trading Strategy</div>
+                      <div class="tip-desc">단타 매매 전략 이름. 카테고리(돌파/역추세/수급 등)와 참신성 ★, 승급 상태가 함께 표시됩니다.</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Return
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Total Return Percentage</div>
+                      <div class="tip-desc">총 수익률. 백테스트 기간 동안 돈이 얼마나 늘었는지.</div>
+                      <div class="tip-example">1,000만원 → 1,352만원 = +35.2%</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Sharpe
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Sharpe Ratio</div>
+                      <div class="tip-desc">샤프 비율 — 위험 대비 수익이 얼마나 좋은지. 클수록 좋음.</div>
+                      <div class="tip-example">&lt;1 별로 / 1~2 괜찮음 / 2~3 좋음 / &gt;3 매우 우수. 짧은 기간엔 과대평가 주의</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Sortino
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Sortino Ratio</div>
+                      <div class="tip-desc">소르티노 비율 — Sharpe와 비슷하지만 "아래로 떨어지는 위험"만 고려. 상승 변동은 좋은 것으로 봐서 더 현실적.</div>
+                      <div class="tip-example">Sharpe보다 숫자가 보통 더 큼. 기준: &gt;1 괜찮음</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">MDD
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Max Drawdown</div>
+                      <div class="tip-desc">최대 낙폭 — 가장 높았을 때부터 가장 낮았을 때까지 얼마나 떨어졌는지. 0에 가까울수록 좋음.</div>
+                      <div class="tip-example">1,000만원 → 1,200만원 → 1,050만원이면 MDD = -12.5%</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Win Rate
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Win Rate</div>
+                      <div class="tip-desc">승률 — 100번 매매 중 몇 번 이겼는가. 50% 이상이면 괜찮음.</div>
+                      <div class="tip-example">승률이 높아도 한 번 크게 지면 손실일 수 있음 → Profit Factor와 함께 봐야 함</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">PF
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Profit Factor</div>
+                      <div class="tip-desc">이익 요인 — 총 번 돈 / 총 잃은 돈. 1보다 크면 흑자.</div>
+                      <div class="tip-example">100만원 벌고 50만원 잃으면 PF = 2.0. 기준: &gt;1.5 괜찮음 / &gt;2 좋음</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Trades
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Number of Trades</div>
+                      <div class="tip-desc">매매 횟수 — 백테스트 기간 동안 총 몇 번 사고 팔았는지. 거래가 적으면 통계 신뢰도 낮음.</div>
+                      <div class="tip-example">최소 10번 이상이어야 통계적으로 의미 있음</div>
+                    </span>
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <!-- filled by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detail (selected strategy) -->
+    <section class="mt-10">
+      <div id="detail-container">
+        <!-- filled when row clicked -->
+      </div>
+    </section>
+
+    </div><!-- /tab-pane leaderboard -->
+
+    <!-- ============================================ -->
+    <!-- TAB: 분석 (3-Tier + Ensembles)               -->
+    <!-- ============================================ -->
+    <div class="tab-pane hidden" data-pane="analysis">
+
+    <!-- Realistic Simulation (3-Tier) -->
+    <section class="mt-8" id="realistic-section">
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3">Phase 8 · Realistic Simulation</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight break-keep mb-3">
+        3-Tier 현실 검증 <span class="text-zinc-500">· Nominal / Intraday / Probabilistic</span>
+      </h2>
+      <p class="text-sm text-zinc-400 mb-6 break-keep max-w-3xl">
+        기존 일봉 시뮬(Nominal)은 장중 경로를 모르기 때문에 실제보다 낙관적입니다.
+        Phase 8에서는 (1) 1분봉 실측(Tier 1, 6일 한계), (2) OHLC 기반 확률적 exit(Tier 2, 장기),
+        (3) 분봉 ↔ 확률 Calibration, (4) Bootstrap p-value · Walk-Forward · KOSPI alpha 통계 검증을 더해
+        "얼마나 진짜인가"를 측정합니다.
+      </p>
+
+      <div class="glass rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-2">
+            <iconify-icon icon="solar:chart-square-bold-duotone" class="accent text-xl"></iconify-icon>
+            <h3 class="font-bold text-white">3-Tier Comparison</h3>
+          </div>
+          <span class="text-xs text-zinc-500" id="realistic-period-label">--</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="lb">
+            <thead>
+              <tr>
+                <th class="w-10">#</th>
+                <th>
+                  <span class="has-tip">Strategy
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Trading Strategy</div>
+                      <div class="tip-desc">전략 이름. walk-forward 수익률 기준 정렬.</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Nominal
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Nominal Return (Day-bar)</div>
+                      <div class="tip-desc">기존 일봉 시뮬 결과. 장중 경로를 모르기 때문에 고점 도달 여부를 가정해서 계산 — 보통 가장 낙관적이거나 보수적인 방향으로 편향됨.</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Tier 1
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Tier 1 · Intraday Actual</div>
+                      <div class="tip-desc">1분봉 실측 시뮬. 09:00 예약 매수, 분봉 순차 탐색으로 +5% 익절 / -3% 손절 / 종가 청산 판정. 거래비용(수수료 0.015%×2 + 거래세 0.18%) 반영. 가장 현실에 가까움 (Ground Truth).</div>
+                      <div class="tip-example">Yahoo Finance 1m API — 최근 6거래일만 가능</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Tier 2
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Tier 2 · Probabilistic Day-bar</div>
+                      <div class="tip-desc">일봉 OHLC로부터 "고점이 먼저였을 확률"을 추정해 확률 가중 기대값 계산. 장기간(1개월/1년)에 쓸 수 있는 대신 실측이 아닌 추정.</div>
+                      <div class="tip-example">p_high_first = 0.5 + 0.8 × (추세 / 변동폭)</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Calibrated
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Calibrated Return</div>
+                      <div class="tip-desc">Tier 2 × (Tier 1 / Tier 2) 보정 계수. 분봉 실측 수준에 맞춘 장기 추정치.</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">WF
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Walk-Forward Return</div>
+                      <div class="tip-desc">롤링 학습/테스트 윈도우로 과적합 체크. 전체 평균과 WF 평균 차이(overfitting gap)가 작을수록 견고한 전략.</div>
+                      <div class="tip-example">train 3일 → test 2일 롤링</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">p-value
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Bootstrap p-value</div>
+                      <div class="tip-desc">수익률을 500회 재샘플링하여 "우연히 0 이하가 나올 확률" 계산. 0.05 미만이면 통계적으로 유의미 ✓.</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">α
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Benchmark Alpha (vs KOSPI)</div>
+                      <div class="tip-desc">KOSPI 지수 대비 초과수익률. 양수면 지수 대비 아웃퍼폼.</div>
+                    </span>
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="realistic-body">
+              <!-- filled by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-4 text-xs text-zinc-500 break-keep">
+        ✓ Tier 1이 가장 신뢰 가능 (ground truth) · Nominal ≠ Tier 1 차이가 클수록 기존 시뮬이 과대/과소 평가
+        · p &lt; 0.05 그리고 WF consistency 높은 전략 우선
+      </div>
+    </section>
+
+    <!-- Ensembles (Phase 7.B) -->
+    <section class="mt-16" id="ensembles-section">
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3">Phase 7.B · Ensemble Strategies</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight break-keep mb-3">
+        조합 전략 <span class="text-zinc-500">· Equal / Performance / Volatility-scaled</span>
+      </h2>
+      <p class="text-sm text-zinc-400 mb-6 break-keep max-w-3xl">
+        상위 전략들을 3가지 방식으로 조합해서 "다각화 효과"를 측정합니다.
+        상관관계가 낮은 전략들을 섞으면 같은 수익에서 변동성이 크게 줄어듭니다 (분산 투자 원리).
+        단일 전략의 peak와 조합 전략의 risk-adjusted 성과를 나란히 봅니다.
+      </p>
+
+      <div class="glass rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center gap-2">
+            <iconify-icon icon="solar:layers-bold-duotone" class="accent text-xl"></iconify-icon>
+            <h3 class="font-bold text-white">Ensemble Track</h3>
+          </div>
+          <span class="text-xs text-zinc-500" id="ensemble-meta">--</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="lb">
+            <thead>
+              <tr>
+                <th class="w-10">#</th>
+                <th>
+                  <span class="has-tip">Method
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Combination Method</div>
+                      <div class="tip-desc">equal=동일 비중, performance_weighted=수익률 비례 비중, volatility_scaled=역변동성 비중 (위험 균등).</div>
+                    </span>
+                  </span>
+                </th>
+                <th>Members (weights)</th>
+                <th class="text-right">
+                  <span class="has-tip">Return
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Ensemble Total Return</div>
+                      <div class="tip-desc">결합된 일일 수익률로 재구성한 누적 수익률.</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">
+                  <span class="has-tip">Sharpe
+                    <iconify-icon class="tip-icon" icon="solar:info-circle-linear"></iconify-icon>
+                    <span class="tip-box">
+                      <div class="tip-en">Sharpe Ratio</div>
+                      <div class="tip-desc">연환산 Sharpe. 상관 낮은 멤버일수록 단일 전략보다 높아지는 것이 다각화 효과.</div>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-right">MDD</th>
+                <th class="text-right">Volatility</th>
+                <th class="text-right">Days</th>
+              </tr>
+            </thead>
+            <tbody id="ensembles-body">
+              <tr><td colspan="8" class="text-center text-zinc-500 py-6">loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-4 text-xs text-zinc-500 break-keep">
+        ✓ 평균 상관계수가 낮을수록 (음수면 이상적) 조합 효과 큼 · 단일 전략 vs 조합 트랙은 별도 비교 (중복 집계 금지)
+      </div>
+    </section>
+
+    </div><!-- /tab-pane analysis -->
+
+    <!-- ============================================ -->
+    <!-- TAB: 가이드 (User Guide)                     -->
+    <!-- ============================================ -->
+    <div class="tab-pane hidden" data-pane="guide">
+
+    <!-- User Guide (Phase 7 완료 기념) -->
+    <section class="mt-8" id="user-guide">
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3">User Guide</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight break-keep mb-3">
+        언제 뭐를 봐야 하나
+      </h2>
+      <p class="text-sm text-zinc-400 mb-6 break-keep max-w-3xl">
+        Phase 7까지 완성된 파이프라인을 <strong>언제/어떻게 써야 하는지</strong> 예시 중심으로 정리.
+        2곳만 자주 보면 됩니다 — 이 페이지 + <code class="text-xs bg-white/10 px-1.5 py-0.5 rounded accent">data/pipeline_runs.jsonl</code>.
+      </p>
+
+      <!-- 주간 리듬 -->
+      <div class="glass rounded-2xl p-6 mb-6">
+        <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+          <iconify-icon icon="solar:calendar-bold-duotone" class="accent text-xl"></iconify-icon>
+          주간 리듬
+        </h3>
+        <div class="grid md:grid-cols-3 gap-3">
+          <div class="rounded-xl p-4 bg-blue-500/5 border border-blue-500/20">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-bold tracking-wider uppercase text-blue-400">월 08:30</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300">자동</span>
+            </div>
+            <div class="font-mono text-sm text-white mb-2">weekly_pipeline.py</div>
+            <ul class="text-xs text-zinc-400 space-y-1 list-disc list-inside break-keep">
+              <li>백테스트 갱신</li>
+              <li>리더보드 최신화</li>
+              <li>승급/탈락 평가</li>
+            </ul>
+          </div>
+          <div class="rounded-xl p-4 bg-cyan-500/10 border border-cyan-500/30">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-bold tracking-wider uppercase text-cyan-400">금 09:00</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Phase 7 신규</span>
+            </div>
+            <div class="font-mono text-sm text-white mb-2">friday_pipeline.py</div>
+            <ul class="text-xs text-zinc-400 space-y-1 list-disc list-inside break-keep">
+              <li>부진 식별 + 약점 분석</li>
+              <li>v0.2 variant 생성</li>
+              <li>앙상블 빌드 3방식</li>
+            </ul>
+          </div>
+          <div class="rounded-xl p-4 bg-white/5 border border-white/10">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-bold tracking-wider uppercase text-zinc-400">주말</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-zinc-300">수동</span>
+            </div>
+            <div class="font-mono text-sm text-white mb-2">리뷰 + 결정</div>
+            <ul class="text-xs text-zinc-400 space-y-1 list-disc list-inside break-keep">
+              <li>결과 리뷰</li>
+              <li>승급 후보 검토</li>
+              <li>신규 아이디어</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- 상황별 명령어 -->
+      <div class="glass rounded-2xl p-6 mb-6">
+        <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+          <iconify-icon icon="solar:command-bold-duotone" class="accent text-xl"></iconify-icon>
+          상황별 "지금 뭐 해야 하나"
+        </h3>
+        <div class="space-y-4">
+
+          <div class="border-l-2 border-cyan-500/40 pl-4">
+            <div class="text-sm text-white font-semibold mb-1">1️⃣ 월요일 아침 — 이번 주 뭐가 잘했나</div>
+            <div class="text-xs text-zinc-400 mb-2">지금 이 페이지의 상단 3섹션 확인: Leaderboard / 3-Tier Comparison / Ensemble Strategies</div>
+            <pre class="font-mono text-xs bg-black/40 border border-white/5 rounded p-3 text-zinc-300 overflow-x-auto">open /Users/kslee/Documents/kslee_ZIP/zip1/strategy-lab/leaderboard.html</pre>
+            <div class="text-[11px] text-zinc-500 mt-2 break-keep">
+              체크 포인트: <span class="accent">PROMOTED</span> 뱃지 있는 전략 = 통합 후보 ·
+              Nominal vs Tier 1 gap이 크면 일봉 시뮬 편향 ·
+              앙상블 Sharpe가 단일 최고보다 높으면 분산 효과 작동
+            </div>
+          </div>
+
+          <div class="border-l-2 border-cyan-500/40 pl-4">
+            <div class="text-sm text-white font-semibold mb-1">2️⃣ 금요일 저녁 — 부진 전략 원인 파악</div>
+            <div class="text-xs text-zinc-400 mb-2">약점 분석 리포트의 <code class="text-[10px] bg-white/10 px-1 rounded accent">hypotheses</code> 필드에 가설 7종 기록</div>
+            <pre class="font-mono text-xs bg-black/40 border border-white/5 rounded p-3 text-zinc-300 overflow-x-auto">ls -t data/weakness_reports/ | head -1
+# JSON 열어서 reports[].hypotheses 읽기</pre>
+          </div>
+
+          <div class="border-l-2 border-cyan-500/40 pl-4">
+            <div class="text-sm text-white font-semibold mb-1">3️⃣ 특정 전략 수동 튜닝 실험</div>
+            <div class="text-xs text-zinc-400 mb-2">v0.1 vs v0.2 실제 백테스트 비교 + 자동 채택 판정</div>
+            <pre class="font-mono text-xs bg-black/40 border border-white/5 rounded p-3 text-zinc-300 overflow-x-auto">python3 runner/compare_variants.py \
+  --parent volatility_breakout_lw \
+  --start 20260329 --end 20260410</pre>
+            <div class="text-[11px] text-zinc-500 mt-2">→ <code class="text-[10px] bg-white/10 px-1 rounded accent">data/adoptions/adoption_*.json</code> 생성</div>
+          </div>
+
+          <div class="border-l-2 border-cyan-500/40 pl-4">
+            <div class="text-sm text-white font-semibold mb-1">4️⃣ 새 앙상블 수동 빌드</div>
+            <pre class="font-mono text-xs bg-black/40 border border-white/5 rounded p-3 text-zinc-300 overflow-x-auto">python3 runner/build_ensembles.py --top 3</pre>
+          </div>
+
+          <div class="border-l-2 border-cyan-500/40 pl-4">
+            <div class="text-sm text-white font-semibold mb-1">5️⃣ 자동화 정상 작동 확인</div>
+            <pre class="font-mono text-xs bg-black/40 border border-white/5 rounded p-3 text-zinc-300 overflow-x-auto">launchctl list | grep strategy-lab
+tail -20 /tmp/strategy_lab_friday.log
+cat data/pipeline_runs.jsonl | tail -3</pre>
+          </div>
+
+          <div class="border-l-2 border-cyan-500/40 pl-4">
+            <div class="text-sm text-white font-semibold mb-1">6️⃣ 지금 당장 수동 실행</div>
+            <pre class="font-mono text-xs bg-black/40 border border-white/5 rounded p-3 text-zinc-300 overflow-x-auto">launchctl start com.kslee.strategy-lab.friday
+# 또는 직접
+cd /Users/kslee/Documents/kslee_ZIP/zip1/strategy-lab
+python3 runner/friday_pipeline.py</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 파일 지도 -->
+      <div class="glass rounded-2xl p-6 mb-6">
+        <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+          <iconify-icon icon="solar:folder-open-bold-duotone" class="accent text-xl"></iconify-icon>
+          파일/폴더 지도
+        </h3>
+        <div class="grid md:grid-cols-2 gap-4">
+
+          <div class="rounded-xl p-4 bg-white/5 border border-white/10">
+            <div class="text-xs tracking-wider uppercase accent font-bold mb-3">🧠 lab/ — 핵심 로직</div>
+            <pre class="font-mono text-[11px] text-zinc-400 leading-relaxed">underperformer.py      [7.A.1] 부진 식별
+weakness_analyzer.py   [7.A.2] 약점 분석
+parameter_tuner.py     [7.A.3] v0.2 생성
+variant_runtime.py     [7.A.4] override 적용
+variant_comparator.py  [7.A.4] 비교/채택
+ensemble.py            [7.B]   앙상블
+promotion.py           [P5]    승급 판정
+discovery.py           [P6]    발굴 큐
+realistic_sim/         [P8]    3-Tier</pre>
+          </div>
+
+          <div class="rounded-xl p-4 bg-white/5 border border-white/10">
+            <div class="text-xs tracking-wider uppercase accent font-bold mb-3">⚙️ runner/ — CLI 실행기</div>
+            <pre class="font-mono text-[11px] text-zinc-400 leading-relaxed">weekly_pipeline.py     월 자동
+friday_pipeline.py     금 자동 (신규)
+identify_underperformers.py
+analyze_weakness.py
+tune_parameters.py
+compare_variants.py    (수동)
+build_ensembles.py
+matrix_runner.py
+backtest_wrapper.py</pre>
+          </div>
+
+          <div class="rounded-xl p-4 bg-white/5 border border-white/10 md:col-span-2">
+            <div class="text-xs tracking-wider uppercase accent font-bold mb-3">📊 data/ — 결과물 (여기서 확인)</div>
+            <pre class="font-mono text-[11px] text-zinc-400 leading-relaxed">results/                       🗃 백테스트 원본 (matrix_*.json)
+leaderboard_data.js            🎯 리더보드 (단일)
+leaderboard_realistic.js       🎯 3-Tier Comparison
+leaderboard_ensembles.js       🎯 앙상블 트랙 (신규)
+
+underperformers/               [7.A.1] 주간 부진 판정
+weakness_reports/              [7.A.2] 주간 약점 분석
+variants/                      [7.A.3] v0.2 VariantSpec
+adoptions/                     [7.A.4] 채택 결정 (수동 실행 시)
+ensembles/                     [7.B]   앙상블 상세
+
+promotions/                    [P5]    승급 평가
+experiments/                   [P1]    실험 로그
+discovery/                     [P6]    신규 발굴 큐
+minute_cache/                  [P8]    Yahoo 분봉 캐시
+pipeline_runs.jsonl            📜 실행 로그 (누적)</pre>
+          </div>
+
+          <div class="rounded-xl p-4 bg-white/5 border border-white/10">
+            <div class="text-xs tracking-wider uppercase accent font-bold mb-3">🧪 tests/ — 67 PASS</div>
+            <pre class="font-mono text-[11px] text-zinc-400 leading-relaxed">test_phase2_strategies.py   50
+test_underperformer.py      13
+test_weakness_analyzer.py    9
+test_parameter_tuner.py     12
+test_variant_comparator.py  14
+test_ensemble.py            19</pre>
+          </div>
+
+          <div class="rounded-xl p-4 bg-white/5 border border-white/10">
+            <div class="text-xs tracking-wider uppercase accent font-bold mb-3">🕐 ~/Library/LaunchAgents</div>
+            <pre class="font-mono text-[11px] text-zinc-400 leading-relaxed">com.kslee.strategy-lab
+  .weekly.plist   월 08:30 (P5)
+  .friday.plist   금 09:00 (P7.B.6)</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- 자주 보는 Top 5 -->
+      <div class="glass rounded-2xl p-6 mb-6">
+        <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+          <iconify-icon icon="solar:star-bold-duotone" class="accent text-xl"></iconify-icon>
+          자주 보는 파일 Top 5
+        </h3>
+        <div class="space-y-2">
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+            <span class="w-6 h-6 rounded-full bg-cyan-500/20 accent text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+            <code class="font-mono text-xs text-cyan-300 flex-shrink-0">leaderboard.html</code>
+            <span class="text-xs text-zinc-400 ml-auto">매주 월요일 아침</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+            <span class="w-6 h-6 rounded-full bg-cyan-500/20 accent text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+            <code class="font-mono text-xs text-cyan-300 flex-shrink-0">data/pipeline_runs.jsonl</code>
+            <span class="text-xs text-zinc-400 ml-auto">자동화 작동 확인</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+            <span class="w-6 h-6 rounded-full bg-cyan-500/20 accent text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+            <code class="font-mono text-xs text-cyan-300 flex-shrink-0">data/weakness_reports/ 최신</code>
+            <span class="text-xs text-zinc-400 ml-auto">부진 원인 궁금할 때</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+            <span class="w-6 h-6 rounded-full bg-cyan-500/20 accent text-xs font-bold flex items-center justify-center flex-shrink-0">4</span>
+            <code class="font-mono text-xs text-cyan-300 flex-shrink-0">data/ensembles/ 최신</code>
+            <span class="text-xs text-zinc-400 ml-auto">앙상블 Sharpe 확인</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+            <span class="w-6 h-6 rounded-full bg-cyan-500/20 accent text-xs font-bold flex items-center justify-center flex-shrink-0">5</span>
+            <code class="font-mono text-xs text-cyan-300 flex-shrink-0">/tmp/strategy_lab_friday.log</code>
+            <span class="text-xs text-zinc-400 ml-auto">금요일 자동화 디버깅</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 실전 루틴 -->
+      <div class="glass rounded-2xl p-6 mb-6">
+        <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+          <iconify-icon icon="solar:sun-bold-duotone" class="accent text-xl"></iconify-icon>
+          실전 예시 — 토요일 아침 루틴
+        </h3>
+        <pre class="font-mono text-xs bg-black/40 border border-white/5 rounded p-4 text-zinc-300 overflow-x-auto leading-relaxed"># 1. 이번 주 자동화 잘 돌았는지
+tail -5 data/pipeline_runs.jsonl
+
+# 2. 브라우저로 리더보드 보기
+open leaderboard.html
+
+# 3. 부진 전략 가설 확인
+ls -t data/weakness_reports/ | head -1
+# → JSON 열어서 reports[].hypotheses 읽기
+
+# 4. 앙상블 vs 단일 비교
+ls -t data/ensembles/ | head -1
+
+# 5. 궁금한 전략만 수동 재실험
+python3 runner/compare_variants.py \
+  --parent &lt;id&gt; --start 20260329 --end 20260410</pre>
+      </div>
+
+      <!-- 트러블슈팅 -->
+      <div class="glass rounded-2xl p-6 mb-6">
+        <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+          <iconify-icon icon="solar:shield-warning-bold-duotone" class="accent text-xl"></iconify-icon>
+          트러블슈팅 치트시트
+        </h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="text-zinc-500 uppercase tracking-wider text-[10px] border-b border-white/10">
+                <th class="text-left py-2 pr-3">증상</th>
+                <th class="text-left py-2 pr-3">확인</th>
+                <th class="text-left py-2">조치</th>
+              </tr>
+            </thead>
+            <tbody class="text-zinc-400">
+              <tr class="border-b border-white/5">
+                <td class="py-2 pr-3">리더보드 업데이트 안 됨</td>
+                <td class="py-2 pr-3 font-mono text-[11px]">ls -t data/results/</td>
+                <td class="py-2 font-mono text-[11px] accent">python3 runner/weekly_pipeline.py</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-2 pr-3">금요일 자동화 실행 안 됨</td>
+                <td class="py-2 pr-3 font-mono text-[11px]">launchctl list | grep strategy-lab</td>
+                <td class="py-2 font-mono text-[11px] accent">launchctl load .../friday.plist</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-2 pr-3">KRX rate limit 에러</td>
+                <td class="py-2 pr-3">매트릭스 실행 로그</td>
+                <td class="py-2 font-mono text-[11px] accent">--workers 2</td>
+              </tr>
+              <tr class="border-b border-white/5">
+                <td class="py-2 pr-3">한 단계만 재실행</td>
+                <td class="py-2 pr-3">—</td>
+                <td class="py-2 text-[11px]">개별 <code class="font-mono accent">runner/*.py</code> 직접 호출</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3">전략 수정 반영</td>
+                <td class="py-2 pr-3">—</td>
+                <td class="py-2 font-mono text-[11px] accent">matrix_runner + build_leaderboard_data</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 다음 할일 -->
+      <div class="glass rounded-2xl p-6">
+        <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+          <iconify-icon icon="solar:arrow-right-bold-duotone" class="accent text-xl"></iconify-icon>
+          다음에 할만한 것 (Phase 7 이후)
+        </h3>
+        <ol class="space-y-3 text-sm text-zinc-300">
+          <li class="flex gap-3">
+            <span class="accent font-bold">1.</span>
+            <div>
+              <strong class="text-white">launchctl load</strong>
+              <span class="text-zinc-400"> — 금요일 자동화 활성화 (1 명령)</span>
+              <pre class="font-mono text-[11px] bg-black/40 border border-white/5 rounded p-2 text-zinc-300 mt-1 overflow-x-auto">launchctl load ~/Library/LaunchAgents/com.kslee.strategy-lab.friday.plist</pre>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <span class="accent font-bold">2.</span>
+            <div>
+              <strong class="text-white">Phase 9 후보</strong>
+              <span class="text-zinc-400"> — 전략 구조 개별화 (entry/exit rule per strategy). 현재는 모든 전략이 같은 +5%/-3% 규칙 사용.</span>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <span class="accent font-bold">3.</span>
+            <div>
+              <strong class="text-white">새 전략 발굴</strong>
+              <span class="text-zinc-400"> — </span>
+              <code class="font-mono text-[11px] bg-white/10 px-1 rounded">data/discovery/</code>
+              <span class="text-zinc-400"> 큐 확인 → </span>
+              <code class="font-mono text-[11px] bg-white/10 px-1 rounded">docs/discovery_prompt.md</code>
+              <span class="text-zinc-400"> 로 Claude 세션 시작</span>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <span class="accent font-bold">4.</span>
+            <div>
+              <strong class="text-white">승급 통합</strong>
+              <span class="text-zinc-400"> — </span>
+              <code class="font-mono text-[11px] bg-white/10 px-1 rounded">docs/integration_guides/</code>
+              <span class="text-zinc-400"> 읽고 </span>
+              <code class="font-mono text-[11px] bg-white/10 px-1 rounded">news-trading-bot</code>
+              <span class="text-zinc-400">에 수동 PR</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    </div><!-- /tab-pane guide -->
+
+    <!-- ============================================ -->
+    <!-- TAB: 참고 (Methodology + Source + Glossary)  -->
+    <!-- ============================================ -->
+    <div class="tab-pane hidden" data-pane="reference">
+
+    <!-- Methodology -->
+    <section class="mt-8">
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3">Methodology</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight break-keep mb-6">
+        백테스트 조건
+      </h2>
+      <div class="grid md:grid-cols-2 gap-3">
+        <div class="glass rounded-xl p-5">
+          <div class="text-xs accent font-semibold mb-2 flex items-center gap-1.5">
+            <iconify-icon icon="solar:dollar-bold-duotone"></iconify-icon>
+            매매 시뮬
+          </div>
+          <ul class="text-sm text-zinc-300 space-y-1.5 break-keep">
+            <li>• 시초가 매수 → 일봉 high/low 기반 익절/손절 판정</li>
+            <li>• 익절: +5% / 손절: -3% / 미체결: 종가 청산</li>
+            <li>• 손절 우선 (보수적 시뮬)</li>
+            <li>• 초기 자본 1,000만원 균등 분할</li>
+          </ul>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="text-xs accent font-semibold mb-2 flex items-center gap-1.5">
+            <iconify-icon icon="solar:database-bold-duotone"></iconify-icon>
+            데이터
+          </div>
+          <ul class="text-sm text-zinc-300 space-y-1.5 break-keep">
+            <li>• KRX OpenAPI (KOSPI + KOSDAQ 일별 OHLCV)</li>
+            <li>• Naver Finance (외국인/기관 수급)</li>
+            <li>• DART OpenAPI (공시)</li>
+            <li>• 일봉 기반 (분봉 historical 6일 한계)</li>
+          </ul>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="text-xs accent font-semibold mb-2 flex items-center gap-1.5">
+            <iconify-icon icon="solar:chart-2-bold-duotone"></iconify-icon>
+            메트릭
+          </div>
+          <ul class="text-sm text-zinc-300 space-y-1.5 break-keep">
+            <li>• Sharpe / Sortino / Calmar 비율</li>
+            <li>• 최대 드로다운 (MDD) + 회복 기간</li>
+            <li>• 승률 / Profit Factor / Win-Loss Ratio</li>
+            <li>• 최대 연속 승/패</li>
+          </ul>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="text-xs accent font-semibold mb-2 flex items-center gap-1.5">
+            <iconify-icon icon="solar:danger-triangle-bold-duotone" class="text-amber-400"></iconify-icon>
+            한계 (정직)
+          </div>
+          <ul class="text-sm text-zinc-300 space-y-1.5 break-keep">
+            <li>• 일봉 기반 → high가 익절선에 닿으면 익절 판정 (실제론 못 닿을 수 있음)</li>
+            <li>• 거래비용/슬리피지 미반영</li>
+            <li>• 짧은 기간(1주~1개월)은 통계적 신뢰도 낮음</li>
+            <li>• 과적합 위험 — 실전 검증 별도 필요</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Source -->
+    <section class="mt-10 glass rounded-2xl p-6">
+      <div class="flex items-start gap-3">
+        <iconify-icon icon="solar:document-text-bold-duotone" class="accent text-2xl mt-1"></iconify-icon>
+        <div class="flex-1">
+          <div class="font-bold text-white mb-2">Source Files</div>
+          <div class="grid md:grid-cols-2 gap-x-4 gap-y-1 text-xs text-zinc-400 font-mono">
+            <div>data/results/matrix_*.json</div>
+            <div>data/experiments/exp_*.json</div>
+            <div>strategies/*.py</div>
+            <div>lab/metadata.py</div>
+            <div>runner/backtest_wrapper.py</div>
+            <div>runner/metrics.py</div>
+            <div>runner/matrix_runner.py</div>
+            <div>data/sources/research_log.md</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Glossary -->
+    <section class="mt-16">
+      <div class="text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium mb-3">Glossary</div>
+      <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight break-keep mb-4">
+        용어집 — 비전문가를 위한 안내
+      </h2>
+      <p class="text-sm text-zinc-400 mb-6 break-keep">
+        대시보드에 나오는 모든 메트릭/영어 용어/카테고리/기능에 대한 쉬운 설명입니다.
+      </p>
+
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button class="glossary-tab active" data-gloss="metrics">📊 성과 메트릭</button>
+        <button class="glossary-tab" data-gloss="terms">🔤 영어 용어</button>
+        <button class="glossary-tab" data-gloss="categories">📁 전략 카테고리</button>
+        <button class="glossary-tab" data-gloss="promotion">🏆 승급 시스템</button>
+        <button class="glossary-tab" data-gloss="simulation">⚙️ 시뮬 규칙</button>
+      </div>
+
+      <!-- Metrics panel -->
+      <div class="glossary-panel active grid md:grid-cols-2 gap-4" data-panel="metrics">
+
+        <div class="glossary-card">
+          <h4>총 수익률</h4>
+          <div class="en">Total Return</div>
+          <div class="desc">백테스트 기간 동안 돈이 얼마나 늘었는지를 %로 표현합니다.</div>
+          <div class="example">1,000만원 시작 → 1,352만원 = +35.2%</div>
+          <div class="interpret">💡 가장 단순한 지표. 단, 짧은 기간일수록 운 요소 큼.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>샤프 비율</h4>
+          <div class="en">Sharpe Ratio</div>
+          <div class="desc">"위험(변동성) 대비 수익이 얼마나 좋은가". 같은 수익률이라도 변동성이 작으면 Sharpe가 높아집니다.</div>
+          <div class="example">공식: (수익률 - 무위험수익률) / 변동성 × √250</div>
+          <div class="interpret">💡 1 이하 별로 / 1~2 괜찮음 / 2~3 좋음 / 3 이상 매우 우수. 단, 1주 같은 짧은 기간엔 30+도 나와서 과대평가됨</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>소르티노 비율</h4>
+          <div class="en">Sortino Ratio</div>
+          <div class="desc">Sharpe와 비슷하지만 "아래로 떨어지는 위험"만 나쁘다고 봅니다. 위로 튀는 변동성은 좋은 것이니 벌점 없음.</div>
+          <div class="example">수익률 변동성 10% 중 하락은 3%만 → Sortino가 Sharpe보다 보통 큼</div>
+          <div class="interpret">💡 Sharpe보다 현실적. 상승 변동성까지 위험으로 치는 Sharpe의 한계 보완.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>칼마 비율</h4>
+          <div class="en">Calmar Ratio</div>
+          <div class="desc">연환산 수익률을 최대 낙폭(MDD)으로 나눈 값. "큰 손실 대비 몇 배 벌었나"</div>
+          <div class="example">연 30% 수익 + MDD -15% → Calmar = 30/15 = 2.0</div>
+          <div class="interpret">💡 1 이상 괜찮음, 3 이상 좋음. 고위험 고수익 전략일수록 낮아짐.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>최대 낙폭 (MDD)</h4>
+          <div class="en">Max Drawdown</div>
+          <div class="desc">운용 중 가장 높았던 잔고에서 가장 낮았던 잔고까지 떨어진 최대 폭. 음수로 표시되며, 0에 가까울수록 좋음.</div>
+          <div class="example">1,000 → 1,200 → 1,050 → 1,300 : MDD = -12.5% (1,200→1,050 구간)</div>
+          <div class="interpret">💡 실전에서 가장 중요한 지표 중 하나. "이 낙폭을 버틸 수 있는가" 심리 테스트.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>승률</h4>
+          <div class="en">Win Rate</div>
+          <div class="desc">전체 매매 중 수익으로 끝난 비율.</div>
+          <div class="example">100번 중 65번 흑자 → 승률 65%</div>
+          <div class="interpret">💡 50% 이상이면 괜찮지만 승률만 보면 안 됨. 9번 이기고 1번 큰 손실일 수 있음 → Profit Factor와 함께 봐야 함.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>이익 요인</h4>
+          <div class="en">Profit Factor (PF)</div>
+          <div class="desc">총 번 돈을 총 잃은 돈으로 나눈 값. 1 초과면 흑자.</div>
+          <div class="example">총이익 200만원 / 총손실 100만원 = PF 2.0 (이익이 손실의 2배)</div>
+          <div class="interpret">💡 1.5 이상 괜찮음 / 2.0 이상 좋음. 승률은 낮아도 PF가 높으면 '크게 벌고 작게 잃는' 전략.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>최대 연속 패</h4>
+          <div class="en">Max Consecutive Losses</div>
+          <div class="desc">연속으로 몇 번 지는 구간이 있었나. 심리적으로 견딜 수 있는 최대 연패 숫자.</div>
+          <div class="example">5일 연속 손절 당하면 연속 패 = 5</div>
+          <div class="interpret">💡 7 이상이면 탈락 기준. 실전에서 7번 연속 지면 "이 전략 틀렸나?" 의심 시작.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>연환산 수익률 (CAGR)</h4>
+          <div class="en">Compound Annual Growth Rate</div>
+          <div class="desc">"이 수익률이 1년 내내 지속됐다면?" 을 복리로 환산한 값.</div>
+          <div class="example">1주 +5% → 연 +1,200% (비현실적)</div>
+          <div class="interpret">⚠️ 짧은 기간엔 무의미. 1년 이상 데이터에서만 신뢰 가능.</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>변동성 (연환산)</h4>
+          <div class="en">Volatility (Annualized)</div>
+          <div class="desc">수익률이 얼마나 널뛰는지를 측정. 일별 변동성에 √250(거래일) 을 곱해 연 단위로 환산.</div>
+          <div class="example">변동성 20% = 연 평균 수익률 ± 20% 범위 내 변동</div>
+          <div class="interpret">💡 작을수록 안정적. Sharpe 계산의 분모가 됨.</div>
+        </div>
+
+      </div>
+
+      <!-- Terms panel -->
+      <div class="glossary-panel grid md:grid-cols-2 gap-4" data-panel="terms">
+
+        <div class="glossary-card">
+          <h4>모멘텀</h4>
+          <div class="en">Momentum</div>
+          <div class="desc">"오르는 놈이 더 오른다"는 믿음. 상승 추세가 있는 종목을 추격하는 전략.</div>
+          <div class="example">5일 이동평균 돌파 + 거래량 3배 = 매수</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>역추세</h4>
+          <div class="en">Contrarian</div>
+          <div class="desc">"너무 떨어진 것은 곧 반등한다"는 반대 방향 전략. 과매도 종목을 매수.</div>
+          <div class="example">RSI 30 이하 대형주 매수</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>돌파</h4>
+          <div class="en">Breakout</div>
+          <div class="desc">주가가 저항선(저항 가격대)을 뚫고 올라가는 순간. 이때 관심과 매수세가 몰려 추가 상승 확률 ↑.</div>
+          <div class="example">전고점 돌파 + 대량 거래 동반 = 매수</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>매수 / 공매도</h4>
+          <div class="en">Long / Short</div>
+          <div class="desc">Long은 "오를 거라 믿고 사는 것"(일반 매수), Short은 "내릴 거라 믿고 빌려서 파는 것"(공매도). 한국은 공매도 제약이 강함.</div>
+          <div class="example">Long: 100만원에 사서 120만원에 판다<br>Short: 100만원에 빌려 팔고 80만원에 사서 갚는다</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>진입가 / 청산가</h4>
+          <div class="en">Entry Price / Exit Price</div>
+          <div class="desc">Entry는 처음 산 가격, Exit은 판 가격. 우리 시뮬에선 Entry는 장 시작 시초가.</div>
+          <div class="example">시초가 10,000원 Entry → 10,500원 Exit (익절)</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>오버나이트</h4>
+          <div class="en">Overnight</div>
+          <div class="desc">장 마감 후부터 다음날 장 시작까지 포지션을 유지하는 것. 한국 시장은 오버나이트 수익률이 양수라는 학술 연구가 있음.</div>
+          <div class="example">종가 매수 → 다음날 시초가 매도 = 오버나이트 수익</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>인트라데이</h4>
+          <div class="en">Intraday</div>
+          <div class="desc">장 중(09:00~15:30) 안에서 사고 파는 것. 단타의 본질.</div>
+          <div class="example">시초가 매수 → 종가 청산 = 인트라데이 단타</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>슬리피지</h4>
+          <div class="en">Slippage</div>
+          <div class="desc">주문한 가격과 실제 체결가의 차이. 빠른 시장에서 주문이 밀리면서 발생.</div>
+          <div class="example">10,000원에 사려 했는데 10,050원에 체결 = 슬리피지 +0.5%</div>
+          <div class="interpret">⚠️ 현재 시뮬은 슬리피지 미반영 → 실전 수익률은 표시값보다 낮음</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>수급</h4>
+          <div class="en">Order Flow / Investor Flow</div>
+          <div class="desc">누가 사고 누가 파는지. 한국에선 외국인/기관/개인 3주체로 나눔. 외국인 순매수는 대표적인 "스마트 머니" 신호.</div>
+          <div class="example">외국인 5일 연속 순매수 + 주가 상승 = 수급 강한 종목</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>DART 공시</h4>
+          <div class="en">DART Disclosure</div>
+          <div class="desc">금융감독원의 전자공시시스템. 상장사가 의무적으로 올리는 재무/계약/투자 발표. 호재 공시 후 주가 반응이 단타 기회.</div>
+          <div class="example">대규모 수주 계약 공시 → 다음날 시초가 급등</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>익절 / 손절</h4>
+          <div class="en">Take Profit / Stop Loss</div>
+          <div class="desc">익절(익절선): 목표 수익 도달 시 매도. 손절(손절선): 허용 손실 도달 시 매도. 우리 시뮬은 +5% 익절, -3% 손절.</div>
+          <div class="example">10,000원 Entry → 10,500원(+5%) = 익절, 9,700원(-3%) = 손절</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>백테스트</h4>
+          <div class="en">Backtest</div>
+          <div class="desc">과거 데이터로 "이 전략이 과거에 잘 먹혔는지" 검증하는 것. 과적합(overfitting) 주의 — 과거에만 잘 맞는 전략은 미래에 실패 가능.</div>
+          <div class="example">2024-2026 KRX 데이터로 전략 돌려서 가상 수익률 계산</div>
+          <div class="interpret">⚠️ 백테스트 ≠ 실전. 실전 검증(paper trading) 필수.</div>
+        </div>
+
+      </div>
+
+      <!-- Categories panel -->
+      <div class="glossary-panel grid md:grid-cols-2 gap-4" data-panel="categories">
+
+        <div class="glossary-card">
+          <h4>모멘텀</h4>
+          <div class="en">Momentum</div>
+          <div class="desc">상승 추세를 따라가는 전략. "이미 오르고 있는 종목"을 매수.</div>
+          <div class="example">Alpha Momentum (MA5 돌파 + 거래량), KOSPI Intraday Momentum</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>역추세</h4>
+          <div class="en">Contrarian</div>
+          <div class="desc">많이 떨어진 종목의 반등을 기대. 과매도 구간 매수.</div>
+          <div class="example">Beta Contrarian (RSI 역추세), BNF 낙폭과대, EOD Reversal Korean</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>돌파</h4>
+          <div class="en">Breakout</div>
+          <div class="desc">특정 가격/신고가를 돌파할 때 진입. 단타에서 가장 흔한 전략군.</div>
+          <div class="example">Echo Frontier(시초가 갭), Volatility Breakout(변동폭), Turtle Breakout(N일 신고가)</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>이벤트</h4>
+          <div class="en">Event-Driven</div>
+          <div class="desc">공시/뉴스/실적 발표 같은 특정 이벤트에 반응하는 전략.</div>
+          <div class="example">Gamma Disclosure (DART 공시), News Catalyst Timing</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>테마</h4>
+          <div class="en">Theme / Sector Rotation</div>
+          <div class="desc">당일 강세 섹터/테마를 찾아 그 안의 대장주 매수.</div>
+          <div class="example">Delta Theme, Sector Rotation (KOSPI 업종 지수)</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>수급</h4>
+          <div class="en">Flow / Order Flow</div>
+          <div class="desc">외국인/기관 매매 동향 기반. "큰손들이 사는 걸 따라가자"</div>
+          <div class="example">Foreign Flow Momentum (외국인 연속 순매수)</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>통계적 차익</h4>
+          <div class="en">Statistical Arbitrage</div>
+          <div class="desc">학술적으로 검증된 시장 비효율성 활용. 반복 가능한 통계적 이상현상.</div>
+          <div class="example">Overnight ETF Reversal (한국 ETF overnight 양수 효과)</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>복합</h4>
+          <div class="en">Hybrid / Multi-Signal</div>
+          <div class="desc">여러 신호를 동시에 만족해야 매수. 단일 신호의 약점 보완.</div>
+          <div class="example">Multi-Signal Hybrid (DART + 수급 + 거래량 AND 결합)</div>
+        </div>
+
+      </div>
+
+      <!-- Promotion panel -->
+      <div class="glossary-panel grid md:grid-cols-2 gap-4" data-panel="promotion">
+
+        <div class="glossary-card">
+          <h4>🏆 승급</h4>
+          <div class="en">PROMOTED</div>
+          <div class="desc">모든 승급 기준(6가지)을 통과한 전략. news-trading-bot 정식 통합 후보.</div>
+          <div class="example">수익률 ≥5% · Sharpe ≥1.0 · 승률 ≥50% · MDD ≥-15% · 거래 ≥10 · PF ≥1.5 모두 통과</div>
+          <div class="interpret">💡 통합 가이드 마크다운 자동 생성 → 수동 검토 후 실제 봇에 추가</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>⚠️ 관찰</h4>
+          <div class="en">WATCHLIST</div>
+          <div class="desc">일부 기준 미달이지만 완전히 탈락은 아님. 관찰하면서 데이터 쌓기.</div>
+          <div class="example">수익률은 +8%지만 승률이 49%로 50% 미달</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>❌ 탈락</h4>
+          <div class="en">REJECTED</div>
+          <div class="desc">명확한 탈락 기준에 해당. 전략 자체를 재고하거나 폐기.</div>
+          <div class="example">음수 수익률 / 7연속 패 / 30% 미만 승률 / 거래 없음 중 하나라도 해당</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>⏳ 대기</h4>
+          <div class="en">PENDING</div>
+          <div class="desc">데이터가 부족해서 평가 자체가 불가능한 상태.</div>
+          <div class="example">거래 수 5 미만 또는 거래일 5일 미만</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>참신성 점수</h4>
+          <div class="en">Novelty Score (0~10)</div>
+          <div class="desc">전략이 얼마나 새로운 아이디어인가. 기존 6개 전략과 얼마나 다른지에 대한 내부 평가.</div>
+          <div class="example">Multi-Signal Hybrid(3중 결합) = ★9, Turtle Breakout(클래식 축소) = ★6</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>신뢰도 등급</h4>
+          <div class="en">Trust Level</div>
+          <div class="desc">전략 출처의 신뢰성을 5단계로 평가. 학술 논문이 가장 높고 익명 블로그가 가장 낮음.</div>
+          <div class="example">★★★★★ 동료심사 논문 / ★★★ 일반 블로그 / ★ 익명 포스트</div>
+        </div>
+
+      </div>
+
+      <!-- Simulation panel -->
+      <div class="glossary-panel grid md:grid-cols-2 gap-4" data-panel="simulation">
+
+        <div class="glossary-card">
+          <h4>시초가 매수</h4>
+          <div class="en">Market Open Entry</div>
+          <div class="desc">장이 시작하는 09:00의 첫 체결가격으로 매수한다고 가정.</div>
+          <div class="example">전날 장 마감 후 전략이 종목 선정 → 다음날 09:00 시가에 자동 매수</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>익절 +5%</h4>
+          <div class="en">Take Profit at +5%</div>
+          <div class="desc">매수 후 가격이 +5%에 도달하면 즉시 매도. 우리 시뮬은 일봉 고가가 이 가격에 닿으면 익절로 판정.</div>
+          <div class="example">10,000원 매수 → 10,500원 도달 → 익절 매도</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>손절 -3%</h4>
+          <div class="en">Stop Loss at -3%</div>
+          <div class="desc">매수 후 가격이 -3%로 하락하면 즉시 매도. 일봉 저가가 이 가격에 닿으면 손절로 판정.</div>
+          <div class="example">10,000원 매수 → 9,700원 도달 → 손절 매도</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>종가 청산</h4>
+          <div class="en">Market Close Exit</div>
+          <div class="desc">익절/손절 모두 도달 안 하면 장 마감(15:30) 종가에 자동 매도. 당일 청산이 원칙.</div>
+          <div class="example">10,000원 → 고가 10,300원, 저가 9,900원 → 10,200원 종가에 매도</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>손절 우선 규칙</h4>
+          <div class="en">Stop-Loss-First Rule</div>
+          <div class="desc">일봉만으로는 장중 가격 경로를 모름. 보수적으로 "저가가 먼저 닿았다"고 가정 → 손절 우선.</div>
+          <div class="example">고가가 익절선 초과 + 저가가 손절선 도달 = 손절로 판정 (수익 기회 버림)</div>
+          <div class="interpret">💡 실제 결과가 시뮬보다 나쁘지 않게 하는 안전장치</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>일봉 기반 시뮬</h4>
+          <div class="en">Daily Bar Simulation</div>
+          <div class="desc">분봉이 아닌 일봉(하루 단위 시/고/저/종)으로 시뮬. 데이터 한계상 장기 백테스트에 필수.</div>
+          <div class="example">분봉 = 1분 단위 가격 추적 (정확하지만 6일 한계) / 일봉 = 하루 한 줄 요약 (무제한)</div>
+          <div class="interpret">⚠️ 정확도 ~80%. 익절 과대평가 위험 → Phase 8에서 분봉 정밀 시뮬 예정</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>초기 자본 1,000만원</h4>
+          <div class="en">Initial Capital</div>
+          <div class="desc">모든 전략이 같은 조건에서 경쟁할 수 있도록 초기 자본을 통일. 선정 종목 수로 균등 분할.</div>
+          <div class="example">5종목 선정 → 종목당 200만원 배분</div>
+        </div>
+
+        <div class="glossary-card">
+          <h4>거래비용/슬리피지 미반영</h4>
+          <div class="en">No Costs / No Slippage</div>
+          <div class="desc">수수료(~0.015%)와 슬리피지(~0.1%)는 현재 시뮬에 반영 안 됨. 실전 수익률은 표시값보다 약간 낮음.</div>
+          <div class="example">시뮬 +5% → 실전 약 +4.5% 수준</div>
+          <div class="interpret">⚠️ 거래 빈도가 높은 전략일수록 영향 큼</div>
+        </div>
+
+      </div>
+    </section>
+
+    </div><!-- /tab-pane reference -->
+
+  </main>
+
+  <footer class="py-10 border-t border-white/5 mt-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center text-xs text-zinc-500 break-keep">
+      <div>Strategy Lab · Phase 3+4 · 2026-04-11</div>
+      <div class="mt-2">백테스트 결과는 과거 데이터 기반이며 미래 수익을 보장하지 않습니다.</div>
+    </div>
+  </footer>
+
+  <script>
+    // ============================================
+    // State
+    // ============================================
+    const state = {
+      data: window.LEADERBOARD_DATA || null,
+      currentPeriod: null,
+      currentSort: 'total_return_pct',
+      sortDirection: 'desc',
+      currentCategory: 'all',
+    };
+
+    // ============================================
+    // Render
+    // ============================================
+    function renderLastUpdated() {
+      if (state.data && state.data.generated_at) {
+        const d = state.data.generated_at.split('T')[0];
+        document.getElementById('last-updated').textContent = `마지막 실행: ${d}`;
+      }
+    }
+
+    function renderPeriodFilters() {
+      const container = document.getElementById('period-filters');
+      if (!state.data || !state.data.periods) {
+        container.innerHTML = '<span class="text-zinc-500 text-sm">데이터 없음</span>';
+        return;
+      }
+      const periods = Object.keys(state.data.periods);
+      if (!state.currentPeriod && periods.length) {
+        state.currentPeriod = periods[0];
+      }
+      const labelMap = { '1w': '1주', '1m': '1개월', '3m': '3개월', '1y': '1년' };
+
+      container.innerHTML = periods.map(p => {
+        const lbl = labelMap[p] || p;
+        const range = state.data.periods[p];
+        const dates = `${range[0].slice(0,4)}-${range[0].slice(4,6)}-${range[0].slice(6,8)} ~ ${range[1].slice(0,4)}-${range[1].slice(4,6)}-${range[1].slice(6,8)}`;
+        return `<button class="filter-btn ${p === state.currentPeriod ? 'active' : ''}" data-period="${p}" title="${dates}">${lbl}</button>`;
+      }).join('');
+
+      container.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.currentPeriod = btn.dataset.period;
+          renderAll();
+        });
+      });
+    }
+
+    function renderSortFilters() {
+      const buttons = document.querySelectorAll('#sort-filters .filter-btn');
+      buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sort === state.currentSort);
+        btn.onclick = () => {
+          state.currentSort = btn.dataset.sort;
+          renderAll();
+        };
+      });
+    }
+
+    function getCurrentRows() {
+      if (!state.data || !state.data.leaderboards) return [];
+      let rows = state.data.leaderboards[state.currentPeriod] || [];
+      // 카테고리 필터
+      if (state.currentCategory && state.currentCategory !== 'all') {
+        rows = rows.filter(r => r.category === state.currentCategory);
+      }
+      const sorted = [...rows].sort((a, b) => {
+        const va = a[state.currentSort] || 0;
+        const vb = b[state.currentSort] || 0;
+        // MDD는 0에 가까울수록 좋음
+        if (state.currentSort === 'max_drawdown_pct') return vb - va;
+        return vb - va;
+      });
+      return sorted;
+    }
+
+    function renderCategoryFilters() {
+      const container = document.getElementById('category-filters');
+      if (!state.data || !state.data.leaderboards) {
+        container.innerHTML = '';
+        return;
+      }
+      const allRows = state.data.leaderboards[state.currentPeriod] || [];
+      const categories = Array.from(new Set(allRows.map(r => r.category).filter(Boolean))).sort();
+      const labelMap = {
+        momentum: '모멘텀', contrarian: '역추세', breakout: '돌파',
+        event: '이벤트', theme: '테마', flow: '수급',
+        pattern: '패턴', statistical: '통계', hybrid: '복합', other: '기타',
+      };
+      const buttons = [`<button class="filter-btn ${state.currentCategory === 'all' ? 'active' : ''}" data-cat="all">전체</button>`];
+      categories.forEach(c => {
+        buttons.push(`<button class="filter-btn ${state.currentCategory === c ? 'active' : ''}" data-cat="${c}">${labelMap[c] || c}</button>`);
+      });
+      container.innerHTML = buttons.join('');
+      container.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.currentCategory = btn.dataset.cat;
+          renderAll();
+        });
+      });
+    }
+
+    function renderStats() {
+      const rows = getCurrentRows();
+      const sCount = rows.length;
+      const sAvg = sCount ? (rows.reduce((s, r) => s + r.total_return_pct, 0) / sCount).toFixed(2) : '--';
+      const sBest = sCount ? rows[0] : null;
+      const sAvgSharpe = sCount ? (rows.reduce((s, r) => s + r.sharpe_ratio, 0) / sCount).toFixed(2) : '--';
+      const sPromoted = rows.filter(r => r.promotion_status === 'promoted').length;
+
+      document.getElementById('stat-strategies').textContent = sCount;
+      document.getElementById('stat-avg-return').textContent = sAvg !== '--' ? `${sAvg > 0 ? '+' : ''}${sAvg}%` : '--';
+      document.getElementById('stat-avg-return').className = `mt-2 font-display font-bold text-3xl ${sAvg > 0 ? 'ret-positive' : (sAvg < 0 ? 'ret-negative' : 'text-white')}`;
+
+      if (sBest) {
+        document.getElementById('stat-best-return').textContent = `${sBest.total_return_pct > 0 ? '+' : ''}${sBest.total_return_pct.toFixed(2)}%`;
+        document.getElementById('stat-best-strategy').textContent = sBest.strategy_id;
+      }
+
+      document.getElementById('stat-avg-sharpe').textContent = sAvgSharpe;
+      const promoEl = document.getElementById('stat-promoted');
+      if (promoEl) promoEl.textContent = sPromoted;
+    }
+
+    function fmtRet(v) {
+      if (v == null) return '--';
+      const sign = v > 0 ? '+' : '';
+      const cls = v > 0 ? 'ret-positive' : (v < 0 ? 'ret-negative' : 'ret-neutral');
+      return `<span class="${cls} font-mono font-semibold">${sign}${v.toFixed(2)}%</span>`;
+    }
+    function fmtNum(v, digits = 2) {
+      if (v == null || v === 0) return '<span class="ret-neutral font-mono">--</span>';
+      const cls = v > 0 ? 'text-zinc-200' : 'ret-negative';
+      return `<span class="${cls} font-mono">${v.toFixed(digits)}</span>`;
+    }
+    function fmtPct(v) {
+      if (v == null) return '--';
+      return `<span class="font-mono">${(v * 100).toFixed(0)}%</span>`;
+    }
+    function medalBadge(rank) {
+      const cls = rank === 1 ? 'medal-1' : rank === 2 ? 'medal-2' : rank === 3 ? 'medal-3' : 'medal-default';
+      return `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full ${cls} font-display font-bold text-xs">${rank}</span>`;
+    }
+
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboard-body');
+      const rows = getCurrentRows();
+
+      const labelMap = { '1w': '1주', '1m': '1개월', '3m': '3개월', '1y': '1년' };
+      const range = state.data?.periods?.[state.currentPeriod];
+      if (range) {
+        document.getElementById('period-label').textContent =
+          `${labelMap[state.currentPeriod] || state.currentPeriod} · ${range[0]} ~ ${range[1]}`;
+      }
+
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="9"><div class="empty">결과 없음. 매트릭스 실행 대기 중.</div></td></tr>`;
+        return;
+      }
+
+      const catLabelMap = {
+        momentum: '모멘텀', contrarian: '역추세', breakout: '돌파',
+        event: '이벤트', theme: '테마', flow: '수급',
+        pattern: '패턴', statistical: '통계', hybrid: '복합', other: '기타',
+      };
+      const promoLabelMap = {
+        promoted: { label: 'PROMOTED', icon: 'solar:medal-ribbon-star-bold' },
+        watchlist: { label: 'WATCHLIST', icon: 'solar:eye-bold' },
+        rejected: { label: 'REJECTED', icon: 'solar:close-circle-bold' },
+        pending: { label: 'PENDING', icon: 'solar:hourglass-bold' },
+      };
+
+      tbody.innerHTML = rows.map((r, i) => `
+        <tr class="row" data-strategy="${r.strategy_id}" data-period="${r.period}">
+          <td>
+            <div class="flex items-center">
+              <span class="expand-icon">▶</span>
+              ${medalBadge(i + 1)}
+            </div>
+          </td>
+          <td>
+            <div class="flex items-center gap-2">
+              <div class="text-white font-semibold">${r.strategy_name || r.strategy_id}</div>
+              ${r.promotion_status ? `
+                <span class="promo-badge promo-${r.promotion_status}">
+                  <iconify-icon icon="${promoLabelMap[r.promotion_status]?.icon || 'solar:question-circle-bold'}"></iconify-icon>
+                  ${promoLabelMap[r.promotion_status]?.label || r.promotion_status.toUpperCase()}
+                </span>
+              ` : ''}
+            </div>
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="text-[9px] font-mono text-zinc-500">${r.strategy_id}</span>
+              ${r.category ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${catLabelMap[r.category] || r.category}</span>` : ''}
+              ${r.novelty_score ? `<span class="text-[9px] text-amber-400">★${r.novelty_score}</span>` : ''}
+              ${r.promotion_score ? `<span class="text-[9px] text-cyan-400">score ${r.promotion_score.toFixed(0)}</span>` : ''}
+            </div>
+          </td>
+          <td class="text-right">${fmtRet(r.total_return_pct)}</td>
+          <td class="text-right">${fmtNum(r.sharpe_ratio)}</td>
+          <td class="text-right">${fmtNum(r.sortino_ratio)}</td>
+          <td class="text-right">${fmtNum(r.max_drawdown_pct)}</td>
+          <td class="text-right">${fmtPct(r.win_rate)}</td>
+          <td class="text-right">${fmtNum(r.profit_factor)}</td>
+          <td class="text-right text-zinc-400 font-mono">${r.num_trades || 0}</td>
+        </tr>
+        <tr class="detail-row" data-for="${r.strategy_id}-${r.period}">
+          <td colspan="9"></td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('tr.row').forEach(tr => {
+        tr.addEventListener('click', (e) => {
+          const sid = tr.dataset.strategy;
+          const period = tr.dataset.period;
+          toggleRowAccordion(tr, sid, period);
+          // 상세 카드도 함께 갱신
+          renderDetail(sid);
+        });
+      });
+    }
+
+    function toggleRowAccordion(rowTr, strategyId, period) {
+      const detailRow = rowTr.parentElement.querySelector(`tr.detail-row[data-for="${strategyId}-${period}"]`);
+      if (!detailRow) return;
+
+      const wasOpen = detailRow.classList.contains('open');
+      // 다른 열린 행 닫기
+      rowTr.parentElement.querySelectorAll('tr.detail-row.open').forEach(tr => {
+        tr.classList.remove('open');
+        tr.innerHTML = '<td colspan="9"></td>';
+      });
+      rowTr.parentElement.querySelectorAll('tr.row.expanded').forEach(tr => tr.classList.remove('expanded'));
+
+      if (wasOpen) return;  // 이미 열려있었다면 닫기로 끝
+
+      // 열기
+      rowTr.classList.add('expanded');
+      detailRow.classList.add('open');
+
+      const history = getHistoryFor(strategyId, period);
+      const cell = detailRow.querySelector('td');
+      cell.innerHTML = renderTradeHistoryTable(history, strategyId, period);
+    }
+
+    function getHistoryFor(strategyId, period) {
+      if (!state.data?.histories) return null;
+      const key = `${strategyId}::${period}`;
+      return state.data.histories[key] || null;
+    }
+
+    function renderTradeHistoryTable(history, strategyId, period) {
+      if (!history || !history.length) {
+        return `<div class="text-xs text-zinc-500 py-4">
+          <iconify-icon icon="solar:info-circle-linear" class="mr-1"></iconify-icon>
+          거래 히스토리 없음. 매트릭스를 최신 코드로 재실행하면 표시됩니다.
+        </div>`;
+      }
+
+      // 일자별 섹션
+      let html = `
+        <div class="mb-3 flex items-center justify-between">
+          <div class="text-xs uppercase tracking-wider text-cyan-400 font-semibold">
+            <iconify-icon icon="solar:history-bold-duotone"></iconify-icon>
+            거래 히스토리 · ${strategyId} (${period})
+          </div>
+          <div class="text-[10px] text-zinc-500">
+            일자별 종목 선정 + 매매 결과 (시초가 매수 → 일봉 익절/손절/종가 청산)
+          </div>
+        </div>
+        <table class="trade-table">
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>#</th>
+              <th>종목코드</th>
+              <th>종목명</th>
+              <th class="text-right">선정점수</th>
+              <th class="text-right">진입가</th>
+              <th class="text-right">청산가</th>
+              <th>결과</th>
+              <th class="text-right">수익률</th>
+              <th class="text-right">수익금</th>
+              <th class="text-right">수량</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      history.forEach(day => {
+        const trades = day.trade_details || [];
+        const dayReturn = day.daily_return_pct || 0;
+        const dayAmount = day.daily_return_amount || 0;
+
+        // 일자 요약 행
+        html += `
+          <tr class="day-separator">
+            <td colspan="11">
+              📅 ${day.date}  ·  후보 ${day.candidates} · 매매 ${day.trades} · 승 ${day.wins}/${day.trades}
+              · 일일 ${dayReturn >= 0 ? '+' : ''}${dayReturn.toFixed(2)}%
+              (${dayAmount >= 0 ? '+' : ''}${(dayAmount || 0).toLocaleString()}원)
+              · 잔고 ${(day.capital_after || 0).toLocaleString()}원
+            </td>
+          </tr>
+        `;
+
+        if (!trades.length) {
+          html += `<tr><td colspan="11" class="text-zinc-600 pl-4 text-[10px]">  (거래 없음 — 후보 미발생 또는 시장 데이터 없음)</td></tr>`;
+          return;
+        }
+
+        trades.forEach((t, idx) => {
+          const exitClass =
+            t.exit_type === 'profit' ? 'exit-profit' :
+            t.exit_type === 'loss' ? 'exit-loss' : 'exit-close';
+          const exitLabel =
+            t.exit_type === 'profit' ? '익절 +5%' :
+            t.exit_type === 'loss' ? '손절 -3%' :
+            t.exit_type === 'close' ? '종가' : (t.exit_type || '—');
+          const score = t.selection?.score || 0;
+          const rank = t.selection?.rank || 0;
+
+          html += `
+            <tr>
+              <td class="text-zinc-600 text-[10px]">${idx === 0 ? '' : ''}</td>
+              <td class="text-zinc-400 font-mono">${rank || '-'}</td>
+              <td class="font-mono text-zinc-400">${t.code}</td>
+              <td class="text-white">${t.name || '-'}</td>
+              <td class="num text-zinc-300">${score ? score.toFixed(1) : '-'}</td>
+              <td class="num text-zinc-300">${(t.entry_price || 0).toLocaleString()}</td>
+              <td class="num text-zinc-300">${(t.exit_price || 0).toLocaleString()}</td>
+              <td><span class="${exitClass}">${exitLabel}</span></td>
+              <td class="num ${exitClass}">${t.return_pct >= 0 ? '+' : ''}${(t.return_pct || 0).toFixed(2)}%</td>
+              <td class="num ${exitClass}">${t.return_amount >= 0 ? '+' : ''}${(t.return_amount || 0).toLocaleString()}</td>
+              <td class="num text-zinc-500">${(t.qty || 0).toLocaleString()}</td>
+            </tr>
+          `;
+
+          // score_detail이 있으면 그 다음 행에 표시
+          if (t.selection?.score_detail && Object.keys(t.selection.score_detail).length > 0) {
+            const tags = Object.entries(t.selection.score_detail)
+              .map(([k, v]) => `<span class="score-detail-tag">${k}: ${typeof v === 'number' ? v.toFixed(1) : v}</span>`)
+              .join('');
+            html += `
+              <tr>
+                <td colspan="4"></td>
+                <td colspan="7" class="text-[10px] text-zinc-500">
+                  선정 내역: ${tags}
+                </td>
+              </tr>
+            `;
+          }
+        });
+      });
+
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function renderDetail(strategyId) {
+      const rows = getCurrentRows();
+      const r = rows.find(x => x.strategy_id === strategyId);
+      if (!r) return;
+
+      const container = document.getElementById('detail-container');
+      const labelMap = { '1w': '1주', '1m': '1개월', '3m': '3개월', '1y': '1년' };
+      const catLabelMap = {
+        momentum: '모멘텀', contrarian: '역추세', breakout: '돌파',
+        event: '이벤트', theme: '테마', flow: '수급',
+        pattern: '패턴', statistical: '통계', hybrid: '복합', other: '기타',
+      };
+      const riskLabelMap = { low: '저위험', medium: '중간', high: '고위험', extreme: '초고위험' };
+      const promoLabelMap = {
+        promoted: { label: 'PROMOTED', icon: 'solar:medal-ribbon-star-bold' },
+        watchlist: { label: 'WATCHLIST', icon: 'solar:eye-bold' },
+        rejected: { label: 'REJECTED', icon: 'solar:close-circle-bold' },
+        pending: { label: 'PENDING', icon: 'solar:hourglass-bold' },
+      };
+
+      container.innerHTML = `
+        <div class="glass-strong rounded-2xl p-6 md:p-8 fade-in">
+          <div class="flex items-start justify-between flex-wrap gap-4 mb-6">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-xs accent font-mono">${r.strategy_id}</span>
+                ${r.category ? `<span class="text-[10px] px-2 py-0.5 rounded-full accent-bg accent-border border accent">${catLabelMap[r.category] || r.category}</span>` : ''}
+                ${r.risk_level ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">${riskLabelMap[r.risk_level] || r.risk_level}</span>` : ''}
+                ${r.novelty_score ? `<span class="text-[10px] text-amber-400">참신성 ★${r.novelty_score}/10</span>` : ''}
+              </div>
+              <h3 class="text-2xl font-bold text-white mt-2 break-keep">${r.strategy_name}</h3>
+              <div class="text-xs text-zinc-500 mt-1">${labelMap[state.currentPeriod] || state.currentPeriod} · ${r.start_date} ~ ${r.end_date}</div>
+            </div>
+            <div class="text-right">
+              <div class="font-display font-bold text-4xl ${r.total_return_pct > 0 ? 'ret-positive' : 'ret-negative'}">${r.total_return_pct > 0 ? '+' : ''}${r.total_return_pct.toFixed(2)}%</div>
+              <div class="text-xs text-zinc-500 mt-1">총 수익률</div>
+            </div>
+          </div>
+
+          ${r.promotion_status ? `
+            <div class="glass rounded-xl p-4 mb-4 promo-${r.promotion_status}" style="border-width: 1px; background-opacity: 0.5;">
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-[10px] uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                  <iconify-icon icon="${promoLabelMap[r.promotion_status]?.icon || 'solar:question-circle-bold'}"></iconify-icon>
+                  승급 평가: ${promoLabelMap[r.promotion_status]?.label || r.promotion_status.toUpperCase()}
+                </div>
+                ${r.promotion_score ? `<div class="text-xs font-mono">종합 ${r.promotion_score.toFixed(1)}/100</div>` : ''}
+              </div>
+              ${r.promotion_passed && r.promotion_passed.length ? `
+                <div class="text-xs text-zinc-300 mt-2">
+                  <strong class="text-emerald-400">통과:</strong> ${r.promotion_passed.join(' · ')}
+                </div>
+              ` : ''}
+              ${r.promotion_failed && r.promotion_failed.length ? `
+                <div class="text-xs text-zinc-300 mt-1">
+                  <strong class="text-red-400">실패:</strong> ${r.promotion_failed.join(' · ')}
+                </div>
+              ` : ''}
+              ${r.promotion_rejection_reasons && r.promotion_rejection_reasons.length ? `
+                <div class="text-xs text-zinc-300 mt-1">
+                  <strong class="text-red-400">탈락 사유:</strong> ${r.promotion_rejection_reasons.join(' · ')}
+                </div>
+              ` : ''}
+              ${r.promotion_warnings && r.promotion_warnings.length ? `
+                <div class="text-xs text-amber-400 mt-1">
+                  <strong>⚠️ 경고:</strong> ${r.promotion_warnings.join(' · ')}
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+
+          ${r.hypothesis ? `
+            <div class="glass rounded-xl p-4 mb-4">
+              <div class="text-[10px] uppercase tracking-wider accent font-semibold mb-2 flex items-center gap-1.5">
+                <iconify-icon icon="solar:lightbulb-bold-duotone"></iconify-icon>
+                가설
+              </div>
+              <p class="text-sm text-zinc-300 break-keep">${r.hypothesis}</p>
+            </div>
+          ` : ''}
+
+          ${r.data_requirements && r.data_requirements.length ? `
+            <div class="flex items-center gap-2 mb-4 text-xs">
+              <iconify-icon icon="solar:database-bold-duotone" class="text-zinc-500"></iconify-icon>
+              <span class="text-zinc-500">데이터:</span>
+              ${r.data_requirements.map(d => `<span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono text-[10px]">${d}</span>`).join('')}
+              ${r.sources_count ? `<span class="text-zinc-600 ml-2">출처 ${r.sources_count}개</span>` : ''}
+            </div>
+          ` : ''}
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Sharpe</div>
+              <div class="font-display font-bold text-xl text-white mt-1">${r.sharpe_ratio?.toFixed(2) || '--'}</div>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Sortino</div>
+              <div class="font-display font-bold text-xl text-white mt-1">${r.sortino_ratio?.toFixed(2) || '--'}</div>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Calmar</div>
+              <div class="font-display font-bold text-xl text-white mt-1">${r.calmar_ratio?.toFixed(2) || '--'}</div>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">MDD</div>
+              <div class="font-display font-bold text-xl ${r.max_drawdown_pct < 0 ? 'ret-negative' : 'text-white'} mt-1">${r.max_drawdown_pct?.toFixed(2) || '0'}%</div>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Win Rate</div>
+              <div class="font-display font-bold text-xl text-white mt-1">${(r.win_rate * 100)?.toFixed(0) || '--'}%</div>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Profit Factor</div>
+              <div class="font-display font-bold text-xl text-white mt-1">${r.profit_factor?.toFixed(2) || '--'}</div>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Trades</div>
+              <div class="font-display font-bold text-xl text-white mt-1">${r.num_trades || 0}</div>
+            </div>
+            <div class="glass rounded-xl p-4">
+              <div class="text-[10px] text-zinc-500 uppercase tracking-wider">Best/Worst Day</div>
+              <div class="font-display font-bold text-sm text-white mt-1">
+                <span class="ret-positive">${r.best_day_pct > 0 ? '+' : ''}${(r.best_day_pct || 0).toFixed(1)}</span>
+                /
+                <span class="ret-negative">${(r.worst_day_pct || 0).toFixed(1)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      renderLastUpdated();
+      renderPeriodFilters();
+      renderCategoryFilters();
+      renderSortFilters();
+      renderStats();
+      renderLeaderboard();
+      renderRealistic();
+      renderEnsembles();
+    }
+
+    // ============================================
+    // Realistic 3-Tier 렌더링
+    // ============================================
+    function fmtRet(v) {
+      if (v === null || v === undefined) return '<span class="text-zinc-600">—</span>';
+      const n = Number(v);
+      if (!isFinite(n)) return '<span class="text-zinc-600">—</span>';
+      const cls = n > 0 ? 'ret-positive' : n < 0 ? 'ret-negative' : 'text-zinc-500';
+      const sign = n > 0 ? '+' : '';
+      return `<span class="${cls}">${sign}${n.toFixed(2)}%</span>`;
+    }
+    function fmtNum(v, digits = 3) {
+      if (v === null || v === undefined) return '<span class="text-zinc-600">—</span>';
+      const n = Number(v);
+      if (!isFinite(n)) return '<span class="text-zinc-600">—</span>';
+      return n.toFixed(digits);
+    }
+
+    function renderRealistic() {
+      const data = window.REALISTIC_LEADERBOARD;
+      const tbody = document.getElementById('realistic-body');
+      const periodLabel = document.getElementById('realistic-period-label');
+      if (!tbody) return;
+      if (!data || !data.rows) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center text-zinc-500 py-6">leaderboard_realistic.js 미생성 — <code class="text-xs">python3 -m runner.build_realistic_leaderboard</code></td></tr>`;
+        return;
+      }
+      if (periodLabel) periodLabel.textContent = `${data.period_label || ''} · ${data.strategies_count}개 전략`;
+
+      const rows = data.rows.slice().sort((a, b) => (b.walk_forward_return || 0) - (a.walk_forward_return || 0));
+      tbody.innerHTML = rows.map((r, i) => {
+        const pval = r.bootstrap_p_value;
+        const sig = r.is_statistically_significant;
+        const pvalHtml = pval === null || pval === undefined
+          ? '<span class="text-zinc-600">—</span>'
+          : `<span class="${sig ? 'ret-positive' : 'text-zinc-400'}">${Number(pval).toFixed(3)}${sig ? ' ✓' : ''}</span>`;
+        return `
+          <tr>
+            <td class="text-zinc-500">${i + 1}</td>
+            <td>
+              <div class="text-white font-medium text-sm">${r.strategy_name || r.strategy_id}</div>
+              <div class="text-[10px] font-mono text-zinc-600">${r.strategy_id}</div>
+            </td>
+            <td class="text-right font-mono text-sm">${fmtRet(r.nominal_return_pct)}</td>
+            <td class="text-right font-mono text-sm font-bold">${fmtRet(r.tier1_intraday_return_pct)}</td>
+            <td class="text-right font-mono text-sm">${fmtRet(r.tier2_probabilistic_return_pct)}</td>
+            <td class="text-right font-mono text-sm">${fmtRet(r.calibrated_return_pct)}</td>
+            <td class="text-right font-mono text-sm">${fmtRet(r.walk_forward_return)}</td>
+            <td class="text-right font-mono text-xs">${pvalHtml}</td>
+            <td class="text-right font-mono text-sm">${fmtRet(r.benchmark_alpha)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ============================================
+    // Ensembles 렌더링 (Phase 7.B)
+    // ============================================
+    function renderEnsembles() {
+      const data = window.LEADERBOARD_ENSEMBLES;
+      const tbody = document.getElementById('ensembles-body');
+      const meta = document.getElementById('ensemble-meta');
+      if (!tbody) return;
+      if (!data || !data.ensembles) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-zinc-500 py-6">leaderboard_ensembles.js 미생성 — <code class="text-xs">python3 runner/build_ensembles.py</code></td></tr>`;
+        return;
+      }
+
+      if (meta) {
+        const corr = data.average_correlation;
+        const corrStr = corr != null ? `avg corr ${corr >= 0 ? '+' : ''}${Number(corr).toFixed(3)}` : '';
+        const topCount = (data.top_strategies || []).length;
+        meta.textContent = `Top ${topCount} · ${corrStr} · ${data.matrix_source || ''}`;
+      }
+
+      const rows = data.ensembles.slice().sort((a, b) => (b.sharpe_ratio || 0) - (a.sharpe_ratio || 0));
+      tbody.innerHTML = rows.map((r, i) => {
+        const weightsHtml = Object.entries(r.weights || {})
+          .sort((a, b) => b[1] - a[1])
+          .map(([k, v]) => `<div class="text-[10px] font-mono text-zinc-400">${k} <span class="text-cyan-400">${(v * 100).toFixed(0)}%</span></div>`)
+          .join('');
+        const methodLabel = {
+          equal: 'Equal Weight',
+          performance_weighted: 'Performance Weighted',
+          volatility_scaled: 'Volatility Scaled',
+        }[r.method] || r.method;
+        return `
+          <tr>
+            <td class="text-zinc-500">${i + 1}</td>
+            <td>
+              <div class="text-white font-medium text-sm">${methodLabel}</div>
+              <div class="text-[10px] font-mono text-zinc-600">${r.ensemble_id}</div>
+            </td>
+            <td>${weightsHtml}</td>
+            <td class="text-right font-mono text-sm font-bold">${fmtRet(r.total_return_pct)}</td>
+            <td class="text-right font-mono text-sm">${fmtNum(r.sharpe_ratio, 2)}</td>
+            <td class="text-right font-mono text-sm">${fmtRet(r.max_drawdown_pct)}</td>
+            <td class="text-right font-mono text-sm">${fmtNum(r.volatility_pct, 1)}%</td>
+            <td class="text-right font-mono text-xs text-zinc-500">${r.trading_days || 0}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ============================================
+    // Top tab navigation (Phase 7 통합)
+    // localStorage로 마지막 선택 탭 기억, URL hash로도 deep link 지원
+    // ============================================
+    function activateTab(tabId) {
+      const validTabs = ['leaderboard', 'analysis', 'guide', 'reference'];
+      if (!validTabs.includes(tabId)) tabId = 'leaderboard';
+
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === tabId);
+      });
+      document.querySelectorAll('.tab-pane').forEach(p => {
+        p.classList.toggle('hidden', p.dataset.pane !== tabId);
+      });
+
+      try { localStorage.setItem('strategy-lab-tab', tabId); } catch (e) {}
+
+      // 탭 전환 시 페이지 상단으로 스크롤 (탭 위치 유지)
+      const nav = document.querySelector('.tab-nav');
+      if (nav) {
+        const rect = nav.getBoundingClientRect();
+        if (rect.top < 0) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+    });
+
+    // 초기화: URL hash → localStorage → default
+    (function initTab() {
+      const hashMap = {
+        '#realistic-section': 'analysis',
+        '#ensembles-section': 'analysis',
+        '#user-guide': 'guide',
+      };
+      const hash = window.location.hash;
+      let initial = hashMap[hash] || null;
+      if (!initial) {
+        try { initial = localStorage.getItem('strategy-lab-tab'); } catch (e) {}
+      }
+      activateTab(initial || 'leaderboard');
+    })();
+
+    // Glossary tab switching
+    document.querySelectorAll('.glossary-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.gloss;
+        document.querySelectorAll('.glossary-tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.glossary-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const panel = document.querySelector(`.glossary-panel[data-panel="${target}"]`);
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // ============================================
+    // Portal Tooltip — body에 직접 붙는 툴팁으로
+    // 어떤 overflow 컨테이너에도 영향 없음
+    // ============================================
+    const gTooltip = document.createElement('div');
+    gTooltip.id = 'g-tooltip';
+    document.body.appendChild(gTooltip);
+
+    let tipVisible = false;
+    let currentAnchor = null;
+
+    function showTooltip(anchorEl) {
+      const source = anchorEl.querySelector('.tip-box');
+      if (!source) return;
+      gTooltip.innerHTML = source.innerHTML;
+      gTooltip.classList.add('visible');
+      tipVisible = true;
+      currentAnchor = anchorEl;
+      positionTooltip(anchorEl);
+    }
+
+    function hideTooltip() {
+      gTooltip.classList.remove('visible');
+      tipVisible = false;
+      currentAnchor = null;
+    }
+
+    function positionTooltip(anchorEl) {
+      const anchorRect = anchorEl.getBoundingClientRect();
+      // 먼저 한 번 보여서 크기 측정
+      const tipRect = gTooltip.getBoundingClientRect();
+      const margin = 10;
+      const gap = 8;
+
+      // 기본: 위쪽 가운데
+      let left = anchorRect.left + anchorRect.width / 2 - tipRect.width / 2;
+      let top = anchorRect.top - tipRect.height - gap;
+
+      // 위쪽 잘리면 아래쪽으로 플립
+      if (top < margin) {
+        top = anchorRect.bottom + gap;
+      }
+
+      // 좌우 화면 클리핑
+      if (left < margin) left = margin;
+      if (left + tipRect.width > window.innerWidth - margin) {
+        left = window.innerWidth - tipRect.width - margin;
+      }
+
+      // 아래도 잘리면 (화면 너무 작음) 가운데로
+      if (top + tipRect.height > window.innerHeight - margin) {
+        top = Math.max(margin, window.innerHeight - tipRect.height - margin);
+      }
+
+      gTooltip.style.left = left + 'px';
+      gTooltip.style.top = top + 'px';
+    }
+
+    // 이벤트 위임: body에 한 번만 붙임 (동적 요소 호환)
+    document.body.addEventListener('mouseover', (e) => {
+      const anchor = e.target.closest('.has-tip');
+      if (anchor && anchor !== currentAnchor) {
+        showTooltip(anchor);
+      }
+    });
+
+    document.body.addEventListener('mouseout', (e) => {
+      const anchor = e.target.closest('.has-tip');
+      if (!anchor) return;
+      // mouseout이 자식으로 이동할 때도 발생하므로 실제로 벗어난 경우만 처리
+      const related = e.relatedTarget;
+      if (!related || !anchor.contains(related)) {
+        hideTooltip();
+      }
+    });
+
+    // 스크롤 / resize 시 위치 갱신 또는 숨김
+    window.addEventListener('scroll', () => {
+      if (tipVisible && currentAnchor) {
+        positionTooltip(currentAnchor);
+      }
+    }, { passive: true });
+    window.addEventListener('resize', () => {
+      if (tipVisible && currentAnchor) {
+        positionTooltip(currentAnchor);
+      }
+    });
+
+    // 터치 디바이스: 탭 시 토글
+    document.body.addEventListener('click', (e) => {
+      const anchor = e.target.closest('.has-tip');
+      if (!anchor) {
+        if (tipVisible) hideTooltip();
+        return;
+      }
+      if (tipVisible && currentAnchor === anchor) {
+        hideTooltip();
+      } else {
+        showTooltip(anchor);
+      }
+    });
+
+    // Init
+    if (state.data) {
+      renderAll();
+    } else {
+      // Empty state
+      document.getElementById('leaderboard-body').innerHTML =
+        `<tr><td colspan="9"><div class="empty">
+          <iconify-icon icon="solar:hourglass-bold-duotone" class="text-4xl text-zinc-600"></iconify-icon>
+          <div class="mt-4 text-sm text-zinc-400 break-keep">아직 백테스트 결과가 없습니다.</div>
+          <div class="mt-2 text-xs text-zinc-600 font-mono">python3 -m runner.matrix_runner --strategies all --periods 1w,1m --save</div>
+        </div></td></tr>`;
+    }
+  </script>
+
+</body>
+</html>

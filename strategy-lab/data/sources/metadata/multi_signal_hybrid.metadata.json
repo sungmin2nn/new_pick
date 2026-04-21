@@ -1,0 +1,39 @@
+{
+  "id": "multi_signal_hybrid",
+  "name": "다중 신호 결합 (DART + 수급 + 거래량)",
+  "version": "0.1.0",
+  "category": "hybrid",
+  "risk_level": "medium",
+  "hypothesis": "DART 호재 + 외국인/기관 순매수 + 거래량 surge 3중 결합 종목은 신호 강도 압도적",
+  "rationale": "단일 시그널(공시만/수급만/거래량만)은 노이즈가 많지만, 이 3가지가 동시에 만족되는 종목은 우연 가능성이 매우 낮다. 보수적이라 후보 수는 적지만 정확도와 일관성이 높다. 앙상블 전략의 기반(Phase 7)으로도 활용 가능.",
+  "expected_edge": "다중 신호의 동시 만족 = 신호 신뢰도 ↑, 우연성 ↓",
+  "sources": [
+    {
+      "type": "handoff_guide",
+      "title": "news-trading-bot-handoff.md Section 6.2 #1",
+      "author": "",
+      "url": "",
+      "published_date": "",
+      "accessed_date": "2026-04-11",
+      "trust_level": "high",
+      "notes": "신규 전략 후보로 명시 — 'Multi-Signal Hybrid'."
+    }
+  ],
+  "data_requirements": [
+    "DART",
+    "NAVER_INVESTOR",
+    "KRX_OHLCV"
+  ],
+  "min_history_days": 5,
+  "requires_intraday": false,
+  "target_basket_size": 5,
+  "target_holding_days": 2,
+  "target_market": "KOSPI+KOSDAQ",
+  "differs_from_existing": "Gamma(공시만), Foreign Flow Momentum(수급만), Alpha(거래량/모멘텀만)와 다름. 본 전략은 3가지를 AND 조건으로 결합하여 신호 신뢰도를 본질적으로 다른 차원으로 끌어올림. 단일 신호 전략의 false positive를 보완하는 메타 전략 성격.",
+  "novelty_score": 9,
+  "status": "draft",
+  "created_at": "2026-04-11T04:33:42",
+  "updated_at": "2026-04-11T04:33:42",
+  "author": "claude-code-session",
+  "notes": "DART + 수급 fetch 비용 큼 → 시초 풀을 시총/공시 종목으로 좁힘. ensemble 기반으로 활용 가능 (Phase 7)."
+}

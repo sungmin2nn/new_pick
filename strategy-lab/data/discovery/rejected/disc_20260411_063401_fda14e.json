@@ -1,0 +1,31 @@
+{
+  "id": "disc_20260411_063401_fda14e",
+  "title": "High Short-Sale Volume 역추종",
+  "source_type": "paper",
+  "source_url": "https://www.e-kjfs.org/journal/view.php?number=1009",
+  "source_author": "Korean Journal of Financial Studies",
+  "source_published": "",
+  "trust_level": "verified",
+  "category_guess": "contrarian",
+  "risk_level_guess": "high",
+  "hypothesis": "당일 공매도 거래량이 비정상적으로 높은 종목은 과매도 → 단기 반등",
+  "rationale": "학술 검증: 공매도 거래량이 일정 수준(매매대금 30%+) 초과 시 단기 mean reversion 발생. 한국 시장 특화 연구. eod_reversal_korean과 시간 차원 다름 — 본 전략은 공매도 거래량 자체가 시그널.",
+  "expected_edge": "과매도 구간 + short covering reversion의 결합",
+  "differs_from_existing_guess": "eod_reversal은 '가격 하락 폭 → 종가 회복' 신호. 본 전략은 '공매도 거래량 비중' 신호. 데이터 소스와 시그널 본질이 다름 (KRX 공매도 거래량 통계).",
+  "data_requirements": [
+    "KRX_SHORT_VOLUME",
+    "KRX_OHLCV"
+  ],
+  "requires_intraday": false,
+  "target_holding_days": 1,
+  "novelty_score": 8,
+  "raw_snippet": "공매도 42% 비중 + day trading 주류 + short covering 시 가격 상승 → 비정상적 공매도 폭증 후 반등 패턴 존재.",
+  "status": "rejected",
+  "discovered_at": "2026-04-11T06:34:01",
+  "discovered_by": "claude-code-session",
+  "reviewed_at": "2026-04-11T06:34:27",
+  "reviewer": "user",
+  "review_notes": "데이터 소스(KRX 공매도 거래량)가 API로 직접 제공되지 않음 — 별도 수집 필요",
+  "coded_at": "",
+  "coded_file": ""
+}

@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+
+# Data (개인 매매 데이터/실험 결과는 제외)
+data/results/*.json
+data/experiments/*.json
+data/sources/cache/
+data/minute_cache/
+# 메타데이터는 commit (전략 출처/가설은 공개 가능)
+!data/sources/metadata/*.json
+
+# Env
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backtest cache
+*.cache
+*.bak

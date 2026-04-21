@@ -1,0 +1,30 @@
+{
+  "id": "disc_20260411_063401_1006a4",
+  "title": "전고점 돌파 다음날 아침 매매",
+  "source_type": "blog_ko",
+  "source_url": "https://blog.miknk.co.kr/entry/주식단타매매-단순한-장중-신고가-돌파매매-검색식",
+  "source_author": "miknk blog + brunch @bjbw",
+  "source_published": "",
+  "trust_level": "medium",
+  "category_guess": "breakout",
+  "risk_level_guess": "medium",
+  "hypothesis": "전일 대량 거래량 동반 전고점 돌파 → 익일 9~10시 추가 상승 확률 높음",
+  "rationale": "한국 단타 관행 기법. 돌파 시점(장 마감)보다 다음날 장 초반에 체결하는 게 익절 확률이 높다는 경험칙. 9~9:30 한국 골든타임 집중도 38%와 결합 시 시점 특화 전략.",
+  "expected_edge": "저항선 돌파 심리적 매수 압력 + 익일 아침 관심 집중",
+  "differs_from_existing_guess": "Echo Frontier(시초가 갭), Volatility BO(변동폭 K배), Opening 30min(거래대금 surge)와 다름: 본 전략은 '전일 장 마감 시점 신고가 돌파' + '다음날 시초가 매수' 2단계 트리거. turtle_breakout_short(당일 신고가 돌파)와 비교해 '전일 마감 신호 → 익일 진입' 시간 차원이 다름.",
+  "data_requirements": [
+    "KRX_OHLCV"
+  ],
+  "requires_intraday": false,
+  "target_holding_days": 1,
+  "novelty_score": 6,
+  "raw_snippet": "전고점 돌파 이전 대량 거래량이 자주 발생했을수록 긍정적. 당일 돌파 확인 후 종가에 매수하며, 매수 후 익일 오전(9시~10시)에 상승 확률이 상대적으로 높다.",
+  "status": "approved",
+  "discovered_at": "2026-04-11T06:34:01",
+  "discovered_by": "claude-code-session",
+  "reviewed_at": "2026-04-11T06:34:26",
+  "reviewer": "user",
+  "review_notes": "한국 관행 + 간단한 데이터 요구사항, 빠른 검증 가능",
+  "coded_at": "",
+  "coded_file": ""
+}

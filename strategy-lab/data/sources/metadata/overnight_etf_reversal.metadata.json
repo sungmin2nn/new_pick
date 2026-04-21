@@ -1,0 +1,38 @@
+{
+  "id": "overnight_etf_reversal",
+  "name": "ETF Overnight 리버설 (학술 검증)",
+  "version": "0.1.0",
+  "category": "statistical",
+  "risk_level": "low",
+  "hypothesis": "한국 KOSPI 200 ETF는 종가 매수 → 다음날 시초가 매도가 양의 알파를 낳는다",
+  "rationale": "한국 ETF 시장의 overnight 수익률이 유의하게 양수, intraday는 음수라는 학술 발견(Preprints 2019)을 활용. 한국 시장 공매도 제약과 disagreement hypothesis로 설명되는 robust한 비효율. 단타 framework 경계에 있지만 보유 시간 ~16시간, 위험 관리 용이, 학술 검증.",
+  "expected_edge": "공매도 제약 + 정보 비대칭에서 발생하는 한국 ETF overnight 프리미엄",
+  "sources": [
+    {
+      "type": "paper",
+      "title": "Intraday Return Reversals: Empirical Evidence from the Korean ETF Market",
+      "author": "",
+      "url": "https://www.preprints.org/manuscript/201905.0306/v1",
+      "published_date": "2019",
+      "accessed_date": "2026-04-11",
+      "trust_level": "high",
+      "notes": "Preprint. 한국 KOSPI 200 ETF 대상 overnight positive / intraday negative 검증."
+    }
+  ],
+  "data_requirements": [
+    "KRX_OHLCV",
+    "KRX_BASE_INFO"
+  ],
+  "min_history_days": 20,
+  "requires_intraday": false,
+  "target_basket_size": 3,
+  "target_holding_days": 1,
+  "target_market": "KOSPI",
+  "differs_from_existing": "기존 6 + 신규 5개와 본질적으로 다름: 1) 진입/청산 시점이 역방향 (종가 진입 → 다음날 시초가 청산) 2) 단타가 아닌 overnight (~16h) 3) 개별 종목이 아닌 ETF 대상 4) 학술적으로 한국 시장 고유 비효율로 검증됨",
+  "novelty_score": 9,
+  "status": "draft",
+  "created_at": "2026-04-11T04:47:42",
+  "updated_at": "2026-04-11T04:47:42",
+  "author": "claude-code-session",
+  "notes": "ETF 식별이 핵심. KRX 종목 기본정보 API로 ISU_KIND가 'EF'인 종목만 추출. 현재 단순화 버전: 종목명에 '코덱스/타이거/킨덱스/아리랑' 포함 + KOSPI 200 시총 큰 ETF만."
+}
