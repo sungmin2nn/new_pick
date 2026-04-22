@@ -29,6 +29,12 @@ POSITION_RATIO = 0.20          # 종목당 최대 20%
 STOP_LOSS_PCT = -3.0           # 손절 기준
 TAKE_PROFIT_PCT = 10.0         # 익절 기준
 
+# 손절 후 동일 종목 재진입 금지 기간 (영업일). 추세 하락 중 반복 진입 차단.
+COOLDOWN_BUSINESS_DAYS = 5
+# 손절 체결가 슬리피지 상한: 진입가 대비 -X%보다 더 낮은 가격으로는 기록하지 않음.
+# 실제 갭하락으로 더 크게 빠져도 BNF 성과 통계가 왜곡되는 걸 완화 (실매매 관점은 주문 레벨에서 처리).
+MAX_STOP_LOSS_SLIPPAGE_PCT = -7.0
+
 
 class BNFPositionManager:
     """
@@ -62,6 +68,8 @@ class BNFPositionManager:
         self.positions: List[Dict[str, Any]] = []
         # 완료된 거래 목록
         self.trades: List[Dict[str, Any]] = []
+        # 재진입 쿨다운: code -> 'YYYY-MM-DD' (이 날짜까지 포함 금지)
+        self.cooldown_until: Dict[str, str] = {}
 
         self.load()
 
@@ -79,8 +87,12 @@ class BNFPositionManager:
             # CLOSED 는 무시 — trade_history 에만 존재해야 한다
             self.positions = [p for p in all_positions if p.get("state") != "CLOSED"]
             self.total_capital = data.get("stats", {}).get("total_capital", self.total_capital)
+            raw_cooldown = data.get("cooldown_until", {}) or {}
+            # 만료된 쿨다운 항목은 로드 시 버림 (today 미정이므로 여기선 유지만, 체크 시 판단)
+            self.cooldown_until = {str(k): str(v) for k, v in raw_cooldown.items()}
         else:
             self.positions = []
+            self.cooldown_until = {}
 
         # trade history
         if self.history_file.exists():
@@ -96,9 +108,17 @@ class BNFPositionManager:
 
         # --- positions.json (활성 포지션만) ---
         pos_stats = self._calc_position_stats()
+        # 쿨다운은 오늘 기준으로 만료된 건 정리해서 저장 (무한 누적 방지)
+        today_iso = datetime.now().strftime("%Y-%m-%d")
+        active_cooldown = {
+            code: until for code, until in self.cooldown_until.items()
+            if until >= today_iso
+        }
+        self.cooldown_until = active_cooldown
         pos_data = {
             "updated_at": ts,
             "positions": self.positions,
+            "cooldown_until": active_cooldown,
             "stats": pos_stats,
         }
         with open(self.positions_file, "w", encoding="utf-8") as f:
@@ -132,6 +152,28 @@ class BNFPositionManager:
     def open_slots(self) -> int:
         return MAX_POSITIONS - len(self.get_open_positions())
 
+    # ========== 재진입 쿨다운 ==========
+
+    @staticmethod
+    def _add_business_days(date_iso: str, n: int) -> str:
+        """date_iso(YYYY-MM-DD)에 영업일 n일을 더한 날짜 (주말만 제외, 공휴일 미반영)."""
+        from datetime import date as _date, timedelta as _td
+        y, m, d = map(int, date_iso.split("-"))
+        cur = _date(y, m, d)
+        added = 0
+        while added < n:
+            cur += _td(days=1)
+            if cur.weekday() < 5:  # Mon-Fri
+                added += 1
+        return cur.isoformat()
+
+    def is_in_cooldown(self, code: str, today_iso: str) -> bool:
+        until = self.cooldown_until.get(code)
+        return bool(until and until >= today_iso)
+
+    def get_cooldown_until(self, code: str) -> Optional[str]:
+        return self.cooldown_until.get(code)
+
     # ========== 신규 진입 ==========
 
     def enter_position(self, code: str, name: str, price: int, quantity: int,
@@ -143,6 +185,12 @@ class BNFPositionManager:
         """
         if self.has_open_position(code):
             print(f"이미 보유 중: {code}")
+            return None
+
+        # 재진입 쿨다운 체크 (손절 후 N영업일 금지)
+        if self.is_in_cooldown(code, date):
+            until = self.cooldown_until.get(code)
+            print(f"  재진입 쿨다운: {name}({code}) {until}까지 금지 (손절 후 {COOLDOWN_BUSINESS_DAYS}영업일)")
             return None
 
         if self.open_slots() <= 0:
@@ -203,6 +251,17 @@ class BNFPositionManager:
         qty = pos.get("total_quantity", 0)
         avg_price = pos.get("avg_price", 0)
 
+        # 손절 체결가 슬리피지 가드: 실제가가 MAX_STOP_LOSS_SLIPPAGE_PCT 아래로 찍혀도
+        # 그 라인에서 체결된 것으로 기록 (갭하락 노이즈로 BNF 성과가 과도하게 왜곡되는 걸 방지).
+        # 실제 주문 집행은 별도 레이어에서 스탑 주문/분할 처리가 필요 (본 변경은 성과 회계용).
+        is_stop_loss = "손절" in (exit_reason or "")
+        if is_stop_loss and avg_price > 0:
+            slip_floor = int(avg_price * (1 + MAX_STOP_LOSS_SLIPPAGE_PCT / 100))
+            if exit_price < slip_floor:
+                print(f"  슬리피지 가드: {pos['name']} 체결가 {exit_price:,} → {slip_floor:,} "
+                      f"(진입가 {avg_price:,} 기준 {MAX_STOP_LOSS_SLIPPAGE_PCT}% 라인)")
+                exit_price = slip_floor
+
         # exits 배열에 청산 기록 추가
         exit_record = {
             "price": exit_price,
@@ -230,6 +289,10 @@ class BNFPositionManager:
             "exit_reason": exit_reason,
         }
         self.trades.append(trade)
+
+        # 손절인 경우 재진입 쿨다운 등록 (해당 영업일 기준)
+        if is_stop_loss:
+            self.cooldown_until[code] = self._add_business_days(exit_date, COOLDOWN_BUSINESS_DAYS)
 
         # positions 에서 제거
         self.positions = [p for p in self.positions
