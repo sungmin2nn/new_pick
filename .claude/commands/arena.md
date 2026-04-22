@@ -1,6 +1,7 @@
 # Arena 오케스트레이터
 
-최상위 오케스트레이터로서 4팀 경쟁 트레이딩 시스템을 총괄합니다.
+최상위 오케스트레이터로서 8팀 경쟁 트레이딩 시스템을 총괄합니다.
+(활성: team_a/c/d/e/f/g/h/i — team_b는 2026-04-19 비활성화, `leaderboard.json`의 `archived_teams` 참조)
 
 ## 실행 흐름
 
@@ -25,15 +26,21 @@ git pull origin master
 
 현재 전체 상황을 요약합니다.
 
-### Step 4: 4팀 병렬 분석 (Agent 4개 동시 실행)
+### Step 4: 8팀 병렬 분석 (Agent 8개 동시 실행)
 각 팀 에이전트에게 분석을 시킵니다:
 
 **Team A (Alpha Momentum)** → `/arena-team-analyze` team_a
-**Team B (Beta Contrarian)** → `/arena-team-analyze` team_b
 **Team C (Gamma Disclosure)** → `/arena-team-analyze` team_c
 **Team D (Delta Theme)** → `/arena-team-analyze` team_d
+**Team E (Echo Frontier)** → `/arena-team-analyze` team_e
+**Team F (Zeta Volatility)** → `/arena-team-analyze` team_f
+**Team G (Kappa Turtle)** → `/arena-team-analyze` team_g
+**Team H (Theta Sector)** → `/arena-team-analyze` team_h
+**Team I (Alpha-Delta Hybrid)** → `/arena-team-analyze` team_i
 
-4개 에이전트를 **병렬로** 실행하여 각 팀의:
+※ Team B (Beta Contrarian)는 2026-04-19 비활성화됨. 분석 대상 아님. 복귀 시 KOSPI 하락 국면 전환 조건 확인 후 재검토 (decisions.md 참조).
+
+8개 에이전트를 **병렬로** 실행하여 각 팀의:
 - 최근 매매 성과 분석
 - 승/패 패턴 발견
 - 파라미터 개선 제안
@@ -41,7 +48,7 @@ git pull origin master
 
 ### Step 5: 전체 평가 (심판 에이전트)
 `/arena-judge` 를 호출하여:
-- 4팀 비교 평가
+- 8팀 비교 평가
 - 전략 간 상관관계 분석
 - 시장 환경 대비 성과 평가
 - 전체 인사이트 도출
@@ -54,7 +61,7 @@ git pull origin master
 
 ### Step 7: 사용자 보고
 최종 결과를 보기 좋게 정리하여 보고합니다:
-- 4팀 현황 요약
+- 8팀 현황 요약
 - 각 팀 분석 결과
 - 심판 평가
 - 다음 액션 아이템

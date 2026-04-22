@@ -13,21 +13,6 @@
       "best_day_return": 22.52,
       "worst_day_return": 0
     },
-    "team_b": {
-      "team_id": "team_b",
-      "team_name": "Beta Contrarian",
-      "emoji": "🔵",
-      "elo": 780,
-      "rank": 6,
-      "total_1st": 0,
-      "total_2nd": 0,
-      "total_3rd": 0,
-      "total_4th": 3,
-      "best_day_return": 0,
-      "worst_day_return": -11.37,
-      "total_5th": 2,
-      "total_6th": 3
-    },
     "team_c": {
       "team_id": "team_c",
       "team_name": "Gamma Disclosure",
@@ -90,14 +75,16 @@
       "team_id": "team_i",
       "team_name": "Alpha-Delta Hybrid",
       "emoji": "🔀",
-      "elo": 1093,
-      "rank": 4,
+      "elo": 1000,
+      "rank": null,
       "total_1st": 0,
-      "total_2nd": 1,
-      "total_3rd": 1,
-      "total_4th": 1,
-      "best_day_return": 18.13,
-      "worst_day_return": 0
+      "total_2nd": 0,
+      "total_3rd": 0,
+      "total_4th": 0,
+      "best_day_return": 0,
+      "worst_day_return": 0,
+      "reset_at": "2026-04-23",
+      "reset_reason": "Hybrid 로직 수정 전까지 team_a 결과 복제(ISSUE-010). 공정 비교 위해 통계 초기화"
     },
     "team_h": {
       "team_id": "team_h",
@@ -128,6 +115,26 @@
       "worst_day_return": 0,
       "total_8th": 2,
       "total_7th": 1
+    }
+  },
+  "archived_teams": {
+    "team_b": {
+      "team_id": "team_b",
+      "team_name": "Beta Contrarian",
+      "strategy_id": "largecap_contrarian",
+      "emoji": "🔵",
+      "elo": 780,
+      "final_rank": 6,
+      "total_1st": 0,
+      "total_2nd": 0,
+      "total_3rd": 0,
+      "total_4th": 3,
+      "total_5th": 2,
+      "total_6th": 3,
+      "best_day_return": 0,
+      "worst_day_return": -11.37,
+      "archived_at": "2026-04-19",
+      "archived_reason": "성과 기반 컷 — 8일 연속 손실, 승률 8.6% (5/31), 누적 -15.93%. 상승장에서 RSI≤35 역발상 필터가 구조적 역풍."
     }
   },
   "daily_history": [
@@ -470,48 +477,41 @@
         },
         {
           "rank": 2,
-          "team_id": "team_i",
-          "total_return": 18.13,
-          "win_rate": 100.0,
-          "trades": 5
-        },
-        {
-          "rank": 3,
           "team_id": "team_d",
           "total_return": 6.83,
           "win_rate": 80.0,
           "trades": 5
         },
         {
-          "rank": 4,
+          "rank": 3,
           "team_id": "team_c",
           "total_return": 2.12,
           "win_rate": 100.0,
           "trades": 1
         },
         {
-          "rank": 5,
+          "rank": 4,
           "team_id": "team_e",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 6,
+          "rank": 5,
           "team_id": "team_f",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 7,
+          "rank": 6,
           "team_id": "team_h",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 8,
+          "rank": 7,
           "team_id": "team_g",
           "total_return": 0,
           "win_rate": 0,
@@ -538,41 +538,34 @@
         },
         {
           "rank": 3,
-          "team_id": "team_i",
-          "total_return": 13.12,
-          "win_rate": 80.0,
-          "trades": 5
-        },
-        {
-          "rank": 4,
           "team_id": "team_e",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 5,
+          "rank": 4,
           "team_id": "team_f",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 6,
+          "rank": 5,
           "team_id": "team_h",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 7,
+          "rank": 6,
           "team_id": "team_g",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 8,
+          "rank": 7,
           "team_id": "team_c",
           "total_return": -1.05,
           "win_rate": 50.0,
@@ -606,34 +599,27 @@
         },
         {
           "rank": 4,
-          "team_id": "team_i",
-          "total_return": 7.19,
-          "win_rate": 60.0,
-          "trades": 5
-        },
-        {
-          "rank": 5,
           "team_id": "team_e",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 6,
+          "rank": 5,
           "team_id": "team_f",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 7,
+          "rank": 6,
           "team_id": "team_h",
           "total_return": 0,
           "win_rate": 0,
           "trades": 0
         },
         {
-          "rank": 8,
+          "rank": 7,
           "team_id": "team_g",
           "total_return": 0,
           "win_rate": 0,

@@ -274,6 +274,33 @@ Layer 4 (통합): backtest_dashboard.html (8개 카드 + 4개 차트 섹션)
 
 ---
 
+## team_b (Beta Contrarian) 비활성화 (2026-04-19)
+
+**결정**: `data/arena/strategy_config.json`에서 `largecap_contrarian.enabled = false`. team_b는 더 이상 장전 종목 선정/매매를 수행하지 않으며, leaderboard에서 `archived_teams`로 이동.
+
+**배경**:
+- 4/10 ~ 4/17 8거래일 연속 운영 결과: 총 31거래, 승 5 / 패 26, 승률 8.6%
+- 누적 수익률 -15.93%, 8일 연속 손실일, ELO 1000 → 780
+- 최근 3일 모두 최하위 랭킹 (4/16 rank 6, 4/17 rank 6, 그 전부터 rank 4~5 지속)
+- 2026-04 시장은 명백한 상승장 — RSI≤35 역발상 진입 조건이 구조적으로 역풍을 맞는 환경
+
+**대안**:
+- **파라미터 조정 후 재활성화** (RSI 임계값 완화, 시장모드 필터 강화): 기각 — 근본 원인이 "전략 철학 vs 현재 시장국면"의 미스매치라 파라미터 튜닝으로는 해결 안 됨. 하락장/횡보장 전환 신호가 확인되면 그때 복귀 검토.
+- **유지** (ELO 자체 보정을 기다림): 기각 — 매일 자본 손실이 실제로 발생하는 paper trading이라 기회비용 큼.
+
+**근거**: 8팀 체제(a/c/d/e/f/g/h/i)로 전략 다양성 확보됨. team_e(frontier_gap), team_f(volatility), team_g(turtle), team_h(sector)가 이미 활성화되어 있어 역발상 슬롯의 공백이 즉시 문제되지 않음.
+
+**영향**:
+- Arena 운영 팀 수: 9팀 → 8팀 (team_b 제외)
+- 레거시 문서(`.claude/commands/arena.md`, `.claude/harness/registry.md`)의 "4팀 a/b/c/d" 서술은 별도 정리 필요
+- leaderboard.json 구조 변경: `archived_teams` 키 추가. 대시보드가 이 섹션을 별도 렌더링하도록 추후 조정 고려.
+
+**복귀 조건**:
+- KOSPI 추세 전환 (예: 20일선 하향 이탈 + RSI 30 이하 저점 형성)
+- 또는 전략 자체를 새 카테고리로 재설계 (예: 변동성 축소 + 공매도 잔고 급증 조합)
+
+---
+
 ## 참고 자료
 
 - Sharpe Ratio: Sharpe, W. F. (1966). "Mutual Fund Performance"

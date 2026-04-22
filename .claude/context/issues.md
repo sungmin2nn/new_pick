@@ -70,6 +70,53 @@
 
 ---
 
+## [ISSUE-010] team_i (Hybrid) 가 team_a (Alpha Momentum) 결과를 3일 연속 100% 복제
+- **발생일**: 관측 확정 2026-04-23 (증상 확인: 20260420, 20260421, 20260422 모두 5종목 완전 일치)
+- **에이전트**: paper_trading.strategies.hybrid_alpha_delta.HybridAlphaDeltaStrategy
+- **증상**: team_i의 일일 수익률/승률/거래수/선정 종목 5개가 team_a와 완전히 동일. team_i의 리더보드 통계(ELO 1093, best_day 18.13%)가 team_a의 복제본 — 독립 전략으로서의 정보량 0
+- **원인**:
+  1. **점수 스케일 불균형** — momentum(Alpha) 상위 점수 65~82점 vs theme_policy(Delta) 상위 점수 53~58점. Alpha가 구조적으로 40% 높은 스케일. 가중평균(0.65×Alpha + 0.35×Delta)에서 Delta-only 후보는 수학적으로 불가능할 정도로 불리 (Delta 최고 58.6 × 0.35 = 20.5 vs Alpha 5위 65.8 × 0.65 = 42.8)
+  2. **겹침 0** — Alpha top 10과 Delta top 10이 관측 기간 내내 한 종목도 공유하지 않음 (momentum은 종목 단위 모멘텀, theme_policy는 섹터/테마 단위 선별 — 선정 기준이 근본적으로 달라 자연스럽게 교집합 희박). OVERLAP_BONUS(+10)는 늘 발동 안 함
+  3. 결과적으로 "가중평균 상위 top_n" 선정이 Alpha-only 상위 N개를 그대로 따라감
+- **해결**: 2026-04-23 `hybrid_alpha_delta.py` 수정:
+  - Alpha/Delta 점수를 각각 min-max 정규화하여 0~100 스케일로 통일 (스케일 불균형 제거)
+  - 최종 편성을 **Alpha 슬롯 3 + Delta 슬롯 2**로 강제 배분. 겹치는 후보는 Alpha 슬롯에 배치, Delta 슬롯은 delta-only 상위에서 충원, 한쪽 부족 시 반대쪽으로 백필
+  - OVERLAP_BONUS 로직 유지 (겹치는 날이 오면 가산)
+- **예방**: 서브 전략들의 점수 스케일이 이질적인 경우 가중평균만으로는 다양성 보장 불가. "슬롯 기반 편성" 또는 "정규화 + 최소 할당" 패턴이 기본. 향후 추가되는 Hybrid 계열 전략에 이 원칙 적용
+- **후속 필요**: team_i의 누적 통계(portfolio/leaderboard)는 복제 기간 데이터 기반 — 공정 비교를 위해 리셋 여부 사용자 결정 대기
+- **상태**: resolved (2026-04-23, 전략 로직 수정 완료. 앞으로 결과는 team_a와 독립)
+
+---
+
+## [ISSUE-009] team_e/f/g/h 장기간 0건 선정 — KRX 당일 데이터 누락 + fetch_date 폴백 미작동
+- **발생일**: 관측 확정 2026-04-23 (증상 지속 기간: 최소 수 거래일 이상)
+- **에이전트**: paper_trading.multi_strategy_runner._resolve_fetch_date, lab 전략 4종
+- **증상**: frontier_gap (team_e), volatility_breakout_lw (team_f), turtle_breakout_short (team_g), sector_rotation (team_h) 4개 전략이 지속적으로 0건 선정. arena_report에 `no_candidates`로 기록. team_e/f/g/h 포트폴리오 last_updated가 2026-04-10 리셋 시점에서 정체
+- **원인**:
+  1. **1차 원인 (외부)** — KRX 공식 OpenAPI(`data-dbg.krx.co.kr`)가 2026-04-22 데이터를 다음 날까지도 업로드 안 함 (`get_stock_ohlcv(20260422)` → 0 rows). 04-10 ~ 04-21은 모두 949 rows 정상
+  2. **2차 원인 (내부)** — `_resolve_fetch_date`가 `is_market_day`(한국 캘린더 기반 평일/공휴일)만 확인. 평일이면 KRX 실데이터 유무 체크 없이 그대로 리턴 → 04-22 fetch 시도 → 빈 결과 → 전략 0건
+  3. momentum/theme/dart는 네이버 크롤링 및 DART API를 우선 경로로 쓰므로 KRX 공백에도 정상 동작. 영향은 "KRX OHLCV/지수 필수" 4전략에 국한
+  4. (배경) pykrx 라이브러리는 2025-12-27 KRX 회원제 전환 이후 전면 무력화 상태 — 단, 이 프로젝트는 이미 `KRXClient`로 공식 OpenAPI 이전 완료되어 있었음. pykrx 오류 로그는 2차 폴백 경로에서 발생한 노이즈였음
+- **해결**: `_resolve_fetch_date`에 KRX 실데이터 존재 확인 추가 (`KRXClient.get_stock_ohlcv` 결과 비어있지 않은 최근 거래일까지 거슬러 올라감). KRX 호출 실패/키 없음 시에는 기존 평일 체크 동작 유지. 진단 스크립트 `_diagnose_team_efgh.py`로 재현 및 검증 완료 — 4전략 전부 5건 선정 복구
+- **예방**:
+  - 외부 API 결과가 비어있어도 "평일이니 OK" 처리하던 로직 전반 재점검 필요 (DART/네이버도 유사 가능성)
+  - arena 헬스체크에 "전 거래일 대비 선정 수 급락" 지표 추가 고려. 현재는 "팀 종목 선정 완료 또는 대기 중"이라는 느슨한 pass 기준이라 이 증상이 10일 넘게 조용히 지나감
+  - pykrx 직접 import가 남아있는 코드(`paper_trading/strategies/frontier_gap.py` 등)는 장기적으로 폴백 경로에서 제거 또는 `KRXClient` 경유로 일원화
+- **상태**: resolved (2026-04-23, paper_trading/multi_strategy_runner.py 패치)
+
+---
+
+## [ISSUE-008] team_b (largecap_contrarian) 상승장 구조적 역풍으로 비활성화
+- **발생일**: 2026-04-17 (증상 확정) / 2026-04-19 (비활성화 조치)
+- **에이전트**: paper_trading.strategies.largecap_contrarian (team_b)
+- **증상**: 4/10 ~ 4/17 8거래일 연속 손실. 31거래 중 26패, 승률 8.6%, 누적 -15.93%, ELO 1000→780. 4/18 이후 daily 산출물 생성 중단 (config에서 제외되어 실행 자체 안 됨)
+- **원인**: 전략 철학(RSI≤35 + 시장모드 필터 기반 역발상)과 현재 시장국면(상승장)의 구조적 미스매치. 상승장에서는 RSI 저점 진입 종목이 약세 지속되는 경향 — 파라미터 튜닝 수준으로는 해결 불가
+- **해결**: 2026-04-19 `strategy_config.json`에서 `largecap_contrarian.enabled=false`. leaderboard.json에 `archived_teams` 섹션 추가하여 team_b 이동 (2026-04-22 정리). 결정 근거는 `.claude/context/decisions.md` 참조
+- **예방**: ① 전략 도입 전 현 시장국면 적합성 점검 (상승장/하락장/횡보장별 백테스트). ② 8팀 체제로 전략 다양성(모멘텀/공시/테마/갭/변동성/터틀/섹터/하이브리드) 이미 확보됨. ③ 복귀 조건 명시 — KOSPI 20일선 하향 이탈 + RSI 30 저점 형성 시 재검토
+- **상태**: resolved (2026-04-22, archive 처리 완료)
+
+---
+
 ## [ISSUE-007] 모닝스캔 1세대 시스템이 백그라운드에서 운영 중 (사용자 미인지)
 - **발생일**: 2026-04-10
 - **에이전트**: morning-scan.yml + afternoon-collect.yml

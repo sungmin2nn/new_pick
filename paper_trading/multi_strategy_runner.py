@@ -23,7 +23,11 @@ DATA_DIR = Path(__file__).parent.parent / "data" / "paper_trading"
 
 
 def _resolve_fetch_date(date_str: str) -> str:
-    """주어진 날짜가 비거래일이면 가장 가까운 과거 거래일로 거슬러 올라감.
+    """주어진 날짜가 비거래일이거나 KRX에 아직 데이터가 없으면 가장 가까운 과거 거래일로 거슬러 올라감.
+
+    평일이라도 KRX OpenAPI가 해당 일자 데이터를 업로드하기 전이면 빈 응답이 온다
+    (관측 사례: 20260422). 이 경우 is_market_day만으로는 폴백이 안 되어 전략이 0건으로 죽는다.
+    KRXClient.get_stock_ohlcv로 실제 데이터 유무까지 확인한다.
 
     Args:
         date_str: YYYYMMDD
@@ -31,10 +35,26 @@ def _resolve_fetch_date(date_str: str) -> str:
     Returns:
         가장 최근 거래일 (YYYYMMDD)
     """
+    # KRX 클라이언트는 선택적 — 키 없거나 예외 시 평일 체크로만 폴백 (기존 동작)
+    try:
+        from paper_trading.utils.krx_api import KRXClient
+        _krx = KRXClient()
+    except Exception:
+        _krx = None
+
     dt = datetime.strptime(date_str, '%Y%m%d')
     for _ in range(10):  # 최대 10일 거슬러 올라가기
+        candidate = dt.strftime('%Y%m%d')
         if is_market_day(dt):
-            return dt.strftime('%Y%m%d')
+            if _krx is None:
+                return candidate
+            try:
+                df = _krx.get_stock_ohlcv(candidate, market='KOSPI')
+                if df is not None and len(df) > 0:
+                    return candidate
+            except Exception:
+                # KRX 호출 실패 시에도 평일 날짜는 유효로 간주 (기존 동작 유지)
+                return candidate
         dt -= timedelta(days=1)
     return date_str
 

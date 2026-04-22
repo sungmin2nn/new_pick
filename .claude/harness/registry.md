@@ -2,13 +2,16 @@
 
 에이전트 등록소 - 모든 에이전트의 메타데이터 및 관계 정의
 
-## Layer 0: Arena (4팀 경쟁 시스템)
+## Layer 0: Arena (8팀 경쟁 시스템)
+
+활성 팀: team_a (Alpha Momentum), team_c (Gamma Disclosure), team_d (Delta Theme), team_e (Echo Frontier), team_f (Zeta Volatility), team_g (Kappa Turtle), team_h (Theta Sector), team_i (Alpha-Delta Hybrid).
+비활성: **team_b (Beta Contrarian)** — 2026-04-19 비활성화 (상승장 구조적 역풍, 누적 -15.93%). `leaderboard.json`의 `archived_teams` 참조. 복귀 조건은 `.claude/context/decisions.md` 참조.
 
 | Agent | Skill Command | Role | Dependencies |
 |-------|---------------|------|--------------|
-| **arena-orchestrator** | `/arena` | 4팀 경쟁 총괄 - git pull → 팀 분석 → 심판 평가 → 결과 반영 | arena-team-analyzer, arena-judge |
+| **arena-orchestrator** | `/arena` | 8팀 경쟁 총괄 - git pull → 팀 분석 → 심판 평가 → 결과 반영 | arena-team-analyzer, arena-judge |
 | **arena-team-analyzer** | `/arena-team-analyze {team_id}` | 팀별 성과 분석, 패턴 발견, 파라미터 개선 제안, journal 업데이트 | data/arena/{team_id}/ |
-| **arena-judge** | `/arena-judge` | 4팀 비교 평가, 등급 부여, 전략 간 상관관계, 종합 인사이트 | data/arena/ 전체 |
+| **arena-judge** | `/arena-judge` | 8팀 비교 평가, 등급 부여, 전략 간 상관관계, 종합 인사이트 | data/arena/ 전체 |
 | **arena-ops-checker** | `/arena-ops-check {date}` | 일일 운영 점검 - Actions/종목선정/매매/정산/텔레그램/대시보드 | gh CLI, data/ 전체 |
 
 ### Arena 실행 흐름
@@ -18,9 +21,13 @@
 git pull → 상태 파악
     ↓
 /arena-team-analyze team_a ─┐
-/arena-team-analyze team_b ─┤ 4팀 병렬 분석
 /arena-team-analyze team_c ─┤
-/arena-team-analyze team_d ─┘
+/arena-team-analyze team_d ─┤
+/arena-team-analyze team_e ─┤ 8팀 병렬 분석
+/arena-team-analyze team_f ─┤ (team_b 제외, archived)
+/arena-team-analyze team_g ─┤
+/arena-team-analyze team_h ─┤
+/arena-team-analyze team_i ─┘
     ↓
 /arena-judge (심판 평가)
     ↓
@@ -62,13 +69,17 @@ git pull → 상태 파악
 ## Quick Reference
 
 ```
-# Arena (L0) - 4팀 경쟁 시스템
+# Arena (L0) - 8팀 경쟁 시스템 (team_b는 2026-04-19 archived)
 /arena                         # 전체 오케스트레이션 (git pull → 분석 → 평가 → 반영)
-/arena-team-analyze team_a     # Team A 분석
-/arena-team-analyze team_b     # Team B 분석
-/arena-team-analyze team_c     # Team C 분석
-/arena-team-analyze team_d     # Team D 분석
-/arena-judge                   # 심판 평가 (4팀 비교)
+/arena-team-analyze team_a     # Team A 분석 (Alpha Momentum)
+/arena-team-analyze team_c     # Team C 분석 (Gamma Disclosure)
+/arena-team-analyze team_d     # Team D 분석 (Delta Theme)
+/arena-team-analyze team_e     # Team E 분석 (Echo Frontier)
+/arena-team-analyze team_f     # Team F 분석 (Zeta Volatility)
+/arena-team-analyze team_g     # Team G 분석 (Kappa Turtle)
+/arena-team-analyze team_h     # Team H 분석 (Theta Sector)
+/arena-team-analyze team_i     # Team I 분석 (Alpha-Delta Hybrid)
+/arena-judge                   # 심판 평가 (8팀 비교)
 /arena-ops-check               # 운영 점검 (Actions/선정/매매/정산/텔레그램/대시보드)
 /arena-ops-check 20260409      # 특정 날짜 점검
 
