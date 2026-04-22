@@ -23,6 +23,31 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from paper_trading.bnf.position import BNFPositionManager, POSITION_RATIO
 
 
+# 신규 진입을 스킵할 candidates 기준일 영업일 임계값
+# (후보 생성 배치가 T일 18:00, 시뮬레이션이 T+1 09:30 실행 → 정상이면 1영업일)
+STALE_CANDIDATES_BIZDAYS = 2
+
+
+def _business_days_between(date_str, target_date) -> int:
+    """date_str(YYYY-MM-DD) 다음날부터 target_date까지의 주중 일수 (공휴일 미반영)."""
+    from datetime import date as _date, timedelta as _td
+    try:
+        y, m, d = map(int, date_str.split('-'))
+    except Exception:
+        return 0
+    src = _date(y, m, d)
+    tgt = target_date if isinstance(target_date, _date) else target_date.date()
+    if src >= tgt:
+        return 0
+    count = 0
+    cur = src + _td(days=1)
+    while cur <= tgt:
+        if cur.weekday() < 5:
+            count += 1
+        cur += _td(days=1)
+    return count
+
+
 def main():
     warnings.filterwarnings("ignore")
     kst = pytz.timezone("Asia/Seoul")
@@ -49,12 +74,22 @@ def main():
         candidates_data = json.load(f)
 
     candidates = candidates_data.get("candidates", [])
-    print(f"후보 종목: {len(candidates)}개")
+    cand_date = candidates_data.get("date", "")
+    print(f"후보 종목: {len(candidates)}개 (기준일: {cand_date or '미상'})")
 
     if not candidates:
         print("후보 종목이 없습니다.")
         mgr.save(f"{today} {time_str}")
         return
+
+    # 후보 기준일이 오래됐으면 신규 진입 스킵 (기존 포지션 관리는 계속 진행)
+    skip_new_entry = False
+    if cand_date:
+        biz_age = _business_days_between(cand_date, now)
+        if biz_age >= STALE_CANDIDATES_BIZDAYS:
+            print(f"⚠️  candidates.json이 {biz_age}영업일 오래됨 → 신규 진입 스킵 "
+                  f"(선정 배치 재실행 필요)")
+            skip_new_entry = True
 
     try:
         from pykrx import stock
@@ -86,11 +121,15 @@ def main():
 
     # --- 3) 신규 진입 ---
     slots = mgr.open_slots()
-    print(f"\n[신규 진입] 가능 슬롯: {slots}개")
+    if skip_new_entry:
+        print(f"\n[신규 진입] 스킵 (stale candidates)")
+    else:
+        print(f"\n[신규 진입] 가능 슬롯: {slots}개")
 
     position_size = mgr.total_capital * POSITION_RATIO
 
-    for candidate in candidates[:slots]:
+    entry_iter = [] if skip_new_entry else candidates[:slots]
+    for candidate in entry_iter:
         code = candidate["code"]
         name = candidate["name"]
 
@@ -98,23 +137,38 @@ def main():
             print(f"  이미 보유 중: {name}")
             continue
 
-        price = candidate.get("price", 0)
-        if price <= 0:
+        cand_price = candidate.get("price", 0)
+        # 당일 시가를 우선 사용 (체결 가능 가격). 실패 시 선정일 종가로 폴백.
+        entry_price = cand_price
+        try:
+            df = stock.get_market_ohlcv(today_str, today_str, code)
+            if not df.empty:
+                open_p = int(df.iloc[-1]["시가"])
+                if open_p > 0:
+                    entry_price = open_p
+        except Exception as e:
+            print(f"  {name}({code}) 당일 시가 조회 실패({e}) → 선정가 폴백")
+
+        if entry_price <= 0:
             print(f"  가격 정보 없음: {name}")
             continue
 
-        quantity = int(position_size / price)
+        quantity = int(position_size / entry_price)
         if quantity <= 0:
-            print(f"  수량 부족: {name} (가격 {price:,}원)")
+            print(f"  수량 부족: {name} (가격 {entry_price:,}원)")
             continue
 
         reason = candidate.get("reasons", "")
         pos = mgr.enter_position(
-            code=code, name=name, price=price, quantity=quantity,
+            code=code, name=name, price=entry_price, quantity=quantity,
             date=today, time=time_str, selection_reason=reason,
         )
         if pos:
-            print(f"  진입: {name}({code}) @ {price:,}원 x {quantity}주")
+            note = ""
+            if cand_price and entry_price != cand_price:
+                gap = (entry_price - cand_price) / cand_price * 100
+                note = f" (갭 {gap:+.1f}% vs 선정가 {cand_price:,})"
+            print(f"  진입: {name}({code}) @ {entry_price:,}원 x {quantity}주{note}")
 
     # --- 4) 저장 ---
     mgr.save(f"{today} {time_str}")
