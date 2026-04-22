@@ -57,9 +57,9 @@ except ImportError:
 # ─── 선정 기준 상수 (1년 백테스트 최적화 결과) ───
 BB_PERIOD = 15           # 볼린저밴드 기간 (20→15, 더 민감)
 BB_STD_MULT = 2          # 표준편차 배수
-PERCENT_B_THRESHOLD = 0.3  # %B 임계값 (하단 30% 이하) — 04-21 진단 결과 0.2는 315개 중 1개만 통과해 완화
+PERCENT_B_THRESHOLD = 0.4  # %B 임계값 (하단 40% 이하) — 04-22 진단: 0.3도 313/329 탈락해 추가 완화
 RSI_PERIOD = 14          # RSI 기간
-RSI_THRESHOLD = 30       # RSI 과매도 기준 (30 이하, 엄격)
+RSI_THRESHOLD = 40       # RSI 과매도 기준 (40 이하) — 04-23 스윕 결과: %B/시총은 둔감, RSI만 유의미한 지렛대. 안전 우선으로 35→40 단계적 완화
 VOLUME_RATIO_THRESHOLD = 1.0  # 거래량 기준 (평균 이상)
 MIN_MARKET_CAP = 1_000_000_000_000     # 시가총액 1조원 (대형주만)
 MIN_TRADING_VALUE = 3_000_000_000      # 거래대금 30억원
@@ -211,12 +211,15 @@ class BollingerSelector:
         if fetch_date != date_str:
             logger.info(f"비거래일 -> fetch_date={fetch_date}")
 
-        # 2) 전종목 데이터 fetch (KRX OpenAPI 우선 -> pykrx 폴백)
-        all_stocks = self._fetch_all_stocks(fetch_date)
+        # 2) 전종목 데이터 fetch (KRX OpenAPI → pykrx 같은 날짜 재시도 → 전일 폴백)
+        #    실제 fetch 성공한 날짜(actual_date)를 받아 지표 계산 기준일로 사용
+        all_stocks, actual_date = self._fetch_all_stocks(fetch_date)
         if not all_stocks:
             logger.error("종목 데이터 수집 실패")
             self._save_result(fetch_date, iso_date, now, [])
             return []
+        if actual_date != fetch_date:
+            logger.info(f"실제 fetch 날짜: {actual_date} (요청: {fetch_date})")
 
         logger.info(f"전체 종목: {len(all_stocks)}개")
 
@@ -225,11 +228,11 @@ class BollingerSelector:
         logger.info(f"기본 필터 통과 (시총/거래대금/양봉/제외): {len(filtered)}개")
 
         if not filtered:
-            self._save_result(fetch_date, iso_date, now, [])
+            self._save_result(actual_date, iso_date, now, [])
             return []
 
-        # 4) BB + RSI + 거래량 계산 (pykrx 히스토리)
-        candidates = self._calculate_indicators(filtered, fetch_date)
+        # 4) BB + RSI + 거래량 계산 (actual_date 기준 → 시총/지표 기준일 일관성 유지)
+        candidates = self._calculate_indicators(filtered, actual_date)
         logger.info(f"BB+RSI+거래량 조건 충족: {len(candidates)}개")
 
         # 5) 정렬 (%%B 낮은 순 -> RSI 낮은 순)
@@ -251,113 +254,118 @@ class BollingerSelector:
             )
 
         # 6) 저장
-        self._save_result(fetch_date, iso_date, now, candidates)
+        self._save_result(actual_date, iso_date, now, candidates)
 
         return candidates
 
-    def _fetch_all_stocks(self, date_str: str) -> List[Dict]:
-        """KRX OpenAPI로 전종목 fetch, 실패 시 pykrx 폴백"""
-        all_stocks = []
-
-        # 1차: KRX OpenAPI
-        if KRX_AVAILABLE:
-            try:
-                krx = KRXClient()
-                for market in ("KOSPI", "KOSDAQ"):
-                    df = krx.get_stock_ohlcv(date_str, market=market)
-                    if df is None or df.empty:
-                        # 전일 폴백
-                        prev_dt = datetime.strptime(date_str, "%Y%m%d") - timedelta(days=1)
-                        for _ in range(5):
-                            prev_str = prev_dt.strftime("%Y%m%d")
-                            df = krx.get_stock_ohlcv(prev_str, market=market)
-                            if df is not None and not df.empty:
-                                if market == "KOSPI":
-                                    logger.info(f"  KRX API 당일 미반영 -> {prev_str} 데이터 사용")
-                                break
-                            prev_dt -= timedelta(days=1)
-
-                    if df is None or df.empty:
-                        logger.info(f"  {market}: 0 (skip)")
-                        continue
-
-                    for code in df.index:
-                        try:
-                            row = df.loc[code]
-                            close_p = int(row.get("종가", 0))
-                            open_p = int(row.get("시가", 0))
-                            if close_p == 0 or open_p == 0:
-                                continue
-                            change_pct = float(row.get("등락률", 0))
-                            all_stocks.append({
-                                "code": code,
-                                "name": str(row.get("종목명", code)),
-                                "price": close_p,
-                                "open": open_p,
-                                "close": close_p,
-                                "change_pct": change_pct,
-                                "volume": int(row.get("거래량", 0)),
-                                "market_cap": int(row.get("시가총액", 0)),
-                                "trading_value": int(row.get("거래대금", 0)),
-                                "market": market,
-                            })
-                        except Exception:
+    def _fetch_via_krx_api(self, date_str: str) -> List[Dict]:
+        """KRX OpenAPI로 단일 날짜 전종목 fetch (폴백/재시도 없음)"""
+        if not KRX_AVAILABLE:
+            return []
+        stocks = []
+        try:
+            krx = KRXClient()
+            for market in ("KOSPI", "KOSDAQ"):
+                df = krx.get_stock_ohlcv(date_str, market=market)
+                if df is None or df.empty:
+                    continue
+                for code in df.index:
+                    try:
+                        row = df.loc[code]
+                        close_p = int(row.get("종가", 0))
+                        open_p = int(row.get("시가", 0))
+                        if close_p == 0 or open_p == 0:
                             continue
-                    logger.info(f"  {market}: {len([s for s in all_stocks if s['market'] == market])}개")
-
-                if all_stocks:
-                    logger.info(f"  [KRX OpenAPI] {len(all_stocks)}개")
-                    return all_stocks
-            except Exception as e:
-                logger.warning(f"KRX OpenAPI fetch 실패: {e}")
-
-        # 2차: pykrx 폴백
-        if PYKRX_AVAILABLE:
-            logger.info("  KRX OpenAPI 데이터 없음 -> pykrx 폴백")
-            try:
-                for market in ("KOSPI", "KOSDAQ"):
-                    tickers = pykrx_stock.get_market_ohlcv_by_ticker(date_str, market=market)
-                    if tickers.empty:
+                        stocks.append({
+                            "code": code,
+                            "name": str(row.get("종목명", code)),
+                            "price": close_p,
+                            "open": open_p,
+                            "close": close_p,
+                            "change_pct": float(row.get("등락률", 0)),
+                            "volume": int(row.get("거래량", 0)),
+                            "market_cap": int(row.get("시가총액", 0)),
+                            "trading_value": int(row.get("거래대금", 0)),
+                            "market": market,
+                        })
+                    except Exception:
                         continue
-                    for code, row in tickers.iterrows():
-                        try:
-                            close_p = int(row.get("종가", 0))
-                            open_p = int(row.get("시가", 0))
-                            if close_p == 0 or open_p == 0:
-                                continue
-                            change_pct = float(row.get("등락률", 0))
-                            volume = int(row.get("거래량", 0))
-                            trading_value = int(row.get("거래대금", 0))
-                            market_cap = int(row.get("시가총액", 0))
-                            all_stocks.append({
-                                "code": code,
-                                "name": "",  # pykrx ticker 테이블에 이름 없음
-                                "price": close_p,
-                                "open": open_p,
-                                "close": close_p,
-                                "change_pct": change_pct,
-                                "volume": volume,
-                                "market_cap": market_cap,
-                                "trading_value": trading_value,
-                                "market": market,
-                            })
-                        except Exception:
+        except Exception as e:
+            logger.warning(f"KRX OpenAPI fetch 실패 ({date_str}): {e}")
+            return []
+        return stocks
+
+    def _fetch_via_pykrx(self, date_str: str) -> List[Dict]:
+        """pykrx로 단일 날짜 전종목 fetch (폴백/재시도 없음)"""
+        if not PYKRX_AVAILABLE:
+            return []
+        stocks = []
+        try:
+            for market in ("KOSPI", "KOSDAQ"):
+                tickers = pykrx_stock.get_market_ohlcv_by_ticker(date_str, market=market)
+                if tickers.empty:
+                    continue
+                cap_df = pykrx_stock.get_market_cap_by_ticker(date_str, market=market)
+                for code, row in tickers.iterrows():
+                    try:
+                        close_p = int(row.get("종가", 0))
+                        open_p = int(row.get("시가", 0))
+                        if close_p == 0 or open_p == 0:
                             continue
+                        mc = int(cap_df.loc[code, "시가총액"]) if code in cap_df.index else 0
+                        stocks.append({
+                            "code": code,
+                            "name": "",
+                            "price": close_p,
+                            "open": open_p,
+                            "close": close_p,
+                            "change_pct": float(row.get("등락률", 0)),
+                            "volume": int(row.get("거래량", 0)),
+                            "market_cap": mc,
+                            "trading_value": int(row.get("거래대금", 0)),
+                            "market": market,
+                        })
+                    except Exception:
+                        continue
+            for s in stocks:
+                if not s["name"]:
+                    try:
+                        s["name"] = pykrx_stock.get_market_ticker_name(s["code"])
+                    except Exception:
+                        s["name"] = s["code"]
+        except Exception as e:
+            logger.warning(f"pykrx fetch 실패 ({date_str}): {e}")
+            return []
+        return stocks
 
-                # 종목명 보완
-                for s in all_stocks:
-                    if not s["name"]:
-                        try:
-                            s["name"] = pykrx_stock.get_market_ticker_name(s["code"])
-                        except Exception:
-                            s["name"] = s["code"]
+    def _fetch_all_stocks(self, date_str: str) -> Tuple[List[Dict], str]:
+        """
+        전종목 fetch. 폴백 우선순위:
+          1) 같은 날짜에 KRX OpenAPI → pykrx 시도 (소스 폴백 먼저)
+          2) 둘 다 실패시 전일로 이동 (최대 10일)
+        반환: (종목 리스트, 실제 데이터가 있는 날짜)
+        """
+        current_dt = datetime.strptime(date_str, "%Y%m%d")
+        for attempt in range(10):
+            current_str = current_dt.strftime("%Y%m%d")
 
-                if all_stocks:
-                    logger.info(f"  [pykrx 폴백] {len(all_stocks)}개")
-            except Exception as e:
-                logger.error(f"pykrx fetch 실패: {e}")
+            krx_stocks = self._fetch_via_krx_api(current_str)
+            if krx_stocks:
+                tag = "" if attempt == 0 else f" ({attempt}일 이전)"
+                logger.info(f"  [KRX OpenAPI {current_str}{tag}] {len(krx_stocks)}개")
+                return krx_stocks, current_str
 
-        return all_stocks
+            pk_stocks = self._fetch_via_pykrx(current_str)
+            if pk_stocks:
+                tag = "" if attempt == 0 else f" ({attempt}일 이전)"
+                logger.info(f"  [pykrx {current_str}{tag}] {len(pk_stocks)}개 (KRX OpenAPI 미반영)")
+                return pk_stocks, current_str
+
+            logger.info(f"  {current_str}: 양쪽 소스 모두 데이터 없음 → 전일 시도")
+            current_dt -= timedelta(days=1)
+
+        logger.error("10일 소급 후에도 데이터 수집 실패")
+        return [], date_str
 
     def _filter_basic(self, stocks: List[Dict]) -> List[Dict]:
         """기본 필터: 시총 + 거래대금 + 제외종목 (양봉 조건 제거 — BB 하단 종목은 하락 중)"""
