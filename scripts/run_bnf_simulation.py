@@ -21,11 +21,21 @@ import pytz
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from paper_trading.bnf.position import BNFPositionManager, POSITION_RATIO
+from scripts.run_bnf_selection import classify_sector_by_name
 
 
 # 신규 진입을 스킵할 candidates 기준일 영업일 임계값
 # (후보 생성 배치가 T일 18:00, 시뮬레이션이 T+1 09:30 실행 → 정상이면 1영업일)
 STALE_CANDIDATES_BIZDAYS = 2
+
+# 동일 섹터 보유 상한 (포트폴리오 편중 방지). 기존 보유 + 오늘 진입 합산 기준.
+# "기타"는 이질적 종목 묶음이라 캡 예외 (아연·보험·엔터가 같이 묶이는 False Positive 방지).
+SECTOR_CAP = 2
+SECTOR_CAP_EXEMPT = {"기타"}
+
+# 갭하락 진입 스킵 임계값: 시가가 선정가 대비 이 % 이하로 열리면 진입 포기.
+# (선정 당시 논리의 전제가 장 초반 붕괴로 깨진 것으로 간주)
+GAP_DOWN_SKIP_PCT = -5.0
 
 
 def _business_days_between(date_str, target_date) -> int:
@@ -128,13 +138,36 @@ def main():
 
     position_size = mgr.total_capital * POSITION_RATIO
 
-    entry_iter = [] if skip_new_entry else candidates[:slots]
-    for candidate in entry_iter:
+    # 기존 보유 종목의 섹터 카운터 초기화 (섹터 캡 적용용)
+    sector_count: dict = {}
+    for pos in mgr.get_open_positions():
+        sec = classify_sector_by_name(pos.get("name", ""))
+        sector_count[sec] = sector_count.get(sec, 0) + 1
+
+    # 후보를 순회하되 한 종목 스킵돼도 다음 후보로 계속 진입 시도 (slots 채울 때까지).
+    # 기존 동작은 candidates[:slots]로 상단 슬라이스 후 진입 → 필터링 후 미달이면 슬롯 낭비.
+    remaining_slots = 0 if skip_new_entry else slots
+    candidate_pool = candidates if not skip_new_entry else []
+
+    for candidate in candidate_pool:
+        if remaining_slots <= 0:
+            break
         code = candidate["code"]
         name = candidate["name"]
 
         if mgr.has_open_position(code):
             print(f"  이미 보유 중: {name}")
+            continue
+
+        # 재진입 쿨다운 (position.py 단에서도 체크하지만 로그 명시 위해 여기서도 한 번)
+        if mgr.is_in_cooldown(code, today):
+            print(f"  재진입 쿨다운: {name}({code}) {mgr.get_cooldown_until(code)}까지 - skip")
+            continue
+
+        # 섹터 캡 체크 ("기타"는 예외)
+        sec = candidate.get("sector") or classify_sector_by_name(name)
+        if sec not in SECTOR_CAP_EXEMPT and sector_count.get(sec, 0) >= SECTOR_CAP:
+            print(f"  섹터 캡: {name}({code}) {sec} {sector_count.get(sec,0)}/{SECTOR_CAP} - skip")
             continue
 
         cand_price = candidate.get("price", 0)
@@ -153,6 +186,14 @@ def main():
             print(f"  가격 정보 없음: {name}")
             continue
 
+        # 갭하락 진입 스킵: 시가가 선정가 대비 임계값 이하로 열리면 포기
+        if cand_price and cand_price > 0:
+            gap_pct = (entry_price - cand_price) / cand_price * 100
+            if gap_pct <= GAP_DOWN_SKIP_PCT:
+                print(f"  갭하락 스킵: {name}({code}) 시가 {entry_price:,} vs 선정가 {cand_price:,} "
+                      f"({gap_pct:+.1f}% ≤ {GAP_DOWN_SKIP_PCT}%)")
+                continue
+
         quantity = int(position_size / entry_price)
         if quantity <= 0:
             print(f"  수량 부족: {name} (가격 {entry_price:,}원)")
@@ -168,7 +209,9 @@ def main():
             if cand_price and entry_price != cand_price:
                 gap = (entry_price - cand_price) / cand_price * 100
                 note = f" (갭 {gap:+.1f}% vs 선정가 {cand_price:,})"
-            print(f"  진입: {name}({code}) @ {entry_price:,}원 x {quantity}주{note}")
+            print(f"  진입: {name}({code}) @ {entry_price:,}원 x {quantity}주 [{sec}]{note}")
+            sector_count[sec] = sector_count.get(sec, 0) + 1
+            remaining_slots -= 1
 
     # --- 4) 저장 ---
     mgr.save(f"{today} {time_str}")
