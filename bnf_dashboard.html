@@ -703,6 +703,12 @@ function toggleAccord(id) {
 
 // ============ Stock Chart Modal ============
 let lwChart = null;
+let lwResizeObserver = null;
+
+function disposeLwChart() {
+  if (lwResizeObserver) { lwResizeObserver.disconnect(); lwResizeObserver = null; }
+  if (lwChart) { lwChart.remove(); lwChart = null; }
+}
 
 function openStockChart(code, name, strategy, extraData) {
   const modal = document.getElementById('chartModal');
@@ -727,7 +733,7 @@ function openStockChart(code, name, strategy, extraData) {
 
 function closeModal() {
   document.getElementById('chartModal').classList.remove('open');
-  if (lwChart) { lwChart.remove(); lwChart = null; }
+  disposeLwChart();
   // iframe 내부일 때 parent에게 하단 네비 복원 요청
   if (window.self !== window.top) {
     try { window.parent.postMessage({ type: 'bnf-modal', open: false }, '*'); } catch(e) {}
@@ -740,6 +746,9 @@ document.getElementById('chartModal')?.addEventListener('click', e => {
 });
 
 async function fetchStockChart(code, name, strategy, extra, container) {
+  // 연속 클릭으로 인한 누수 방지: 기존 차트/옵저버 정리
+  disposeLwChart();
+
   const data = await fetchJSON(`data/bnf/stock_charts/${code}.json`);
 
   if (!data || !data.ohlcv || !data.ohlcv.length) {
@@ -751,6 +760,18 @@ async function fetchStockChart(code, name, strategy, extra, container) {
 
   const ohlcv = data.ohlcv;
   const lastClose = ohlcv[ohlcv.length - 1].close;
+  const lastDateStr = ohlcv[ohlcv.length - 1].date;
+
+  // 데이터 최신성 계산 (영업일 기준, 주말만 제외 — 공휴일 미반영)
+  const [ly, lm, ld] = lastDateStr.split('-').map(Number);
+  const lastLocal = new Date(ly, lm - 1, ld);
+  const todayLocal = new Date(); todayLocal.setHours(0, 0, 0, 0);
+  let ageBiz = 0;
+  for (const cur = new Date(lastLocal.getTime() + 86400000); cur <= todayLocal; cur.setDate(cur.getDate() + 1)) {
+    const wd = cur.getDay();
+    if (wd !== 0 && wd !== 6) ageBiz++;
+  }
+  const isStale = ageBiz >= 3;
 
   // Create lightweight chart
   lwChart = LightweightCharts.createChart(container, {
@@ -934,6 +955,10 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     return `<div class="modal-legend-item"><div class="${dotCls}" style="${style}"></div>${l.label}</div>`;
   }).join('');
 
+  // 데이터 기준일을 info 최상단에 표시 (stale 시 경고)
+  const staleSuffix = isStale ? ` <span style="color:#ef4444;font-weight:600">· ${ageBiz}영업일 전</span>` : '';
+  infoItems.unshift({ label: '데이터 기준', val: lastDateStr + staleSuffix, cls: isStale ? 'neg-c' : '' });
+
   // Render info
   document.getElementById('modalInfo').innerHTML = infoItems.map(i =>
     `<div class="modal-info-item"><span class="modal-info-label">${i.label}</span><span class="modal-info-val ${i.cls||''}">${i.val}</span></div>`
@@ -942,10 +967,11 @@ async function fetchStockChart(code, name, strategy, extra, container) {
   // Render strategy description
   document.getElementById('modalStrategyDesc').innerHTML = strategyDesc;
 
-  // Resize handler
-  new ResizeObserver(() => {
+  // Resize handler (변수에 보관 후 close/재오픈 시 disconnect)
+  lwResizeObserver = new ResizeObserver(() => {
     if (lwChart) lwChart.applyOptions({ width: container.clientWidth });
-  }).observe(container);
+  });
+  lwResizeObserver.observe(container);
 }
 
 // ============ Init ============
