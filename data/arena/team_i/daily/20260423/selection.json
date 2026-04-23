@@ -1,0 +1,136 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260422",
+  "selected_at": "2026-04-23 18:04:58",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "079550",
+      "name": "LIG디펜스앤에어로스페이스",
+      "price": 1020000,
+      "change_pct": 12.21,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 87.1,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 1256173,
+      "trading_value": 1287241710500
+    },
+    {
+      "code": "094840",
+      "name": "슈프리마에이치큐",
+      "price": 10300,
+      "change_pct": 14.44,
+      "score": 52.4,
+      "score_detail": {
+        "alpha_score": 70.2,
+        "delta_score": 0.0,
+        "alpha_norm": 80.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 52.4,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 885877,
+      "trading_value": 9097600885
+    },
+    {
+      "code": "088340",
+      "name": "유라클",
+      "price": 14900,
+      "change_pct": 13.74,
+      "score": 51.9,
+      "score_detail": {
+        "alpha_score": 69.5,
+        "delta_score": 0.0,
+        "alpha_norm": 79.8,
+        "delta_norm": 0.0,
+        "alpha_weighted": 51.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 3462858,
+      "trading_value": 52086774520
+    },
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "price": 224500,
+      "change_pct": 3.22,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 64.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 0,
+      "volume": 100,
+      "trading_value": 13124895000000
+    },
+    {
+      "code": "034020",
+      "name": "두산에너빌리티",
+      "price": 122600,
+      "change_pct": 5.78,
+      "score": 33.1,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 60.9,
+        "alpha_norm": 0.0,
+        "delta_norm": 94.6,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.1,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 0,
+      "volume": 5000,
+      "trading_value": 785328000000
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
