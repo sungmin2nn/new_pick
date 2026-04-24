@@ -1,0 +1,136 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260423",
+  "selected_at": "2026-04-24 18:26:41",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "010140",
+      "name": "삼성중공업",
+      "price": 34000,
+      "change_pct": 6.92,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 81.4,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 24473941,
+      "trading_value": 828187670125
+    },
+    {
+      "code": "010120",
+      "name": "LS ELECTRIC",
+      "price": 217000,
+      "change_pct": 11.74,
+      "score": 63.9,
+      "score_detail": {
+        "alpha_score": 80.0,
+        "delta_score": 0.0,
+        "alpha_norm": 98.3,
+        "delta_norm": 0.0,
+        "alpha_weighted": 63.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 3163517,
+      "trading_value": 684673484150
+    },
+    {
+      "code": "046120",
+      "name": "오르비텍",
+      "price": 12420,
+      "change_pct": 13.42,
+      "score": 60.4,
+      "score_detail": {
+        "alpha_score": 75.7,
+        "delta_score": 0.0,
+        "alpha_norm": 93.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 60.4,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 19547811,
+      "trading_value": 249063410990
+    },
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "price": 219500,
+      "change_pct": -2.23,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 77.9,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 0,
+      "volume": 100,
+      "trading_value": 12832582000000
+    },
+    {
+      "code": "000660",
+      "name": "SK하이닉스",
+      "price": 1222000,
+      "change_pct": -0.24,
+      "score": 28.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 64.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 82.4,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 28.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 0,
+      "volume": 5000,
+      "trading_value": 8709223000000
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
