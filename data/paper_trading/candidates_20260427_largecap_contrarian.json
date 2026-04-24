@@ -1,0 +1,76 @@
+{
+  "strategy_id": "largecap_contrarian",
+  "strategy_name": "대형주 역추세",
+  "date": "20260423",
+  "selected_at": "2026-04-24 18:24:16",
+  "count": 3,
+  "candidates": [
+    {
+      "code": "000250",
+      "name": "삼천당제약",
+      "price": 380000,
+      "change_pct": -5.71,
+      "score": 82.5,
+      "score_detail": {
+        "market_cap": 30.0,
+        "change_pct": 25.0,
+        "trading_value": 20.0,
+        "price_level": 7.5
+      },
+      "rank": 1,
+      "market_cap": 8913839360000,
+      "volume": 475528,
+      "trading_value": 180636471500
+    },
+    {
+      "code": "263750",
+      "name": "펄어비스",
+      "price": 55600,
+      "change_pct": -3.64,
+      "score": 48.1,
+      "score_detail": {
+        "market_cap": 12.022364080386568,
+        "change_pct": 15.936952714535902,
+        "trading_value": 5.136909956747023,
+        "price_level": 15
+      },
+      "rank": 2,
+      "market_cap": 3572180738000,
+      "volume": 835961,
+      "trading_value": 46395664450
+    },
+    {
+      "code": "475150",
+      "name": "SK이터닉스",
+      "price": 53200,
+      "change_pct": -3.45,
+      "score": 39.8,
+      "score_detail": {
+        "market_cap": 6.099609403775479,
+        "change_pct": 15.105078809106832,
+        "trading_value": 3.6085740414830902,
+        "price_level": 15
+      },
+      "rank": 3,
+      "market_cap": 1812364612800,
+      "volume": 608804,
+      "trading_value": 32592004100
+    }
+  ],
+  "params": {
+    "min_price": 5000,
+    "max_change": -3.0,
+    "min_trading_value": 50,
+    "min_market_cap": 1000000000000,
+    "kospi_drop_threshold": -2.0,
+    "entry_time": "09:30",
+    "weights": {
+      "market_cap": 30,
+      "change_pct": 25,
+      "trading_value": 20,
+      "price_level": 15,
+      "volatility": 10
+    }
+  },
+  "simulation": null
+}
