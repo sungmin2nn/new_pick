@@ -46,5 +46,53 @@
       }
     ],
     "issues": []
+  },
+  {
+    "date": "20260424",
+    "checked_at": "2026-04-24 14:39:11",
+    "status": "healthy",
+    "checks": [
+      {
+        "check_type": "workflow_files",
+        "workflow": "paper-trading-select",
+        "description": "장전 종목 선정",
+        "status": "pass",
+        "details": "모든 파일 정상"
+      },
+      {
+        "check_type": "workflow_files",
+        "workflow": "paper-trading",
+        "description": "장후 최종 결과",
+        "status": "pass",
+        "details": "아직 실행 전 (예정: 16:10 KST)"
+      },
+      {
+        "check_type": "workflow_files",
+        "workflow": "paper-trading-check",
+        "description": "장중 상태 체크",
+        "status": "pass",
+        "details": "모든 파일 정상"
+      },
+      {
+        "check_type": "team_selections",
+        "description": "팀별 종목 선정 여부",
+        "status": "pass",
+        "details": "모든 팀 종목 선정 완료 또는 대기 중"
+      },
+      {
+        "check_type": "arena_integrity",
+        "description": "아레나 리포트 무결성",
+        "status": "pass",
+        "details": "아레나 리포트 아직 생성 전"
+      },
+      {
+        "check_type": "portfolio_health",
+        "description": "포트폴리오 건전성",
+        "status": "pass",
+        "details": "모든 팀 포트폴리오 정상",
+        "warnings": []
+      }
+    ],
+    "issues": []
   }
 ]
