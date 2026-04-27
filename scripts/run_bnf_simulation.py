@@ -40,13 +40,20 @@ GAP_DOWN_SKIP_PCT = -5.0
 
 def _business_days_between(date_str, target_date) -> int:
     """date_str(YYYY-MM-DD) 다음날부터 target_date까지의 주중 일수 (공휴일 미반영)."""
-    from datetime import date as _date, timedelta as _td
+    from datetime import date as _date, datetime as _dt, timedelta as _td
     try:
         y, m, d = map(int, date_str.split('-'))
     except Exception:
         return 0
     src = _date(y, m, d)
-    tgt = target_date if isinstance(target_date, _date) else target_date.date()
+    # datetime은 date의 서브클래스라 isinstance(date) 체크가 True가 되어
+    # tgt에 datetime이 들어가면 line 50 비교에서 TypeError 발생. datetime을 먼저 좁힘.
+    if isinstance(target_date, _dt):
+        tgt = target_date.date()
+    elif isinstance(target_date, _date):
+        tgt = target_date
+    else:
+        tgt = target_date  # 호출자가 잘못 넘긴 경우 — 다음 단계에서 자연스럽게 실패
     if src >= tgt:
         return 0
     count = 0
