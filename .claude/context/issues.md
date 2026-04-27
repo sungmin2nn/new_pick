@@ -70,6 +70,35 @@
 
 ---
 
+## [ISSUE-012] BNF 시뮬 _business_days_between datetime/date 비교 TypeError로 5일간 시뮬 정지
+- **발생일**: 2026-04-23 (잠복 → 노출), 2026-04-27 (수정)
+- **에이전트**: scripts/run_bnf_simulation.py `_business_days_between`
+- **증상**: 04-23 ~ 04-27 BNF Trading Simulation 워크플로우 6번 연속 failure (실행 35초 만에 즉사). positions.json `updated_at: 2026-04-22 17:17:46` 이후 5일간 정지. 가격 갱신/손절·익절/신규 진입/쿨다운 등록 전부 멈춤. P0 가드(ISSUE-011)도 실행 자체가 안 되어 검증 불가 상태
+- **원인**:
+  ```
+  TypeError: can't compare datetime.datetime to datetime.date  (line 50)
+  ```
+  `_business_days_between(date_str, target_date)` 안에서 `isinstance(target_date, _date)` 체크로 `tgt`를 결정. 그러나 `datetime.datetime`이 `datetime.date`의 서브클래스이므로 datetime 입력에도 isinstance가 True 반환 → tgt에 datetime 그대로 들어감 → src(date)와 비교에서 충돌. 이건 P0 패치 이전부터 잠복하던 버그였으나, 04-22까지는 candidates.json이 매일 fresh해서 stale 검증 분기를 한 번도 안 탔음. 04-23부터 cand_date가 1일 묵으며 분기 활성화 → 노출
+- **해결**: 2026-04-27 수정 (`commit ddae5b7`):
+  ```python
+  if isinstance(target_date, _dt):       # datetime을 먼저 좁힘
+      tgt = target_date.date()
+  elif isinstance(target_date, _date):
+      tgt = target_date
+  ```
+- **검증 (수동 트리거 결과)**: 핫픽스 후 즉시 시뮬 정상 가동.
+  - 5일간 묵었던 4건 청산 일괄 처리: 로킷 손절 -4.44%, 삼천당 손절 -6.41% (이전 -19.05% 대비 1/3로 축소 — 추세 회복 + 슬리피지 가드 효과), 앱클론 익절 +13.76%, 오름 보유 유지 +7.16%
+  - **쿨다운 자동 등록 확증**: `cooldown_until: {'376900': '2026-05-04', '000250': '2026-05-04'}` (손절 후 +5영업일)
+  - 신규 진입 2종목이 비-바이오 (성호전자, SK오션플랜트) → 섹터 캡 작동 추정
+  - 누적 수익률 +10.40% → +11.25%
+- **예방**:
+  - datetime/date 헬퍼 추가 시 항상 isinstance(_dt) 분기를 먼저 둘 것 (date의 서브클래스 함정)
+  - 새 분기 추가 시 그 분기를 한 번이라도 호출하는 단위/회귀 테스트 작성 (이번 stale 분기는 운영 환경에서 자연 발현 후 처음 깨짐)
+  - GitHub Actions failure 알림을 24h 내에 수신할 수 있는 채널 설정 (5일간 모름 = 운영 위험)
+- **상태**: resolved (2026-04-27, 시뮬 부활 + 가드 4종 동작 확증)
+
+---
+
 ## [ISSUE-011] BNF 04-22 전원 손절 (-25.3만원) — 섹터 집중 + 재진입 덫 + 슬리피지
 - **발생일**: 2026-04-22 (증상), 2026-04-23 (원인 규명 및 수정)
 - **에이전트**: paper_trading.bnf (낙폭과대 자동매매)
