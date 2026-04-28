@@ -1,0 +1,136 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260427",
+  "selected_at": "2026-04-28 18:52:56",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "030530",
+      "name": "원익홀딩스",
+      "price": 35100,
+      "change_pct": 10.2,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 91.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 7465220,
+      "trading_value": 262541200125
+    },
+    {
+      "code": "011790",
+      "name": "SKC",
+      "price": 124700,
+      "change_pct": 7.41,
+      "score": 52.9,
+      "score_detail": {
+        "alpha_score": 74.7,
+        "delta_score": 0.0,
+        "alpha_norm": 81.4,
+        "delta_norm": 0.0,
+        "alpha_weighted": 52.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1966444,
+      "trading_value": 242525476000
+    },
+    {
+      "code": "061970",
+      "name": "LB세미콘",
+      "price": 6880,
+      "change_pct": 13.34,
+      "score": 52.4,
+      "score_detail": {
+        "alpha_score": 74.0,
+        "delta_score": 0.0,
+        "alpha_norm": 80.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 52.4,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 5289787,
+      "trading_value": 35418436605
+    },
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "price": 222000,
+      "change_pct": -1.11,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 78.3,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 0,
+      "volume": 100,
+      "trading_value": 12978738000000
+    },
+    {
+      "code": "005380",
+      "name": "현대차",
+      "price": 555000,
+      "change_pct": 5.92,
+      "score": 32.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 71.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 91.4,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 32.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 0,
+      "volume": 5000,
+      "trading_value": 1136406000000
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}

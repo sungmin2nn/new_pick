@@ -1,0 +1,108 @@
+{
+  "strategy_id": "volatility_breakout_lw",
+  "strategy_name": "변동성 돌파 (Larry Williams)",
+  "date": "20260427",
+  "selected_at": "2026-04-28 18:36:44",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "333620",
+      "name": "엔시스",
+      "price": 7340,
+      "change_pct": 10.04,
+      "score": 77.42,
+      "score_detail": {
+        "breakout_strength": 37.19,
+        "volume_surge": 30.0,
+        "trading_value": 0.23,
+        "price_level": 10
+      },
+      "rank": 1,
+      "market_cap": 77483564960,
+      "volume": 3566607,
+      "trading_value": 27858911200
+    },
+    {
+      "code": "042700",
+      "name": "한미반도체",
+      "price": 373500,
+      "change_pct": 26.4,
+      "score": 70.7,
+      "score_detail": {
+        "breakout_strength": 40.31,
+        "volume_surge": 10.39,
+        "trading_value": 15.0,
+        "price_level": 5.0
+      },
+      "rank": 2,
+      "market_cap": 35599106700000,
+      "volume": 5287941,
+      "trading_value": 1849534448750
+    },
+    {
+      "code": "425040",
+      "name": "티이엠씨",
+      "price": 16340,
+      "change_pct": 29.99,
+      "score": 69.7,
+      "score_detail": {
+        "breakout_strength": 45.0,
+        "volume_surge": 13.69,
+        "trading_value": 1.0,
+        "price_level": 10
+      },
+      "rank": 3,
+      "market_cap": 348517199880,
+      "volume": 8048118,
+      "trading_value": 123703415315
+    },
+    {
+      "code": "042500",
+      "name": "링네트",
+      "price": 6250,
+      "change_pct": 23.27,
+      "score": 63.79,
+      "score_detail": {
+        "breakout_strength": 37.2,
+        "volume_surge": 16.2,
+        "trading_value": 0.39,
+        "price_level": 10
+      },
+      "rank": 4,
+      "market_cap": 139319650000,
+      "volume": 8360214,
+      "trading_value": 47942816765
+    },
+    {
+      "code": "147830",
+      "name": "제룡산업",
+      "price": 10850,
+      "change_pct": 29.94,
+      "score": 58.42,
+      "score_detail": {
+        "breakout_strength": 37.42,
+        "volume_surge": 10.49,
+        "trading_value": 0.51,
+        "price_level": 10
+      },
+      "rank": 5,
+      "market_cap": 217000000000,
+      "volume": 6084109,
+      "trading_value": 63059801295
+    }
+  ],
+  "params": {
+    "k_value": 0.5,
+    "min_price": 3000,
+    "min_trading_value": 5000000000,
+    "min_market_cap": 50000000000,
+    "volume_surge_min": 1.5,
+    "weights": {
+      "breakout_strength": 45,
+      "volume_surge": 30,
+      "trading_value": 15,
+      "price_level": 10
+    }
+  },
+  "simulation": null
+}

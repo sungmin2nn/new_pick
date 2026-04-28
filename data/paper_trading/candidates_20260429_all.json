@@ -1,0 +1,1010 @@
+{
+  "date": "20260429",
+  "generated_at": "2026-04-28 18:52:57",
+  "strategies": {
+    "largecap_contrarian": {
+      "strategy_id": "largecap_contrarian",
+      "strategy_name": "대형주 역추세",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:50:06",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "min_price": 5000,
+        "max_change": -3.0,
+        "min_trading_value": 50,
+        "min_market_cap": 1000000000000,
+        "kospi_drop_threshold": -2.0,
+        "entry_time": "09:30",
+        "weights": {
+          "market_cap": 30,
+          "change_pct": 25,
+          "trading_value": 20,
+          "price_level": 15,
+          "volatility": 10
+        }
+      },
+      "simulation": null
+    },
+    "momentum": {
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀 추세",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:50:34",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "030530",
+          "name": "원익홀딩스",
+          "price": 35100,
+          "change_pct": 10.2,
+          "score": 91.8,
+          "score_detail": {
+            "change_pct": 26.761619190404797,
+            "trading_value": 30.0,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 7465220,
+          "trading_value": 262541200125
+        },
+        {
+          "code": "011790",
+          "name": "SKC",
+          "price": 124700,
+          "change_pct": 7.41,
+          "score": 74.7,
+          "score_detail": {
+            "change_pct": 19.441529235382312,
+            "trading_value": 27.71284764652517,
+            "volume_surge": 20,
+            "price_level": 7.5
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 1966444,
+          "trading_value": 242525476000
+        },
+        {
+          "code": "061970",
+          "name": "LB세미콘",
+          "price": 6880,
+          "change_pct": 13.34,
+          "score": 74.0,
+          "score_detail": {
+            "change_pct": 35.0,
+            "trading_value": 4.047186108862539,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 5289787,
+          "trading_value": 35418436605
+        },
+        {
+          "code": "058610",
+          "name": "에스피지",
+          "price": 132900,
+          "change_pct": 11.77,
+          "score": 73.5,
+          "score_detail": {
+            "change_pct": 30.880809595202397,
+            "trading_value": 15.088157453435803,
+            "volume_surge": 20,
+            "price_level": 7.5
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 1017780,
+          "trading_value": 132042098850
+        },
+        {
+          "code": "474170",
+          "name": "루미르",
+          "price": 16740,
+          "change_pct": 12.88,
+          "score": 72.2,
+          "score_detail": {
+            "change_pct": 33.793103448275865,
+            "trading_value": 3.451335765276395,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 1817694,
+          "trading_value": 30203927795
+        }
+      ],
+      "params": {
+        "min_price": 3000,
+        "min_change": 3.0,
+        "max_change": 15.0,
+        "min_trading_value": 30,
+        "weights": {
+          "change_pct": 35,
+          "trading_value": 30,
+          "volume_surge": 20,
+          "price_level": 15
+        }
+      },
+      "simulation": null
+    },
+    "theme_policy": {
+      "strategy_id": "theme_policy",
+      "strategy_name": "테마/정책",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:51:22",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "005930",
+          "name": "삼성전자",
+          "price": 222000,
+          "change_pct": -1.11,
+          "score": 78.3,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 3.3,
+            "trading_value": 20.0,
+            "theme_strength": 15.0,
+            "themes": [
+              "기계·장비",
+              "코스닥 기술성장기업부",
+              "코스닥 150 헬스케어",
+              "기계·장비",
+              "제약",
+              "전기전자",
+              "운송·창고",
+              "운송장비·부품",
+              "코스피 50",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 100,
+          "trading_value": 12978738000000
+        },
+        {
+          "code": "005380",
+          "name": "현대차",
+          "price": 555000,
+          "change_pct": 5.92,
+          "score": 71.6,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 14.8,
+            "trading_value": 1.8,
+            "theme_strength": 15.0,
+            "themes": [
+              "기계·장비",
+              "코스닥 기술성장기업부",
+              "코스닥 150 헬스케어",
+              "기계·장비",
+              "제약",
+              "전기전자",
+              "운송·창고",
+              "운송장비·부품",
+              "코스피 50",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 5000,
+          "trading_value": 1136406000000
+        },
+        {
+          "code": "005935",
+          "name": "삼성전자우",
+          "price": 160000,
+          "change_pct": -0.06,
+          "score": 60.7,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 3.7,
+            "trading_value": 2.0,
+            "theme_strength": 15.0,
+            "themes": [
+              "기계·장비",
+              "코스닥 기술성장기업부",
+              "코스닥 150 헬스케어",
+              "기계·장비",
+              "제약",
+              "전기전자",
+              "운송·창고",
+              "운송장비·부품",
+              "코스피 50",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 100,
+          "trading_value": 1283794000000
+        },
+        {
+          "code": "032830",
+          "name": "삼성생명",
+          "price": 252000,
+          "change_pct": 0.8,
+          "score": 57.8,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 2.0,
+            "trading_value": 0.8,
+            "theme_strength": 15.0,
+            "themes": [
+              "기계·장비",
+              "코스닥 기술성장기업부",
+              "코스닥 150 헬스케어",
+              "기계·장비",
+              "제약",
+              "전기전자",
+              "운송·창고",
+              "운송장비·부품",
+              "코스피 50",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 500,
+          "trading_value": 504000000000
+        },
+        {
+          "code": "034020",
+          "name": "두산에너빌리티",
+          "price": 127800,
+          "change_pct": -0.85,
+          "score": 55.7,
+          "score_detail": {
+            "theme_relevance": 36.0,
+            "change_pct": 3.4,
+            "trading_value": 1.3,
+            "theme_strength": 15.0,
+            "themes": [
+              "기계·장비",
+              "코스닥 150 헬스케어",
+              "기계·장비",
+              "제약",
+              "전기전자",
+              "운송·창고",
+              "운송장비·부품",
+              "코스피 50",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 5000,
+          "trading_value": 818637000000
+        }
+      ],
+      "params": {
+        "active_themes": [
+          {
+            "name": "기계·장비",
+            "change_pct": 6.69
+          },
+          {
+            "name": "코스닥 기술성장기업부",
+            "change_pct": 4.32
+          },
+          {
+            "name": "코스닥 150 헬스케어",
+            "change_pct": 3.76
+          },
+          {
+            "name": "기계·장비",
+            "change_pct": 3.61
+          },
+          {
+            "name": "제약",
+            "change_pct": 3.56
+          },
+          {
+            "name": "전기전자",
+            "change_pct": 3.25
+          },
+          {
+            "name": "운송·창고",
+            "change_pct": 3.2
+          },
+          {
+            "name": "운송장비·부품",
+            "change_pct": 2.82
+          },
+          {
+            "name": "코스피 50",
+            "change_pct": 2.57
+          },
+          {
+            "name": "코스닥 150 산업재",
+            "change_pct": 2.57
+          }
+        ],
+        "theme_count": 10,
+        "total_stocks": 72,
+        "weights": {
+          "theme_relevance": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "theme_strength": 15
+        }
+      },
+      "simulation": null
+    },
+    "dart_disclosure": {
+      "strategy_id": "dart_disclosure",
+      "strategy_name": "DART 공시",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:51:25",
+      "count": 3,
+      "candidates": [
+        {
+          "code": "161000",
+          "name": "애경케미칼",
+          "price": 16800,
+          "change_pct": 2.44,
+          "score": 81.1,
+          "score_detail": {
+            "disclosure": 40.0,
+            "change_pct": 6.1,
+            "trading_value": 20.0,
+            "market_cap": 15.0,
+            "dart_raw": 10,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "타법인주식및출자증권취득결정              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 1,
+          "market_cap": 817298311200,
+          "volume": 1047818,
+          "trading_value": 17514298540
+        },
+        {
+          "code": "003000",
+          "name": "부광약품",
+          "price": 7300,
+          "change_pct": -4.7,
+          "score": 73.9,
+          "score_detail": {
+            "disclosure": 40.0,
+            "change_pct": 0,
+            "trading_value": 18.945818871487617,
+            "market_cap": 15.0,
+            "dart_raw": 10,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "타법인주식및출자증권취득결정              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 2,
+          "market_cap": 720252098300,
+          "volume": 2214526,
+          "trading_value": 16591136390
+        },
+        {
+          "code": "475580",
+          "name": "에이럭스",
+          "price": 13310,
+          "change_pct": -2.06,
+          "score": 50.4,
+          "score_detail": {
+            "disclosure": 40.0,
+            "change_pct": 0,
+            "trading_value": 6.061812778714916,
+            "market_cap": 4.352338056000001,
+            "dart_raw": 10,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "유상증자결정(종속회사의주요경영사항)              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 3,
+          "market_cap": 181347419000,
+          "volume": 398136,
+          "trading_value": 5308419935
+        }
+      ],
+      "params": {
+        "weights": {
+          "disclosure": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "market_cap": 15
+        },
+        "min_market_cap": 100000000000,
+        "max_market_cap": 10000000000000,
+        "min_trading_value": 1000000000
+      },
+      "simulation": null
+    },
+    "frontier_gap": {
+      "strategy_id": "frontier_gap",
+      "strategy_name": "프론티어 갭",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:51:40",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "460850",
+          "name": "동국씨엠",
+          "price": 6310,
+          "change_pct": 3.7828947368421053,
+          "score": 75.7,
+          "score_detail": {
+            "gap_pct": 30.44898430286242,
+            "volume_surge": 35.0,
+            "trading_value": 0.27957091473719975,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 194939237120,
+          "volume": 4998483,
+          "trading_value": 34471735845
+        },
+        {
+          "code": "147830",
+          "name": "제룡산업",
+          "price": 8730,
+          "change_pct": 4.550898203592815,
+          "score": 64.3,
+          "score_detail": {
+            "gap_pct": 36.6307385229541,
+            "volume_surge": 17.1942905837239,
+            "trading_value": 0.5114243857767994,
+            "price_level": 10
+          },
+          "rank": 2,
+          "market_cap": 217000000000,
+          "volume": 6084109,
+          "trading_value": 63059801295
+        },
+        {
+          "code": "017510",
+          "name": "세명전기",
+          "price": 12040,
+          "change_pct": 4.969485614646905,
+          "score": 61.0,
+          "score_detail": {
+            "gap_pct": 40.0,
+            "volume_surge": 9.73796335747763,
+            "trading_value": 1.263852999969704,
+            "price_level": 10
+          },
+          "rank": 3,
+          "market_cap": 205211160000,
+          "volume": 11457121,
+          "trading_value": 155835977440
+        },
+        {
+          "code": "042700",
+          "name": "한미반도체",
+          "price": 305000,
+          "change_pct": 3.2148900169204735,
+          "score": 58.5,
+          "score_detail": {
+            "gap_pct": 25.8770445572476,
+            "volume_surge": 12.66084363016617,
+            "trading_value": 15.0,
+            "price_level": 5.0
+          },
+          "rank": 4,
+          "market_cap": 35599106700000,
+          "volume": 5287941,
+          "trading_value": 1849534448750
+        },
+        {
+          "code": "009900",
+          "name": "명신산업",
+          "price": 12490,
+          "change_pct": 4.083333333333333,
+          "score": 53.8,
+          "score_detail": {
+            "gap_pct": 32.8672514619883,
+            "volume_surge": 10.095867064337453,
+            "trading_value": 0.8221090951577767,
+            "price_level": 10
+          },
+          "rank": 5,
+          "market_cap": 771310955100,
+          "volume": 7238908,
+          "trading_value": 101367939475
+        }
+      ],
+      "params": {
+        "gap_min": 2.0,
+        "gap_max": 5.0,
+        "min_price": 3000,
+        "min_trading_value": 50,
+        "volume_surge_mult": 2.0,
+        "weights": {
+          "gap_pct": 40,
+          "volume_surge": 35,
+          "trading_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    },
+    "hybrid_alpha_delta": {
+      "strategy_id": "hybrid_alpha_delta",
+      "strategy_name": "Alpha-Delta 하이브리드",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:52:56",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "030530",
+          "name": "원익홀딩스",
+          "price": 35100,
+          "change_pct": 10.2,
+          "score": 65.0,
+          "score_detail": {
+            "alpha_score": 91.8,
+            "delta_score": 0.0,
+            "alpha_norm": 100.0,
+            "delta_norm": 0.0,
+            "alpha_weighted": 65.0,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 7465220,
+          "trading_value": 262541200125
+        },
+        {
+          "code": "011790",
+          "name": "SKC",
+          "price": 124700,
+          "change_pct": 7.41,
+          "score": 52.9,
+          "score_detail": {
+            "alpha_score": 74.7,
+            "delta_score": 0.0,
+            "alpha_norm": 81.4,
+            "delta_norm": 0.0,
+            "alpha_weighted": 52.9,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 1966444,
+          "trading_value": 242525476000
+        },
+        {
+          "code": "061970",
+          "name": "LB세미콘",
+          "price": 6880,
+          "change_pct": 13.34,
+          "score": 52.4,
+          "score_detail": {
+            "alpha_score": 74.0,
+            "delta_score": 0.0,
+            "alpha_norm": 80.6,
+            "delta_norm": 0.0,
+            "alpha_weighted": 52.4,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 5289787,
+          "trading_value": 35418436605
+        },
+        {
+          "code": "005930",
+          "name": "삼성전자",
+          "price": 222000,
+          "change_pct": -1.11,
+          "score": 35.0,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 78.3,
+            "alpha_norm": 0.0,
+            "delta_norm": 100.0,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 35.0,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 100,
+          "trading_value": 12978738000000
+        },
+        {
+          "code": "005380",
+          "name": "현대차",
+          "price": 555000,
+          "change_pct": 5.92,
+          "score": 32.0,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 71.6,
+            "alpha_norm": 0.0,
+            "delta_norm": 91.4,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 32.0,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 5000,
+          "trading_value": 1136406000000
+        }
+      ],
+      "params": {
+        "weight_alpha": 0.65,
+        "weight_delta": 0.35,
+        "overlap_bonus": 10.0,
+        "sub_top_n": 10,
+        "alpha_slot": 3,
+        "delta_slot": 2,
+        "score_normalization": "min-max per-strategy (0~100)",
+        "alpha_strategy": "momentum",
+        "delta_strategy": "theme_policy"
+      },
+      "simulation": null
+    },
+    "volatility_breakout_lw": {
+      "strategy_id": "volatility_breakout_lw",
+      "strategy_name": "변동성 돌파 (Larry Williams)",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:52:56",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "333620",
+          "name": "엔시스",
+          "price": 7340,
+          "change_pct": 10.04,
+          "score": 77.42,
+          "score_detail": {
+            "breakout_strength": 37.19,
+            "volume_surge": 30.0,
+            "trading_value": 0.23,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 77483564960,
+          "volume": 3566607,
+          "trading_value": 27858911200
+        },
+        {
+          "code": "042700",
+          "name": "한미반도체",
+          "price": 373500,
+          "change_pct": 26.4,
+          "score": 70.7,
+          "score_detail": {
+            "breakout_strength": 40.31,
+            "volume_surge": 10.39,
+            "trading_value": 15.0,
+            "price_level": 5.0
+          },
+          "rank": 2,
+          "market_cap": 35599106700000,
+          "volume": 5287941,
+          "trading_value": 1849534448750
+        },
+        {
+          "code": "425040",
+          "name": "티이엠씨",
+          "price": 16340,
+          "change_pct": 29.99,
+          "score": 69.7,
+          "score_detail": {
+            "breakout_strength": 45.0,
+            "volume_surge": 13.69,
+            "trading_value": 1.0,
+            "price_level": 10
+          },
+          "rank": 3,
+          "market_cap": 348517199880,
+          "volume": 8048118,
+          "trading_value": 123703415315
+        },
+        {
+          "code": "042500",
+          "name": "링네트",
+          "price": 6250,
+          "change_pct": 23.27,
+          "score": 63.79,
+          "score_detail": {
+            "breakout_strength": 37.2,
+            "volume_surge": 16.2,
+            "trading_value": 0.39,
+            "price_level": 10
+          },
+          "rank": 4,
+          "market_cap": 139319650000,
+          "volume": 8360214,
+          "trading_value": 47942816765
+        },
+        {
+          "code": "147830",
+          "name": "제룡산업",
+          "price": 10850,
+          "change_pct": 29.94,
+          "score": 58.42,
+          "score_detail": {
+            "breakout_strength": 37.42,
+            "volume_surge": 10.49,
+            "trading_value": 0.51,
+            "price_level": 10
+          },
+          "rank": 5,
+          "market_cap": 217000000000,
+          "volume": 6084109,
+          "trading_value": 63059801295
+        }
+      ],
+      "params": {
+        "k_value": 0.5,
+        "min_price": 3000,
+        "min_trading_value": 5000000000,
+        "min_market_cap": 50000000000,
+        "volume_surge_min": 1.5,
+        "weights": {
+          "breakout_strength": 45,
+          "volume_surge": 30,
+          "trading_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    },
+    "sector_rotation": {
+      "strategy_id": "sector_rotation",
+      "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:52:56",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "005930",
+          "name": "삼성전자",
+          "price": 224500,
+          "change_pct": 2.28,
+          "score": 72.59,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 2.59,
+            "market_cap_rank": 20.0,
+            "volume_surge": 15.0
+          },
+          "rank": 1,
+          "market_cap": 1312489547496000,
+          "volume": 22870374,
+          "trading_value": 5112167489250
+        },
+        {
+          "code": "042700",
+          "name": "한미반도체",
+          "price": 373500,
+          "change_pct": 26.4,
+          "score": 70.97,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 30.0,
+            "market_cap_rank": 0.54,
+            "volume_surge": 5.43
+          },
+          "rank": 2,
+          "market_cap": 35599106700000,
+          "volume": 5287941,
+          "trading_value": 1849534448750
+        },
+        {
+          "code": "010120",
+          "name": "LS ELECTRIC",
+          "price": 255500,
+          "change_pct": 12.8,
+          "score": 51.31,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 14.55,
+            "market_cap_rank": 0.58,
+            "volume_surge": 1.18
+          },
+          "rank": 3,
+          "market_cap": 38325000000000,
+          "volume": 1591106,
+          "trading_value": 401209888000
+        },
+        {
+          "code": "443060",
+          "name": "HD현대마린솔루션",
+          "price": 280500,
+          "change_pct": 10.65,
+          "score": 47.8,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 12.1,
+            "market_cap_rank": 0.19,
+            "volume_surge": 0.51
+          },
+          "rank": 4,
+          "market_cap": 12575785530000,
+          "volume": 623593,
+          "trading_value": 173555647250
+        },
+        {
+          "code": "006260",
+          "name": "LS",
+          "price": 426000,
+          "change_pct": 6.9,
+          "score": 43.33,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 7.84,
+            "market_cap_rank": 0.2,
+            "volume_surge": 0.29
+          },
+          "rank": 5,
+          "market_cap": 13291200000000,
+          "volume": 229840,
+          "trading_value": 98193519476
+        }
+      ],
+      "params": {
+        "top_sectors": 5,
+        "stocks_per_sector": 3,
+        "min_price": 3000,
+        "min_market_cap": 100000000000,
+        "min_trading_value": 5000000000,
+        "min_change_pct": 0.5,
+        "weights": {
+          "sector_strength": 35,
+          "stock_momentum": 30,
+          "market_cap_rank": 20,
+          "volume_surge": 15
+        }
+      },
+      "simulation": null
+    },
+    "turtle_breakout_short": {
+      "strategy_id": "turtle_breakout_short",
+      "strategy_name": "단축 터틀 돌파 (5/10일 신고가)",
+      "date": "20260427",
+      "selected_at": "2026-04-28 18:52:57",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "042700",
+          "name": "한미반도체",
+          "price": 373500,
+          "change_pct": 26.4,
+          "score": 71.95,
+          "score_detail": {
+            "breakout_freshness": 27.89,
+            "volume_surge": 10.85,
+            "trading_value": 20.0,
+            "price_momentum": 13.2
+          },
+          "rank": 1,
+          "market_cap": 35599106700000,
+          "volume": 5287941,
+          "trading_value": 1849534448750
+        },
+        {
+          "code": "046890",
+          "name": "서울반도체",
+          "price": 14540,
+          "change_pct": 29.94,
+          "score": 64.78,
+          "score_detail": {
+            "breakout_freshness": 32.78,
+            "volume_surge": 15.62,
+            "trading_value": 1.41,
+            "price_momentum": 14.97
+          },
+          "rank": 2,
+          "market_cap": 847760516000,
+          "volume": 9202911,
+          "trading_value": 130815514750
+        },
+        {
+          "code": "138360",
+          "name": "앤로보틱스",
+          "price": 3585,
+          "change_pct": 29.89,
+          "score": 63.31,
+          "score_detail": {
+            "breakout_freshness": 35.0,
+            "volume_surge": 12.45,
+            "trading_value": 0.91,
+            "price_momentum": 14.95
+          },
+          "rank": 3,
+          "market_cap": 276015323370,
+          "volume": 24909381,
+          "trading_value": 84403405500
+        },
+        {
+          "code": "147830",
+          "name": "제룡산업",
+          "price": 10850,
+          "change_pct": 29.94,
+          "score": 61.89,
+          "score_detail": {
+            "breakout_freshness": 31.5,
+            "volume_surge": 14.74,
+            "trading_value": 0.68,
+            "price_momentum": 14.97
+          },
+          "rank": 4,
+          "market_cap": 217000000000,
+          "volume": 6084109,
+          "trading_value": 63059801295
+        },
+        {
+          "code": "425040",
+          "name": "티이엠씨",
+          "price": 16340,
+          "change_pct": 29.99,
+          "score": 59.21,
+          "score_detail": {
+            "breakout_freshness": 28.85,
+            "volume_surge": 14.02,
+            "trading_value": 1.34,
+            "price_momentum": 15.0
+          },
+          "rank": 5,
+          "market_cap": 348517199880,
+          "volume": 8048118,
+          "trading_value": 123703415315
+        }
+      ],
+      "params": {
+        "lookback_days": 5,
+        "history_fetch_days": 14,
+        "min_price": 3000,
+        "min_market_cap": 100000000000,
+        "min_trading_value": 5000000000,
+        "volume_surge_min": 1.5,
+        "min_price_increase": 1.0,
+        "weights": {
+          "breakout_freshness": 35,
+          "volume_surge": 30,
+          "trading_value": 20,
+          "price_momentum": 15
+        }
+      },
+      "simulation": null
+    }
+  }
+}
