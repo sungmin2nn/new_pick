@@ -871,6 +871,14 @@ function renderHistorySection() {
   `;
 }
 
+// exit_type → 한국어 라벨 매핑. exit_reason 우선, 없으면 exit_type 매핑.
+const EXIT_TYPE_LABEL = { profit: '익절', loss: '손절', close: '종가청산' };
+function exitLabel(t) {
+  if (t && t.exit_reason) return t.exit_reason;
+  if (t && t.exit_type) return EXIT_TYPE_LABEL[t.exit_type] || t.exit_type;
+  return '';
+}
+
 function calcHoldingPeriod(entry_time, exit_time) {
   if (!entry_time || !exit_time) return '당일';
   // format: "HH:MM" or "YYYY-MM-DD HH:MM"
@@ -918,7 +926,7 @@ function renderTradeDetail(results, summary) {
         </div>
         <div class="trade-prices">
           <div class="num">${fmtMoney(t.entry_price)} → ${fmtMoney(t.exit_price)}</div>
-          <div class="trade-meta">${t.exit_reason || ''} · ${t.quantity || 0}주 · <span class="trade-holding">⏱ ${holdingPeriod}</span></div>
+          <div class="trade-meta">${exitLabel(t)} · ${t.quantity || 0}주 · <span class="trade-holding">⏱ ${holdingPeriod}</span></div>
         </div>
         <div class="trade-ret ${cls}">
           ${fmtPctSigned(t.return_pct)}
