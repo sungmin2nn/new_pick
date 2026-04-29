@@ -4,6 +4,17 @@
 
 ---
 
+## [ISSUE-013] Arena 매매 카드 청산 사유 미표시 — 데이터 키 불일치
+- **발생일**: 2026-04-30
+- **에이전트**: 데이터 검증 (모달 재설계 후속)
+- **증상**: Arena 8팀 카드의 매매 상세에서 "사유 · 수량 · 시간" 영역의 사유가 항상 비어 표시 (" · 12주 · ⏱ 1시간 30분")
+- **원인**: `js/phase8/arena.js:921` 이 `t.exit_reason` 참조하나, `data/arena/{tid}/daily/{date}/trades.json`의 실제 키는 `exit_type` (332/332건 전수 검증, exit_reason 키 0건)
+- **해결**: `exitLabel(t)` 헬퍼 추가 — `EXIT_TYPE_LABEL = { profit: '익절', loss: '손절', close: '종가청산' }`. exit_reason 우선, 없으면 exit_type 매핑. 커밋 c500659
+- **예방**: 화면 코드에서 데이터 키 참조 시 schema와 교차 검증 필요. 본 이슈는 시간 데이터 검증 중 부수 발견됨 (332건 시간 데이터 자체는 100% 정상: HH:MM, 09:00~15:30, 역전 0건)
+- **상태**: resolved
+
+---
+
 ## [ISSUE-001] 리스크 지표 계산 단위 불일치
 - **발생일**: 2026-04-05
 - **에이전트**: dev-agent-analytics
