@@ -95,26 +95,87 @@ tr:hover{background:rgba(0,198,190,.02)}
 .rule-label{color:#00a39c;font-weight:600;min-width:80px;flex-shrink:0}
 .rule-label.bb-label{color:#6366f1}
 
-/* === Chart Modal === */
+/* === Chart Modal Base === */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999999;justify-content:center;align-items:flex-start;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal-overlay.open{display:flex}
-.modal-box{background:#fff;border-radius:14px;width:100%;max-width:720px;margin:20px auto 80px;box-shadow:0 20px 60px rgba(0,0,0,.3);flex-shrink:0}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #e5e7eb}
-.modal-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
-.modal-close{width:32px;height:32px;border:none;background:#f0f2f5;border-radius:8px;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center}
+.modal-box{background:#fff;border-radius:14px;width:100%;max-width:760px;margin:20px auto 80px;box-shadow:0 20px 60px rgba(0,0,0,.3);flex-shrink:0}
+.modal-header{padding:14px 18px 10px;border-bottom:1px solid #f0f2f5}
+.modal-header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.modal-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.4}
+.modal-close{width:32px;height:32px;border:none;background:#f0f2f5;border-radius:8px;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .modal-close:hover{background:#e5e7eb}
+.modal-context{font-size:11px;color:#6b7280;margin-top:6px;line-height:1.55}
+.modal-context strong{color:#1a1a2e;font-weight:600}
 .modal-body{padding:14px 18px}
 .modal-chart{width:100%;height:320px;border-radius:8px;overflow:hidden;background:#131722}
 .modal-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .modal-legend-item{display:flex;align-items:center;gap:5px;padding:4px 10px;background:#f8fafb;border:1px solid #e5e7eb;border-radius:6px;font-size:11px;font-weight:500}
 .modal-legend-dot{width:18px;height:3px;border-radius:1px;flex-shrink:0}
 .modal-legend-dot.dashed{background:repeating-linear-gradient(90deg,var(--c) 0,var(--c) 4px,transparent 4px,transparent 8px)!important;height:2px}
-.modal-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-top:12px;font-size:12px}
-.modal-info-item{display:flex;justify-content:space-between;padding:8px 10px;background:#f8fafb;border:1px solid #f0f2f5;border-radius:8px}
-.modal-info-label{color:#6b7280;font-size:11px}
-.modal-info-val{font-weight:700;font-variant-numeric:tabular-nums}
-.modal-naver{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#f0f2f5;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;font-weight:600;color:#00a39c;margin-top:12px;text-decoration:none}
-.modal-naver:hover{background:#e5e7eb}
+
+/* === State Badges === */
+.modal-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:11px;display:inline-flex;align-items:center;gap:4px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.badge-active{background:#dcfce7;color:#15803d;border:1px solid #86efac}
+.badge-active.loss{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+.badge-cand{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.badge-cooldown{background:#fef3c7;color:#a16207;border:1px solid #fcd34d}
+.badge-closed{background:#f3f4f6;color:#4b5563;border:1px solid #d1d5db}
+.badge-closed.win{background:#dcfce7;color:#15803d;border-color:#86efac}
+.badge-closed.loss{background:#fee2e2;color:#b91c1c;border-color:#fca5a5}
+
+/* === Price Scale Slider === */
+.modal-slider{margin-top:14px;padding:30px 14px 38px;background:#fafbfc;border:1px solid #e5e7eb;border-radius:10px;position:relative}
+.slider-label{position:absolute;top:8px;left:14px;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em}
+.slider-stale{position:absolute;top:8px;right:14px;font-size:10px;color:#9ca3af;font-variant-numeric:tabular-nums}
+.slider-stale.warn{color:#ef4444;font-weight:700}
+.slider-track{position:relative;height:6px;background:linear-gradient(90deg,#dc2626 0%,#f59e0b 22%,#fbbf24 45%,#10b981 100%);border-radius:3px}
+.slider-mark{position:absolute;transform:translateX(-50%);text-align:center}
+.slider-mark-label{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:#6b7280;font-weight:600;white-space:nowrap}
+.slider-mark-line{width:2px;height:14px;background:#1a1a2e;border-radius:1px;margin-left:-1px}
+.slider-mark-val{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:#1a1a2e;white-space:nowrap;font-variant-numeric:tabular-nums}
+.slider-mark-pct{font-size:9px;color:#6b7280;font-weight:500;margin-top:1px}
+.slider-mark.now .slider-mark-line{background:#00a39c;width:3px;margin-left:-1.5px;height:18px;margin-top:-6px}
+.slider-mark.now .slider-mark-label{color:#00a39c;font-weight:700}
+.slider-mark.now .slider-mark-val{color:#00a39c;font-size:11px}
+.slider-mark.entry .slider-mark-line{background:#1a1a2e;width:3px;margin-left:-1.5px;height:18px;margin-top:-6px}
+.slider-mark.stop .slider-mark-line{background:#dc2626}
+.slider-mark.stop .slider-mark-label{color:#dc2626}
+.slider-mark.tp .slider-mark-line{background:#10b981}
+.slider-mark.tp .slider-mark-label{color:#10b981}
+.slider-mark.high .slider-mark-line{background:#f59e0b}
+.slider-mark.high .slider-mark-label{color:#a16207}
+
+/* === Reason / History / Next Cards === */
+.modal-card{margin-top:10px;padding:11px 13px;background:#fafbfc;border:1px solid #e5e7eb;border-radius:10px}
+.modal-card-title{font-size:11px;font-weight:700;color:#1a1a2e;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.modal-card-title .ico{font-size:13px}
+.modal-card-meta{margin-left:auto;color:#9ca3af;font-weight:500;font-size:10px}
+.modal-card-body{font-size:12px;color:#4b5563;line-height:1.65;font-variant-numeric:tabular-nums}
+.modal-card-body strong{color:#1a1a2e;font-weight:600}
+
+.history-row{display:grid;grid-template-columns:22px 80px 70px 70px 1fr;gap:8px;font-size:11px;padding:5px 0;border-bottom:1px dashed #e5e7eb;align-items:center}
+.history-row:last-child{border-bottom:none}
+.history-rank{font-weight:700;font-size:10px;color:#6b7280;text-align:center}
+.history-date{color:#6b7280;font-size:10px}
+.history-pct{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.history-amt{text-align:right;font-variant-numeric:tabular-nums;font-size:10px;color:#6b7280}
+.history-pct.win,.history-amt.win{color:#15803d}
+.history-pct.loss,.history-amt.loss{color:#b91c1c}
+.history-reason{font-size:10px;color:#9ca3af;text-align:left}
+
+.next-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;align-items:baseline}
+.next-row .next-label{color:#6b7280;font-size:11px}
+.next-row .next-value{font-variant-numeric:tabular-nums;font-weight:600}
+.next-amount.pos{color:#15803d}
+.next-amount.neg{color:#b91c1c}
+
+/* === Link Row === */
+.modal-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.modal-link{display:inline-flex;align-items:center;gap:4px;padding:7px 12px;background:#f0f2f5;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;font-weight:600;color:#374151;text-decoration:none;transition:background .15s}
+.modal-link:hover{background:#e5e7eb}
+.modal-link .ico{font-size:13px}
+
+/* Strategy desc (kept for fallback) */
 .modal-strategy-desc{margin-top:10px;padding:10px 12px;background:#f8fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:11px;line-height:1.7;color:#6b7280}
 .modal-strategy-desc strong{color:#1a1a2e}
 
@@ -273,15 +334,30 @@ if(window.self!==window.top){document.documentElement.classList.add('in-iframe')
 <div class="modal-overlay" id="chartModal">
   <div class="modal-box">
     <div class="modal-header">
-      <div class="modal-title" id="modalTitle">-</div>
-      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-header-top">
+        <div class="modal-title" id="modalTitle">-</div>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-context" id="modalContext"></div>
     </div>
     <div class="modal-body">
       <div class="modal-chart" id="modalChart"></div>
       <div class="modal-legend" id="modalLegend"></div>
-      <div class="modal-info" id="modalInfo"></div>
+      <div class="modal-slider" id="modalSlider" style="display:none"></div>
+      <div class="modal-card" id="modalReason" style="display:none">
+        <div class="modal-card-title"><span class="ico">📍</span> 왜 이 종목?</div>
+        <div class="modal-card-body" id="modalReasonBody"></div>
+      </div>
+      <div class="modal-card" id="modalHistory" style="display:none">
+        <div class="modal-card-title"><span class="ico">📊</span> 이 종목 거래 이력 <span class="modal-card-meta" id="modalHistoryMeta"></span></div>
+        <div class="modal-card-body" id="modalHistoryBody"></div>
+      </div>
+      <div class="modal-card" id="modalNext" style="display:none">
+        <div class="modal-card-title"><span class="ico">⏭</span> 다음 액션</div>
+        <div class="modal-card-body" id="modalNextBody"></div>
+      </div>
       <div class="modal-strategy-desc" id="modalStrategyDesc"></div>
-      <a class="modal-naver" id="modalNaver" href="#" target="_blank">네이버 증권에서 보기 &rarr;</a>
+      <div class="modal-links" id="modalLinks"></div>
     </div>
   </div>
 </div>
@@ -309,6 +385,7 @@ async function loadAll() {
     fetchJSON('data/bnf/bollinger_trades.json'),
     fetchJSON('data/bnf/bollinger_candidates.json'),
   ]);
+  window.bnfState = { pos, hist, cand, bbPos, bbTrades, bbCand };
   renderHero(pos, bbPos);
   renderKPI(pos, hist, bbPos, bbTrades);
   renderPositions(pos, bbPos);
@@ -710,51 +787,298 @@ function disposeLwChart() {
   if (lwChart) { lwChart.remove(); lwChart = null; }
 }
 
+function fmtKr(v) {
+  if (v >= 1e12) return (v/1e12).toFixed(1) + '조';
+  if (v >= 1e8) return Math.round(v/1e8).toLocaleString() + '억';
+  if (v >= 1e4) return Math.round(v/1e4).toLocaleString() + '만';
+  return v.toLocaleString();
+}
+
+function computeStockContext(code, strategy, extraData) {
+  const s = window.bnfState || {};
+  const positions = strategy === 'bb'
+    ? ((s.bbPos && s.bbPos.positions) || [])
+    : ((s.pos && s.pos.positions) || []);
+  const cooldown = strategy === 'bb'
+    ? ((s.bbPos && s.bbPos.cooldown_until) || {})
+    : ((s.pos && s.pos.cooldown_until) || {});
+  const candidates = strategy === 'bb'
+    ? ((s.bbCand && s.bbCand.candidates) || [])
+    : ((s.cand && s.cand.candidates) || []);
+  const trades = strategy === 'bb'
+    ? ((s.bbTrades && s.bbTrades.trades) || [])
+    : ((s.hist && s.hist.trades) || []);
+
+  const activePos = positions.find(p => p.code === code && p.state !== 'CLOSED');
+  const cooldownUntil = cooldown[code];
+  const candEntry = candidates.find(c => c.code === code);
+  const stockTrades = trades.filter(t => t.code === code);
+
+  let stateType = 'unknown', badgeHtml = '';
+  let cooldownDays = 0;
+
+  if (activePos) {
+    const pnl = activePos.unrealized_pnl_pct || 0;
+    const cls = pnl >= 0 ? 'badge-active' : 'badge-active loss';
+    stateType = 'active';
+    badgeHtml = `<span class="modal-badge ${cls}">● 보유 중 ${fmtPct(pnl)}</span>`;
+  } else if (cooldownUntil) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const cuParts = cooldownUntil.split('-').map(Number);
+    const until = new Date(cuParts[0], cuParts[1]-1, cuParts[2]);
+    const diff = Math.ceil((until - today) / 86400000);
+    if (diff > 0) {
+      stateType = 'cooldown';
+      cooldownDays = diff;
+      badgeHtml = `<span class="modal-badge badge-cooldown">⏸ 쿨다운 D-${diff}</span>`;
+    }
+  }
+
+  if (!badgeHtml && candEntry) {
+    stateType = 'candidate';
+    badgeHtml = `<span class="modal-badge badge-cand">▣ 후보</span>`;
+  }
+
+  if (!badgeHtml && stockTrades.length) {
+    const last = [...stockTrades].sort((a,b) => (b.exit_date||'').localeCompare(a.exit_date||''))[0];
+    const ret = last.return_pct || 0;
+    const cls = ret > 0 ? 'badge-closed win' : ret < 0 ? 'badge-closed loss' : 'badge-closed';
+    stateType = 'closed';
+    badgeHtml = `<span class="modal-badge ${cls}">✓ 청산 ${fmtPct(ret)}</span>`;
+  }
+
+  // Context line — candEntry 우선, 없으면 activePos에 저장된 메타로 fallback
+  const parts = [];
+  const meta = candEntry || activePos || {};
+  if (meta.market_cap) parts.push(`시총 <strong>${fmtKr(meta.market_cap)}</strong>`);
+  if (meta.sector) parts.push(meta.sector);
+  if (meta.trading_value) parts.push(`거래대금 <strong>${fmtKr(meta.trading_value)}</strong>`);
+
+  const totalCount = stockTrades.length + (activePos ? 1 : 0);
+  if (totalCount === 0) {
+    parts.push(`<strong>1차</strong> 거래 (예정)`);
+  } else if (activePos) {
+    parts.push(`<strong>${totalCount}차</strong> 거래 (진행 중)`);
+  } else {
+    parts.push(`<strong>${stockTrades.length}차</strong> 종료`);
+  }
+
+  return {
+    stateType, badgeHtml, contextHtml: parts.join(' · '),
+    activePos, candEntry, stockTrades, cooldownDays, cooldownUntil,
+    extraData
+  };
+}
+
+function renderLinks(code) {
+  const links = [
+    { ico: '🟢', label: '네이버', href: `https://m.stock.naver.com/domestic/stock/${code}` },
+    { ico: '📋', label: 'DART 공시', href: `https://dart.fss.or.kr/dsab007/main.do?option=corp&textCrpNm=${code}` },
+    { ico: '📰', label: '뉴스', href: `https://search.naver.com/search.naver?where=news&query=${code}` },
+    { ico: '📈', label: '차트', href: `https://m.stock.naver.com/domestic/stock/${code}/chart` },
+  ];
+  return links.map(l => `<a class="modal-link" href="${l.href}" target="_blank" rel="noopener"><span class="ico">${l.ico}</span>${l.label}</a>`).join('');
+}
+
+// 가격 스케일 슬라이더 — marks=[{type, label, value, pct}]
+function buildPriceSlider(marks, dataDate, isStale, ageBiz) {
+  if (!marks || !marks.length) return '';
+  const values = marks.map(m => m.value).filter(v => v && isFinite(v));
+  if (!values.length) return '';
+  const minV = Math.min(...values);
+  const maxV = Math.max(...values);
+  const pad = (maxV - minV) * 0.08 || maxV * 0.02 || 1;
+  const lo = minV - pad, hi = maxV + pad;
+  const pos = v => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100));
+
+  // 라벨/값 위치 단계화 (가까운 마크는 위/아래로 stagger)
+  const sorted = [...marks].sort((a,b) => a.value - b.value);
+  const positions = sorted.map(m => pos(m.value));
+  let prevOff = 0, prevPos = -100;
+  sorted.forEach((m,i) => {
+    if (Math.abs(positions[i] - prevPos) < 10) {
+      m._off = (prevOff + 1) % 2;  // 0,1,0,1 토글
+    } else {
+      m._off = 0;
+    }
+    prevOff = m._off; prevPos = positions[i];
+  });
+
+  const marksHtml = sorted.map(m => {
+    const labelTop = -22 - (m._off || 0) * 12;
+    const valTop = 18 + (m._off || 0) * 24;
+    const pctHtml = m.pct ? `<div class="slider-mark-pct">${m.pct}</div>` : '';
+    return `<div class="slider-mark ${m.type}" style="left:${pos(m.value).toFixed(1)}%">
+      <div class="slider-mark-label" style="top:${labelTop}px">${m.label}</div>
+      <div class="slider-mark-line"></div>
+      <div class="slider-mark-val" style="top:${valTop}px">${fmt(m.value)}${pctHtml}</div>
+    </div>`;
+  }).join('');
+
+  const staleHtml = `<div class="slider-stale ${isStale?'warn':''}">${dataDate}${isStale?` · ${ageBiz}영업일 전`:''}</div>`;
+  return `<div class="slider-label">가격 스케일</div>${staleHtml}<div class="slider-track">${marksHtml}</div>`;
+}
+
+// 선정 이유 카드
+function buildReasonBody(strategy, ctx, extra, lastClose) {
+  const cand = ctx.candEntry;
+  const lines = [];
+
+  if (strategy === 'bnf') {
+    if (cand) {
+      const d5 = cand.drop_5d || 0, d10 = cand.drop_10d || 0, dh = cand.drop_from_high || 0;
+      const dp = [];
+      if (d5 > 0) dp.push(`5일 <strong>-${d5.toFixed(1)}%</strong>`);
+      if (d10 > 0) dp.push(`10일 <strong>-${d10.toFixed(1)}%</strong>`);
+      if (dh > 0) dp.push(`고점 <strong>-${dh.toFixed(1)}%</strong> <span style="color:${dh>=25?'#15803d':'#9ca3af'}">${dh>=25?'(≥25 통과)':'(미달)'}</span>`);
+      if (dp.length) lines.push('낙폭 ' + dp.join(' · '));
+
+      const fp = [];
+      if (cand.market_cap) fp.push(`시총 ${fmtKr(cand.market_cap)} <span style="color:${cand.market_cap>=1e12?'#15803d':'#dc2626'}">${cand.market_cap>=1e12?'통과':'미달'}</span>`);
+      if (cand.trading_value) fp.push(`거래대금 ${fmtKr(cand.trading_value)} <span style="color:${cand.trading_value>=1e10?'#15803d':'#dc2626'}">${cand.trading_value>=1e10?'통과':'미달'}</span>`);
+      if (fp.length) lines.push('필터 ' + fp.join(' · '));
+    } else if (ctx.activePos && ctx.activePos.selection_reason) {
+      lines.push(ctx.activePos.selection_reason);
+    } else {
+      lines.push('현재 선정 후보 목록에 없습니다 (과거 청산 종목 또는 데이터 결손).');
+    }
+  } else { // bb
+    if (cand) {
+      const p = [];
+      if (cand.percent_b !== undefined) p.push(`%B <strong>${cand.percent_b.toFixed(2)}</strong> <span style="color:${cand.percent_b<0.2?'#15803d':'#dc2626'}">${cand.percent_b<0.2?'< 0.20 통과':'미달'}</span>`);
+      if (cand.rsi !== undefined) p.push(`RSI <strong>${cand.rsi.toFixed(1)}</strong> <span style="color:${cand.rsi<=30?'#15803d':'#dc2626'}">${cand.rsi<=30?'≤ 30 통과':'미달'}</span>`);
+      if (cand.vol_ratio !== undefined) p.push(`거래량 <strong>${cand.vol_ratio.toFixed(1)}x</strong>`);
+      if (p.length) lines.push('지표 ' + p.join(' · '));
+    } else if (ctx.activePos && ctx.activePos.selection_reason) {
+      lines.push(ctx.activePos.selection_reason);
+    } else {
+      lines.push('현재 선정 후보 목록에 없습니다.');
+    }
+  }
+
+  return lines.join('<br>');
+}
+
+// 거래 이력 카드
+function buildHistoryBody(ctx) {
+  const trades = [...ctx.stockTrades].sort((a,b) => (a.entry_date||'').localeCompare(b.entry_date||''));
+  if (!trades.length) return null;
+  const rows = trades.map((t, i) => {
+    const ret = t.return_pct || 0;
+    const cls = ret > 0 ? 'win' : ret < 0 ? 'loss' : '';
+    return `<div class="history-row">
+      <div class="history-rank">#${i+1}</div>
+      <div class="history-date">${(t.entry_date||'').slice(5)}~${(t.exit_date||'').slice(5)}</div>
+      <div class="history-pct ${cls}">${fmtPct(ret)}</div>
+      <div class="history-amt ${cls}">${fmtSign(t.profit||0)}</div>
+      <div class="history-reason">${t.exit_reason||''}</div>
+    </div>`;
+  }).join('');
+
+  const totalProfit = trades.reduce((sum, t) => sum + (t.profit||0), 0);
+  const wins = trades.filter(t => (t.return_pct||0) > 0).length;
+  const winRate = trades.length ? (wins / trades.length * 100).toFixed(0) : 0;
+  const sumCls = totalProfit > 0 ? 'win' : totalProfit < 0 ? 'loss' : '';
+
+  const summary = `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:11px"><span style="color:#6b7280">누적 ${trades.length}건 · 승률 ${winRate}%</span><strong class="history-amt ${sumCls}">${fmtSign(totalProfit)}원</strong></div>`;
+  return { html: rows + summary, meta: `${trades.length}회` };
+}
+
+// 다음 액션 카드
+function buildNextBody(strategy, ctx, lastClose) {
+  const lines = [];
+  const stopPct = strategy === 'bb' ? -6 : -3;
+  const tpPct = strategy === 'bb' ? 7 : 10;
+
+  if (ctx.stateType === 'active') {
+    const p = ctx.activePos;
+    const avg = p.avg_price || 0;
+    const qty = p.total_quantity || 0;
+    const tpPrice = Math.round(avg * (1 + tpPct/100));
+    const slPrice = Math.round(avg * (1 + stopPct/100));
+    const tpAmt = Math.round((tpPrice - avg) * qty);
+    const slAmt = Math.round((slPrice - avg) * qty);
+    const days = Math.floor((new Date() - new Date(p.entry_date)) / 86400000);
+    lines.push(`<div class="next-row"><span class="next-label">진입일</span><span class="next-value">${p.entry_date} (D+${days}, ${qty}주)</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label">익절 도달 시 (+${tpPct}%)</span><span class="next-value next-amount pos">+${fmt(tpAmt)}원</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label">손절 도달 시 (${stopPct}%)</span><span class="next-value next-amount neg">${fmt(slAmt)}원</span></div>`);
+  } else if (ctx.stateType === 'cooldown') {
+    lines.push(`<div class="next-row"><span class="next-label">상태</span><span class="next-value" style="color:#a16207;font-weight:700">쿨다운 D-${ctx.cooldownDays}</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label">재진입 가능</span><span class="next-value">${ctx.cooldownUntil} 이후</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label" style="font-size:10px">사유</span><span class="next-value" style="font-size:10px;color:#9ca3af;font-weight:500">최근 손절 → 5영업일 차단 (P0 가드)</span></div>`);
+  } else if (ctx.stateType === 'candidate' && ctx.candEntry) {
+    const c = ctx.candEntry;
+    const entryPrice = c.price || lastClose;
+    const slotCap = strategy === 'bb' ? 600000 : 600000;  // 자본 3M / 5포지션
+    const qty = Math.floor(slotCap / entryPrice);
+    const tpAmt = Math.round(qty * entryPrice * (tpPct/100));
+    const slAmt = Math.round(qty * entryPrice * (stopPct/100));
+    lines.push(`<div class="next-row"><span class="next-label">예상 진입가</span><span class="next-value">${fmt(entryPrice)}원 × ${qty}주 ≈ ${fmt(qty*entryPrice)}원</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label">익절 도달 시 (+${tpPct}%)</span><span class="next-value next-amount pos">+${fmt(tpAmt)}원</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label">손절 도달 시 (${stopPct}%)</span><span class="next-value next-amount neg">${fmt(slAmt)}원</span></div>`);
+  } else if (ctx.stateType === 'closed' && ctx.stockTrades.length) {
+    const last = [...ctx.stockTrades].sort((a,b) => (b.exit_date||'').localeCompare(a.exit_date||''))[0];
+    const ret = last.return_pct || 0;
+    lines.push(`<div class="next-row"><span class="next-label">마지막 청산</span><span class="next-value">${last.exit_date}</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label">결과</span><span class="next-value next-amount ${ret>0?'pos':'neg'}">${fmtPct(ret)} (${fmtSign(last.profit||0)}원)</span></div>`);
+    lines.push(`<div class="next-row"><span class="next-label" style="font-size:10px">사유</span><span class="next-value" style="font-size:10px;color:#9ca3af;font-weight:500">${last.exit_reason||'-'}</span></div>`);
+  } else {
+    return null;
+  }
+
+  return lines.join('');
+}
+
 function openStockChart(code, name, strategy, extraData) {
   const modal = document.getElementById('chartModal');
   const tagCls = strategy === 'bb' ? 'tag-bb' : 'tag-bnf';
   const tagName = strategy === 'bb' ? '볼린저' : '낙폭과대';
-  document.getElementById('modalTitle').innerHTML =
-    `${name} <span style="color:#9ca3af;font-weight:400;font-size:12px;margin-left:4px">${code}</span> <span class="tag ${tagCls}" style="font-size:10px;padding:2px 8px;">${tagName}</span>`;
-  document.getElementById('modalNaver').href = `https://m.stock.naver.com/domestic/stock/${code}`;
-  modal.classList.add('open');
 
-  // iframe 내부일 때 parent에게 하단 네비 숨기기 요청
+  const ctx = computeStockContext(code, strategy, extraData);
+
+  document.getElementById('modalTitle').innerHTML =
+    `${name} <span style="color:#9ca3af;font-weight:400;font-size:12px">${code}</span> <span class="tag ${tagCls}" style="font-size:10px;padding:2px 8px;">${tagName}</span> ${ctx.badgeHtml}`;
+  document.getElementById('modalContext').innerHTML = ctx.contextHtml;
+  document.getElementById('modalLinks').innerHTML = renderLinks(code);
+
+  // Reset cards
+  ['modalSlider','modalReason','modalHistory','modalNext'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  modal.classList.add('open');
   if (window.self !== window.top) {
     try { window.parent.postMessage({ type: 'bnf-modal', open: true }, '*'); } catch(e) {}
   }
 
-  // Clear previous chart
   const container = document.getElementById('modalChart');
   container.innerHTML = '';
 
-  fetchStockChart(code, name, strategy, extraData, container);
+  fetchStockChart(code, name, strategy, ctx, container);
 }
 
 function closeModal() {
   document.getElementById('chartModal').classList.remove('open');
   disposeLwChart();
-  // iframe 내부일 때 parent에게 하단 네비 복원 요청
   if (window.self !== window.top) {
     try { window.parent.postMessage({ type: 'bnf-modal', open: false }, '*'); } catch(e) {}
   }
 }
 
-// Close on overlay click
 document.getElementById('chartModal')?.addEventListener('click', e => {
   if (e.target.classList.contains('modal-overlay')) closeModal();
 });
 
-async function fetchStockChart(code, name, strategy, extra, container) {
-  // 연속 클릭으로 인한 누수 방지: 기존 차트/옵저버 정리
+async function fetchStockChart(code, name, strategy, ctx, container) {
   disposeLwChart();
+  const extra = ctx.extraData || {};
 
   const data = await fetchJSON(`data/bnf/stock_charts/${code}.json`);
 
   if (!data || !data.ohlcv || !data.ohlcv.length) {
     container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6b7280;font-size:13px;">차트 데이터가 아직 없습니다. 다음 워크플로우 실행 후 반영됩니다.</div>';
     document.getElementById('modalLegend').innerHTML = '';
-    document.getElementById('modalInfo').innerHTML = '';
     return;
   }
 
@@ -762,7 +1086,7 @@ async function fetchStockChart(code, name, strategy, extra, container) {
   const lastClose = ohlcv[ohlcv.length - 1].close;
   const lastDateStr = ohlcv[ohlcv.length - 1].date;
 
-  // 데이터 최신성 계산 (영업일 기준, 주말만 제외 — 공휴일 미반영)
+  // 데이터 최신성 (영업일, 공휴일 미반영)
   const [ly, lm, ld] = lastDateStr.split('-').map(Number);
   const lastLocal = new Date(ly, lm - 1, ld);
   const todayLocal = new Date(); todayLocal.setHours(0, 0, 0, 0);
@@ -773,10 +1097,8 @@ async function fetchStockChart(code, name, strategy, extra, container) {
   }
   const isStale = ageBiz >= 3;
 
-  // Create lightweight chart
   lwChart = LightweightCharts.createChart(container, {
-    width: container.clientWidth,
-    height: 320,
+    width: container.clientWidth, height: 320,
     layout: { background: { color: '#131722' }, textColor: '#d1d4dc', fontSize: 11 },
     grid: { vertLines: { color: '#1e222d' }, horzLines: { color: '#1e222d' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
@@ -784,7 +1106,6 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     timeScale: { borderColor: '#2b2b43', timeVisible: false },
   });
 
-  // Candlestick series
   const candleSeries = lwChart.addCandlestickSeries({
     upColor: '#ef4444', downColor: '#3b82f6',
     borderUpColor: '#ef4444', borderDownColor: '#3b82f6',
@@ -794,10 +1115,8 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     time: d.date, open: d.open, high: d.high, low: d.low, close: d.close,
   })));
 
-  // Volume
   const volSeries = lwChart.addHistogramSeries({
-    priceFormat: { type: 'volume' },
-    priceScaleId: 'vol',
+    priceFormat: { type: 'volume' }, priceScaleId: 'vol',
   });
   lwChart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.85, bottom: 0 } });
   volSeries.setData(ohlcv.map(d => ({
@@ -805,56 +1124,55 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     color: d.close >= d.open ? '#ef444433' : '#3b82f633',
   })));
 
-  // Strategy reference lines & markers
+  // Strategy reference lines & slider marks
   const lines = [];
   const legends = [];
-  const infoItems = [];
+  const sliderMarks = [];
   let strategyDesc = '';
 
   if (strategy === 'bnf') {
-    // Fix 2: 최근 20일 구간에서만 고점 계산 (전체 차트 최고값 대신)
     const recent20 = ohlcv.slice(-20);
-    const high20d = extra.high_20d || (recent20.length ? Math.max(...recent20.map(d => d.high)) : lastClose);
-    const entryLine = Math.round(high20d * 0.75); // 20일 고점 대비 -25%
-    const avgPrice = extra.avg_price || lastClose;
-    const tpPrice = Math.round(avgPrice * 1.10);
-    const slPrice = Math.round(avgPrice * 0.97);
+    const high20d = (extra.high_20d) || (ctx.candEntry && ctx.candEntry.high_20d) || (ctx.activePos && ctx.activePos.high_20d) || (recent20.length ? Math.max(...recent20.map(d => d.high)) : lastClose);
+    const entryLine = Math.round(high20d * 0.75);
+    const avgPrice = (ctx.activePos && ctx.activePos.avg_price) || extra.avg_price || 0;
+    const tpPrice = avgPrice ? Math.round(avgPrice * 1.10) : 0;
+    const slPrice = avgPrice ? Math.round(avgPrice * 0.97) : 0;
 
     lines.push({ price: high20d, color: '#fbbf24', style: 2, width: 1, title: '20일 고점' });
-    // Fix 3: 라벨 명확화 — "20일고점 -25%"로 기준 명시
-    lines.push({ price: entryLine, color: '#22c55e', style: 2, width: 1, title: '진입선 (20일고점 -25%)' });
-    if (extra.avg_price) {
+    lines.push({ price: entryLine, color: '#22c55e', style: 2, width: 1, title: '진입선 (-25%)' });
+    if (avgPrice) {
       lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: `매수가 ${fmt(avgPrice)}원` });
       lines.push({ price: tpPrice, color: '#3b82f6', style: 2, width: 1, title: '익절 (+10%)' });
       lines.push({ price: slPrice, color: '#ef4444', style: 2, width: 1, title: '손절 (-3%)' });
     }
 
     legends.push({ color: '#fbbf24', label: '20일 고점', dashed: true });
-    legends.push({ color: '#22c55e', label: '진입선 (20일고점 -25%)', dashed: true });
-    if (extra.avg_price) {
+    legends.push({ color: '#22c55e', label: '진입선 (고점-25%)', dashed: true });
+    if (avgPrice) {
       legends.push({ color: '#ffffff', label: '매수가', dashed: false });
       legends.push({ color: '#3b82f6', label: '익절 +10%', dashed: true });
       legends.push({ color: '#ef4444', label: '손절 -3%', dashed: true });
     }
 
-    infoItems.push({ label: '20일 고점', val: fmt(high20d) + '원' });
-    infoItems.push({ label: '현재가', val: fmt(lastClose) + '원' });
-    infoItems.push({ label: '고점 대비', val: '-' + ((high20d - lastClose) / high20d * 100).toFixed(1) + '%', cls: 'neg-c' });
-    infoItems.push({ label: '진입 기준가', val: fmt(entryLine) + '원' });
-    if (extra.avg_price) {
-      const pnlPct = ((lastClose - avgPrice) / avgPrice * 100);
-      infoItems.push({ label: '매수가', val: fmt(avgPrice) + '원' });
-      infoItems.push({ label: '평가 수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
-      infoItems.push({ label: '익절 목표', val: fmt(tpPrice) + '원' });
-      infoItems.push({ label: '손절 기준', val: fmt(slPrice) + '원', cls: 'neg-c' });
+    // Slider marks
+    const dropFromHigh = ((high20d - lastClose) / high20d * 100);
+    sliderMarks.push({ type: 'high', label: '20일 고점', value: high20d });
+    if (avgPrice) {
+      sliderMarks.push({ type: 'stop', label: '손절', value: slPrice, pct: '-3%' });
+      sliderMarks.push({ type: 'entry', label: '매수', value: avgPrice });
+      sliderMarks.push({ type: 'tp', label: '익절', value: tpPrice, pct: '+10%' });
+    } else {
+      sliderMarks.push({ type: 'entry', label: '진입선', value: entryLine, pct: '-25%' });
     }
-    strategyDesc = `<strong>낙폭과대 전략:</strong> 20일 고점 대비 -25% 이상 하락한 대형주(시총 1조+)에 진입. 손절 -3% / 익절 +10% (분할: +5%→+10%→트레일링). 최대 5포지션.`;
+    sliderMarks.push({ type: 'now', label: '현재가', value: lastClose, pct: `-${dropFromHigh.toFixed(1)}%` });
+
+    strategyDesc = `<strong>낙폭과대 전략:</strong> 20일 고점 -25% 이상 + 시총 1조+. 손절 -3% / 익절 +10% (분할: +5%→+10%→트레일링). 최대 5포지션.`;
 
   } else { // bollinger
     const closes = ohlcv.map(d => d.close);
     const period = 15;
+    let lastBBU = 0, lastBBM = 0, lastBBL = 0;
     if (closes.length >= period) {
-      // Calculate BB for each point and draw as line series
       const bbUpper = [], bbMiddle = [], bbLower = [];
       for (let i = period - 1; i < closes.length; i++) {
         const slice = closes.slice(i - period + 1, i + 1);
@@ -865,34 +1183,25 @@ async function fetchStockChart(code, name, strategy, extra, container) {
         bbMiddle.push({ time: date, value: Math.round(mean) });
         bbLower.push({ time: date, value: Math.round(mean - 2 * std) });
       }
-
-      const upperSeries = lwChart.addLineSeries({ color: '#ef444466', lineWidth: 1, lineStyle: 2 });
-      upperSeries.setData(bbUpper);
-      const midSeries = lwChart.addLineSeries({ color: '#fbbf2466', lineWidth: 1, lineStyle: 2 });
-      midSeries.setData(bbMiddle);
-      const lowerSeries = lwChart.addLineSeries({ color: '#22c55e66', lineWidth: 1, lineStyle: 2 });
-      lowerSeries.setData(bbLower);
+      lwChart.addLineSeries({ color: '#ef444466', lineWidth: 1, lineStyle: 2 }).setData(bbUpper);
+      lwChart.addLineSeries({ color: '#fbbf2466', lineWidth: 1, lineStyle: 2 }).setData(bbMiddle);
+      lwChart.addLineSeries({ color: '#22c55e66', lineWidth: 1, lineStyle: 2 }).setData(bbLower);
 
       legends.push({ color: '#ef4444', label: 'BB 상단', dashed: true });
       legends.push({ color: '#fbbf24', label: 'BB 중심 (SMA15)', dashed: true });
       legends.push({ color: '#22c55e', label: 'BB 하단', dashed: true });
 
-      // BB 최신값 info
       if (bbUpper.length) {
-        const lastBBU = bbUpper[bbUpper.length-1].value;
-        const lastBBM = bbMiddle[bbMiddle.length-1].value;
-        const lastBBL = bbLower[bbLower.length-1].value;
-        infoItems.push({ label: 'BB 상단', val: fmt(lastBBU) + '원' });
-        infoItems.push({ label: 'BB 중심', val: fmt(lastBBM) + '원' });
-        infoItems.push({ label: 'BB 하단', val: fmt(lastBBL) + '원' });
-        infoItems.push({ label: 'BB 폭', val: fmt(lastBBU - lastBBL) + '원' });
+        lastBBU = bbUpper[bbUpper.length-1].value;
+        lastBBM = bbMiddle[bbMiddle.length-1].value;
+        lastBBL = bbLower[bbLower.length-1].value;
       }
     }
 
-    const avgPrice = extra.avg_price || lastClose;
-    const tpBb = Math.round(avgPrice * 1.07);
-    const slBb = Math.round(avgPrice * 0.94);
-    if (extra.avg_price) {
+    const avgPrice = (ctx.activePos && ctx.activePos.avg_price) || extra.avg_price || 0;
+    const tpBb = avgPrice ? Math.round(avgPrice * 1.07) : 0;
+    const slBb = avgPrice ? Math.round(avgPrice * 0.94) : 0;
+    if (avgPrice) {
       lines.push({ price: avgPrice, color: '#ffffff', style: 0, width: 2, title: `매수가 ${fmt(avgPrice)}원` });
       lines.push({ price: tpBb, color: '#3b82f6', style: 2, width: 1, title: '익절 (+7%)' });
       lines.push({ price: slBb, color: '#ef4444', style: 2, width: 1, title: '손절 (-6%)' });
@@ -901,20 +1210,20 @@ async function fetchStockChart(code, name, strategy, extra, container) {
       legends.push({ color: '#ef4444', label: '손절 -6%', dashed: true });
     }
 
-    infoItems.push({ label: '현재가', val: fmt(lastClose) + '원' });
-    if (extra.percent_b !== undefined) infoItems.push({ label: '%B', val: extra.percent_b.toFixed(3), cls: extra.percent_b < 0.2 ? 'pos-c' : '' });
-    if (extra.rsi !== undefined) infoItems.push({ label: 'RSI(14)', val: extra.rsi.toFixed(1), cls: extra.rsi <= 30 ? 'pos-c' : '' });
-    if (extra.avg_price) {
-      const pnlPct = ((lastClose - avgPrice) / avgPrice * 100);
-      infoItems.push({ label: '매수가', val: fmt(avgPrice) + '원' });
-      infoItems.push({ label: '평가 수익률', val: fmtPct(pnlPct), cls: pnlCls(pnlPct) });
-      infoItems.push({ label: '익절 목표', val: fmt(tpBb) + '원' });
-      infoItems.push({ label: '손절 기준', val: fmt(slBb) + '원', cls: 'neg-c' });
+    // Slider marks
+    if (lastBBU) sliderMarks.push({ type: 'high', label: 'BB 상단', value: lastBBU });
+    if (avgPrice) {
+      sliderMarks.push({ type: 'stop', label: '손절', value: slBb, pct: '-6%' });
+      sliderMarks.push({ type: 'entry', label: '매수', value: avgPrice });
+      sliderMarks.push({ type: 'tp', label: '익절', value: tpBb, pct: '+7%' });
     }
-    strategyDesc = `<strong>볼린저 스윙:</strong> BB(15,2) 하단 %B&lt;0.2 + RSI&le;30 + 거래량 1.0x 이상. 손절 -6% / 익절 %B&ge;0.7 OR RSI&ge;40 OR +7%. 최대 12일 보유, 3포지션.`;
+    if (lastBBL) sliderMarks.push({ type: 'stop', label: 'BB 하단', value: lastBBL });
+    sliderMarks.push({ type: 'now', label: '현재가', value: lastClose });
+
+    strategyDesc = `<strong>볼린저 스윙:</strong> %B&lt;0.2 + RSI&le;30 + 거래량&ge;1.0x. 손절 -6% / 익절 %B&ge;0.7 OR RSI&ge;40 OR +7%. 최대 12일, 3포지션.`;
   }
 
-  // Draw price lines
+  // Draw price lines on chart
   lines.forEach(l => {
     candleSeries.createPriceLine({
       price: l.price, color: l.color,
@@ -923,30 +1232,26 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     });
   });
 
-  // Fix 1: 매수 마커 위치를 매수가 기준으로 스마트하게 배치
-  // - 매수가가 그날 캔들 고가보다 높으면 aboveBar (화살표 ↓, 캔들 위에서 아래 방향)
-  // - 매수가가 그날 캔들 저가보다 낮으면 belowBar (화살표 ↑, 캔들 아래에서 위 방향)
-  // - 캔들 범위 안이면 belowBar 기본
-  // 화살표 텍스트에 매수가를 명시해 하얀 가로선과의 연결 명확히 함
-  if (extra.entry_date) {
-    const entryBar = ohlcv.find(d => d.date === extra.entry_date);
-    const avgP = extra.avg_price || 0;
-    let position = 'belowBar';
-    let shape = 'arrowUp';
-    if (entryBar && avgP) {
-      if (avgP > entryBar.high) { position = 'aboveBar'; shape = 'arrowDown'; }
-      else if (avgP < entryBar.low) { position = 'belowBar'; shape = 'arrowUp'; }
+  // 매수 마커
+  const entryDateForMarker = (ctx.activePos && ctx.activePos.entry_date) || extra.entry_date;
+  const avgForMarker = (ctx.activePos && ctx.activePos.avg_price) || extra.avg_price || 0;
+  if (entryDateForMarker) {
+    const entryBar = ohlcv.find(d => d.date === entryDateForMarker);
+    let position = 'belowBar', shape = 'arrowUp';
+    if (entryBar && avgForMarker) {
+      if (avgForMarker > entryBar.high) { position = 'aboveBar'; shape = 'arrowDown'; }
+      else if (avgForMarker < entryBar.low) { position = 'belowBar'; shape = 'arrowUp'; }
     }
-    const priceLabel = avgP ? ` @${fmt(avgP)}` : '';
+    const priceLabel = avgForMarker ? ` @${fmt(avgForMarker)}` : '';
     candleSeries.setMarkers([{
-      time: extra.entry_date, position, color: '#22c55e',
+      time: entryDateForMarker, position, color: '#22c55e',
       shape, text: '매수' + priceLabel,
     }]);
   }
 
   lwChart.timeScale().fitContent();
 
-  // Render legend (실선 vs 점선 구분)
+  // Legend
   document.getElementById('modalLegend').innerHTML = legends.map(l => {
     const dotCls = l.dashed ? 'modal-legend-dot dashed' : 'modal-legend-dot';
     const style = l.dashed
@@ -955,19 +1260,39 @@ async function fetchStockChart(code, name, strategy, extra, container) {
     return `<div class="modal-legend-item"><div class="${dotCls}" style="${style}"></div>${l.label}</div>`;
   }).join('');
 
-  // 데이터 기준일을 info 최상단에 표시 (stale 시 경고)
-  const staleSuffix = isStale ? ` <span style="color:#ef4444;font-weight:600">· ${ageBiz}영업일 전</span>` : '';
-  infoItems.unshift({ label: '데이터 기준', val: lastDateStr + staleSuffix, cls: isStale ? 'neg-c' : '' });
+  // Zone 2: Price slider
+  const sliderEl = document.getElementById('modalSlider');
+  if (sliderMarks.length) {
+    sliderEl.innerHTML = buildPriceSlider(sliderMarks, lastDateStr, isStale, ageBiz);
+    sliderEl.style.display = 'block';
+  }
 
-  // Render info
-  document.getElementById('modalInfo').innerHTML = infoItems.map(i =>
-    `<div class="modal-info-item"><span class="modal-info-label">${i.label}</span><span class="modal-info-val ${i.cls||''}">${i.val}</span></div>`
-  ).join('');
+  // Zone 3a: Reason
+  const reasonBody = buildReasonBody(strategy, ctx, extra, lastClose);
+  if (reasonBody) {
+    document.getElementById('modalReasonBody').innerHTML = reasonBody;
+    document.getElementById('modalReason').style.display = 'block';
+  }
 
-  // Render strategy description
+  // Zone 3b: History
+  const historyResult = buildHistoryBody(ctx);
+  if (historyResult) {
+    document.getElementById('modalHistoryBody').innerHTML = historyResult.html;
+    document.getElementById('modalHistoryMeta').textContent = historyResult.meta;
+    document.getElementById('modalHistory').style.display = 'block';
+  }
+
+  // Zone 3c: Next
+  const nextBody = buildNextBody(strategy, ctx, lastClose);
+  if (nextBody) {
+    document.getElementById('modalNextBody').innerHTML = nextBody;
+    document.getElementById('modalNext').style.display = 'block';
+  }
+
+  // Strategy desc
   document.getElementById('modalStrategyDesc').innerHTML = strategyDesc;
 
-  // Resize handler (변수에 보관 후 close/재오픈 시 disconnect)
+  // Resize observer
   lwResizeObserver = new ResizeObserver(() => {
     if (lwChart) lwChart.applyOptions({ width: container.clientWidth });
   });

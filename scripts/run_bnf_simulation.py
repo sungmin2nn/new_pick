@@ -207,9 +207,16 @@ def main():
             continue
 
         reason = candidate.get("reasons", "")
+        meta = {
+            "sector": candidate.get("sector", ""),
+            "market_cap": candidate.get("market_cap", 0),
+            "trading_value": candidate.get("trading_value", 0),
+            "high_20d": candidate.get("high_20d", 0),
+        }
         pos = mgr.enter_position(
             code=code, name=name, price=entry_price, quantity=quantity,
             date=today, time=time_str, selection_reason=reason,
+            meta=meta,
         )
         if pos:
             note = ""

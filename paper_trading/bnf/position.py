@@ -178,10 +178,14 @@ class BNFPositionManager:
 
     def enter_position(self, code: str, name: str, price: int, quantity: int,
                        date: str, time: str,
-                       selection_reason: str = "") -> Optional[Dict[str, Any]]:
+                       selection_reason: str = "",
+                       meta: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
         """
         신규 포지션 진입 (FULL 상태로 즉시 등록).
         이미 동일 종목을 보유 중이면 None 반환.
+
+        meta: 후보 시점의 메타데이터 (sector, market_cap, trading_value, high_20d 등).
+              대시보드 모달에서 시총/섹터/거래대금 표시에 사용됨.
         """
         if self.has_open_position(code):
             print(f"이미 보유 중: {code}")
@@ -197,6 +201,7 @@ class BNFPositionManager:
             print(f"슬롯 부족 (최대 {MAX_POSITIONS})")
             return None
 
+        m = meta or {}
         position = {
             "code": code,
             "name": name,
@@ -209,6 +214,10 @@ class BNFPositionManager:
             "unrealized_pnl": 0,
             "unrealized_pnl_pct": 0.0,
             "selection_reason": selection_reason,
+            "sector": m.get("sector", ""),
+            "market_cap": m.get("market_cap", 0),
+            "trading_value": m.get("trading_value", 0),
+            "high_20d": m.get("high_20d", 0),
             "entries": [
                 {"price": price, "quantity": quantity, "date": date, "time": time}
             ],
