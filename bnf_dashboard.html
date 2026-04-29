@@ -185,6 +185,51 @@ tr:hover{background:rgba(0,198,190,.02)}
   .hero-value{font-size:2em}
   .hero-strategies{flex-direction:column;align-items:center}
   .pos-mid{flex-wrap:wrap;gap:8px}
+
+  /* === 모달 모바일 (S23 393px 기준) === */
+  .modal-overlay{padding:8px}
+  .modal-box{margin:8px auto 60px;border-radius:12px}
+  .modal-header{padding:12px 14px 8px}
+  .modal-body{padding:12px 14px}
+  .modal-title{font-size:14px;gap:6px;line-height:1.45}
+  .modal-context{font-size:10px;line-height:1.6}
+  .modal-badge{font-size:9px;padding:2px 7px}
+  .modal-chart{height:240px}
+
+  /* 가격 슬라이더 — 4단 stagger 가능하도록 padding 확대 */
+  .modal-slider{padding:78px 8px 110px}
+  .slider-label{font-size:9px}
+  .slider-stale{font-size:9px}
+
+  /* 거래 이력 — 2줄 area 배치 (rank/date/pct/amt 한 줄, reason 둘째 줄) */
+  .history-row{
+    grid-template-columns:22px 1fr 60px 70px;
+    grid-template-areas:
+      "rank date pct amt"
+      ".    reason reason reason";
+    gap:2px 6px;
+    padding:6px 0;
+  }
+  .history-rank{grid-area:rank}
+  .history-date{grid-area:date}
+  .history-pct{grid-area:pct;font-size:11px}
+  .history-amt{grid-area:amt;font-size:10px}
+  .history-reason{grid-area:reason;font-size:10px;line-height:1.4;padding-left:0}
+
+  /* 다음 액션 행 — 줄바꿈 허용, 우측값 좌측 정렬로 */
+  .next-row{flex-wrap:wrap;gap:0 8px}
+  .next-row .next-label{flex:0 0 auto;font-size:10px}
+  .next-row .next-value{font-size:11px;flex:0 0 auto}
+
+  /* 외부 링크 */
+  .modal-link{padding:6px 10px;font-size:10px}
+  .modal-link .ico{font-size:11px}
+
+  /* Strategy desc */
+  .modal-strategy-desc{font-size:10px;line-height:1.65}
+
+  /* 차트 범례 칩 */
+  .modal-legend-item{font-size:10px;padding:3px 8px}
 }
 </style>
 </head>
@@ -891,13 +936,16 @@ function buildPriceSlider(marks, dataDate, isStale, ageBiz) {
   const lo = minV - pad, hi = maxV + pad;
   const pos = v => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100));
 
-  // 라벨/값 위치 단계화 (가까운 마크는 위/아래로 stagger)
+  // 라벨/값 stagger — 화면 폭에 따라 단수 조정 (모바일 4단, 데스크톱 2단)
+  const isMobile = (typeof window !== 'undefined') && window.innerWidth < 600;
+  const maxOff = isMobile ? 4 : 2;
+  const threshold = isMobile ? 16 : 10;
   const sorted = [...marks].sort((a,b) => a.value - b.value);
   const positions = sorted.map(m => pos(m.value));
-  let prevOff = 0, prevPos = -100;
+  let prevOff = -1, prevPos = -100;
   sorted.forEach((m,i) => {
-    if (Math.abs(positions[i] - prevPos) < 10) {
-      m._off = (prevOff + 1) % 2;  // 0,1,0,1 토글
+    if (Math.abs(positions[i] - prevPos) < threshold) {
+      m._off = (prevOff + 1) % maxOff;
     } else {
       m._off = 0;
     }
@@ -905,8 +953,10 @@ function buildPriceSlider(marks, dataDate, isStale, ageBiz) {
   });
 
   const marksHtml = sorted.map(m => {
-    const labelTop = -22 - (m._off || 0) * 12;
-    const valTop = 18 + (m._off || 0) * 24;
+    const labelStep = isMobile ? 14 : 12;
+    const valStep = isMobile ? 22 : 24;
+    const labelTop = -22 - (m._off || 0) * labelStep;
+    const valTop = 18 + (m._off || 0) * valStep;
     const pctHtml = m.pct ? `<div class="slider-mark-pct">${m.pct}</div>` : '';
     return `<div class="slider-mark ${m.type}" style="left:${pos(m.value).toFixed(1)}%">
       <div class="slider-mark-label" style="top:${labelTop}px">${m.label}</div>
