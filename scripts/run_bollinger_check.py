@@ -265,9 +265,15 @@ def main():
             continue
 
         reason = candidate.get("reasons", candidate.get("selection_reason", ""))
+        meta = {
+            "sector": candidate.get("sector", ""),
+            "market_cap": candidate.get("market_cap", 0),
+            "trading_value": candidate.get("trading_value", 0),
+        }
         pos = mgr.enter_position(
             code=code, name=name, price=price, quantity=quantity,
             date=today, time=time_str, selection_reason=reason,
+            meta=meta,
         )
         if pos:
             print(f"  진입: {name}({code}) @ {price:,}원 x {quantity}주")
