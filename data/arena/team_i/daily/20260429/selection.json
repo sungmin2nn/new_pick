@@ -1,0 +1,136 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260428",
+  "selected_at": "2026-04-29 18:24:50",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "001510",
+      "name": "SK증권",
+      "price": 5510,
+      "change_pct": 13.73,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 96.9,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 157812824,
+      "trading_value": 905843480145
+    },
+    {
+      "code": "005490",
+      "name": "POSCO홀딩스",
+      "price": 466500,
+      "change_pct": 11.74,
+      "score": 57.1,
+      "score_detail": {
+        "alpha_score": 85.1,
+        "delta_score": 0.0,
+        "alpha_norm": 87.8,
+        "delta_norm": 0.0,
+        "alpha_weighted": 57.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1962453,
+      "trading_value": 916571495500
+    },
+    {
+      "code": "241520",
+      "name": "DSC인베스트먼트",
+      "price": 18190,
+      "change_pct": 13.69,
+      "score": 50.8,
+      "score_detail": {
+        "alpha_score": 75.7,
+        "delta_score": 0.0,
+        "alpha_norm": 78.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 50.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 14107634,
+      "trading_value": 261888991315
+    },
+    {
+      "code": "000660",
+      "name": "SK하이닉스",
+      "price": 1293000,
+      "change_pct": -0.54,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 64.7,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 0,
+      "volume": 5000,
+      "trading_value": 9215242000000
+    },
+    {
+      "code": "402340",
+      "name": "SK스퀘어",
+      "price": 830000,
+      "change_pct": 2.34,
+      "score": 33.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 62.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 96.6,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 0,
+      "volume": 100,
+      "trading_value": 1095255000000
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}

@@ -1,0 +1,1057 @@
+{
+  "date": "20260430",
+  "generated_at": "2026-04-29 18:40:06",
+  "strategies": {
+    "largecap_contrarian": {
+      "strategy_id": "largecap_contrarian",
+      "strategy_name": "대형주 역추세",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:37:55",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "min_price": 5000,
+        "max_change": -3.0,
+        "min_trading_value": 50,
+        "min_market_cap": 1000000000000,
+        "kospi_drop_threshold": -2.0,
+        "entry_time": "09:30",
+        "weights": {
+          "market_cap": 30,
+          "change_pct": 25,
+          "trading_value": 20,
+          "price_level": 15,
+          "volatility": 10
+        }
+      },
+      "simulation": null
+    },
+    "momentum": {
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀 추세",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:38:09",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "001510",
+          "name": "SK증권",
+          "price": 5510,
+          "change_pct": 13.73,
+          "score": 96.9,
+          "score_detail": {
+            "change_pct": 32.25167785234899,
+            "trading_value": 29.64886485971895,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 157812824,
+          "trading_value": 905843480145
+        },
+        {
+          "code": "005490",
+          "name": "POSCO홀딩스",
+          "price": 466500,
+          "change_pct": 11.74,
+          "score": 85.1,
+          "score_detail": {
+            "change_pct": 27.57718120805369,
+            "trading_value": 30.0,
+            "volume_surge": 20,
+            "price_level": 7.5
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 1962453,
+          "trading_value": 916571495500
+        },
+        {
+          "code": "241520",
+          "name": "DSC인베스트먼트",
+          "price": 18190,
+          "change_pct": 13.69,
+          "score": 75.7,
+          "score_detail": {
+            "change_pct": 32.15771812080536,
+            "trading_value": 8.571802394055576,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 14107634,
+          "trading_value": 261888991315
+        },
+        {
+          "code": "001200",
+          "name": "유진투자증권",
+          "price": 6280,
+          "change_pct": 12.95,
+          "score": 71.4,
+          "score_detail": {
+            "change_pct": 30.419463087248317,
+            "trading_value": 5.938638954979371,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 28832557,
+          "trading_value": 181439572940
+        },
+        {
+          "code": "092190",
+          "name": "서울바이오시스",
+          "price": 6730,
+          "change_pct": 12.92,
+          "score": 67.3,
+          "score_detail": {
+            "change_pct": 30.348993288590602,
+            "trading_value": 1.9112565219414464,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 8338390,
+          "trading_value": 58393441620
+        }
+      ],
+      "params": {
+        "min_price": 3000,
+        "min_change": 3.0,
+        "max_change": 15.0,
+        "min_trading_value": 30,
+        "weights": {
+          "change_pct": 35,
+          "trading_value": 30,
+          "volume_surge": 20,
+          "price_level": 15
+        }
+      },
+      "simulation": null
+    },
+    "theme_policy": {
+      "strategy_id": "theme_policy",
+      "strategy_name": "테마/정책",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:38:55",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "000660",
+          "name": "SK하이닉스",
+          "price": 1293000,
+          "change_pct": -0.54,
+          "score": 64.7,
+          "score_detail": {
+            "theme_relevance": 36.0,
+            "change_pct": 3.5,
+            "trading_value": 13.9,
+            "theme_strength": 11.2,
+            "themes": [
+              "건설",
+              "금융",
+              "IT 서비스",
+              "비금속",
+              "보험",
+              "운송장비·부품",
+              "화학",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 5000,
+          "trading_value": 9215242000000
+        },
+        {
+          "code": "402340",
+          "name": "SK스퀘어",
+          "price": 830000,
+          "change_pct": 2.34,
+          "score": 62.5,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 5.8,
+            "trading_value": 1.7,
+            "theme_strength": 15.0,
+            "themes": [
+              "금속",
+              "건설",
+              "금융",
+              "IT 서비스",
+              "비금속",
+              "보험",
+              "운송장비·부품",
+              "화학",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 100,
+          "trading_value": 1095255000000
+        },
+        {
+          "code": "373220",
+          "name": "LG에너지솔루션",
+          "price": 473000,
+          "change_pct": 0.21,
+          "score": 57.2,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 0.5,
+            "trading_value": 1.7,
+            "theme_strength": 15.0,
+            "themes": [
+              "금속",
+              "건설",
+              "금융",
+              "IT 서비스",
+              "비금속",
+              "보험",
+              "운송장비·부품",
+              "화학",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 500,
+          "trading_value": 1106820000000
+        },
+        {
+          "code": "005935",
+          "name": "삼성전자우",
+          "price": 163500,
+          "change_pct": 2.19,
+          "score": 49.5,
+          "score_detail": {
+            "theme_relevance": 32.0,
+            "change_pct": 5.5,
+            "trading_value": 2.0,
+            "theme_strength": 10.1,
+            "themes": [
+              "금융",
+              "IT 서비스",
+              "비금속",
+              "보험",
+              "운송장비·부품",
+              "화학",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 100,
+          "trading_value": 1311877000000
+        },
+        {
+          "code": "005930",
+          "name": "삼성전자",
+          "price": 226000,
+          "change_pct": 1.8,
+          "score": 46.2,
+          "score_detail": {
+            "theme_relevance": 16.0,
+            "change_pct": 4.5,
+            "trading_value": 20.0,
+            "theme_strength": 5.7,
+            "themes": [
+              "운송장비·부품",
+              "화학",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 150 산업재"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 100,
+          "trading_value": 13212590000000
+        }
+      ],
+      "params": {
+        "active_themes": [
+          {
+            "name": "금속",
+            "change_pct": 3.49
+          },
+          {
+            "name": "건설",
+            "change_pct": 2.61
+          },
+          {
+            "name": "금융",
+            "change_pct": 2.34
+          },
+          {
+            "name": "IT 서비스",
+            "change_pct": 2.29
+          },
+          {
+            "name": "비금속",
+            "change_pct": 1.88
+          },
+          {
+            "name": "보험",
+            "change_pct": 1.56
+          },
+          {
+            "name": "운송장비·부품",
+            "change_pct": 1.32
+          },
+          {
+            "name": "화학",
+            "change_pct": 1.23
+          },
+          {
+            "name": "코스닥 150 커뮤니케이션서비스",
+            "change_pct": 1.13
+          },
+          {
+            "name": "코스닥 150 산업재",
+            "change_pct": 1.1
+          }
+        ],
+        "theme_count": 10,
+        "total_stocks": 80,
+        "weights": {
+          "theme_relevance": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "theme_strength": 15
+        }
+      },
+      "simulation": null
+    },
+    "dart_disclosure": {
+      "strategy_id": "dart_disclosure",
+      "strategy_name": "DART 공시",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:39:00",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "002780",
+          "name": "진흥기업",
+          "price": 1355,
+          "change_pct": 2.11,
+          "score": 70.0,
+          "score_detail": {
+            "disclosure": 40.0,
+            "change_pct": 5.2749999999999995,
+            "trading_value": 20.0,
+            "market_cap": 4.730741147400001,
+            "dart_raw": 30,
+            "disclosures": [
+              {
+                "category": "계약",
+                "report_nm": "단일판매ㆍ공급계약체결              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 1,
+          "market_cap": 197114214475,
+          "volume": 83587032,
+          "trading_value": 124959421535
+        },
+        {
+          "code": "336370",
+          "name": "솔루스첨단소재",
+          "price": 16150,
+          "change_pct": 3.53,
+          "score": 53.1,
+          "score_detail": {
+            "disclosure": 26.666666666666664,
+            "change_pct": 8.825,
+            "trading_value": 2.5745557369589016,
+            "market_cap": 15.0,
+            "dart_raw": 20,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "유상증자결정(종속회사의주요경영사항)              ",
+                "amount": 0
+              },
+              {
+                "category": "투자",
+                "report_nm": "타법인주식및출자증권취득결정(자율공시)(종속회사의주요경영사항)              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 2,
+          "market_cap": 1134010105600,
+          "volume": 1003117,
+          "trading_value": 16085749780
+        },
+        {
+          "code": "178920",
+          "name": "PI첨단소재",
+          "price": 25950,
+          "change_pct": 0.0,
+          "score": 48.9,
+          "score_detail": {
+            "disclosure": 33.333333333333336,
+            "change_pct": 0,
+            "trading_value": 0.6094004962936787,
+            "market_cap": 15.0,
+            "dart_raw": 25,
+            "disclosures": [
+              {
+                "category": "실적",
+                "report_nm": "영업(잠정)실적(공정공시)              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 3,
+          "market_cap": 762056055900,
+          "volume": 147265,
+          "trading_value": 3807516675
+        },
+        {
+          "code": "003000",
+          "name": "부광약품",
+          "price": 6680,
+          "change_pct": -8.49,
+          "score": 39.2,
+          "score_detail": {
+            "disclosure": 20.0,
+            "change_pct": 0,
+            "trading_value": 4.241775127388357,
+            "market_cap": 15.0,
+            "dart_raw": 15.0,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "타법인주식및출자증권취득결정              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 4,
+          "market_cap": 659080002280,
+          "volume": 3997363,
+          "trading_value": 26502488310
+        },
+        {
+          "code": "161000",
+          "name": "애경케미칼",
+          "price": 15940,
+          "change_pct": -5.12,
+          "score": 37.9,
+          "score_detail": {
+            "disclosure": 20.0,
+            "change_pct": 0,
+            "trading_value": 2.8823839449282067,
+            "market_cap": 15.0,
+            "dart_raw": 15.0,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "타법인주식및출자증권취득결정              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 5,
+          "market_cap": 775460421460,
+          "volume": 1138195,
+          "trading_value": 18009051520
+        }
+      ],
+      "params": {
+        "weights": {
+          "disclosure": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "market_cap": 15
+        },
+        "min_market_cap": 100000000000,
+        "max_market_cap": 10000000000000,
+        "min_trading_value": 1000000000
+      },
+      "simulation": null
+    },
+    "frontier_gap": {
+      "strategy_id": "frontier_gap",
+      "strategy_name": "프론티어 갭",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:39:07",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "001510",
+          "name": "SK증권",
+          "price": 5020,
+          "change_pct": 3.611971104231166,
+          "score": 89.8,
+          "score_detail": {
+            "gap_pct": 35.023664638269096,
+            "volume_surge": 29.816428126944615,
+            "trading_value": 15.0,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 1274435918350,
+          "volume": 157812824,
+          "trading_value": 905843480145
+        },
+        {
+          "code": "058430",
+          "name": "포스코스틸리온",
+          "price": 7320,
+          "change_pct": 4.125177809388336,
+          "score": 64.7,
+          "score_detail": {
+            "gap_pct": 40.0,
+            "volume_surge": 12.349097697573118,
+            "trading_value": 2.373506751719228,
+            "price_level": 10
+          },
+          "rank": 2,
+          "market_cap": 547800000000,
+          "volume": 16475098,
+          "trading_value": 143335041075
+        },
+        {
+          "code": "092790",
+          "name": "넥스틸",
+          "price": 17050,
+          "change_pct": 2.525556223692123,
+          "score": 64.4,
+          "score_detail": {
+            "gap_pct": 24.489186555249137,
+            "volume_surge": 27.682016179215932,
+            "trading_value": 2.1875033789312166,
+            "price_level": 10
+          },
+          "rank": 3,
+          "market_cap": 561643200000,
+          "volume": 7005553,
+          "trading_value": 132102378240
+        },
+        {
+          "code": "071090",
+          "name": "하이스틸",
+          "price": 4645,
+          "change_pct": 2.0879120879120876,
+          "score": 62.2,
+          "score_detail": {
+            "gap_pct": 20.24554755589238,
+            "volume_surge": 35.0,
+            "trading_value": 1.9942192892096968,
+            "price_level": 5.0
+          },
+          "rank": 4,
+          "market_cap": 105803308040,
+          "volume": 22841104,
+          "trading_value": 120430036074
+        },
+        {
+          "code": "322510",
+          "name": "제이엘케이",
+          "price": 7200,
+          "change_pct": 3.4482758620689653,
+          "score": 53.2,
+          "score_detail": {
+            "gap_pct": 33.436385255648034,
+            "volume_surge": 9.648413192283758,
+            "trading_value": 0.16135581709613167,
+            "price_level": 10
+          },
+          "rank": 5,
+          "market_cap": 190886118640,
+          "volume": 1313946,
+          "trading_value": 9744207660
+        }
+      ],
+      "params": {
+        "gap_min": 2.0,
+        "gap_max": 5.0,
+        "min_price": 3000,
+        "min_trading_value": 50,
+        "volume_surge_mult": 2.0,
+        "weights": {
+          "gap_pct": 40,
+          "volume_surge": 35,
+          "trading_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    },
+    "hybrid_alpha_delta": {
+      "strategy_id": "hybrid_alpha_delta",
+      "strategy_name": "Alpha-Delta 하이브리드",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:40:05",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "001510",
+          "name": "SK증권",
+          "price": 5510,
+          "change_pct": 13.73,
+          "score": 65.0,
+          "score_detail": {
+            "alpha_score": 96.9,
+            "delta_score": 0.0,
+            "alpha_norm": 100.0,
+            "delta_norm": 0.0,
+            "alpha_weighted": 65.0,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 157812824,
+          "trading_value": 905843480145
+        },
+        {
+          "code": "005490",
+          "name": "POSCO홀딩스",
+          "price": 466500,
+          "change_pct": 11.74,
+          "score": 57.1,
+          "score_detail": {
+            "alpha_score": 85.1,
+            "delta_score": 0.0,
+            "alpha_norm": 87.8,
+            "delta_norm": 0.0,
+            "alpha_weighted": 57.1,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 1962453,
+          "trading_value": 916571495500
+        },
+        {
+          "code": "241520",
+          "name": "DSC인베스트먼트",
+          "price": 18190,
+          "change_pct": 13.69,
+          "score": 50.8,
+          "score_detail": {
+            "alpha_score": 75.7,
+            "delta_score": 0.0,
+            "alpha_norm": 78.1,
+            "delta_norm": 0.0,
+            "alpha_weighted": 50.8,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 14107634,
+          "trading_value": 261888991315
+        },
+        {
+          "code": "000660",
+          "name": "SK하이닉스",
+          "price": 1293000,
+          "change_pct": -0.54,
+          "score": 35.0,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 64.7,
+            "alpha_norm": 0.0,
+            "delta_norm": 100.0,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 35.0,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 5000,
+          "trading_value": 9215242000000
+        },
+        {
+          "code": "402340",
+          "name": "SK스퀘어",
+          "price": 830000,
+          "change_pct": 2.34,
+          "score": 33.8,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 62.5,
+            "alpha_norm": 0.0,
+            "delta_norm": 96.6,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 33.8,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 100,
+          "trading_value": 1095255000000
+        }
+      ],
+      "params": {
+        "weight_alpha": 0.65,
+        "weight_delta": 0.35,
+        "overlap_bonus": 10.0,
+        "sub_top_n": 10,
+        "alpha_slot": 3,
+        "delta_slot": 2,
+        "score_normalization": "min-max per-strategy (0~100)",
+        "alpha_strategy": "momentum",
+        "delta_strategy": "theme_policy"
+      },
+      "simulation": null
+    },
+    "volatility_breakout_lw": {
+      "strategy_id": "volatility_breakout_lw",
+      "strategy_name": "변동성 돌파 (Larry Williams)",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:40:05",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "263020",
+          "name": "디케이앤디",
+          "price": 4130,
+          "change_pct": 29.87,
+          "score": 80.12,
+          "score_detail": {
+            "breakout_strength": 45.0,
+            "volume_surge": 30.0,
+            "trading_value": 0.12,
+            "price_level": 5.0
+          },
+          "rank": 1,
+          "market_cap": 57143282980,
+          "volume": 6561976,
+          "trading_value": 24992381738
+        },
+        {
+          "code": "017480",
+          "name": "삼현철강",
+          "price": 5420,
+          "change_pct": 12.56,
+          "score": 79.11,
+          "score_detail": {
+            "breakout_strength": 39.9,
+            "volume_surge": 29.13,
+            "trading_value": 0.08,
+            "price_level": 10
+          },
+          "rank": 2,
+          "market_cap": 85109663800,
+          "volume": 2822119,
+          "trading_value": 15986512428
+        },
+        {
+          "code": "026940",
+          "name": "부국철강",
+          "price": 3350,
+          "change_pct": 26.18,
+          "score": 67.93,
+          "score_detail": {
+            "breakout_strength": 41.35,
+            "volume_surge": 21.22,
+            "trading_value": 0.36,
+            "price_level": 5.0
+          },
+          "rank": 3,
+          "market_cap": 67000000000,
+          "volume": 22975453,
+          "trading_value": 74890440080
+        },
+        {
+          "code": "008420",
+          "name": "문배철강",
+          "price": 3185,
+          "change_pct": 30.0,
+          "score": 66.77,
+          "score_detail": {
+            "breakout_strength": 40.77,
+            "volume_surge": 20.91,
+            "trading_value": 0.09,
+            "price_level": 5.0
+          },
+          "rank": 4,
+          "market_cap": 65303663425,
+          "volume": 6075519,
+          "trading_value": 18116979627
+        },
+        {
+          "code": "071090",
+          "name": "하이스틸",
+          "price": 5240,
+          "change_pct": 15.16,
+          "score": 58.32,
+          "score_detail": {
+            "breakout_strength": 32.16,
+            "volume_surge": 15.57,
+            "trading_value": 0.59,
+            "price_level": 10
+          },
+          "rank": 5,
+          "market_cap": 105803308040,
+          "volume": 22841104,
+          "trading_value": 120430036074
+        }
+      ],
+      "params": {
+        "k_value": 0.5,
+        "min_price": 3000,
+        "min_trading_value": 5000000000,
+        "min_market_cap": 50000000000,
+        "volume_surge_min": 1.5,
+        "weights": {
+          "breakout_strength": 45,
+          "volume_surge": 30,
+          "trading_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    },
+    "sector_rotation": {
+      "strategy_id": "sector_rotation",
+      "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:40:06",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "047040",
+          "name": "대우건설",
+          "price": 37150,
+          "change_pct": 11.9,
+          "score": 82.76,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 30.0,
+            "market_cap_rank": 2.76,
+            "volume_surge": 15.0
+          },
+          "rank": 1,
+          "market_cap": 15265218751700,
+          "volume": 81046981,
+          "trading_value": 3081518711950
+        },
+        {
+          "code": "005490",
+          "name": "POSCO홀딩스",
+          "price": 466500,
+          "change_pct": 11.74,
+          "score": 75.75,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 29.6,
+            "market_cap_rank": 6.69,
+            "volume_surge": 4.46
+          },
+          "rank": 2,
+          "market_cap": 36966172345500,
+          "volume": 1962453,
+          "trading_value": 916571495500
+        },
+        {
+          "code": "066570",
+          "name": "LG전자",
+          "price": 140000,
+          "change_pct": 7.69,
+          "score": 60.9,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 19.39,
+            "market_cap_rank": 4.13,
+            "volume_surge": 2.38
+          },
+          "rank": 3,
+          "market_cap": 22804094180000,
+          "volume": 3412120,
+          "trading_value": 488906813550
+        },
+        {
+          "code": "373220",
+          "name": "LG에너지솔루션",
+          "price": 472000,
+          "change_pct": 1.72,
+          "score": 60.32,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 4.34,
+            "market_cap_rank": 20.0,
+            "volume_surge": 0.99
+          },
+          "rank": 4,
+          "market_cap": 110448000000000,
+          "volume": 431570,
+          "trading_value": 203035420250
+        },
+        {
+          "code": "307950",
+          "name": "현대오토에버",
+          "price": 478000,
+          "change_pct": 8.39,
+          "score": 59.51,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 21.15,
+            "market_cap_rank": 2.37,
+            "volume_surge": 0.99
+          },
+          "rank": 5,
+          "market_cap": 13108663396000,
+          "volume": 421491,
+          "trading_value": 202389741250
+        }
+      ],
+      "params": {
+        "top_sectors": 5,
+        "stocks_per_sector": 3,
+        "min_price": 3000,
+        "min_market_cap": 100000000000,
+        "min_trading_value": 5000000000,
+        "min_change_pct": 0.5,
+        "weights": {
+          "sector_strength": 35,
+          "stock_momentum": 30,
+          "market_cap_rank": 20,
+          "volume_surge": 15
+        }
+      },
+      "simulation": null
+    },
+    "turtle_breakout_short": {
+      "strategy_id": "turtle_breakout_short",
+      "strategy_name": "단축 터틀 돌파 (5/10일 신고가)",
+      "date": "20260428",
+      "selected_at": "2026-04-29 18:40:06",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "139990",
+          "name": "아주스틸",
+          "price": 4450,
+          "change_pct": 29.93,
+          "score": 79.68,
+          "score_detail": {
+            "breakout_freshness": 34.85,
+            "volume_surge": 29.81,
+            "trading_value": 0.05,
+            "price_momentum": 14.96
+          },
+          "rank": 1,
+          "market_cap": 172461592300,
+          "volume": 1846743,
+          "trading_value": 8107244125
+        },
+        {
+          "code": "013310",
+          "name": "아진산업",
+          "price": 3760,
+          "change_pct": 9.62,
+          "score": 58.48,
+          "score_detail": {
+            "breakout_freshness": 23.27,
+            "volume_surge": 30.0,
+            "trading_value": 0.4,
+            "price_momentum": 4.81
+          },
+          "rank": 2,
+          "market_cap": 145912748320,
+          "volume": 15603703,
+          "trading_value": 61022822660
+        },
+        {
+          "code": "004430",
+          "name": "송원산업",
+          "price": 14560,
+          "change_pct": 30.0,
+          "score": 56.71,
+          "score_detail": {
+            "breakout_freshness": 31.82,
+            "volume_surge": 9.25,
+            "trading_value": 0.63,
+            "price_momentum": 15.0
+          },
+          "rank": 3,
+          "market_cap": 349440000000,
+          "volume": 7029779,
+          "trading_value": 97667361270
+        },
+        {
+          "code": "092790",
+          "name": "넥스틸",
+          "price": 21600,
+          "change_pct": 29.89,
+          "score": 56.68,
+          "score_detail": {
+            "breakout_freshness": 34.02,
+            "volume_surge": 6.86,
+            "trading_value": 0.86,
+            "price_momentum": 14.95
+          },
+          "rank": 4,
+          "market_cap": 561643200000,
+          "volume": 7005553,
+          "trading_value": 132102378240
+        },
+        {
+          "code": "005010",
+          "name": "휴스틸",
+          "price": 6740,
+          "change_pct": 17.22,
+          "score": 54.22,
+          "score_detail": {
+            "breakout_freshness": 29.75,
+            "volume_surge": 14.36,
+            "trading_value": 1.5,
+            "price_momentum": 8.61
+          },
+          "rank": 5,
+          "market_cap": 378707625500,
+          "volume": 34284530,
+          "trading_value": 231195909015
+        }
+      ],
+      "params": {
+        "lookback_days": 5,
+        "history_fetch_days": 14,
+        "min_price": 3000,
+        "min_market_cap": 100000000000,
+        "min_trading_value": 5000000000,
+        "volume_surge_min": 1.5,
+        "min_price_increase": 1.0,
+        "weights": {
+          "breakout_freshness": 35,
+          "volume_surge": 30,
+          "trading_value": 20,
+          "price_momentum": 15
+        }
+      },
+      "simulation": null
+    }
+  }
+}
