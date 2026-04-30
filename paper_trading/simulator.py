@@ -121,6 +121,71 @@ class TradingSimulator:
                 return max_profit_pct - drawback
         return None
 
+    def _find_trailing_exit_from_bars(self,
+                                      minute_data: List[Dict],
+                                      entry_price: int,
+                                      entry_time_str: str) -> Optional[Dict]:
+        """
+        분봉 시계열에서 트레일링 매도 시점/가격을 정확히 추출.
+
+        진입 시각 이후 분봉을 순회하며 running_max_pct를 갱신하고,
+        TRAILING_LEVELS 기준 매도선(running_max - drawback)에 도달한
+        최초 분봉을 매도 시점으로 반환.
+
+        Returns:
+            {'exit_time': 'HH:MM:SS', 'exit_price': int, 'final_max_pct': float}
+            또는 None (매도 시점 미발견 — 종가 직전까지 매도선 미터치)
+        """
+        if not self.TRAILING_ENABLED or not minute_data or entry_price <= 0:
+            return None
+
+        running_max_pct = 0.0
+        # 부동소수점 엣지 케이스 방지를 위해 가격(원 단위)으로 비교
+        EPS = 1e-9
+
+        for candle in minute_data:
+            t = candle.get('time', '')
+            if t < entry_time_str:
+                continue
+
+            high = candle.get('high', 0)
+            low = candle.get('low', 0)
+            close = candle.get('close', 0)
+            if not (high and low and close):
+                continue
+
+            high_pct = (high - entry_price) / entry_price * 100
+
+            # 매도선 산정은 직전 max 기준 (이번 봉의 high로 갱신하기 전)
+            exit_threshold_pct = self._calc_trailing_exit_pct(running_max_pct)
+
+            # 직전 max 기준 매도선이 활성화된 상태에서 이번 봉 low가 매도선 이하면 체결
+            if exit_threshold_pct is not None:
+                threshold_price = entry_price * (1 + exit_threshold_pct / 100)
+                if low <= threshold_price + EPS:
+                    return {
+                        'exit_time': t,
+                        'exit_price': int(threshold_price),
+                        'final_max_pct': running_max_pct,
+                    }
+
+            # 이번 봉 high로 max 갱신
+            if high_pct > running_max_pct:
+                running_max_pct = high_pct
+
+            # 갱신 후 동일 봉의 low가 새 매도선을 깨는 경우(드물지만 가능)
+            exit_threshold_pct = self._calc_trailing_exit_pct(running_max_pct)
+            if exit_threshold_pct is not None:
+                threshold_price = entry_price * (1 + exit_threshold_pct / 100)
+                if low <= threshold_price + EPS:
+                    return {
+                        'exit_time': t,
+                        'exit_price': int(threshold_price),
+                        'final_max_pct': running_max_pct,
+                    }
+
+        return None
+
     def simulate_day(self,
                      candidates: List[StockCandidate],
                      date: str = None,
@@ -247,9 +312,20 @@ class TradingSimulator:
             if trailing_pct is not None:
                 # 트레일링 발동 — max가 트리거 도달
                 # 분봉 first_hit='loss'여도 max가 트리거를 넘었다면 트레일링 우선 (max 도달 후 다시 빠진 케이스)
+                # 정확한 매도 시점은 분봉 시계열을 다시 훑어 추출 (running_max - drawback 매도선 터치 시점)
                 exit_price = int(entry_price * (1 + trailing_pct / 100))
                 exit_type = 'trailing'
-                exit_time = first_hit_time or '11:00:00'
+                exit_time = '11:00:00'  # 폴백 (분봉 재조회 실패 시)
+                try:
+                    minute_bars = self.intraday.get_minute_data(code, self.trade_date, freq='1')
+                    trailing_hit = self._find_trailing_exit_from_bars(
+                        minute_bars, entry_price, entry_time or '09:00:00'
+                    )
+                    if trailing_hit:
+                        exit_time = trailing_hit['exit_time']
+                        # exit_price는 트리거 매도선 가격 유지 (룰 일관성). 실제 체결가는 회귀 분석 기준이므로 변경 X.
+                except Exception as inner:
+                    log_warning(_logger, f"[{name}] 트레일링 시점 재추출 실패, 폴백 사용: {inner}")
             elif first_hit == 'profit':
                 # TRAILING_ENABLED=False 호환 경로
                 exit_price = first_hit_price or int(entry_price * (1 + self.PROFIT_TARGET / 100))
