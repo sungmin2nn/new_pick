@@ -119,9 +119,15 @@ def run_all_strategies(date: str = None, top_n: int = 5, simulate: bool = False)
                     continue
 
                 # 전략별 독립 시뮬레이터
+                # 3순위 진단 룰 (2026-04-29) — team_d(theme_policy)에만 09:30 추세 확인 적용
+                #   다른 팀(team_a/b/c/e/f/g/h/i)은 기존 시초가 일괄 진입 유지
+                strategy_kwargs = {}
+                if strategy_id == 'theme_policy':
+                    strategy_kwargs['entry_mode'] = 'confirm_0930'
                 simulator = TradingSimulator(
                     strategy_id=strategy_id,
-                    strategy_name=result.strategy_name
+                    strategy_name=result.strategy_name,
+                    **strategy_kwargs,
                 )
 
                 # Candidate → StockCandidate 변환

@@ -90,8 +90,20 @@ class TradingSimulator:
         (3.0, 1.0),   # max ≥ 3%  → max - 1%
     ]
 
+    # 3순위 진단 룰 (2026-04-29) — 09:30 추세 확인 분할 진입
+    #   entry_mode='open' (default): 시초가 일괄 진입 (기존 동작)
+    #   entry_mode='confirm_0930'  : 09:30 시점 가격이 시초가 대비
+    #                                 +ENTRY_CONFIRM_THRESHOLD_PCT 이상이면 진입,
+    #                                 미만이면 해당 종목 진입 거부 (슬롯 비움)
+    #   분봉 모드(intraday)에서만 의미 있고, 일봉 백테스트에서는 noop.
+    ENTRY_MODE_OPEN = 'open'
+    ENTRY_MODE_CONFIRM_0930 = 'confirm_0930'
+    ENTRY_CONFIRM_TIME = '09:30'        # 추세 확인 시각
+    ENTRY_CONFIRM_THRESHOLD_PCT = 0.5   # 시초가 대비 +0.5% 이상이어야 진입
+
     def __init__(self, capital: int = None, strategy_id: str = None, strategy_name: str = None,
-                 loss_target: float = None, trailing_enabled: bool = None):
+                 loss_target: float = None, trailing_enabled: bool = None,
+                 entry_mode: str = None):
         self.capital = capital or self.INITIAL_CAPITAL
         self.results: List[TradeResult] = []
         self.trade_date: str = ""
@@ -101,12 +113,58 @@ class TradingSimulator:
             self.LOSS_TARGET = loss_target
         if trailing_enabled is not None:
             self.TRAILING_ENABLED = trailing_enabled
+        # 진입 모드: open(default) | confirm_0930
+        self.entry_mode = entry_mode or self.ENTRY_MODE_OPEN
 
         # 분봉 수집기 초기화
         if INTRADAY_AVAILABLE:
             self.intraday = IntradayCollector()
         else:
             self.intraday = None
+
+    def _check_0930_trend(self, code: str, entry_price: int) -> Optional[Dict]:
+        """09:30 시점 추세 확인.
+
+        분봉 시계열에서 09:30 시점(또는 가장 가까운 직전 분봉) 종가를 가져와
+        시초가(entry_price) 대비 등락률 계산.
+
+        Returns:
+            {'pass': bool, 'price_at_0930': int, 'change_pct': float}
+            분봉 fetch 실패 시 {'pass': True, ...} (보수적 허용 — 기존 동작 fallback)
+        """
+        if self.intraday is None or entry_price <= 0:
+            return {'pass': True, 'price_at_0930': entry_price, 'change_pct': 0.0,
+                    'reason': 'intraday_unavailable'}
+        try:
+            bars = self.intraday.get_minute_data(code, self.trade_date, freq='1')
+            if not bars:
+                return {'pass': True, 'price_at_0930': entry_price, 'change_pct': 0.0,
+                        'reason': 'no_minute_data'}
+            target = self.ENTRY_CONFIRM_TIME
+            # 09:30 정각 이전(<= 09:30:00) 마지막 분봉 종가 사용. 없으면 첫 분봉.
+            picked = None
+            for c in bars:
+                t = c.get('time', '') or ''
+                # time 형식 'HH:MM:SS' 또는 'HH:MM'
+                t_hhmm = t[:5]
+                if t_hhmm <= target:
+                    picked = c
+                else:
+                    break
+            if picked is None:
+                picked = bars[0]
+            price_at = int(picked.get('close', 0) or picked.get('open', 0) or 0)
+            if price_at <= 0:
+                return {'pass': True, 'price_at_0930': entry_price, 'change_pct': 0.0,
+                        'reason': 'invalid_price'}
+            change_pct = (price_at - entry_price) / entry_price * 100
+            passed = change_pct >= self.ENTRY_CONFIRM_THRESHOLD_PCT
+            return {'pass': passed, 'price_at_0930': price_at, 'change_pct': change_pct,
+                    'reason': 'ok'}
+        except Exception as e:
+            log_warning(_logger, f"[{code}] 09:30 추세 확인 오류 (보수적 허용): {e}")
+            return {'pass': True, 'price_at_0930': entry_price, 'change_pct': 0.0,
+                    'reason': f'error:{e}'}
 
     def _calc_trailing_exit_pct(self, max_profit_pct: float) -> Optional[float]:
         """
@@ -289,6 +347,18 @@ class TradingSimulator:
             if entry_price == 0:
                 print(f"  [{name}] 진입가 0원 - 스킵")
                 return None
+
+            # 3순위 진단 룰 — 09:30 추세 확인 (entry_mode='confirm_0930'일 때만)
+            #   미확인 → 진입 거부 (슬롯 비움)
+            #   확인 통과 → 시초가 진입 그대로 진행 (백테스트 일관성 유지: max_profit/loss
+            #                는 시초가 기준이므로 entry_price를 옮기면 손익 재계산 필요)
+            #   효과: 09:30까지 음전 종목(예: 4/30 005935) 자동 회피, 슬롯 비워둬 손실 노출 감소
+            if self.entry_mode == self.ENTRY_MODE_CONFIRM_0930:
+                trend = self._check_0930_trend(code, entry_price)
+                if not trend.get('pass', True):
+                    print(f"  [{name}] 09:30 추세 미확인 ({trend.get('change_pct',0):+.2f}% < "
+                          f"+{self.ENTRY_CONFIRM_THRESHOLD_PCT}%) - 진입 거부 (슬롯 비움)")
+                    return None
 
             # 매수 수량 계산
             quantity = investment // entry_price
