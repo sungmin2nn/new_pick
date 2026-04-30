@@ -232,7 +232,7 @@
 - **원인**: arena_manager.run_daily 가 동일 일자에 여러 번 호출됨 (수동 재실행 또는 cron 중복).
 - **해결**: run_daily idempotency 추가 + 1회성 daily_history dedupe 스크립트.
 - **예방**: verify_facts.py 가 매일 자동 감지.
-- **상태**: open
+- **상태**: resolved (2026-04-30) — arena_manager.py 진입점 가드 추가, scripts/dedupe_arena_data.py 로 20260410 중복 2건 제거. verify_facts.py 재실행 시 W_DUPLICATE_RUNS 미발행 확인
 
 ---
 
@@ -271,6 +271,6 @@
 - **원인**: arena_manager.run_daily() 동일 날짜 재실행 시 portfolio.update_after_day 는 total_trades 를 누적(+=)하지만 save_daily_record 는 trades.json 을 덮어씀. idempotency 부재. leaderboard.daily_history 에서 동일 일자 중복 등장으로 확인됨.
 - **해결**: (권고 1) run_daily 시작 시 daily/<date>/arena_report.json 존재 확인 후 skip + force 옵션. (권고 2) _load_portfolio 에서 daily 기반 자동 보정.
 - **예방**: verify_facts.py 가 매일 W_TRADE_COUNT_MISMATCH + W_DUPLICATE_RUNS 로 자동 감지. issues.md 자동 등재 (dedupe).
-- **상태**: open
+- **상태**: resolved (2026-04-30) — 권고 1 적용 (arena_manager.run_daily 진입점 idempotency 가드). scripts/dedupe_arena_data.py 로 portfolio 9개 + leaderboard ELO/rank/MDD 재구성. team_a 80건/team_b 26건/team_c 41건/team_d 75건으로 trades.json 합산과 일치. ELO 재조정: team_a 1222→1188 외 7팀
 
 ---
