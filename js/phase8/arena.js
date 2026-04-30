@@ -872,7 +872,7 @@ function renderHistorySection() {
 }
 
 // exit_type → 한국어 라벨 매핑. exit_reason 우선, 없으면 exit_type 매핑.
-const EXIT_TYPE_LABEL = { profit: '익절', loss: '손절', close: '종가청산' };
+const EXIT_TYPE_LABEL = { profit: '익절', loss: '손절', close: '종가청산', trailing: '트레일링' };
 function exitLabel(t) {
   if (t && t.exit_reason) return t.exit_reason;
   if (t && t.exit_type) return EXIT_TYPE_LABEL[t.exit_type] || t.exit_type;

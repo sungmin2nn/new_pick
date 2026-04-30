@@ -61,22 +61,37 @@ class TradingSimulator:
     """
     페이퍼 트레이딩 시뮬레이터
 
-    매매 규칙:
+    매매 규칙 (TRAILING_ENABLED=True 기준):
     - 진입: 당일 시가 매수 (09:00~09:05)
-    - 익절: +3% 도달 시 즉시 청산
-    - 손절: -2.0% 도달 시 즉시 청산
+    - 트레일링 스톱 (v3 룰):
+        * max +10% 이상 도달 → 매도가 = max - 3%
+        * max +5~10% 도달    → 매도가 = max - 2%
+        * max +3~5% 도달     → 매도가 = max - 1%
+        * max +3% 미달       → 손절 -3% 또는 종가 청산
+    - 손절: -3% 도달 시 즉시 청산 (max_profit이 트레일링 트리거 미달일 때)
     - 시간 청산: 14:30 이후 종가 청산
+
+    TRAILING_ENABLED=False 시 기존 5% 고정 익절 룰 사용 (호환).
     """
 
     # 매매 파라미터
-    PROFIT_TARGET = 5.0     # 익절 +5%
+    PROFIT_TARGET = 5.0     # 익절 +5% (TRAILING_ENABLED=False일 때만 사용)
     LOSS_TARGET = -3.0      # 손절 -3% (기본값, 전략별 오버라이드 가능)
     EXIT_DEADLINE = "14:30"
     INITIAL_CAPITAL = 1_000_000  # 초기 자본 100만원
     MAX_STOCKS = 5          # 최대 종목 수
 
+    # 트레일링 스톱 (4월 332건 백테스트 기반: v0 +5.75M → v3 +14.99M, +160%)
+    # 큰 트리거부터 검사 (10%대를 5%대보다 먼저)
+    TRAILING_ENABLED = True
+    TRAILING_LEVELS = [
+        (10.0, 3.0),  # max ≥ 10% → max - 3%
+        (5.0, 2.0),   # max ≥ 5%  → max - 2%
+        (3.0, 1.0),   # max ≥ 3%  → max - 1%
+    ]
+
     def __init__(self, capital: int = None, strategy_id: str = None, strategy_name: str = None,
-                 loss_target: float = None):
+                 loss_target: float = None, trailing_enabled: bool = None):
         self.capital = capital or self.INITIAL_CAPITAL
         self.results: List[TradeResult] = []
         self.trade_date: str = ""
@@ -84,12 +99,27 @@ class TradingSimulator:
         self.strategy_name: str = strategy_name or ""
         if loss_target is not None:
             self.LOSS_TARGET = loss_target
+        if trailing_enabled is not None:
+            self.TRAILING_ENABLED = trailing_enabled
 
         # 분봉 수집기 초기화
         if INTRADAY_AVAILABLE:
             self.intraday = IntradayCollector()
         else:
             self.intraday = None
+
+    def _calc_trailing_exit_pct(self, max_profit_pct: float) -> Optional[float]:
+        """
+        트레일링 스톱 매도 % 계산.
+        TRAILING_LEVELS의 큰 트리거부터 검사 (10% > 5% > 3%).
+        발동 미만이면 None 반환 (호출부에서 손절/종가 룰 적용).
+        """
+        if not self.TRAILING_ENABLED:
+            return None
+        for trigger, drawback in self.TRAILING_LEVELS:
+            if max_profit_pct >= trigger:
+                return max_profit_pct - drawback
+        return None
 
     def simulate_day(self,
                      candidates: List[StockCandidate],
@@ -169,11 +199,15 @@ class TradingSimulator:
         name = candidate.name
 
         try:
+            # 트레일링 모드: profit_target을 매우 크게 (999%) 설정해서 +5% 도달 시 멈추지 않게 함.
+            # max_profit이 정확히 측정되도록. 손절은 그대로 작동.
+            profit_target_for_intraday = 999.0 if self.TRAILING_ENABLED else self.PROFIT_TARGET
+
             # intraday_collector의 analyze_profit_loss 활용
             analysis = self.intraday.analyze_profit_loss(
                 code,
                 self.trade_date,
-                profit_target=self.PROFIT_TARGET,
+                profit_target=profit_target_for_intraday,
                 loss_target=self.LOSS_TARGET,
                 avg_volume_20d=0
             )
@@ -203,9 +237,21 @@ class TradingSimulator:
             first_hit_time = virtual_result.get('first_hit_time', '')
             first_hit_price = virtual_result.get('first_hit_price', 0)
             closing_price = virtual_result.get('closing_price', entry_price)
+            max_profit_pct = virtual_result.get('max_profit_percent', 0) or 0
+
+            # 트레일링 매도% 계산 (TRAILING_ENABLED 시)
+            trailing_pct = self._calc_trailing_exit_pct(max_profit_pct)
 
             # 청산 유형 및 가격 결정
-            if first_hit == 'profit':
+            # 우선순위: 손절(트리거 미달 시) > 트레일링(트리거 도달 시) > 종가
+            if trailing_pct is not None:
+                # 트레일링 발동 — max가 트리거 도달
+                # 분봉 first_hit='loss'여도 max가 트리거를 넘었다면 트레일링 우선 (max 도달 후 다시 빠진 케이스)
+                exit_price = int(entry_price * (1 + trailing_pct / 100))
+                exit_type = 'trailing'
+                exit_time = first_hit_time or '11:00:00'
+            elif first_hit == 'profit':
+                # TRAILING_ENABLED=False 호환 경로
                 exit_price = first_hit_price or int(entry_price * (1 + self.PROFIT_TARGET / 100))
                 exit_type = 'profit'
                 exit_time = first_hit_time or '10:00:00'
@@ -294,19 +340,20 @@ class TradingSimulator:
             profit_price = open_price * (1 + self.PROFIT_TARGET / 100)
             loss_price = open_price * (1 + self.LOSS_TARGET / 100)
 
-            # 청산 시뮬레이션
+            # 장중 최대 수익/손실 (트레일링 판정용 + 결과 저장용)
+            max_profit_pct = (high_price - open_price) / open_price * 100 if open_price > 0 else 0
+            max_loss_pct = (low_price - open_price) / open_price * 100 if open_price > 0 else 0
+
+            # 청산 시뮬레이션 (트레일링 발동 여부 판정 후 분기)
             exit_price, exit_type, exit_time = self._determine_exit_daily(
                 open_price, high_price, low_price, close_price,
-                profit_price, loss_price
+                profit_price, loss_price,
+                max_profit_pct, max_loss_pct
             )
 
             # 수익률 계산
             return_pct = (exit_price - open_price) / open_price * 100
             return_amount = int((exit_price - open_price) * quantity)
-
-            # 장중 최대 수익/손실
-            max_profit_pct = (high_price - open_price) / open_price * 100 if open_price > 0 else 0
-            max_loss_pct = (low_price - open_price) / open_price * 100 if open_price > 0 else 0
 
             result = TradeResult(
                 code=code,
@@ -341,19 +388,32 @@ class TradingSimulator:
                                low_p: int,
                                close_p: int,
                                profit_p: float,
-                               loss_p: float) -> tuple:
+                               loss_p: float,
+                               max_profit_pct: float = 0.0,
+                               max_loss_pct: float = 0.0) -> tuple:
         """
         일봉 기반 청산 유형 결정 (추정 시간)
 
-        로직:
-        1. 고가가 익절가 이상 → 익절 (+3%)
-        2. 저가가 손절가 이하 → 손절 (-1.5%)
-        3. 둘 다 해당 → 손절 우선 (보수적)
-        4. 둘 다 미해당 → 종가 청산
+        TRAILING_ENABLED=True 시 (v3 룰):
+        1. max_profit이 트레일링 트리거(3/5/10%) 도달 → 트레일링 매도 (max - 1/2/3%)
+           시간순 모르므로 max_profit이 max_loss보다 먼저 도달 가정 (낙관)
+        2. 트리거 미달 + 저가 손절가 도달 → 손절
+        3. 둘 다 미달 → 종가 청산
+
+        TRAILING_ENABLED=False 시 (구 호환):
+        1. 고가 익절가 이상 → 익절
+        2. 저가 손절가 이하 → 손절
+        3. 둘 다 → 손절 우선 (보수적)
 
         Returns:
             (청산가, 청산유형, 청산시간)
         """
+        # 트레일링 모드 — max_profit 기반 매도가 우선 계산
+        trailing_pct = self._calc_trailing_exit_pct(max_profit_pct)
+        if trailing_pct is not None:
+            # 트레일링 발동 (max 도달 후 매도선까지 빠짐 가정)
+            return int(open_p * (1 + trailing_pct / 100)), 'trailing', '11:00'
+
         hit_profit = high_p >= profit_p
         hit_loss = low_p <= loss_p
 
@@ -385,9 +445,11 @@ class TradingSimulator:
         profit_exits = len([r for r in self.results if r.exit_type == 'profit'])
         loss_exits = len([r for r in self.results if r.exit_type == 'loss'])
         close_exits = len([r for r in self.results if r.exit_type == 'close'])
+        trailing_exits = len([r for r in self.results if r.exit_type == 'trailing'])
 
         print(f"\n{'='*50}")
-        print(f"[Simulator] 일일 매매 결과 요약")
+        mode = "트레일링" if self.TRAILING_ENABLED else "5% 고정익절"
+        print(f"[Simulator] 일일 매매 결과 요약 ({mode})")
         print(f"{'='*50}")
         print(f"  총 거래: {total_trades}건")
         print(f"  승/패/무: {wins}/{losses}/{even}")
@@ -395,7 +457,7 @@ class TradingSimulator:
         print(f"  총 수익률: {total_return_pct:+.2f}%")
         print(f"  총 손익: {total_return_amount:+,}원")
         print(f"  평균 수익률: {avg_return:+.2f}%")
-        print(f"  청산 유형: 익절 {profit_exits} / 손절 {loss_exits} / 종가 {close_exits}")
+        print(f"  청산 유형: 트레일링 {trailing_exits} / 익절 {profit_exits} / 손절 {loss_exits} / 종가 {close_exits}")
         print(f"{'='*50}")
 
     def get_daily_summary(self) -> dict:
@@ -434,6 +496,7 @@ class TradingSimulator:
             'profit_exits': len([r for r in self.results if r.exit_type == 'profit']),
             'loss_exits': len([r for r in self.results if r.exit_type == 'loss']),
             'close_exits': len([r for r in self.results if r.exit_type == 'close']),
+            'trailing_exits': len([r for r in self.results if r.exit_type == 'trailing']),
             'results': [r.to_dict() for r in self.results]
         }
 
