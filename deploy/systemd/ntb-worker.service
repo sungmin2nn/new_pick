@@ -1,0 +1,42 @@
+[Unit]
+Description=News Trading Bot Worker
+Documentation=https://github.com/sungmin2nn/new_pick/tree/master/deploy
+After=network-online.target chrony.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ntb
+Group=ntb
+WorkingDirectory=/opt/news-trading-bot
+EnvironmentFile=/etc/news-trading-bot/secrets.env
+Environment=PYTHONUNBUFFERED=1
+Environment=TZ=Asia/Seoul
+Environment=PYTHONPATH=/opt/news-trading-bot
+ExecStart=/opt/news-trading-bot/.venv/bin/python -m worker.healthcheck
+
+# 자동 재시작
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+# 로그
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ntb-worker
+
+# 보안 강화
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/news-trading-bot/data /opt/news-trading-bot/logs
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
