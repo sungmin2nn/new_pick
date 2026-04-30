@@ -131,6 +131,16 @@ jobs:
             print(f'  - {issue[\"description\"]}: {issue[\"details\"]}')
         "
 
+    - name: Verify performance facts (deterministic recompute)
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      env:
+        TZ: Asia/Seoul
+      run: |
+        # 결정적 검증 → data/arena/_verified_facts.json 갱신.
+        # 환각 방지: LLM 분석은 이 파일만 인용해야 함 (CLAUDE.md 규칙).
+        # --update-issues: warning code 별 ISSUE 자동 등재 (dedupe, 새로운 것만)
+        python -m paper_trading.audit.verify_facts --quiet --update-issues || true
+
     - name: Commit and push results
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
@@ -138,6 +148,7 @@ jobs:
         git config --local user.name "github-actions[bot]"
 
         git add data/arena/ 2>/dev/null || true
+        git add .claude/context/issues.md 2>/dev/null || true
         git add data/paper_trading/ 2>/dev/null || true
         git add data/arena_dashboard.html 2>/dev/null || true
         git add data/dashboard_report.html 2>/dev/null || true

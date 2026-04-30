@@ -209,3 +209,68 @@
 - **예방**: 재발 방지 조치
 - **상태**: open | resolved
 ```
+
+## [ISSUE-014] Arena portfolio.json vs daily/ 합산 capital 불일치
+- **발생일**: 2026-04-30
+- **에이전트**: verify_facts.py (자동 등재)
+- **warning code**: `W_CAPITAL_MISMATCH`
+- **scope**: team_a, team_b, team_d
+- **증상**: portfolio.current_capital 과 (초기자본 + sum(daily/*/trades.json/total_return_amount)) 차이 0.1% 초과.
+- **원인**: W_TRADE_COUNT_MISMATCH 와 동일 — 동일 날짜 재실행으로 portfolio 만 누적.
+- **해결**: W_TRADE_COUNT_MISMATCH 해결과 함께 처리.
+- **예방**: verify_facts.py 자동 감지.
+- **상태**: open
+
+---
+
+## [ISSUE-015] leaderboard.daily_history 에 동일 일자 중복
+- **발생일**: 2026-04-30
+- **에이전트**: verify_facts.py (자동 등재)
+- **warning code**: `W_DUPLICATE_RUNS`
+- **scope**: leaderboard
+- **증상**: leaderboard.json 의 daily_history 배열에서 같은 date 가 2회 이상.
+- **원인**: arena_manager.run_daily 가 동일 일자에 여러 번 호출됨 (수동 재실행 또는 cron 중복).
+- **해결**: run_daily idempotency 추가 + 1회성 daily_history dedupe 스크립트.
+- **예방**: verify_facts.py 가 매일 자동 감지.
+- **상태**: open
+
+---
+
+## [ISSUE-016] 시뮬레이터 슬리피지/체결률 모형 부재
+- **발생일**: 2026-04-30
+- **에이전트**: verify_facts.py (자동 등재)
+- **warning code**: `W_SIM_NO_SLIPPAGE`
+- **scope**: global
+- **증상**: trades.json 의 손절가가 정확히 -3.0%, 트레일링/익절가도 정확한 % 로 체결됨.
+- **원인**: paper_trading/simulator.py 가 호가/체결률 모형 없이 이상적 가격 사용.
+- **해결**: 단기: 슬리피지 ±0.2% 가정. 중기: KIS 모의투자(`broker/kis/`) 도입.
+- **예방**: verify_facts.py 가 매번 W_SIM_NO_SLIPPAGE 발행 (해결 전까지).
+- **상태**: open
+
+---
+
+## [ISSUE-017] 자본 MDD 가 비현실적으로 낮음 — 시뮬 슬리피지 미반영 의심
+- **발생일**: 2026-04-30
+- **에이전트**: verify_facts.py (자동 등재)
+- **warning code**: `W_SUSPICIOUS_LOW_MDD`
+- **scope**: team_a, team_e
+- **증상**: 운영 5일 이상인 팀의 자본 MDD < 0.1% (예: team_a 0.04%, team_e 0%).
+- **원인**: trades.json 검사 결과 손절가/트레일링가가 정확한 % 단위로 체결됨. 시뮬에 슬리피지·호가·체결률 모형 없음.
+- **해결**: (권고 1) simulator.py 에 진입가/청산가에 ±0.2% 슬리피지 가정 추가. (권고 2) KIS 모의투자 연동(옵션 3, Phase A→G) 으로 실거래 검증.
+- **예방**: verify_facts.py 자동 감지. 모든 % 수치 보수적 해석 강제 (CLAUDE.md).
+- **상태**: open
+
+---
+
+## [ISSUE-018] Arena portfolio.json vs daily/ trades.json 거래수 불일치
+- **발생일**: 2026-04-30
+- **에이전트**: verify_facts.py (자동 등재)
+- **warning code**: `W_TRADE_COUNT_MISMATCH`
+- **scope**: team_a, team_b, team_c, team_d
+- **증상**: portfolio.total_trades 가 daily/<date>/trades.json 합산보다 큼 (team_a/b/c/d 에서 5~10건씩 차이).
+- **원인**: arena_manager.run_daily() 동일 날짜 재실행 시 portfolio.update_after_day 는 total_trades 를 누적(+=)하지만 save_daily_record 는 trades.json 을 덮어씀. idempotency 부재. leaderboard.daily_history 에서 동일 일자 중복 등장으로 확인됨.
+- **해결**: (권고 1) run_daily 시작 시 daily/<date>/arena_report.json 존재 확인 후 skip + force 옵션. (권고 2) _load_portfolio 에서 daily 기반 자동 보정.
+- **예방**: verify_facts.py 가 매일 W_TRADE_COUNT_MISMATCH + W_DUPLICATE_RUNS 로 자동 감지. issues.md 자동 등재 (dedupe).
+- **상태**: open
+
+---
