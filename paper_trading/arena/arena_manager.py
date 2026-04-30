@@ -89,6 +89,21 @@ class ArenaManager:
         print(f"# 시간: {datetime.now(KST).strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"{'#'*60}")
 
+        # 멱등성 가드: 동일 날짜 재실행 차단 (포트폴리오/ELO/일일히스토리 이중 계산 방지)
+        daily_report_path = ARENA_DIR / "daily" / date / "arena_report.json"
+        if daily_report_path.exists() and not force:
+            print(f"[Arena] {date} 이미 실행 완료 — skip (재실행하려면 --force)")
+            print(f"        기존 리포트: {daily_report_path}")
+            return {
+                "status": "skipped",
+                "reason": "already_run",
+                "date": date,
+                "report_path": str(daily_report_path),
+            }
+        if daily_report_path.exists() and force:
+            print(f"[Arena] ⚠ --force 재실행: {date} 의 portfolio/leaderboard 누적값이 이중 계산될 수 있음")
+            print(f"        클린 재실행이 필요하면 scripts/dedupe_arena_data.py 먼저 실행")
+
         # 장 종료 확인
         if not force and not self._is_market_closed():
             print("[Arena] 장이 아직 종료되지 않았습니다.")
