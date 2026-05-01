@@ -445,19 +445,24 @@ def verify(write: bool = True, output_path: Path | None = None) -> dict:
     bollinger = _verify_bollinger_system(warnings)
     duplicate_runs = _check_duplicate_runs(warnings)
 
-    # 전역 시뮬 결함 경고 — 매번 발행 (해결되기 전까지)
-    warnings.append(
-        FactsWarning(
-            code="W_SIM_NO_SLIPPAGE",
-            severity="info",
-            scope="global",
-            message=(
-                "trades.json 검사: 손절가 정확 -3.0%, 트레일링/익절가 정확 — "
-                "시뮬에 슬리피지/체결률 모형 없음. KIS 모의투자 도입 전까지 "
-                "모든 % 는 보수적으로 해석 (실거래 시 일정 폭 깎임)"
-            ),
+    # 전역 시뮬 결함 경고 — TradingSimulator.SLIPPAGE_PCT == 0 일 때만 발행
+    try:
+        from paper_trading.simulator import TradingSimulator
+        slippage_pct = float(getattr(TradingSimulator, "SLIPPAGE_PCT", 0))
+    except Exception:
+        slippage_pct = 0.0
+    if slippage_pct <= 0:
+        warnings.append(
+            FactsWarning(
+                code="W_SIM_NO_SLIPPAGE",
+                severity="info",
+                scope="global",
+                message=(
+                    "TradingSimulator.SLIPPAGE_PCT=0 — 시뮬에 슬리피지/체결률 모형 없음. "
+                    "KIS 모의투자 도입 전까지 모든 % 는 보수적으로 해석"
+                ),
+            )
         )
-    )
 
     facts = {
         "schema_version": SCHEMA_VERSION,

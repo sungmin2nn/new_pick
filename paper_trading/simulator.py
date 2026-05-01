@@ -81,6 +81,12 @@ class TradingSimulator:
     INITIAL_CAPITAL = 1_000_000  # 초기 자본 100만원
     MAX_STOCKS = 5          # 최대 종목 수
 
+    # 슬리피지 / 체결 비용 — 진입가 +SLIPPAGE_PCT, 룰 기반 청산가 -SLIPPAGE_PCT
+    # (왕복 약 0.4% 추가 손실, 호가 단위·체결 지연·시장 충격 합산 가정)
+    # 종가 청산('close')은 시장 종가 그대로 — 슬리피지 미적용 (실 종가 매도 가능)
+    # 분봉 first_hit (실제 터치) 가격도 그대로 — 이미 시장 호가 반영됨
+    SLIPPAGE_PCT = 0.2
+
     # 트레일링 스톱 (4월 332건 백테스트 기반: v0 +5.75M → v3 +14.99M, +160%)
     # 큰 트리거부터 검사 (10%대를 5%대보다 먼저)
     TRAILING_ENABLED = True
@@ -348,6 +354,9 @@ class TradingSimulator:
                 print(f"  [{name}] 진입가 0원 - 스킵")
                 return None
 
+            # 슬리피지: 진입은 호가 한 단계 위에서 체결 가정 (+SLIPPAGE_PCT)
+            entry_price = int(entry_price * (1 + self.SLIPPAGE_PCT / 100))
+
             # 3순위 진단 룰 — 09:30 추세 확인 (entry_mode='confirm_0930'일 때만)
             #   미확인 → 진입 거부 (슬롯 비움)
             #   확인 통과 → 시초가 진입 그대로 진행 (백테스트 일관성 유지: max_profit/loss
@@ -379,11 +388,15 @@ class TradingSimulator:
 
             # 청산 유형 및 가격 결정
             # 우선순위: 손절(트리거 미달 시) > 트레일링(트리거 도달 시) > 종가
+            # 슬리피지: 룰 기반 청산('trailing'/'profit'/'loss' 폴백)은 매도 호가 한 단계 아래
+            # (-SLIPPAGE_PCT). first_hit_price (실제 터치)와 closing_price 는 시장가 그대로.
+            slip_factor = 1 - self.SLIPPAGE_PCT / 100
+
             if trailing_pct is not None:
                 # 트레일링 발동 — max가 트리거 도달
                 # 분봉 first_hit='loss'여도 max가 트리거를 넘었다면 트레일링 우선 (max 도달 후 다시 빠진 케이스)
                 # 정확한 매도 시점은 분봉 시계열을 다시 훑어 추출 (running_max - drawback 매도선 터치 시점)
-                exit_price = int(entry_price * (1 + trailing_pct / 100))
+                exit_price = int(entry_price * (1 + trailing_pct / 100) * slip_factor)
                 exit_type = 'trailing'
                 exit_time = '11:00:00'  # 폴백 (분봉 재조회 실패 시)
                 try:
@@ -398,11 +411,11 @@ class TradingSimulator:
                     log_warning(_logger, f"[{name}] 트레일링 시점 재추출 실패, 폴백 사용: {inner}")
             elif first_hit == 'profit':
                 # TRAILING_ENABLED=False 호환 경로
-                exit_price = first_hit_price or int(entry_price * (1 + self.PROFIT_TARGET / 100))
+                exit_price = first_hit_price or int(entry_price * (1 + self.PROFIT_TARGET / 100) * slip_factor)
                 exit_type = 'profit'
                 exit_time = first_hit_time or '10:00:00'
             elif first_hit == 'loss':
-                exit_price = first_hit_price or int(entry_price * (1 + self.LOSS_TARGET / 100))
+                exit_price = first_hit_price or int(entry_price * (1 + self.LOSS_TARGET / 100) * slip_factor)
                 exit_type = 'loss'
                 exit_time = first_hit_time or '09:30:00'
             else:
@@ -475,6 +488,9 @@ class TradingSimulator:
             if open_price == 0:
                 print(f"  [{name}] 시가 0원 - 스킵")
                 return None
+
+            # 슬리피지: 진입은 시가 + SLIPPAGE_PCT
+            open_price = int(open_price * (1 + self.SLIPPAGE_PCT / 100))
 
             # 매수 수량 계산
             quantity = investment // open_price
@@ -554,22 +570,25 @@ class TradingSimulator:
         Returns:
             (청산가, 청산유형, 청산시간)
         """
+        # 슬리피지: 룰 기반 청산은 매도 호가 한 단계 아래 (-SLIPPAGE_PCT). 종가는 그대로.
+        slip_factor = 1 - self.SLIPPAGE_PCT / 100
+
         # 트레일링 모드 — max_profit 기반 매도가 우선 계산
         trailing_pct = self._calc_trailing_exit_pct(max_profit_pct)
         if trailing_pct is not None:
             # 트레일링 발동 (max 도달 후 매도선까지 빠짐 가정)
-            return int(open_p * (1 + trailing_pct / 100)), 'trailing', '11:00'
+            return int(open_p * (1 + trailing_pct / 100) * slip_factor), 'trailing', '11:00'
 
         hit_profit = high_p >= profit_p
         hit_loss = low_p <= loss_p
 
         if hit_profit and hit_loss:
             # 둘 다 도달한 경우 → 손절 우선 (보수적 접근)
-            return int(loss_p), 'loss', '09:30'
+            return int(loss_p * slip_factor), 'loss', '09:30'
         elif hit_profit:
-            return int(profit_p), 'profit', '10:00'
+            return int(profit_p * slip_factor), 'profit', '10:00'
         elif hit_loss:
-            return int(loss_p), 'loss', '09:30'
+            return int(loss_p * slip_factor), 'loss', '09:30'
         else:
             return close_p, 'close', '14:30'
 
