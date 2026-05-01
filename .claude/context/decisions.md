@@ -301,6 +301,91 @@ Layer 4 (통합): backtest_dashboard.html (8개 카드 + 4개 차트 섹션)
 
 ---
 
+## 데이터 정합성 인프라 4종 도입 (2026-04-30 ~ 05-01)
+
+`verify_facts.py` 가 자동 등재한 ISSUE-015~018 일괄 처리. 한 세션에서 누적 결함의 근본 원인 → 가드 → 보정 → 검증을 일관 적용했다. 4건 모두 운영 중 발견된 실제 결함이며, 해결책은 모두 코드 + 데이터 + 검증 도구 3축으로 적용됨.
+
+### 1) Arena run_daily 멱등성 가드 (ISSUE-015/018, f39ea2e + 7333e69)
+
+**결정**: `arena_manager.run_daily()` 진입점에 `daily/<date>/arena_report.json` 존재 체크 → skip + `--force` 플래그. 1회성 정정 스크립트 `scripts/dedupe_arena_data.py` 로 누적 데이터 재구성.
+
+**배경**:
+- 04-30 운영 후 verify_facts 가 W_DUPLICATE_RUNS, W_TRADE_COUNT_MISMATCH 등재.
+- portfolio.update_after_day 의 `+=` 연산자와 `leaderboard.daily_history.append`, ELO 라운드로빈 업데이트 등 9곳이 중복 호출 시 이중 누적되는 구조.
+- 04-10 에 1회, 04-30 에 2회 (cron + 수동 workflow_dispatch) 중복 실행 발견 → team_a/b/c/d 에서 5~10건씩 거래수 차이.
+
+**대안 비교**:
+- (a) `_load_portfolio` 에서 daily 기반 자동 보정 (issues.md 권고 2): 기각 — 매 로드마다 전 일자 trades.json 합산 비용 + 일관성 검증 부담. 진입점 1회 차단이 더 작은 수술.
+- (b) `force=True` 시 자동 dedupe 후 재실행: 기각 — 복잡도 큼, 사용자가 명시적으로 dedupe 후 재실행하는 게 안전. force 시 경고만 출력.
+- (c) 그대로 두고 운영자 규칙으로 해결: 기각 — 2026-04-30 자체가 그 규칙이 깨진 사례.
+
+**근거**: 누적 지점 9곳을 모두 idempotent 하게 만드는 비용보다, 진입점 1곳 차단이 훨씬 작고 검증 가능. 이미 `daily/<date>/arena_report.json` 가 사실상 "그 날 실행됨" 의 자연스러운 마커.
+
+**영향**:
+- Arena cron + 수동 디스패치 동시 발생해도 두 번째는 `status: skipped, reason: already_run` 으로 종료
+- dedupe 스크립트 적용 결과: team_a 85→80건 / team_d 85→75건 / leaderboard 18→15 entries / 8팀 ELO 재조정 (team_a 1241→1188, team_f 1025→908 등)
+- 백업: `*.backup_YYYYMMDD_HHMMSS` (.gitignore 추가)
+
+**검증 대기**: 2026-05-04 (월) 16:10 KST cron + 수동 재실행 시도 시 "skip" 메시지 출력 확인.
+
+### 2) 시뮬레이터 슬리피지 0.2% 도입 (ISSUE-016/017, c2a625a)
+
+**결정**: `TradingSimulator.SLIPPAGE_PCT = 0.2` 신규 상수. 진입가 +0.2%, 룰 기반 청산가(trailing/profit/loss 폴백) -0.2%. 종가 청산 및 분봉 first_hit_price 는 시장가 그대로.
+
+**배경**:
+- 운영 5일 이상 팀의 자본 MDD가 비현실적으로 낮음 (team_a 0.04%, team_e 0%).
+- trades.json 검사 결과 손절가가 정확히 -3.0%, 트레일링/익절가도 정확한 % 단위로 체결됨.
+- 시뮬에 호가/체결률 모형 부재 → "이상적 가격 매매" 환각.
+
+**대안 비교**:
+- (a) 슬리피지 정적 ±0.2% (선택): 결정적, 같은 입력 같은 결과. 단순/안전.
+- (b) 확률적 슬리피지 (정규분포 등): 기각 — 결정적 백테스트 비교 어려워짐, 단기 운영용엔 과도.
+- (c) KIS 모의투자로 전면 대체: 기각 — 도입 비용 큼, 별도 트랙(broker/kis/)으로 진행 예정.
+
+**적용 제외 이유**:
+- **종가 청산('close')**: 실제로 종가는 시장이 정한 값이라 그 가격에 매도 가능 (실 종가 매도)
+- **분봉 first_hit_price**: 이미 시장 호가가 반영된 실제 터치 가격이라 추가 슬리피지 부적절
+
+**근거**: 한국 주식 시장의 호가 단위(틱) + 체결 지연 + 시장 충격을 합산하면 0.1~0.3% 수준. 0.2% 는 보수적 중간값. 왕복 0.4% 는 일평균 ~5종목 매매 시 연간 약 100% 영향이라 실거래 비교에 충분한 마진.
+
+**verify_facts 통합**: `W_SIM_NO_SLIPPAGE` 무조건 발행 → `TradingSimulator.SLIPPAGE_PCT == 0` 일 때만 발행하도록 동적 검사. 누군가 SLIPPAGE_PCT 를 0으로 되돌리면 자동 재발행.
+
+### 3) ISSUE-017 자연 해소 대기 (옵션 A, c2a625a)
+
+**결정**: 코드 fix 후 issues.md 상태를 `resolved` 가 아닌 `code_applied` 로 표시. 기존 trades.json 은 손대지 않고, 향후 거래일 누적으로 W_SUSPICIOUS_LOW_MDD 자연 해소를 기다림.
+
+**대안 비교**:
+- (a) 자연 해소 대기 (선택): 데이터 정직성 — 슬리피지 부재 시점의 trades.json 은 "그 시점 사실"로 보존.
+- (b) 강제 close + verify_facts 임계치 조정: 기각 — 검증 기능 약화, 과거 데이터에 사후 보정 흔적 남김.
+- (c) 메시지 수정 ("코드 fix 적용됨"): 기각 — 반쪽 해결, 사용자에게 혼란.
+
+**근거**: 며칠 운영하면 슬리피지 적용된 새 거래가 누적되어 자본 MDD 가 0.1% 이상으로 자연 상승, 경고 자동 사라짐. 인위적 보정보다 시간이 해결.
+
+**Trade-off**: 며칠간 W_SUSPICIOUS_LOW_MDD 2건 (team_a, team_e) 계속 보임. 사용자에게는 "이미 해결된 사안" 임을 issues.md 의 `code_applied` 상태와 state.json 의 `code_applied_pending_natural_resolve` 섹션으로 명시.
+
+### 4) BNF/Bollinger 동일 테마 중복 캡 (d83da08)
+
+**결정**: `MAX_PER_THEME = 2` (BNF/Bollinger 각각 클래스/모듈 상수, A/B 토글 가능). `paper_trading/utils/theme_cap.py` 의 `apply_theme_cap()` 헬퍼로 정렬된 후보 리스트에서 같은 테마 N개 초과 시 차단. 종목→테마 역인덱스(`data/theme_cache/_stock_to_themes.json`, 200테마/2189종목) 기반.
+
+**배경**:
+- team_d (theme_policy) 의 동일 그룹 캡 (`c38d53c`) 효과 검증됨. 같은 패턴을 다른 전략에도 적용 가능성 높음.
+- BNF/Bollinger 가 낙폭 큰 순/볼린저 하단 순으로 정렬할 때 같은 섹터/테마 종목이 상위 5위 모두 차지하는 케이스가 종종 발생 → 분산 효과 상실.
+
+**대안 비교**:
+- (a) 정적 스냅샷 (`_stock_to_themes.json`, 선택): 빌드 1회 + 캡 적용 비용 거의 0. 단점: 신규 상장/테마 변동 반영 지연.
+- (b) 매일 동적 빌드: 기각 — 60초 fetch 비용 매일 누적, ROI 낮음.
+- (c) 시점별 스냅샷 + backtest 시 해당 시점 사용: 기각 — 인프라 복잡도 폭증, 단기 운영용엔 과도.
+
+**근거**: backtest 의 lookahead bias 가능성은 있으나 단기 운영 (≤30일) 에서 테마 정의 자체는 거의 안 변함. 실용적 절충.
+
+**graceful degrade**: 인덱스 파일 부재/깨짐 → 캡 비활성, 후보 그대로 통과. 인덱스에 없는 종목 → 캡 미적용 통과. 모든 실패 경로가 "캡 비활성" 으로 수렴.
+
+**검증**: apply_theme_cap 단위 테스트 3건 통과 (cap=None 통과 / cap=2 + 5종목 same-theme → 정확히 2건 통과 + 3건 차단 / 인덱스 부재 종목 통과).
+
+**Trade-off**: max_per_theme=2 가 너무 빡빡할 가능성. 운영 후 후보 풀이 자주 부족해지면 3 또는 None 으로 토글 검토.
+
+---
+
 ## 참고 자료
 
 - Sharpe Ratio: Sharpe, W. F. (1966). "Mutual Fund Performance"
