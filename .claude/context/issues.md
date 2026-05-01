@@ -245,7 +245,7 @@
 - **원인**: paper_trading/simulator.py 가 호가/체결률 모형 없이 이상적 가격 사용.
 - **해결**: 단기: 슬리피지 ±0.2% 가정. 중기: KIS 모의투자(`broker/kis/`) 도입.
 - **예방**: verify_facts.py 가 매번 W_SIM_NO_SLIPPAGE 발행 (해결 전까지).
-- **상태**: open
+- **상태**: resolved (2026-05-01) — TradingSimulator.SLIPPAGE_PCT=0.2 도입. 진입가 +0.2%, 룰 기반 청산가(trailing/profit/loss 폴백) -0.2% 적용 (왕복 -0.4%). 종가청산 및 분봉 first_hit 가격은 시장가 그대로. verify_facts 는 SLIPPAGE_PCT=0 일 때만 W_SIM_NO_SLIPPAGE 발행하도록 동적 검사로 변경. 중기 KIS 모의투자 연동은 별도 트랙
 
 ---
 
@@ -258,7 +258,7 @@
 - **원인**: trades.json 검사 결과 손절가/트레일링가가 정확한 % 단위로 체결됨. 시뮬에 슬리피지·호가·체결률 모형 없음.
 - **해결**: (권고 1) simulator.py 에 진입가/청산가에 ±0.2% 슬리피지 가정 추가. (권고 2) KIS 모의투자 연동(옵션 3, Phase A→G) 으로 실거래 검증.
 - **예방**: verify_facts.py 자동 감지. 모든 % 수치 보수적 해석 강제 (CLAUDE.md).
-- **상태**: open
+- **상태**: code_applied (2026-05-01) — 권고 1 코드 적용 (ISSUE-016 fix 와 동일 커밋, SLIPPAGE_PCT=0.2). 기존 trades.json 은 슬리피지 없는 상태로 보존 → team_a/team_e 의 MDD < 0.1% 경고는 현 데이터 기반이라 즉시 사라지지 않음. 향후 거래일이 누적되면 자연 해소 예상. 권고 2 (KIS 모의투자) 는 별도 트랙
 
 ---
 
