@@ -1,162 +1,188 @@
 {
-  "current_phase": "ready_for_monday_validation_v2",
-  "last_updated": "2026-04-11T01:00:00+09:00",
+  "current_phase": "9팀 운영 + 데이터 정합성 인프라 정착 (verify_facts SoT, 멱등성 가드, 슬리피지, 테마 캡)",
+  "last_updated": "2026-05-01T10:00:00+09:00",
   "project": "news-trading-bot",
-  "task": "Arena 5팀 + Pearl + KRX 통합 + 3주 backtest + Team C fix",
+  "task": "Arena 8 active + 1 disabled = 9팀 풀 + BNF/Bollinger 보강 + 검증 하네스",
   "active_systems": {
     "arena": {
-      "status": "정상 운영 (5팀)",
-      "teams": 5,
-      "team_list": [
-        "team_a (Alpha Momentum) - 모멘텀 + MA5 + 거래량 3배",
-        "team_b (Beta Contrarian) - 대형주 역추세 + RSI≤35 + KOSPI 모드 필터",
-        "team_c (Gamma Disclosure) - DART 호재 공시 (Phase 2C 정제 97% 노이즈 제거)",
-        "team_d (Delta Theme) - 테마/정책 (Phase 2D 보강 예정)",
-        "team_e (Echo Frontier) - 시초가 갭 +2~5% + 거래량 surge"
+      "status": "정상 운영 (8 active / 9팀 풀)",
+      "teams_total_pool": 9,
+      "teams_active": 8,
+      "teams_disabled": 1,
+      "team_list_active": [
+        "team_a Alpha Momentum (momentum) - MA5↑ + 거래량 3배 [활성 04-01~]",
+        "team_c Gamma Disclosure (dart_disclosure) - DART 호재 공시 [Phase 2C/7G/7H]",
+        "team_d Delta Theme (theme_policy) - 시장 테마 선도주 [동일 그룹 캡 + 시총 상한 + 09:30 추세]",
+        "team_e Echo Frontier (frontier_gap) - 시초가 갭 +2~5% + 거래량 surge",
+        "team_f Zeta Volatility (volatility_breakout_lw) - 변동성 돌파 [04-15~]",
+        "team_g Kappa Turtle (turtle_breakout_short) - 단축 터틀 5/10일 신고가 [04-19~]",
+        "team_h Theta Sector (sector_rotation) - KOSPI 업종 로테이션 [04-19~]",
+        "team_i Alpha-Delta Hybrid (hybrid_alpha_delta) - 모멘텀+테마 가중평균 [04-19~]"
+      ],
+      "team_disabled": "team_b Beta Contrarian (largecap_contrarian) - 백테스트 -14%대 손실로 비활성, 재설계 검토",
+      "candidate_pool_inactive": [
+        "Eta Reversal (eod_reversal_korean)",
+        "Iota Flow (foreign_flow_momentum)",
+        "Lambda Intraday (kospi_intraday_momentum)",
+        "Mu Burst (opening_30min_volume_burst)",
+        "Nu Catalyst (news_catalyst_timing)",
+        "Xi Hybrid (multi_signal_hybrid)",
+        "Pi Bollinger (bollinger_reversal)",
+        "Omicron ETF (overnight_etf_reversal)"
       ],
       "workflows": ["paper-trading.yml", "paper-trading-check.yml", "paper-trading-select.yml"],
       "data_dir": "data/arena/",
       "dashboard": "index.html (Pearl Phase 7C)",
       "reset_date": "2026-04-10",
-      "last_run": "2026-04-10 성공 (수동 트리거 3회)",
-      "next_auto_run": "2026-04-13 16:10 KST"
+      "last_run": "2026-04-30 16:23 KST (schedule, success). 같은 날 14:37 KST workflow_dispatch 1회 추가 → portfolio/leaderboard 중복 누적 발견 → 멱등성 가드 + dedupe 적용",
+      "next_auto_run": "2026-05-04 (월) 16:10 KST",
+      "single_source_of_truth": "data/arena/_verified_facts.json (paper_trading.audit.verify_facts 가 매 운영일 자동 갱신). 모든 일별/팀별 % 수치 인용은 이 파일 기준 — raw daily/portfolio/trades 직접 인용 금지 (CLAUDE.md 규칙 1)"
     },
     "bnf": {
       "status": "정상 운영",
       "workflows": ["bnf-selection.yml", "bnf-simulation.yml"],
       "data_dir": "data/bnf/",
       "dashboard": "bnf_dashboard.html",
-      "last_verified": "2026-04-10 수동 트리거 success"
+      "recent_changes": "동일 테마 중복 캡 도입 (MAX_PER_THEME=2, d83da08)"
+    },
+    "bollinger": {
+      "status": "정상 운영",
+      "workflow": "Bollinger Swing Trading (schedule)",
+      "data_dir": "data/bnf/ (bollinger_*)",
+      "recent_changes": "동일 테마 중복 캡 도입 (MAX_PER_THEME=2, d83da08)"
     },
     "theme_snapshot": {
-      "status": "Cron 설정 완료 (04-10 시작)",
-      "workflow": "theme-snapshot.yml (16:30 KST 매일)",
+      "status": "Cron 가동 (04-10~)",
+      "workflow": "Theme Snapshot Daily (16:30 KST)",
       "data_dir": "data/theme_snapshots/",
-      "purpose": "7일 누적 후 Team D 대장주 보강 재료"
+      "purpose": "Team D 대장주 보강 재료 + 종목→테마 역인덱스 빌드 입력"
     }
   },
   "data_sources": {
     "KRX_OpenAPI": {
       "status": "정상",
       "client": "paper_trading/utils/krx_api.py",
-      "base_url": "http://data-dbg.krx.co.kr/svc/apis",
       "env_key": "KRX_API_KEY",
-      "endpoints": ["sto/stk_bydd_trd", "sto/ksq_bydd_trd", "idx/kospi_dd_trd", "idx/kosdaq_dd_trd", "sto/stk_isu_base_info", "sto/ksq_isu_base_info"],
-      "purpose": "OHLCV + 시가총액 + 지수 historical (pykrx 고장 우회)",
-      "used_by": ["momentum (MA5)", "largecap_contrarian (RSI + KOSPI 지수)", "frontier_gap (시가/전일종가)"],
-      "tested_samples": "KOSPI 950종목 + KOSDAQ 1823종목 + 51개 지수 fetch 성공"
+      "purpose": "OHLCV + 시가총액 + 지수 historical (pykrx 우회)"
     },
     "Naver_Finance": {
       "status": "정상",
       "modules": ["naver_market.py", "paper_trading/utils/naver_theme.py", "paper_trading/utils/naver_investor.py", "intraday_collector.py"],
       "purpose": "Snapshot + 테마 + 수급 + 분봉",
-      "used_by": ["4팀 모두 (snapshot)", "theme_policy (테마)", "future Phase 2D (수급)", "simulator (분봉)"],
-      "tested_samples": "KOSPI 2190종목 snapshot, 삼성전자 historical 7일, 테마 200개, 종목별 수급 0.2초/종목"
+      "recent_changes": "naver_theme.build_stock_to_themes_index() 추가 (역인덱스 빌드용)"
     },
     "DART_OpenAPI": {
-      "status": "정상 (Phase 2C 정제)",
-      "client": "paper_trading/utils/dart_utils.py",
-      "env_key": "DART_API_KEY",
-      "purpose": "호재성 공시 종목 선정",
-      "used_by": ["dart_disclosure (Team C)"],
-      "phase_2c_result": "200건 raw → 6건 (97% boilerplate 제거)",
-      "exclude_patterns": "증권/자산운용/리츠/ETF/스팩/캐피탈 등 회사명 + 거래실적/수익률공시 등 보고서명"
+      "status": "정상 (Phase 2C 정제 + 7G target_date fix + 7H 카테고리 가중치)",
+      "env_key": "DART_API_KEY"
     },
     "KIS_OpenAPI": {
-      "status": "불필요 판정",
-      "reason": "Naver 종목별 매매동향 페이지로 수급 데이터 대체 가능",
-      "alternative": "paper_trading/utils/naver_investor.py (NaverInvestorClient)",
-      "env_key": "미설정 (가입 불필요)"
+      "status": "보류 (중기 도입 예정 — 슬리피지 실거래 검증 목적)",
+      "alternative_for_supply_demand": "paper_trading/utils/naver_investor.py (수급 데이터 대체)"
     }
   },
-  "completed_phases": [
-    "Phase 1: 레거시 1세대 모닝스캔 시스템 폐지 (16개 파일 삭제)",
-    "Phase 2A: Team A 보강 (MA5 + 거래량 3배)",
-    "Phase 2B: Team B 손실 방지 (RSI≤35 + KOSPI -2% 차단)",
-    "Phase 2C: DART 키워드 정제 (97% 노이즈 제거)",
-    "Phase 2.5a: 테마 스냅샷 cron (7일 누적 시작)",
-    "Phase 2.5b: 수급 데이터 소스 (Naver 스크래핑으로 해결)",
-    "Phase 3F: Team F 신규 Frontier Gap (team_e)",
-    "Phase 7A: Frontend 5팀 + 한국식 색상 + 이모지 정리",
-    "Phase 7B-lite: H2H Hero + JetBrains Mono + 하단 탭바",
-    "Phase 7C: Today 탭 신규 (Pearl KPI 첫 화면)",
-    "Phase 7D: 5팀 KRX 통합 + 3주 backtest 인프라 + 실측 검증",
-    "Phase 7E: Beta Contrarian 강화 시도 → 폐기 (uncommitted)",
-    "Phase 7F: Echo Flow 신규 시도 → 중단 (사용자 결정)",
-    "Phase 7G: Team C DART target_date fix (매핑률 0%→100%)",
-    "Phase 7H: Team C 카테고리 가중치 조정 (단타 framework)",
-    "theme_policy 0종목 fix (시장 단위 fetch)",
-    "Telegram 메시지 디자인 (Premium Minimal)"
-  ],
-  "backtest_3week_results": {
-    "period": "2026-03-23 ~ 2026-04-10",
-    "trading_days": 14,
-    "initial_capital": 10000000,
-    "results": {
-      "team_a_alpha_momentum": "+27.45% (44/70 win, 63%) ✅ 검증됨",
-      "team_e_echo_frontier": "+23.80% (41/68 win, 60%) ✅ 검증됨",
-      "team_d_delta_theme": "-0.62% (35/70 win, 50%) ⚠ break-even",
-      "team_c_gamma_disclosure": "Phase 7G/7H 후 -3.20% (2/7 win) ⚠ 신호 약",
-      "team_b_beta_contrarian": "-24.74% (1/33 win, 3%) ❌ Critical - Monday 결정"
+  "infrastructure": {
+    "verify_facts": {
+      "status": "활성 (2ab4f25)",
+      "module": "paper_trading.audit.verify_facts",
+      "output": "data/arena/_verified_facts.json",
+      "trigger": "매 운영일 paper-trading.yml 자동 + 수동 (`python -m paper_trading.audit.verify_facts`)",
+      "warning_codes": [
+        "W_DUPLICATE_RUNS — leaderboard.daily_history 동일 일자 중복",
+        "W_TRADE_COUNT_MISMATCH — portfolio.total_trades vs daily/<date>/trades.json 합산 불일치",
+        "W_SUSPICIOUS_LOW_MDD — 자본 MDD < 0.1% (operational_days ≥5)",
+        "W_SIM_NO_SLIPPAGE — TradingSimulator.SLIPPAGE_PCT == 0 (동적 검사)"
+      ],
+      "purpose": "전략 성과 분석 환각 차단 (LLM은 _verified_facts.json만 읽기, raw data 직접 인용 금지)"
     },
-    "key_findings": [
-      "Phase 2A Alpha + Phase 3F Echo가 단타 framework winning combo",
-      "Phase 2B 손실 방지(KOSPI 차단) 03-23(-6.49%), 04-02(-3.22%) 작동 확인",
-      "Beta Contrarian: RSI 단독으로 단타 mean reversion 신호 부족",
-      "DART 호재 공시: 단독으로는 단타 신호 약함 (multi-signal 필요)"
-    ]
-  },
-  "pending_phases": {
-    "Phase 2D": {
-      "description": "Team D 대장주 + 수급 가산 보강",
-      "blocker": "테마 history 7일 누적 대기",
-      "expected_start": "2026-04-19",
-      "data_ready": ["KRX 시총", "naver_investor 수급", "테마 스냅샷 (누적 중)"]
+    "idempotency_guard": {
+      "scope": "arena_manager.run_daily()",
+      "behavior": "daily/<date>/arena_report.json 존재 시 skip (--force 로 재실행)",
+      "deployed": "2026-04-30 (f39ea2e)",
+      "validation_pending": "2026-05-04 cron + GitHub Actions 로그에서 'skip' 메시지 미출현 확인 예정"
+    },
+    "slippage_model": {
+      "scope": "paper_trading.simulator.TradingSimulator",
+      "constant": "SLIPPAGE_PCT = 0.2",
+      "applies_to": "진입가 +0.2%, 룰 기반 청산가(trailing/profit/loss 폴백) -0.2%",
+      "excluded": "종가 청산('close'), 분봉 first_hit_price (실 시장가)",
+      "deployed": "2026-05-01 (c2a625a)",
+      "next_check": "다음 거래일 trades.json 에 정확 ±X.0% 패턴 사라졌는지 확인"
+    },
+    "theme_cap": {
+      "scope": "BNF + Bollinger + (기존) Team D",
+      "config": "MAX_PER_THEME=2 (BNF/Bollinger 각각 클래스 상수, A/B 토글 가능)",
+      "index_file": "data/theme_cache/_stock_to_themes.json (200테마/2189종목/100% 커버)",
+      "rebuild_cmd": "python -m scripts.build_stock_theme_index [--refresh]",
+      "deployed": "2026-05-01 (d83da08)"
     }
   },
-  "monday_verification_checklist": [
-    "1. 04-13 16:10 KST paper-trading.yml 자동 실행 성공 확인 (gh run list)",
-    "2. 5팀 모두 매매 시뮬 완료 (data/arena/team_*/daily/20260413/)",
-    "3. 04-14(화) 후보 파일 5개 생성 (data/paper_trading/candidates_20260414_*.json)",
-    "4. 텔레그램 새 포맷 메시지 도착 확인 (Premium Minimal 디자인)",
-    "5. Pages 대시보드 Today 탭 04-13 데이터 표시",
-    "6. Phase 2B 효과: Beta Contrarian 손실 방지 작동 (KOSPI/RSI 필터 로그)",
-    "7. Phase 2C 효과: Team C 후보 boilerplate 없는 종목으로 구성",
-    "8. Phase 3F 효과: Team E Frontier Gap 실전 첫 매매 결과",
-    "9. 테마 스냅샷 cron 16:30 실행 (data/theme_snapshots/themes_20260413.json)"
+  "open_issues": {
+    "tracker": ".claude/context/issues.md",
+    "recently_resolved": [
+      "ISSUE-015 leaderboard.daily_history 중복 (2026-04-30 resolved)",
+      "ISSUE-016 시뮬레이터 슬리피지 부재 (2026-05-01 resolved, SLIPPAGE_PCT=0.2)",
+      "ISSUE-018 portfolio vs trades.json 거래수 불일치 (2026-04-30 resolved, 멱등성 가드 + dedupe)"
+    ],
+    "code_applied_pending_natural_resolve": [
+      "ISSUE-017 자본 MDD < 0.1% (team_a 0.04%, team_e 0%) — 슬리피지 코드 적용됨, 기존 trades.json 보존, 향후 거래일 누적으로 자연 해소 예상"
+    ],
+    "current_warnings_count": 2,
+    "current_warnings_detail": "W_SUSPICIOUS_LOW_MDD × 2 (team_a, team_e) — ISSUE-017 동일 원인"
+  },
+  "completed_phases_recent": [
+    "Phase 1~7H: 5팀 체제 → 9팀 확장 + Pearl 프론트 + DART/테마 정제 (~04-29)",
+    "Phase A: 24h 워커 인프라 골격 (Oracle Cloud Free Tier, d4ce0b4)",
+    "team_d 개선 3종: 동일 그룹 캡 + 시총 상한 + 09:30 추세 확인 (c38d53c)",
+    "verify_facts 하네스: 전략 성과 분석 환각 차단 (2ab4f25)",
+    "ISSUE-015/018 fix: 멱등성 가드 + dedupe (f39ea2e, 7333e69, 2026-04-30)",
+    "ISSUE-016/017 fix: 시뮬 슬리피지 0.2% 도입 (c2a625a, 2026-05-01)",
+    "BNF/Bollinger 테마 중복 캡 (max_per_theme=2, d83da08, 2026-05-01)"
   ],
-  "git_commits_today": [
-    "cadbe6f - Arena 정상화 4팀 동시 리셋",
-    "4f482ac - Phase 1 레거시 폐지 16개 파일",
-    "4c0188b - Phase 2A/2B/3F/2.5a 일괄 적용",
-    "eed84ef - 텔레그램 디자인 (Premium Minimal)",
-    "007de4f - theme_policy 0종목 fix",
-    "889ec46 - Phase 2C DART 키워드 정제",
-    "23efcb6 - Phase 7A 5팀 + 한국식 색상",
-    "5801350 - Phase 7B-lite H2H Hero + 하단 탭바",
-    "e778681 - Phase 7C Today 탭 신규",
-    "4622850 - Today 탭 fallback + 5팀 헤더",
-    "dacd4c3 - Naver 수급 유틸",
-    "ad71233 - 세션 1차 마무리 state.json",
-    "d0a9eb5 - Phase 7D 5팀 KRX 통합 + 3주 backtest",
-    "6b01f8a - Phase 7G DART target_date fix",
-    "6d3c287 - Phase 7H DART 가중치 조정"
+  "pending_phases": {
+    "Phase_2D": {
+      "description": "Team D 대장주 + 수급 가산 보강",
+      "blocker": "테마 history 7일 누적 (04-10 시작 → 04-19 완료 예정이었으나 우선순위 재평가 중)",
+      "data_ready": ["KRX 시총", "naver_investor 수급", "테마 스냅샷 (누적 진행)"]
+    },
+    "monitoring_idempotency_guard": {
+      "description": "멱등성 가드 검증 — 다음 cron(2026-05-04 16:10 KST) 후 logs 확인",
+      "expected": "GitHub Actions 로그에서 'skip' 미출현 (단일 실행 정상)"
+    },
+    "monitoring_slippage_effect": {
+      "description": "슬리피지 0.2% 효과 검증 — 5/4 이후 거래에서 trades.json 의 정확 ±X.0% 패턴 사라지는지",
+      "expected": "손절가가 정확히 -3.00%가 아닌 -3.20% 근처로 분포"
+    },
+    "kis_paper_trading": {
+      "description": "KIS 모의투자 연동 (broker/kis/) — 슬리피지 가정의 실거래 검증",
+      "ref": "obsidian/ai-lab-showcase/broker-api-setup.md"
+    },
+    "team_b_redesign": {
+      "description": "Beta Contrarian 재설계 또는 폐지 결정 — 백테스트 -14%대 손실로 disabled 상태",
+      "options": ["RSI 단독 → multi-signal 변경", "전략 폐지 후 신규 후보(Pi Bollinger 등) 활성화"]
+    }
+  },
+  "verification_checklist_2026_05_04": [
+    "1. 16:10 KST paper-trading.yml schedule 자동 실행 — gh run list 1회만 보이는지",
+    "2. 8 active 팀 모두 매매 시뮬 완료 (data/arena/team_*/daily/20260504/)",
+    "3. 멱등성 가드 동작 — 수동 재실행 시도 시 'arena_report.json 이미 존재 — skip' 출력",
+    "4. 슬리피지 효과 — 신규 trades.json 의 손절/익절가가 정확한 % 가 아닌 ±0.2% 깎인 값",
+    "5. verify_facts: W_DUPLICATE_RUNS / W_TRADE_COUNT_MISMATCH / W_SIM_NO_SLIPPAGE 미발행",
+    "6. BNF/Bollinger 후보에 동일 테마 캡 효과 — 로그에서 'theme_cap: N건 제외' 확인",
+    "7. 5/5(화) 후보 파일 8개 생성 (data/paper_trading/candidates_20260505_*.json)"
+  ],
+  "session_commits_2026_05_01": [
+    "f39ea2e 🛡️ Arena run_daily 멱등성 가드 + 누적 데이터 정정 (ISSUE-015/018)",
+    "7333e69 🔧 Arena 04-30 자동운영 결과 dedupe 재정정",
+    "c2a625a 💧 시뮬레이터 슬리피지 도입 (ISSUE-016/017)",
+    "d83da08 🎯 BNF/Bollinger 동일 테마 중복 캡 (max_per_theme=2)"
   ],
   "project_phase": {
-    "current": "운영 검증 단계 (5팀 체제 완성, Monday 자동 실행 대기)",
-    "next": "Phase 2D Team D 대장주 보강 (04-19 이후, 테마 누적 7일)",
-    "after": "Echo Flow 신규 팀 검토 (6팀 확장)",
-    "roadmap": [
-      "✅ Phase 1: 정상화 + 레거시 폐지",
-      "✅ Phase 2A/2B/2C: 기존 4팀 보강",
-      "✅ Phase 3F: Team F 신규 추가 (5팀 체제)",
-      "✅ Phase 2.5a: 테마 스냅샷 cron",
-      "✅ Phase 2.5b: 수급 데이터 (Naver로 해결)",
-      "✅ Phase 7A/7B-lite/7C: Pearl 프론트 디자인",
-      "⏸️ Phase 2D: Team D 대장주 + 수급 (04-19 이후)",
-      "📅 Phase 3G: Echo Flow 신규 팀 (선택, 6팀 확장)",
-      "📅 Phase 4: 1~2주 운영 후 ELO 변별력 평가 + 파라미터 튜닝",
-      "📅 Phase 5: 모의투자 → 소액 실매매"
+    "current": "운영 + 데이터 정합성 정착 (8팀 매일 검증, verify_facts SoT, 4종 신규 인프라)",
+    "next": "5/4 모니터링 → 6 verification_checklist 통과 시 다음 단계 결정",
+    "after": [
+      "team_b 재설계 또는 폐지 + 신규 팀 활성화 (Pi Bollinger / Eta Reversal)",
+      "Phase 2D Team D 대장주 보강",
+      "KIS 모의투자 연동 (실거래 슬리피지 검증)"
     ]
   }
 }
