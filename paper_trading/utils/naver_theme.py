@@ -265,6 +265,87 @@ class NaverThemeCrawler:
 
         return result
 
+    def build_stock_to_themes_index(
+        self,
+        refresh_missing: bool = False,
+        save_path: Optional[Path] = None,
+    ) -> Dict:
+        """
+        종목 → 테마 역인덱스 생성.
+
+        theme_<code>.json (theme→stocks) 들을 읽어 stock→themes 역방향으로 뒤집는다.
+        BNF/Bollinger 등 다른 전략의 "동일 테마 중복 회피" 필터에 쓰인다.
+
+        Args:
+            refresh_missing: True면 theme_list.json 에는 있지만 theme_<code>.json
+                             캐시가 없는 테마를 fetch (200개 풀 커버시 ~60s).
+                             False면 기존 캐시만 뒤집음 (cost 0).
+            save_path: 출력 경로. None이면 CACHE_DIR / "_stock_to_themes.json"
+
+        Returns:
+            {
+              "_meta": {"generated_at", "themes_with_stocks", "themes_missing",
+                        "stocks_total", "coverage_pct", ...},
+              "<stock_code>": {"name": "...", "themes": [{"code","name"}, ...]}
+            }
+        """
+        themes = self.get_theme_list()
+        theme_name_by_code = {t['code']: t['name'] for t in themes}
+
+        if refresh_missing:
+            for t in themes:
+                cache_file = CACHE_DIR / f"theme_{t['code']}.json"
+                if not cache_file.exists():
+                    self.get_theme_stocks(t['code'], t['name'])
+                    time.sleep(0.2)
+
+        index: Dict[str, Dict] = {}
+        themes_with_stocks: List[str] = []
+        themes_missing: List[Dict] = []
+
+        for t in themes:
+            code = t['code']
+            name = t['name']
+            cache_file = CACHE_DIR / f"theme_{code}.json"
+            if not cache_file.exists():
+                themes_missing.append({'code': code, 'name': name})
+                continue
+            stocks = self._load_cache(cache_file)
+            if not stocks:
+                themes_missing.append({'code': code, 'name': name})
+                continue
+            themes_with_stocks.append(code)
+            for s in stocks:
+                stock_code = s.get('code')
+                if not stock_code:
+                    continue
+                entry = index.setdefault(stock_code, {
+                    'name': s.get('name', ''),
+                    'themes': [],
+                })
+                if not any(th['code'] == code for th in entry['themes']):
+                    entry['themes'].append({'code': code, 'name': name})
+
+        result = {
+            '_meta': {
+                'generated_at': datetime.now().isoformat(timespec='seconds'),
+                'themes_total_known': len(themes),
+                'themes_with_stocks': len(themes_with_stocks),
+                'themes_missing_count': len(themes_missing),
+                'themes_missing': themes_missing,
+                'stocks_total': len(index),
+                'coverage_pct': round(100.0 * len(themes_with_stocks) / len(themes), 2) if themes else 0.0,
+                'source_cache_dir': str(CACHE_DIR),
+            },
+            **index,
+        }
+
+        out_path = save_path or (CACHE_DIR / "_stock_to_themes.json")
+        with open(out_path, 'w', encoding='utf-8') as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+
+        return result
+
     def _is_cache_valid(self, cache_file: Path) -> bool:
         """캐시 유효성 확인"""
         if not cache_file.exists():

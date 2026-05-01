@@ -66,6 +66,10 @@ MIN_TRADING_VALUE = 3_000_000_000      # 거래대금 30억원
 LOOKBACK_DAYS = 35       # 과거 데이터 조회 일수 (BB 15일 + RSI 14일 + 여유)
 TOP_N = 20
 
+# 동일 테마 중복 캡 (None/0 = 비활성, A/B 토글)
+# data/theme_cache/_stock_to_themes.json 기반
+MAX_PER_THEME: Optional[int] = 2
+
 # 제외 키워드
 EXCLUDE_KEYWORDS = ["우", "스팩", "SPAC", "리츠", "REIT", "ETF", "ETN",
                     "인버스", "레버리지", "선물"]
@@ -237,7 +241,16 @@ class BollingerSelector:
 
         # 5) 정렬 (%%B 낮은 순 -> RSI 낮은 순)
         candidates.sort(key=lambda x: (x["percent_b"], x["rsi"]))
-        candidates = candidates[:top_n]
+
+        # 6) 동일 테마 중복 캡 (정렬 후, top_n 자르기 전)
+        from paper_trading.utils.theme_cap import apply_theme_cap
+        candidates = apply_theme_cap(
+            candidates,
+            get_code=lambda c: c["code"],
+            top_n=top_n,
+            max_per_theme=MAX_PER_THEME,
+            log_prefix="Bollinger",
+        )
 
         for i, c in enumerate(candidates, 1):
             c["rank"] = i
