@@ -115,6 +115,10 @@ class BNFSelector:
     LOOKBACK_DAYS = 30  # 과거 30일 데이터 조회
     HIGH_LOOKBACK = 20  # 최근 고점 조회 기간
 
+    # 동일 테마 중복 캡 (None/0 = 비활성, A/B 토글)
+    # data/theme_cache/_stock_to_themes.json 기반
+    MAX_PER_THEME: Optional[int] = 2
+
     def __init__(self, data_dir: str = "data/bnf"):
         """초기화"""
         self.candidates: List[BNFCandidate] = []
@@ -507,11 +511,21 @@ class BNFSelector:
         # 낙폭 큰 순으로 정렬
         candidates.sort(key=lambda x: x.max_drop, reverse=True)
 
+        # 동일 테마 중복 캡 적용 (정렬 후, top_n 자르기 전)
+        from paper_trading.utils.theme_cap import apply_theme_cap
+        capped = apply_theme_cap(
+            candidates,
+            get_code=lambda c: c.code,
+            top_n=top_n,
+            max_per_theme=self.MAX_PER_THEME,
+            log_prefix="BNF",
+        )
+
         # 순위 부여
-        for i, candidate in enumerate(candidates[:top_n], 1):
+        for i, candidate in enumerate(capped, 1):
             candidate.rank = i
 
-        self.candidates = candidates[:top_n]
+        self.candidates = capped
 
         # 결과 출력
         logger.info(f"\n{'='*60}")
