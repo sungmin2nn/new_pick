@@ -68,7 +68,12 @@ TOP_N = 20
 
 # 동일 테마 중복 캡 (None/0 = 비활성, A/B 토글)
 # data/theme_cache/_stock_to_themes.json 기반
-MAX_PER_THEME: Optional[int] = 2
+# AB_THEME_CAP 환경변수로 override 가능 ("0" = 비활성, "3" = 3종목 허용 등)
+import os as _os
+_env_cap = _os.environ.get("AB_THEME_CAP")
+MAX_PER_THEME: Optional[int] = int(_env_cap) if _env_cap and _env_cap.isdigit() else 2
+if MAX_PER_THEME == 0:
+    MAX_PER_THEME = None
 
 # 제외 키워드
 EXCLUDE_KEYWORDS = ["우", "스팩", "SPAC", "리츠", "REIT", "ETF", "ETN",

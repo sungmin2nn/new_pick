@@ -193,7 +193,7 @@
 - **원인**: 시스템 진화 과정에서 1세대 → 2세대(BNF) → 3세대(Arena) 전환했으나 1세대 워크플로우 비활성화 누락. 기존 코드 동작 확인 안 한 채 새 시스템만 추가
 - **해결**: 검증 후 레거시 14개 Python + 2개 워크플로우 + auto_reporter 산출물 일괄 삭제 (Phase 1 진행 예정, Agent 검증 중)
 - **예방**: 시스템 세대 전환 시 항상 이전 세대 워크플로우 schedule 비활성화 체크리스트 적용. 정기적으로 `gh run list` 검토하여 미인지 워크플로우 식별
-- **상태**: open (검증 후 삭제 진행)
+- **상태**: resolved (2026-05-01 사후 확인) — 발견 당일(04-10) Phase 1 레거시 폐지로 이미 처리 완료. .github/workflows/morning-scan.yml + afternoon-collect.yml 삭제 (마지막 실행 04-10), 레거시 Python 16개 폐지 (state.json completed_phases 기록 + commit 4f482ac). 잔존 데이터 4건(morning_candidates.json/db × 2, morning_stock.db)은 history 스냅샷으로 보존
 
 ---
 
@@ -219,7 +219,7 @@
 - **원인**: W_TRADE_COUNT_MISMATCH 와 동일 — 동일 날짜 재실행으로 portfolio 만 누적.
 - **해결**: W_TRADE_COUNT_MISMATCH 해결과 함께 처리.
 - **예방**: verify_facts.py 자동 감지.
-- **상태**: open
+- **상태**: resolved (2026-05-01) — ISSUE-018 (W_TRADE_COUNT_MISMATCH) fix 와 같은 dedupe 적용으로 자동 해결. verify_facts 재확인: 9팀 모두 portfolio_json_current_krw == computed_current_krw (diff=0). W_CAPITAL_MISMATCH 미발행
 
 ---
 
