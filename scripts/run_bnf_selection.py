@@ -36,6 +36,15 @@ MIN_TRADING_VALUE = 10_000_000_000      # 100억
 LOOKBACK_HIGH = 20  # 고점 lookback
 TOP_N = 20
 
+# 동일 테마 중복 캡 (None/0 = 비활성, A/B 토글)
+# data/theme_cache/_stock_to_themes.json 기반
+# AB_THEME_CAP 환경변수로 override 가능 ("0" = 비활성, "3" = 3종목 허용 등)
+import os as _os
+_env_cap = _os.environ.get("AB_THEME_CAP")
+MAX_PER_THEME = int(_env_cap) if _env_cap and _env_cap.isdigit() else 2
+if MAX_PER_THEME == 0:
+    MAX_PER_THEME = None
+
 # 관리종목/투자경고 제외 여부
 EXCLUDE_ADMIN_ISSUES = True
 
@@ -259,7 +268,16 @@ def main():
             continue
 
     candidates.sort(key=lambda x: x["max_drop"], reverse=True)
-    candidates = candidates[:TOP_N]
+
+    # 동일 테마 중복 캡 적용 (정렬 후, top_n 자르기 전)
+    from paper_trading.utils.theme_cap import apply_theme_cap
+    candidates = apply_theme_cap(
+        candidates,
+        get_code=lambda c: c["code"],
+        top_n=TOP_N,
+        max_per_theme=MAX_PER_THEME,
+        log_prefix="BNF",
+    )
     for i, c in enumerate(candidates, 1):
         c["rank"] = i
 
