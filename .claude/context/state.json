@@ -1,6 +1,6 @@
 {
-  "current_phase": "9팀 운영 + 데이터 정합성 인프라 정착 (verify_facts SoT, 멱등성 가드, 슬리피지, 테마 캡)",
-  "last_updated": "2026-05-01T10:00:00+09:00",
+  "current_phase": "9팀 운영 + 데이터 정합성 인프라 정착 (verify_facts SoT, 멱등성 가드, 슬리피지, 테마 캡, 휴장일 원격 연동)",
+  "last_updated": "2026-05-05T22:00:00+09:00",
   "project": "news-trading-bot",
   "task": "Arena 8 active + 1 disabled = 9팀 풀 + BNF/Bollinger 보강 + 검증 하네스",
   "active_systems": {
@@ -126,6 +126,9 @@
     "code_applied_pending_natural_resolve": [
       "ISSUE-017 자본 MDD < 0.1% (team_a 0.04%, team_e 0%) — 슬리피지 코드 적용됨, 기존 trades.json 보존, 향후 거래일 누적으로 자연 해소 예상"
     ],
+    "code_applied_pending_data_cleanup": [
+      "ISSUE-019 휴장일 데이터 오염 (5/1 노동절) — utils.py + paper-trading.yml fix 완료 (커밋 6554f1e). 5/5 후보 10개 삭제 완료. 5/1 데이터 dedupe(arena daily 8팀×3 + arena_report + evolution + healthcheck + theme + portfolio·leaderboard 누적) 별도 작업 대기"
+    ],
     "current_warnings_count": 2,
     "current_warnings_detail": "W_SUSPICIOUS_LOW_MDD × 2 (team_a, team_e) — ISSUE-017 동일 원인"
   },
@@ -136,7 +139,10 @@
     "verify_facts 하네스: 전략 성과 분석 환각 차단 (2ab4f25)",
     "ISSUE-015/018 fix: 멱등성 가드 + dedupe (f39ea2e, 7333e69, 2026-04-30)",
     "ISSUE-016/017 fix: 시뮬 슬리피지 0.2% 도입 (c2a625a, 2026-05-01)",
-    "BNF/Bollinger 테마 중복 캡 (max_per_theme=2, d83da08, 2026-05-01)"
+    "BNF/Bollinger 테마 중복 캡 (max_per_theme=2, d83da08, 2026-05-01)",
+    "내일 후보 카드에 매수 예정일 메타 추가 (1a33c23, 2026-05-05)",
+    "ISSUE-019 fix: 휴장일 hyunbinseo/holidays-kr 원격 연동 + paper-trading.yml tomorrow 계산 fix (6554f1e, 2026-05-05)",
+    "5/5 후보 파일 10개 정리 (2026-05-05)"
   ],
   "pending_phases": {
     "Phase_2D": {
@@ -161,15 +167,33 @@
       "options": ["RSI 단독 → multi-signal 변경", "전략 폐지 후 신규 후보(Pi Bollinger 등) 활성화"]
     }
   },
-  "verification_checklist_2026_05_04": [
-    "1. 16:10 KST paper-trading.yml schedule 자동 실행 — gh run list 1회만 보이는지",
-    "2. 8 active 팀 모두 매매 시뮬 완료 (data/arena/team_*/daily/20260504/)",
-    "3. 멱등성 가드 동작 — 수동 재실행 시도 시 'arena_report.json 이미 존재 — skip' 출력",
-    "4. 슬리피지 효과 — 신규 trades.json 의 손절/익절가가 정확한 % 가 아닌 ±0.2% 깎인 값",
-    "5. verify_facts: W_DUPLICATE_RUNS / W_TRADE_COUNT_MISMATCH / W_SIM_NO_SLIPPAGE 미발행",
-    "6. BNF/Bollinger 후보에 동일 테마 캡 효과 — 로그에서 'theme_cap: N건 제외' 확인",
-    "7. 5/5(화) 후보 파일 8개 생성 (data/paper_trading/candidates_20260505_*.json)"
+  "verification_checklist_2026_05_06": [
+    "1. 5/6(수) paper-trading.yml 16:10 KST schedule 자동 실행 — gh run list 1회만",
+    "2. 8 active 팀 모두 매매 시뮬 완료 (data/arena/team_*/daily/20260506/)",
+    "3. 휴장일 fix 검증 — paper-trading.yml 로그에서 'tomorrow_str=20260507' 출력 (5/7 목, 영업일)",
+    "4. 5/5 후보 파일 미생성 확인 (data/paper_trading/candidates_20260505_*.json 부재)",
+    "5. utils.is_market_day() 호출 시 hyunbinseo raw fetch 성공 또는 캐시 hit (data/holidays_cache/2026.json)",
+    "6. verify_facts: 신규 경고 미발행",
+    "7. BNF/Bollinger 동일 테마 캡 효과 — 로그에서 'theme_cap: N건 제외' 확인"
   ],
+  "pending_data_cleanup": {
+    "scope": "ISSUE-019 5/1 노동절 데이터 정리",
+    "files_to_remove": [
+      "data/paper_trading/candidates_20260501_*.json (10)",
+      "data/paper_trading/status_20260501.json (1)",
+      "data/arena/team_a/c/d/e/f/g/h/i/daily/20260501/* (8팀 × 3 = 24)",
+      "data/arena/daily/20260501/* (arena_report, evolution_report)",
+      "data/arena/healthcheck/health_20260501.json",
+      "data/theme_snapshots/themes_20260501.json"
+    ],
+    "files_to_rebuild": [
+      "data/arena/leaderboard.json (daily_history 에서 20260501 제거)",
+      "data/arena/team_*/portfolio.json (5/1 trades 누적 분 제거 — total_trades, current_capital 재계산)",
+      "data/arena/team_*/journal.md (5/1 항목 제거)"
+    ],
+    "approach": "scripts/dedupe_arena_data.py 패턴 확장 — 특정 일자 제거 모드 추가",
+    "risk": "portfolio·leaderboard 재계산 정확성. dedupe 스크립트 자체 단위 테스트 필요"
+  },
   "session_commits_2026_05_01": [
     "f39ea2e 🛡️ Arena run_daily 멱등성 가드 + 누적 데이터 정정 (ISSUE-015/018)",
     "7333e69 🔧 Arena 04-30 자동운영 결과 dedupe 재정정",
