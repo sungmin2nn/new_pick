@@ -124,13 +124,14 @@ export async function loadArenaData(force = false) {
     )),
 
     // 후보: 최근 7일치 병렬 fetch → 가장 최근 non-null 사용
+    // _trade_date = 파일명의 날짜 (= 매수 예정일). data 내부 `date` 는 분석 기준 거래일이라 의미가 다름
     Promise.all(TEAM_IDS.map(async tid => {
       const sid = TEAM_META[tid].strategy;
       const results = await Promise.all(
         histDates.map(d => fetchCached(`data/paper_trading/candidates_${d}_${sid}.json`, force).then(data => ({ date: d, data })))
       );
       const found = results.find(r => r.data);
-      return [sid, found ? found.data : null];
+      return [sid, found ? { ...found.data, _trade_date: found.date } : null];
     })),
 
     // 매매 이력: 5팀 × 7일 × 2파일 = 70개 동시 fetch
@@ -650,13 +651,36 @@ function renderStockDetail(c, totalCount) {
   `;
 }
 
+function formatTradeDate(yyyymmdd) {
+  if (!yyyymmdd || yyyymmdd.length !== 8) return yyyymmdd || '';
+  const y = +yyyymmdd.slice(0, 4);
+  const m = +yyyymmdd.slice(4, 6);
+  const d = +yyyymmdd.slice(6, 8);
+  const dt = new Date(y, m - 1, d);
+  const dow = ['일','월','화','수','목','금','토'][dt.getDay()];
+  return `${yyyymmdd.slice(0,4)}-${yyyymmdd.slice(4,6)}-${yyyymmdd.slice(6,8)} (${dow})`;
+}
+
+function renderTradeDateBadge(tradeDate, selectedAt) {
+  if (!tradeDate) return '';
+  const sel = selectedAt ? ` · 선정 ${String(selectedAt).slice(0, 16)}` : '';
+  return `<div class="cand-trade-meta" style="font-size:var(--fs-sm);color:var(--text-secondary);margin:0 0 var(--space-2);padding:var(--space-2) var(--space-3);background:rgba(0,0,0,0.03);border-radius:var(--radius-sm);">📅 매수 예정일 <b style="color:var(--text-primary);">${formatTradeDate(tradeDate)}</b>${sel}</div>`;
+}
+
 function renderCandidatesTable() {
   // 5전략 후보 카드 리스트
   const allRows = [];
+  let tradeDate = null;
+  let selectedAt = null;
   for (const tid of TEAM_IDS) {
     const meta = TEAM_META[tid];
     const cands = state.candidates[meta.strategy];
     const candList = cands?.candidates || (Array.isArray(cands) ? cands : []) || [];
+    // 매매일 = 모든 전략 중 가장 최근의 _trade_date (보통 동일하지만 일부 전략이 0건이면 누락)
+    if (cands?._trade_date && (!tradeDate || cands._trade_date > tradeDate)) {
+      tradeDate = cands._trade_date;
+      selectedAt = cands.selected_at || selectedAt;
+    }
     for (const c of candList) {
       allRows.push({ ...c, _tid: tid, _team: meta.name, _color: meta.color });
     }
@@ -672,6 +696,7 @@ function renderCandidatesTable() {
           <h2 class="section-title display">📋 내일 후보</h2>
           <span class="section-subtitle">0종목</span>
         </div>
+        ${renderTradeDateBadge(tradeDate, selectedAt)}
         <div class="empty"><div class="empty-icon">📭</div><div class="empty-text">후보 없음</div></div>
       </div>
     `;
@@ -719,6 +744,7 @@ function renderCandidatesTable() {
         <h2 class="section-title display">📋 내일 후보</h2>
         <span class="section-subtitle">${Object.keys(teamGroups).length}전략 · ${allRows.length}종목</span>
       </div>
+      ${renderTradeDateBadge(tradeDate, selectedAt)}
       <div class="cand-filter-bar" style="display:flex;gap:6px;overflow-x:auto;padding:0 0 var(--space-2);-webkit-overflow-scrolling:touch;">
         <button class="cand-filter-tab active" data-filter="all">전체 <span class="cand-filter-count">${allRows.length}</span></button>
         ${teamTabs}
