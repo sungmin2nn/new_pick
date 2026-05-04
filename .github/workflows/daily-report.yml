@@ -1,0 +1,48 @@
+name: Daily Report (옵션 B 메시지 1)
+
+on:
+  schedule:
+    # 매일 16:35 KST (07:35 UTC) 평일 — 장 마감(15:30) + paper-trading.yml(16:10) 종료 후
+    - cron: '35 7 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Check market day
+        id: market_check
+        env:
+          TZ: Asia/Seoul
+        run: |
+          python -c "
+          from utils import is_market_day
+          if is_market_day():
+              print('IS_MARKET_DAY=true')
+          else:
+              print('오늘은 휴장일 — daily report skip')
+              print('IS_MARKET_DAY=false')
+          " | tee /tmp/market_check.out
+          grep IS_MARKET_DAY /tmp/market_check.out >> $GITHUB_OUTPUT
+
+      - name: Send daily report
+        if: steps.market_check.outputs.IS_MARKET_DAY == 'true'
+        env:
+          TZ: Asia/Seoul
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python scripts/daily_report.py
