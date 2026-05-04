@@ -2,8 +2,19 @@
 유틸리티 함수 모음
 """
 
+import json
 import random
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+# 공휴일 원격 데이터 (hyunbinseo/holidays-kr — 우주항공청 월력요항 자동 반영, 임시공휴일 포함)
+_HOLIDAYS_CACHE_DIR = Path(__file__).parent / 'data' / 'holidays_cache'
+_HOLIDAYS_MEMORY_CACHE: dict = {}  # {year: set('MM-DD')}
+_HOLIDAYS_REMOTE_URL = 'https://raw.githubusercontent.com/hyunbinseo/holidays-kr/main/public/{year}.json'
+# 정부 공휴일이지만 KRX는 영업하는 날 (이름 부분일치). 추가 시 효과 즉시 반영
+_KRX_OPEN_HOLIDAY_KEYWORDS = ('제헌절', '선거')
 
 # 한국 시간대 (UTC+9)
 KST = timezone(timedelta(hours=9))
@@ -128,15 +139,74 @@ def is_market_day(dt=None):
     return date_str not in holidays
 
 
+def _is_krx_open_holiday(names):
+    """정부 공휴일이지만 KRX는 영업하는 날(제헌절·선거일 등)이면 True."""
+    return any(
+        any(kw in n for kw in _KRX_OPEN_HOLIDAY_KEYWORDS)
+        for n in names
+    )
+
+
+def _parse_holidays_json(data, year):
+    """원격 JSON({YYYY-MM-DD: [name,...]})에서 KRX 휴장일 set('MM-DD') 추출."""
+    return {
+        k[5:] for k, names in data.items()
+        if k.startswith(f'{year}-') and not _is_krx_open_holiday(names)
+    }
+
+
+def _load_remote_holidays(year):
+    """hyunbinseo/holidays-kr 에서 해당 연도의 KRX 휴장일 set('MM-DD') 반환.
+    1일 디스크 캐시 + 메모리 캐시. 네트워크/파싱 실패 시 None."""
+    try:
+        _HOLIDAYS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        cache_file = _HOLIDAYS_CACHE_DIR / f'{year}.json'
+
+        if cache_file.exists():
+            mtime = datetime.fromtimestamp(cache_file.stat().st_mtime)
+            if datetime.now() - mtime < timedelta(days=1):
+                data = json.loads(cache_file.read_text(encoding='utf-8'))
+                return _parse_holidays_json(data, year)
+
+        url = _HOLIDAYS_REMOTE_URL.format(year=year)
+        with urllib.request.urlopen(url, timeout=5) as r:
+            raw = r.read().decode('utf-8')
+        data = json.loads(raw)
+        cache_file.write_text(raw, encoding='utf-8')
+        return _parse_holidays_json(data, year)
+
+    except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError,
+            OSError, TimeoutError, ValueError):
+        # 네트워크 차단 / 파싱 실패 → stale 디스크 캐시라도 시도
+        try:
+            cache_file = _HOLIDAYS_CACHE_DIR / f'{year}.json'
+            if cache_file.exists():
+                data = json.loads(cache_file.read_text(encoding='utf-8'))
+                return _parse_holidays_json(data, year)
+        except Exception:
+            pass
+        return None
+
+
 def _get_holidays(year):
     """
-    해당 연도의 한국 공휴일 목록 반환 (MM-DD 형식 set)
-    음력 명절(설/추석)은 매년 달라지므로 연도별로 관리
+    해당 연도의 한국 공휴일 set('MM-DD') 반환.
+    1차: hyunbinseo/holidays-kr 원격 (정부 출처 자동 반영, 임시공휴일 포함, 1일 캐시)
+    2차: 하드코딩 폴백 (네트워크 장애 시)
     """
-    # 매년 고정 공휴일
+    if year in _HOLIDAYS_MEMORY_CACHE:
+        return _HOLIDAYS_MEMORY_CACHE[year]
+
+    remote = _load_remote_holidays(year)
+    if remote is not None:
+        _HOLIDAYS_MEMORY_CACHE[year] = remote
+        return remote
+
+    # === Fallback (오프라인/장애 시) — 매년 수동 갱신 필요 ===
     fixed = {
         '01-01',  # 신정
         '03-01',  # 삼일절
+        '05-01',  # 노동절 (2026~ 정식 법정공휴일로 격상)
         '05-05',  # 어린이날
         '06-06',  # 현충일
         '08-15',  # 광복절
@@ -144,8 +214,6 @@ def _get_holidays(year):
         '10-09',  # 한글날
         '12-25',  # 크리스마스
     }
-
-    # 연도별 음력 명절 + 대체공휴일 (매년 업데이트 필요)
     variable = {
         2025: {
             '01-28', '01-29', '01-30',  # 설날 연휴
@@ -168,11 +236,10 @@ def _get_holidays(year):
             '09-14', '09-15', '09-16',  # 추석 연휴 (추정)
         },
     }
-
     holidays = set(fixed)
     if year in variable:
         holidays.update(variable[year])
-
+    _HOLIDAYS_MEMORY_CACHE[year] = holidays
     return holidays
 
 
