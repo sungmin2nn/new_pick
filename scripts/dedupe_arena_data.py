@@ -135,12 +135,15 @@ def rebuild_portfolio(team_id: str, trades_by_date: dict[str, dict],
     }
 
 
-def dedupe_daily_history(history: list[dict]) -> list[dict]:
-    """동일 date 는 마지막 entry 만 유지, date 오름차순 정렬"""
+def dedupe_daily_history(history: list[dict],
+                         exclude_dates: set[str] | None = None) -> list[dict]:
+    """동일 date 는 마지막 entry 만 유지, date 오름차순 정렬.
+    exclude_dates 에 포함된 일자는 결과에서 제거 (휴장일 오염 정정용)."""
+    excl = exclude_dates or set()
     by_date: dict[str, dict] = {}
     for entry in history:
         date = entry.get("date", "")
-        if date:
+        if date and date not in excl:
             by_date[date] = entry  # 뒤에 나오는 것이 덮어씀
     return [by_date[d] for d in sorted(by_date.keys())]
 
@@ -215,7 +218,10 @@ def main():
     parser = argparse.ArgumentParser(description="Arena 데이터 중복 누적 정정")
     parser.add_argument("--dry-run", action="store_true",
                         help="변경 미리보기만 (파일 쓰기 없음)")
+    parser.add_argument("--exclude-dates", type=str, default="",
+                        help="leaderboard.daily_history 에서 제거할 일자 (콤마 구분, YYYYMMDD)")
     args = parser.parse_args()
+    exclude_dates = {d.strip() for d in args.exclude_dates.split(",") if d.strip()}
 
     if not ARENA_DIR.exists():
         print(f"[Error] {ARENA_DIR} 없음")
@@ -262,7 +268,7 @@ def main():
         with open(lb_path, encoding="utf-8") as f:
             lb = json.load(f)
         old_history = lb.get("daily_history", [])
-        new_history = dedupe_daily_history(old_history)
+        new_history = dedupe_daily_history(old_history, exclude_dates=exclude_dates)
         team_meta = lb.get("teams", {})
         new_teams = replay_team_aggregates(new_history, team_meta)
 
