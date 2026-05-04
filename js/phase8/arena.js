@@ -111,6 +111,7 @@ export async function loadArenaData(force = false) {
     healthLogs,
     candidates,
     historyRaw,
+    verifiedFacts,
   ] = await Promise.all([
     fetchCached(`${DATA_BASE}/leaderboard.json`, force),
 
@@ -141,12 +142,16 @@ export async function loadArenaData(force = false) {
         fetchCached(`${DATA_BASE}/${tid}/daily/${date}/trades.json`, force).then(d => ({ tid, date, kind: 'trades', data: d })),
       ])
     )),
+
+    // verify_facts SoT (Single Source of Truth) — 트리거·게이트 계산용
+    fetchCached(`${DATA_BASE}/_verified_facts.json`, force),
   ]);
 
   // 2) 결과 정리
   state.leaderboard = leaderboard;
   state.portfolios = Object.fromEntries(portfolios);
   state.candidates = Object.fromEntries(candidates);
+  state.facts = verifiedFacts;
   // 헬스: 배열이면 마지막 항목 사용 (날짜별 누적 구조)
   const rawHealth = healthLogs.find(h => h !== null) || null;
   if (Array.isArray(rawHealth) && rawHealth.length > 0) {
@@ -1311,6 +1316,92 @@ function renderSystemMini() {
 }
 
 // ============ Main render ============
+// 의사결정 트리거·게이트 임계값 (scripts/daily_report.py 와 동일)
+const REPORT_TRIGGER_MDD_PCT = 5.0;
+const REPORT_TRIGGER_CUM_DOWN_PCT = -10.0;
+const REPORT_GATE_DAYS = 30;
+const REPORT_GATE_CUM_PCT = 5.0;
+const REPORT_GATE_MDD_PCT = 3.0;
+const REPORT_GATE_WR_PCT = 55.0;
+
+function renderDailyReportCard() {
+  const facts = state.facts;
+  if (!facts || !facts.arena) return '';
+
+  const arena = facts.arena;
+  const activeTeams = TEAM_IDS.filter(tid => arena[tid]?.enabled);
+  if (activeTeams.length === 0) return '';
+
+  const teamLabel = tid => (TEAM_META[tid]?.name || tid).split(' ')[0];
+
+  // 트리거
+  const triggers = [];
+  for (const tid of activeTeams) {
+    const t = arena[tid];
+    const mdd = t.drawdown?.max_pct_capital_basis || 0;
+    const cum = t.returns_capital_basis?.cumulative_pct || 0;
+    if (mdd > REPORT_TRIGGER_MDD_PCT) triggers.push(`${teamLabel(tid)} 자본 MDD ${mdd.toFixed(2)}% 초과 ${REPORT_TRIGGER_MDD_PCT}%`);
+    if (cum < REPORT_TRIGGER_CUM_DOWN_PCT) triggers.push(`${teamLabel(tid)} 누적 ${cum.toFixed(1)}% — 재설계 검토`);
+  }
+
+  // 게이트 충족 팀
+  const qualified = [];
+  let daysMax = 0;
+  for (const tid of activeTeams) {
+    const t = arena[tid];
+    const days = t.operational_days || 0;
+    const cum = t.returns_capital_basis?.cumulative_pct || 0;
+    const mdd = t.drawdown?.max_pct_capital_basis || 0;
+    const wr = t.trades?.win_rate_pct || 0;
+    if (days > daysMax) daysMax = days;
+    if (days >= REPORT_GATE_DAYS && cum >= REPORT_GATE_CUM_PCT && mdd <= REPORT_GATE_MDD_PCT && wr >= REPORT_GATE_WR_PCT) {
+      qualified.push(`${teamLabel(tid)}: cum=${cum.toFixed(1)}% MDD=${mdd.toFixed(2)}% WR=${wr.toFixed(0)}%`);
+    }
+  }
+
+  // 정합성
+  const warnings = facts.warnings || [];
+  const serious = warnings.filter(w => ['warn', 'error'].includes(w.severity));
+  const info = warnings.filter(w => w.severity === 'info');
+  const integrityHtml = warnings.length === 0
+    ? `<span style="color:#0a7;">✓ 모든 검증 통과</span>`
+    : serious.length > 0
+      ? `<span style="color:#c33;">⚠ 경고 ${serious.length}건</span>`
+      : `<span style="color:var(--text-secondary);">ℹ info ${info.length}건 (자연 해소 진행)</span>`;
+
+  // 마지막 거래일
+  const lastDates = activeTeams.map(tid => arena[tid]?.data_health?.last_date).filter(Boolean);
+  const lastDate = lastDates.length ? lastDates.sort().slice(-1)[0] : null;
+  const lastDateLabel = lastDate
+    ? `${lastDate.slice(0, 4)}-${lastDate.slice(4, 6)}-${lastDate.slice(6, 8)}`
+    : '-';
+
+  const triggerHtml = triggers.length === 0
+    ? `<span style="color:#0a7;">없음 — 모든 팀 정상</span>`
+    : triggers.map(t => `<div>· ${t}</div>`).join('');
+
+  const gateHtml = qualified.length > 0
+    ? `<b style="color:#0a7;">모의투자 후보:</b>` + qualified.map(q => `<div>· ${q}</div>`).join('')
+    : `<span style="color:var(--text-tertiary);">표본 부족 (max ${daysMax}일 / ${REPORT_GATE_DAYS}일↑ · cum≥${REPORT_GATE_CUM_PCT}% · MDD≤${REPORT_GATE_MDD_PCT}% · WR≥${REPORT_GATE_WR_PCT}%)</span>`;
+
+  return `
+    <div class="section daily-report-card" style="border-left:3px solid #4a90e2;background:rgba(74,144,226,0.05);padding:var(--space-3);border-radius:var(--radius-md);margin-bottom:var(--space-3);">
+      <div style="display:flex;align-items:baseline;gap:var(--space-2);margin-bottom:var(--space-2);">
+        <span style="font-size:var(--fs-md);font-weight:600;">📊 오늘의 리포트</span>
+        <span style="font-size:var(--fs-xs);color:var(--text-tertiary);">${lastDateLabel} 결과 · 텔레그램 동일</span>
+      </div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:6px var(--space-3);font-size:var(--fs-sm);align-items:start;">
+        <div style="color:var(--text-secondary);white-space:nowrap;">정합성</div>
+        <div>${integrityHtml}</div>
+        <div style="color:var(--text-secondary);white-space:nowrap;">⚠ 트리거</div>
+        <div>${triggerHtml}</div>
+        <div style="color:var(--text-secondary);white-space:nowrap;">📌 Phase 1→2</div>
+        <div>${gateHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
 export function renderArena() {
   const container = $('#arena-content');
   if (!container) return;
@@ -1318,6 +1409,7 @@ export function renderArena() {
   try {
     const rows = buildTeamRows();
     container.innerHTML = `
+      ${renderDailyReportCard()}
       ${renderKPI(rows)}
       ${renderCandidatesTable()}
       ${renderTeamsAccordion(rows)}
