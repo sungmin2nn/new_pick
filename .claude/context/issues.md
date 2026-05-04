@@ -274,3 +274,30 @@
 - **상태**: resolved (2026-04-30) — 권고 1 적용 (arena_manager.run_daily 진입점 idempotency 가드). scripts/dedupe_arena_data.py 로 portfolio 9개 + leaderboard ELO/rank/MDD 재구성. team_a 80건/team_b 26건/team_c 41건/team_d 75건으로 trades.json 합산과 일치. ELO 재조정: team_a 1222→1188 외 7팀
 
 ---
+
+## [ISSUE-019] 휴장일에 후보·시뮬 생성 — 다음거래일 계산이 공휴일 미체크 + 5/1 노동절 누락
+- **발생일**: 2026-05-05 (사후 발견, 실제 영향: 2026-05-01·05-05)
+- **에이전트**: paper-trading.yml `Select tomorrow stocks`, paper-trading-select.yml, utils._get_holidays
+- **증상**:
+  1. 2026-05-01 (노동절, 법정공휴일) 에 paper-trading.yml 이 정상 실행 → arena 8팀(a/c/d/e/f/g/h/i) daily 결과 + arena_report + evolution + healthcheck + theme snapshot + multi-strategy 후보 10개 + leaderboard.daily_history 누적 + portfolio.json 매매 누적 발생. KRX 데이터 부재 상태에서 시뮬이 돌아 데이터 오염
+  2. 2026-05-05 (어린이날) 매수용 후보 10개(`candidates_20260505_*.json`) 가 5/4 18:52 에 생성 → 대시보드 `📅 매수 예정일 2026-05-05 (화)` 로 표시됨. 시뮬은 미실행 (cron 1-5 평일 기준이지만 5/5는 화요일이라 또 실행 가능성 있었음)
+- **원인**:
+  1. `utils.py` `_get_holidays` `fixed` 셋에 `'05-01'` 누락. 2026년부터 노동절(근로자의날)이 정식 법정공휴일로 격상됐으나 코드 미반영. `is_market_day(2026-05-01)` 가 True 반환 → paper-trading.yml 진입점 `IS_MARKET_DAY` 통과
+  2. `.github/workflows/paper-trading.yml:96-98` 의 tomorrow 계산이 `weekday() >= 5` 만 체크 → 토/일만 건너뛰고 평일 공휴일은 그대로 통과. 5/4(월) 실행 시 tomorrow=5/5(화) 가 어린이날인데 그대로 매매 후보 생성
+  3. `utils._get_holidays` 가 매년 수동 갱신을 요구하는 하드코딩 셋. 임시공휴일 발표 시 코드 수정 전엔 누락. 2025년 1/27 같은 임시공휴일도 동일 패턴 위험
+- **해결** (2026-05-05, 커밋 6554f1e):
+  - `utils.py`: `hyunbinseo/holidays-kr` 원격 raw JSON fetch 도입 (1일 디스크 캐시 + 메모리 캐시). 우주항공청 월력요항을 자동 반영하므로 임시공휴일도 정부 발표 후 며칠 내 자동 반영
+  - KRX 영업일 키워드 필터(`제헌절`, `선거`): 정부 공휴일이지만 KRX는 영업하는 날 자동 제외 → 6/3 지방선거·7/17 제헌절 KRX 영업으로 정확 분류
+  - 폴백 셋에 `'05-01'` 노동절 추가 (네트워크 장애 시 보호)
+  - `paper-trading.yml`: `from utils import is_market_day` 추가 후 tomorrow 루프를 `weekday() >= 5 or not is_market_day(tomorrow)` 로 변경
+  - 검증: 5/1·5/5·5/24·5/25 휴장 ✓ / 5/4·5/26 영업 ✓ / 6/3·7/17 KRX 영업 ✓ / 폴백 동작 ✓
+- **데이터 정리**:
+  - 5/5 후보 파일 10개(`candidates_20260505_*.json`) 삭제 — 영향 범위 단순(시뮬 미실행)
+  - 5/1 데이터 정리는 별도 작업: candidates 10 + status 1 + arena daily 8팀×3 + arena_report + evolution + healthcheck + theme + portfolio/leaderboard 누적까지 영향. dedupe_arena_data.py 패턴으로 재구성 필요 (Pending)
+- **예방**:
+  - 다른 워크플로우의 다음거래일 계산도 동일 패턴 점검 필요 (현재는 paper-trading.yml만 확인됨)
+  - state.json 의 `next_auto_run` 필드는 수동 입력이라 실제 KRX 영업일과 다를 수 있음 — 자동화 고려
+  - 라이브러리 갱신 누락 위험 모니터: 매월 1회 `_load_remote_holidays` 실패율 점검
+- **상태**: code_applied_pending_data_cleanup (2026-05-05) — 코드 fix 완료, 5/5 후보 정리 완료. 5/1 portfolio/leaderboard dedupe 별도 작업 대기
+
+---
