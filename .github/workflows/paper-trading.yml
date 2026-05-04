@@ -89,12 +89,14 @@ jobs:
       run: |
         python -c "
         from paper_trading.multi_strategy_runner import run_all_strategies
+        from utils import is_market_day
         from datetime import datetime, timedelta, timezone
 
         kst = timezone(timedelta(hours=9))
         today = datetime.now(kst)
         tomorrow = today + timedelta(days=1)
-        while tomorrow.weekday() >= 5:
+        # 주말 + 한국 공휴일(임시공휴일 포함) 모두 건너뜀
+        while tomorrow.weekday() >= 5 or not is_market_day(tomorrow):
             tomorrow += timedelta(days=1)
 
         tomorrow_str = tomorrow.strftime('%Y%m%d')
