@@ -75,32 +75,39 @@ jobs:
             exit(1)
 
         entry = config["strategies"][sid]
+        cur_status = entry.get("status") or ("active" if entry["enabled"] else ("deactivated" if entry.get("activated_at") else "pending"))
         print(f"\n{'='*50}")
         print(f"전략: {entry['team_name']} ({sid})")
         print(f"출처: {entry['source']}")
-        print(f"현재 상태: {'ON ✅' if entry['enabled'] else 'OFF ⬜'}")
+        print(f"현재 상태: {cur_status} (enabled={entry['enabled']})")
         print(f"팀 ID: {entry.get('team_id', 'N/A')}")
         print(f"활성화일: {entry.get('activated_at', 'N/A')}")
         print(f"{'='*50}")
 
+        STATUS_ICON = {"active": "✅ active     ", "pending": "⬜ pending    ", "deactivated": "🛑 deactivated"}
+
         if "STATUS" in action:
             # 전체 현황 표시
             print(f"\n📊 전체 전략 현황:")
-            on_count = 0
+            counts = {"active": 0, "pending": 0, "deactivated": 0}
             for s_id, s_entry in config["strategies"].items():
-                status = "✅ ON " if s_entry["enabled"] else "⬜ OFF"
-                team = s_entry.get("team_id", "-")
-                print(f"  {status}  {s_entry['team_name']:25s} ({s_id}) → {team}")
-                if s_entry["enabled"]:
-                    on_count += 1
-            print(f"\n활성: {on_count}/{len(config['strategies'])}개")
+                st = s_entry.get("status") or ("active" if s_entry["enabled"] else ("deactivated" if s_entry.get("activated_at") else "pending"))
+                team = s_entry.get("team_id") or "-"
+                print(f"  {STATUS_ICON.get(st, st)}  {s_entry['team_name']:25s} ({s_id}) → {team}")
+                counts[st] = counts.get(st, 0) + 1
+            total = len(config['strategies'])
+            print(f"\n활성화 중: {counts['active']}/{total}  활성화 전: {counts['pending']}/{total}  활성화 중단: {counts['deactivated']}/{total}")
 
         elif "ON" in action:
             if entry["enabled"]:
                 print(f"\n⚠️ 이미 활성화 상태입니다.")
             else:
                 entry["enabled"] = True
+                entry["status"] = "active"
                 entry["activated_at"] = datetime.now(KST).strftime("%Y-%m-%d")
+                # 재활성화 시 deactivated 메타 정리
+                entry.pop("deactivated_at", None)
+                entry.pop("deactivated_reason", None)
 
                 if not entry.get("team_id"):
                     pool = config.get("team_id_pool", [])
@@ -114,7 +121,7 @@ jobs:
                 with open(CONFIG_PATH, "w", encoding="utf-8") as f:
                     json.dump(config, f, ensure_ascii=False, indent=2)
 
-                print(f"\n✅ 활성화 완료!")
+                print(f"\n✅ 활성화 완료! (status=active)")
                 print(f"   팀 ID: {entry['team_id']}")
                 print(f"   다음 거래일부터 페이퍼 트레이딩 참여")
 
@@ -123,13 +130,16 @@ jobs:
                 print(f"\n⚠️ 이미 비활성화 상태입니다.")
             else:
                 entry["enabled"] = False
+                entry["status"] = "deactivated"
+                entry["deactivated_at"] = datetime.now(KST).strftime("%Y-%m-%d")
                 config["updated_at"] = datetime.now(KST).strftime("%Y-%m-%dT%H:%M:%S")
                 with open(CONFIG_PATH, "w", encoding="utf-8") as f:
                     json.dump(config, f, ensure_ascii=False, indent=2)
 
-                print(f"\n⬜ 비활성화 완료!")
+                print(f"\n🛑 비활성화 완료! (status=deactivated)")
                 print(f"   팀 ID: {entry['team_id']} (데이터 보존)")
                 print(f"   페이퍼 트레이딩에서 제외됨")
+                print(f"   ⚠️ deactivated_reason 은 별도 수동 기록 권장")
         PYEOF
 
     - name: Commit changes

@@ -1,9 +1,10 @@
 {
   "version": "1.0",
-  "updated_at": "2026-04-19T12:14:21",
+  "updated_at": "2026-05-07T07:55:00",
   "strategies": {
     "momentum": {
       "enabled": true,
+      "status": "active",
       "source": "ntb",
       "module_path": "paper_trading.strategies.momentum",
       "class_name": "MomentumStrategy",
@@ -19,6 +20,7 @@
     },
     "largecap_contrarian": {
       "enabled": false,
+      "status": "deactivated",
       "source": "ntb",
       "module_path": "paper_trading.strategies.largecap_contrarian",
       "class_name": "LargecapContrarianStrategy",
@@ -33,7 +35,8 @@
       "top_n": 5
     },
     "dart_disclosure": {
-      "enabled": true,
+      "enabled": false,
+      "status": "deactivated",
       "source": "ntb",
       "module_path": "paper_trading.strategies.dart_disclosure",
       "class_name": "DartDisclosureStrategy",
@@ -45,10 +48,13 @@
       "risk_level": "medium",
       "initial_capital": 10000000,
       "activated_at": "2026-04-01",
+      "deactivated_at": "2026-05-07",
+      "deactivated_reason": "성과 기반 컷 — 16일 운용 누적 +6.95% (동기간 team_a +61.51%, team_d +17.60% 대비 저성과). 승률 50%, 진단 4가지 구조적 약점: ① 일평균 선정 2.94/5종목(분산 부족) ② 09:05 시초가 진입 직후 손절 40.9% ③ trailing 익절 6.8% ④ DART 점수 가중 40점이 시장 컨디션 무시. MDD 3.09%로 정책(5%) 미달이나 사용자 판단으로 OFF.",
       "top_n": 5
     },
     "theme_policy": {
       "enabled": true,
+      "status": "active",
       "source": "ntb",
       "module_path": "paper_trading.strategies.theme_policy",
       "class_name": "ThemePolicyStrategy",
@@ -64,6 +70,7 @@
     },
     "frontier_gap": {
       "enabled": true,
+      "status": "active",
       "source": "ntb",
       "module_path": "paper_trading.strategies.frontier_gap",
       "class_name": "FrontierGapStrategy",
@@ -79,6 +86,7 @@
     },
     "hybrid_alpha_delta": {
       "enabled": true,
+      "status": "active",
       "source": "ntb",
       "module_path": "paper_trading.strategies.hybrid_alpha_delta",
       "class_name": "HybridAlphaDeltaStrategy",
@@ -94,6 +102,7 @@
     },
     "volatility_breakout_lw": {
       "enabled": true,
+      "status": "active",
       "source": "lab",
       "module_path": "strategies.volatility_breakout_lw",
       "class_name": "VolatilityBreakoutLW",
@@ -109,6 +118,7 @@
     },
     "eod_reversal_korean": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.eod_reversal_korean",
       "class_name": "EODReversalKoreanStrategy",
@@ -124,6 +134,7 @@
     },
     "sector_rotation": {
       "enabled": true,
+      "status": "active",
       "source": "lab",
       "module_path": "strategies.sector_rotation",
       "class_name": "SectorRotationStrategy",
@@ -139,6 +150,7 @@
     },
     "foreign_flow_momentum": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.foreign_flow_momentum",
       "class_name": "ForeignFlowMomentumStrategy",
@@ -154,6 +166,7 @@
     },
     "turtle_breakout_short": {
       "enabled": true,
+      "status": "active",
       "source": "lab",
       "module_path": "strategies.turtle_breakout_short",
       "class_name": "TurtleBreakoutShortStrategy",
@@ -169,6 +182,7 @@
     },
     "kospi_intraday_momentum": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.kospi_intraday_momentum",
       "class_name": "KospiIntradayMomentumStrategy",
@@ -184,6 +198,7 @@
     },
     "opening_30min_volume_burst": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.opening_30min_volume_burst",
       "class_name": "Opening30MinVolumeBurstStrategy",
@@ -199,6 +214,7 @@
     },
     "news_catalyst_timing": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.news_catalyst_timing",
       "class_name": "NewsCatalystTimingStrategy",
@@ -214,6 +230,7 @@
     },
     "multi_signal_hybrid": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.multi_signal_hybrid",
       "class_name": "MultiSignalHybridStrategy",
@@ -229,6 +246,7 @@
     },
     "bollinger_reversal": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.bollinger_reversal",
       "class_name": "BollingerReversalStrategy",
@@ -244,6 +262,7 @@
     },
     "overnight_etf_reversal": {
       "enabled": false,
+      "status": "pending",
       "source": "lab",
       "module_path": "strategies.overnight_etf_reversal",
       "class_name": "OvernightETFReversalStrategy",
