@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-05-07T07:55:00",
+  "updated_at": "2026-05-07T08:10:00",
   "strategies": {
     "momentum": {
       "enabled": true,
@@ -165,8 +165,8 @@
       "top_n": 5
     },
     "turtle_breakout_short": {
-      "enabled": true,
-      "status": "active",
+      "enabled": false,
+      "status": "deactivated",
       "source": "lab",
       "module_path": "strategies.turtle_breakout_short",
       "class_name": "TurtleBreakoutShortStrategy",
@@ -178,6 +178,8 @@
       "risk_level": "medium",
       "initial_capital": 10000000,
       "activated_at": "2026-04-19",
+      "deactivated_at": "2026-05-07",
+      "deactivated_reason": "사용자 판단 컷 — 8거래일 운용 누적 +8.29%로 8일팀 5개 중 최하위 (team_h +19.93%, team_e +16.57%, team_f +16.41%, team_i +10.77% 대비 명확한 저성과). 승률 55%이나 avg_max_loss -4.46%로 8일팀 최악, loss exit 42.5%로 정액 손절 빈발, 최선일 +3.37%로 큰 수익 캡처 실패. MDD 2.96%로 정책(5%) 미달, 표본도 정책 기준(10거래일) 미달이나 동기간 비교상 명확한 부진과 단축 터틀 신호의 시장 부적합으로 사용자 판단 OFF.",
       "top_n": 5
     },
     "kospi_intraday_momentum": {
