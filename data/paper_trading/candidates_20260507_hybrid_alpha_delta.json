@@ -1,0 +1,137 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260504",
+  "selected_at": "2026-05-06 19:07:07",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "003530",
+      "name": "한화투자증권",
+      "price": 8190,
+      "change_pct": 9.05,
+      "score": 76.4,
+      "score_detail": {
+        "alpha_score": 64.6,
+        "delta_score": 45.3,
+        "alpha_norm": 70.4,
+        "delta_norm": 59.1,
+        "alpha_weighted": 45.7,
+        "delta_weighted": 20.7,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 19840727,
+      "trading_value": 164365786985
+    },
+    {
+      "code": "018880",
+      "name": "한온시스템",
+      "price": 4850,
+      "change_pct": 14.66,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 91.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 121205936,
+      "trading_value": 586935849243
+    },
+    {
+      "code": "050890",
+      "name": "쏠리드",
+      "price": 18640,
+      "change_pct": 8.94,
+      "score": 54.7,
+      "score_detail": {
+        "alpha_score": 77.2,
+        "delta_score": 0.0,
+        "alpha_norm": 84.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 54.7,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 22188387,
+      "trading_value": 415775259390
+    },
+    {
+      "code": "003670",
+      "name": "포스코퓨처엠",
+      "price": 288500,
+      "change_pct": 8.05,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 76.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 23748640740000,
+      "volume": 500,
+      "trading_value": 256610000000
+    },
+    {
+      "code": "247540",
+      "name": "에코프로비엠",
+      "price": 228500,
+      "change_pct": 6.03,
+      "score": 34.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 76.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 99.3,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 21082458527000,
+      "volume": 500,
+      "trading_value": 223543000000
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
