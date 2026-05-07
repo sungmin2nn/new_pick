@@ -13,20 +13,6 @@
       "best_day_return": 45.97,
       "worst_day_return": -12.06
     },
-    "team_c": {
-      "team_id": "team_c",
-      "team_name": "Gamma Disclosure",
-      "emoji": "🟢",
-      "elo": 823,
-      "rank": 8,
-      "total_1st": 1,
-      "total_2nd": 1,
-      "total_3rd": 4,
-      "total_4th": 1,
-      "best_day_return": 10.03,
-      "worst_day_return": -9.01,
-      "total_8th": 1
-    },
     "team_d": {
       "team_id": "team_d",
       "team_name": "Delta Theme",
@@ -54,20 +40,6 @@
       "worst_day_return": -15.97,
       "total_6th": 2
     },
-    "team_f": {
-      "team_id": "team_f",
-      "team_name": "Zeta Volatility",
-      "emoji": "🟠",
-      "elo": 1018,
-      "rank": 3,
-      "total_1st": 2,
-      "total_2nd": 0,
-      "total_3rd": 2,
-      "total_4th": 2,
-      "best_day_return": 47.88,
-      "worst_day_return": -9.56,
-      "total_5th": 1
-    },
     "team_i": {
       "team_id": "team_i",
       "team_name": "Alpha-Delta Hybrid",
@@ -94,20 +66,6 @@
       "best_day_return": 39.94,
       "worst_day_return": -15.95,
       "total_5th": 1
-    },
-    "team_g": {
-      "team_id": "team_g",
-      "team_name": "Kappa Turtle",
-      "emoji": "🐢",
-      "elo": 947,
-      "rank": 7,
-      "total_1st": 1,
-      "total_2nd": 0,
-      "total_3rd": 2,
-      "total_4th": 1,
-      "best_day_return": 16.45,
-      "worst_day_return": -7.47,
-      "total_7th": 1
     }
   },
   "archived_teams": {
@@ -128,6 +86,57 @@
       "worst_day_return": -11.37,
       "archived_at": "2026-04-19",
       "archived_reason": "성과 기반 컷 — 8일 연속 손실, 승률 8.6% (5/31), 누적 -15.93%. 상승장에서 RSI≤35 역발상 필터가 구조적 역풍."
+    },
+    "team_c": {
+      "team_id": "team_c",
+      "team_name": "Gamma Disclosure",
+      "strategy_id": "dart_disclosure",
+      "emoji": "🟢",
+      "elo": 823,
+      "final_rank": 8,
+      "total_1st": 1,
+      "total_2nd": 1,
+      "total_3rd": 4,
+      "total_4th": 1,
+      "total_8th": 1,
+      "best_day_return": 10.03,
+      "worst_day_return": -9.01,
+      "archived_at": "2026-05-07",
+      "archived_reason": "성과 기반 컷 — 16일 운용 누적 +6.95% (동기간 team_a +61.51%, team_d +17.60% 대비 저성과). 승률 50%, 진단 4가지 구조적 약점: 선정 부족(2.94/5종목), 시초가 즉사(loss exit 40.9%), trailing 6.8%, DART 점수 가중이 시장 컨디션 무시. MDD 3.09%로 정책(5%) 미달이나 사용자 판단으로 OFF."
+    },
+    "team_g": {
+      "team_id": "team_g",
+      "team_name": "Kappa Turtle",
+      "strategy_id": "turtle_breakout_short",
+      "emoji": "🐢",
+      "elo": 947,
+      "final_rank": 7,
+      "total_1st": 1,
+      "total_2nd": 0,
+      "total_3rd": 2,
+      "total_4th": 1,
+      "total_7th": 1,
+      "best_day_return": 16.45,
+      "worst_day_return": -7.47,
+      "archived_at": "2026-05-07",
+      "archived_reason": "사용자 판단 컷 — 8거래일 운용 누적 +8.29%로 8일팀 5개 중 최하위 (team_h +19.93%, team_e +16.57%, team_f +16.41%, team_i +10.77% 대비 저성과). avg_max_loss -4.46%(8일팀 최악), loss exit 42.5%(8일팀 최고), 최선일 +3.37%로 큰 수익 캡처 실패. MDD 2.96%/표본 8일로 정책 미달이나 단축 터틀 신호의 시장 부적합으로 OFF."
+    },
+    "team_f": {
+      "team_id": "team_f",
+      "team_name": "Zeta Volatility",
+      "strategy_id": "volatility_breakout_lw",
+      "emoji": "🟠",
+      "elo": 1018,
+      "final_rank": 3,
+      "total_1st": 2,
+      "total_2nd": 0,
+      "total_3rd": 2,
+      "total_4th": 2,
+      "total_5th": 1,
+      "best_day_return": 47.88,
+      "worst_day_return": -9.56,
+      "archived_at": "2026-05-08",
+      "archived_reason": "슬리피지 위험 컷 — 9거래일 운용 누적 +14.19%로 절대 부진 아니나 시뮬-실거래 괴리 위험 일관. MDD 3.31%(active 8일팀 최고), avg_max_loss -4.42%(8일팀 최악). 백테스트 calibrated +25.49%로 lab 1위이나 CLAUDE.md §3 시뮬레이터 결함(슬리피지 미반영) 직접 노출. 동일 breakout 카테고리 team_e가 분산 유지하므로 사용자 판단 OFF."
     }
   },
   "daily_history": [
@@ -1090,7 +1099,7 @@
       ]
     }
   ],
-  "last_updated": "2026-05-07 19:05:25",
+  "last_updated": "2026-05-08 08:21:59",
   "reset_at": "2026-04-10 14:28:11",
   "reset_reason": "4팀 동시 시작 - 데이터 파이프라인 정상화 후 공정 경쟁"
 }
