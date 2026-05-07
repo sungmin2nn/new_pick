@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-05-07T08:10:00",
+  "updated_at": "2026-05-08T08:30:00",
   "strategies": {
     "momentum": {
       "enabled": true,
@@ -101,8 +101,8 @@
       "top_n": 5
     },
     "volatility_breakout_lw": {
-      "enabled": true,
-      "status": "active",
+      "enabled": false,
+      "status": "deactivated",
       "source": "lab",
       "module_path": "strategies.volatility_breakout_lw",
       "class_name": "VolatilityBreakoutLW",
@@ -114,6 +114,8 @@
       "risk_level": "medium",
       "initial_capital": 10000000,
       "activated_at": "2026-04-15",
+      "deactivated_at": "2026-05-08",
+      "deactivated_reason": "슬리피지 위험 컷 — 9거래일 운용 누적 +14.19%로 절대 부진은 아니나 시뮬-실거래 괴리 위험 일관. MDD 3.31%(active 8일팀 최고), avg_max_loss -4.42%(8일팀 최악, team_g 다음) — 진입 후 평균적으로 손절선(-3%)을 깨고 추락하는 패턴. loss exit 비율 40%(team_g 컷 후 active 최고), trail% 30%로 추세 캡처는 양호하나 손절 빈발이 누적 발목. 백테스트 calibrated +25.49%로 lab 전략 1위이나 CLAUDE.md §3 시뮬레이터 결함(손절가 정액 체결, 슬리피지 미반영) 직접 노출되어 실거래 전환 시 깎임 가장 큼. 동일 카테고리 team_e(frontier_gap)이 분산 유지하므로 사용자 판단 OFF.",
       "top_n": 5
     },
     "eod_reversal_korean": {
