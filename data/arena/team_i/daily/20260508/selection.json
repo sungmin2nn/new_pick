@@ -1,0 +1,136 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260507",
+  "selected_at": "2026-05-08 17:55:10",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "203650",
+      "name": "드림시큐리티",
+      "price": 4130,
+      "change_pct": 9.99,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 81.4,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 134633891,
+      "trading_value": 574264452129
+    },
+    {
+      "code": "041440",
+      "name": "현대에버다임",
+      "price": 10430,
+      "change_pct": 14.62,
+      "score": 61.2,
+      "score_detail": {
+        "alpha_score": 76.7,
+        "delta_score": 0.0,
+        "alpha_norm": 94.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 61.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 12198007,
+      "trading_value": 129019570130
+    },
+    {
+      "code": "078150",
+      "name": "HB테크놀러지",
+      "price": 4530,
+      "change_pct": 12.69,
+      "score": 59.2,
+      "score_detail": {
+        "alpha_score": 74.1,
+        "delta_score": 0.0,
+        "alpha_norm": 91.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 59.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 67835178,
+      "trading_value": 310758336920
+    },
+    {
+      "code": "247540",
+      "name": "에코프로비엠",
+      "price": 237500,
+      "change_pct": 0.85,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 71.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 23039067207000,
+      "volume": 500,
+      "trading_value": 232347000000
+    },
+    {
+      "code": "086280",
+      "name": "현대글로비스",
+      "price": 251000,
+      "change_pct": 8.89,
+      "score": 33.5,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 68.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 95.8,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.5,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 17287500000000,
+      "volume": 500,
+      "trading_value": 188250000000
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
