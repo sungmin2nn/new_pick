@@ -57,8 +57,13 @@ METADATA = StrategyMetadata(
     requires_intraday=False,
 
     target_basket_size=5,
+    # 베이스라인 보유 1일 (BB 평균회귀). 임마누엘 옵션(MA200+SQUEEZE) 활성 시
+    # KOSPI Top53 백테스트(2024-05~2026-04, 81거래)에서 5일 보유가 최적:
+    #   1d: Win 69.1%, Avg +0.81%, Total +65.71%, MDD 3.69%
+    #   3d: Win 69.1%, Avg +1.73%, Total +139.83%, MDD 9.72%
+    #   5d: Win 65.4%, Avg +2.40%, Total +194.75%, MDD 8.17% ← 권장
     target_holding_days=1,
-    target_market="KOSPI+KOSDAQ",
+    target_market="KOSPI",  # KOSDAQ은 v6 부적합 (P2 백테스트, DEC-005), v5(squeeze 단독)이 우위
 
     differs_from_existing=(
         "Beta Contrarian은 RSI(14)≤35 기반, 본 전략은 볼린저밴드 %B < 0.2 기반. "
@@ -107,6 +112,21 @@ class BollingerReversalStrategy(BaseStrategy):
     MIN_MARKET_CAP = 100_000_000_000     # 1000억
     VOLUME_SURGE_MIN = 1.3               # 거래량 5일평균 대비 배수
 
+    # 임마누엘 스퀴즈 플레이 옵션 (기본 OFF — 기존 동작 보존)
+    # ─ 활성 시 권장 보유기간(시뮬레이터/오케스트레이터에서 참조 가능):
+    #     RECOMMENDED_HOLDING_DAYS_WITH_SQUEEZE = 5
+    # ─ 활성 시 권장 universe: KOSPI 시총 상위 (KOSDAQ엔 v5 단독이 더 적합, DEC-005)
+    RECOMMENDED_HOLDING_DAYS_WITH_SQUEEZE = 5
+    # 200일선이 우상향이고 가격이 그 위인 종목만 매수 (장기 추세 필터)
+    MA200_FILTER_ENABLED = False
+    MA200_PERIOD = 200
+    # 20일선과 200일선의 간격(%)이 임계값 이하일 때만 매수 — 변동성 수축(스퀴즈)
+    SQUEEZE_FILTER_ENABLED = False
+    # 임계값 10.0 = KOSPI Top53, 2024-05~2026-04 (485영업일) 백테스트에서
+    # MA200 + 스퀴즈 결합 변형(v6) 최고 성과: 승률 69.1%, 평균 +0.81%/거래, MDD 3.69% (81거래)
+    # 15%(v7)는 거래 빈도 ↑이지만 승률·MDD 열위. 자세한 근거: DEC-004 + 영상 z-jew4y_D0Y
+    SQUEEZE_MAX_SPREAD_PCT = 10.0
+
     # 점수 가중치
     WEIGHTS = {
         "percent_b": 35,        # %B가 낮을수록 (과매도)
@@ -114,8 +134,10 @@ class BollingerReversalStrategy(BaseStrategy):
         "volume_surge": 20,     # 거래량 증가
         "trading_value": 15,    # 유동성
     }
+    # 스퀴즈 옵션 활성화 시 추가 가중치 (좁은 스프레드 = 높은 점수)
+    SQUEEZE_SCORE_WEIGHT = 15
 
-    LOOKBACK_DAYS = 30  # BB 계산용 과거 데이터
+    LOOKBACK_DAYS = 30  # BB 계산용 과거 데이터 (기본)
 
     def select_stocks(
         self, date: Optional[str] = None, top_n: int = 5,
@@ -166,13 +188,19 @@ class BollingerReversalStrategy(BaseStrategy):
         return self.candidates
 
     def _filter_by_bollinger(self, stocks: List[Dict], date: str) -> List[Dict]:
-        """볼린저밴드 %B 계산 후 하단 근접 종목만 필터"""
+        """볼린저밴드 %B 계산 후 하단 근접 종목만 필터.
+        MA200_FILTER_ENABLED 시 200일선 위 종목만, SQUEEZE_FILTER_ENABLED 시 두 선 수렴 구간만."""
         krx = get_krx()
         if not krx:
             return []
 
+        # 200MA 옵션 사용 시 lookback 확장
+        needs_long_history = self.MA200_FILTER_ENABLED or self.SQUEEZE_FILTER_ENABLED
+        lookback = (self.MA200_PERIOD + 30) if needs_long_history else self.LOOKBACK_DAYS + 10
+
         end_dt = datetime.strptime(date, "%Y%m%d")
-        start_dt = end_dt - timedelta(days=self.LOOKBACK_DAYS + 10)  # 영업일 여유
+        # 영업일이 아닌 캘린더일 기준이라 200거래일을 위해 약 1.5배 마진
+        start_dt = end_dt - timedelta(days=int(lookback * 1.5))
 
         passed = []
         for s in stocks:
@@ -185,6 +213,8 @@ class BollingerReversalStrategy(BaseStrategy):
                 )
                 if df is None or df.empty or len(df) < self.BB_PERIOD:
                     continue
+                if needs_long_history and len(df) < self.MA200_PERIOD:
+                    continue  # 200일 데이터 없으면 스킵 (신규 상장 등)
 
                 closes = df["종가"].astype(float).values
 
@@ -203,6 +233,26 @@ class BollingerReversalStrategy(BaseStrategy):
                 if percent_b > self.PERCENT_B_MAX:
                     continue
 
+                # ---- 임마누엘 스퀴즈 플레이 추가 필터 ----
+                ma200 = None
+                squeeze_spread_pct = None
+                if needs_long_history:
+                    ma200 = float(np.mean(closes[-self.MA200_PERIOD:]))
+                    # 200일선 우상향 확인 (오늘 평균 vs 5일 전 평균)
+                    ma200_5days_ago = float(np.mean(closes[-(self.MA200_PERIOD + 5):-5]))
+                    ma200_rising = ma200 > ma200_5days_ago
+
+                    # 200일선 위 + 우상향 필터
+                    if self.MA200_FILTER_ENABLED:
+                        if current_close <= ma200 or not ma200_rising:
+                            continue
+
+                    # 스퀴즈 감지 (20일선과 200일선 간격이 좁음 = 변동성 수축)
+                    if ma200 > 0:
+                        squeeze_spread_pct = abs(ma - ma200) / ma200 * 100
+                        if self.SQUEEZE_FILTER_ENABLED and squeeze_spread_pct > self.SQUEEZE_MAX_SPREAD_PCT:
+                            continue
+
                 # 거래량 surge 확인
                 volumes = df["거래량"].astype(float).values
                 avg_vol_5 = np.mean(volumes[-6:-1]) if len(volumes) >= 6 else np.mean(volumes[:-1])
@@ -213,6 +263,10 @@ class BollingerReversalStrategy(BaseStrategy):
                 s["bb_middle"] = int(ma)
                 s["bb_upper"] = int(upper)
                 s["vol_ratio"] = round(vol_ratio, 2)
+                if ma200 is not None:
+                    s["ma200"] = int(ma200)
+                if squeeze_spread_pct is not None:
+                    s["squeeze_spread_pct"] = round(squeeze_spread_pct, 2)
                 passed.append(s)
 
             except Exception as e:
@@ -248,6 +302,13 @@ class BollingerReversalStrategy(BaseStrategy):
 
             # 거래대금
             scores["trading_value"] = (s["trading_value"] / max_tv) * self.WEIGHTS["trading_value"]
+
+            # 스퀴즈 가산점: 옵션 활성화 시 두 선 간격이 좁을수록 높은 점수
+            if self.SQUEEZE_FILTER_ENABLED and "squeeze_spread_pct" in s:
+                spread = s["squeeze_spread_pct"]
+                # 0% spread → 1.0, SQUEEZE_MAX_SPREAD_PCT → 0.0
+                squeeze_norm = max(0.0, 1.0 - spread / self.SQUEEZE_MAX_SPREAD_PCT)
+                scores["squeeze"] = squeeze_norm * self.SQUEEZE_SCORE_WEIGHT
 
             total = sum(scores.values())
             candidates.append(Candidate(
@@ -316,4 +377,8 @@ class BollingerReversalStrategy(BaseStrategy):
             "min_market_cap": self.MIN_MARKET_CAP,
             "volume_surge_min": self.VOLUME_SURGE_MIN,
             "weights": self.WEIGHTS,
+            "ma200_filter_enabled": self.MA200_FILTER_ENABLED,
+            "squeeze_filter_enabled": self.SQUEEZE_FILTER_ENABLED,
+            "squeeze_max_spread_pct": self.SQUEEZE_MAX_SPREAD_PCT,
+            "squeeze_score_weight": self.SQUEEZE_SCORE_WEIGHT,
         }

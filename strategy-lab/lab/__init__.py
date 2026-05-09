@@ -10,8 +10,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# news-trading-bot 경로 자동 추가
-NTB_ROOT = Path("/Users/kslee/Documents/kslee_ZIP/zip1/news-trading-bot")
+# news-trading-bot 경로 자동 추가 (strategy-lab의 부모 디렉토리)
+NTB_ROOT = Path(__file__).resolve().parents[2]
 if NTB_ROOT.exists() and str(NTB_ROOT) not in sys.path:
     sys.path.insert(0, str(NTB_ROOT))
 
