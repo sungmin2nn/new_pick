@@ -45,13 +45,15 @@ class TradeResult:
     quantity: int
     return_pct: float
     return_amount: int
-    exit_type: str  # 'profit', 'loss', 'close'
+    exit_type: str  # 'profit', 'loss', 'close', 'trailing', 'close_multiday'
     entry_time: str = "09:00"
     exit_time: str = ""
     high_price: int = 0
     low_price: int = 0
     max_profit_pct: float = 0  # 장중 최대 수익률
     max_loss_pct: float = 0    # 장중 최대 손실률
+    # 다일 보유(holding_days>1) 시 청산일 (YYYYMMDD). 1일 보유 시 빈 문자열.
+    exit_date: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -109,7 +111,7 @@ class TradingSimulator:
 
     def __init__(self, capital: int = None, strategy_id: str = None, strategy_name: str = None,
                  loss_target: float = None, trailing_enabled: bool = None,
-                 entry_mode: str = None):
+                 entry_mode: str = None, holding_days: int = 1):
         self.capital = capital or self.INITIAL_CAPITAL
         self.results: List[TradeResult] = []
         self.trade_date: str = ""
@@ -121,6 +123,17 @@ class TradingSimulator:
             self.TRAILING_ENABLED = trailing_enabled
         # 진입 모드: open(default) | confirm_0930
         self.entry_mode = entry_mode or self.ENTRY_MODE_OPEN
+
+        # 다일 보유 (DEC-005, P3-3a). 1=기존 동작, N>1=N번째 거래일 종가 단순 청산
+        # 백테스트 합의: hold=N → entry=signal+1, exit=signal+N → entry-to-exit gap=N-1 거래일
+        # 즉 holding_days=5 ⇒ 진입일 시초 + 4거래일 후 종가
+        if not isinstance(holding_days, int) or holding_days < 1:
+            raise ValueError(f"holding_days must be int >= 1, got {holding_days!r}")
+        self.holding_days = holding_days
+        if holding_days > 1 and self.TRAILING_ENABLED:
+            # 다일 보유 모드는 단순 종가 청산 — DEC-005 + ISSUE-014 회귀 회피
+            log_warning(_logger, f"holding_days={holding_days} > 1 → TRAILING_ENABLED 자동 OFF")
+            self.TRAILING_ENABLED = False
 
         # 분봉 수집기 초기화
         if INTRADAY_AVAILABLE:
@@ -298,7 +311,10 @@ class TradingSimulator:
         print(f"{'='*50}")
 
         for candidate in candidates[:self.MAX_STOCKS]:
-            if can_use_intraday:
+            if self.holding_days > 1:
+                # 다일 보유 (P3-3a) — 분봉/일봉 분기 무관, 일봉 종가 청산만
+                result = self._simulate_trade_multiday(candidate, amount_per_stock)
+            elif can_use_intraday:
                 result = self._simulate_trade_intraday(candidate, amount_per_stock)
             else:
                 result = self._simulate_trade_daily(candidate, amount_per_stock)
@@ -556,6 +572,107 @@ class TradingSimulator:
             print(f"  [{name}] 오류: {e}")
             return None
 
+    def _simulate_trade_multiday(self,
+                                  candidate: StockCandidate,
+                                  investment: int) -> Optional[TradeResult]:
+        """
+        다일 보유 시뮬레이션 (P3-3a, DEC-005 squeeze play shadow 4주 운영용).
+
+        규칙 (트레일링/익절/손절 모두 비사용 — 단순 매수 후 N일째 종가 청산):
+        - 진입: trade_date 시가 + SLIPPAGE_PCT (기존 1일 path와 동일)
+        - 청산: trade_date 기준 N번째 거래일(인덱스 N-1) 종가, 슬리피지 미적용
+                (종가는 시장가 그대로 가정 — 기존 'close' 청산 컨벤션)
+        - holding_days=N=5 ⇒ 진입일 + 4거래일 후 종가에 청산
+                (백테스트 hold=5 의미와 일치: entry=signal+1, exit=signal+5)
+
+        max_profit/loss_pct: N일 보유 구간 high/low 기준.
+
+        데이터 부족 시 (예: 진입일이 너무 최근이라 N일 후 데이터 미존재) None 반환.
+        호출부는 retroactive backfill (이후 데이터가 채워진 뒤 재호출)을 통해 처리.
+        """
+        code = candidate.code
+        name = candidate.name
+
+        try:
+            # 거래일 N개 + 주말/공휴일 buffer 확보
+            buffer_days = self.holding_days * 2 + 7
+            start_dt = datetime.strptime(self.trade_date, '%Y%m%d')
+            end_dt = start_dt + pd.Timedelta(days=buffer_days)
+            end_str = end_dt.strftime('%Y%m%d')
+
+            df = stock.get_market_ohlcv(self.trade_date, end_str, code)
+
+            if df is None or df.empty or len(df) < self.holding_days:
+                rows = 0 if df is None else len(df)
+                print(f"  [{name}] {self.holding_days}일 보유 데이터 부족 (rows={rows}) - 스킵")
+                return None
+
+            entry_row = df.iloc[0]
+            exit_row = df.iloc[self.holding_days - 1]
+
+            open_price = int(entry_row['시가'])
+            if open_price == 0:
+                print(f"  [{name}] 시가 0원 - 스킵")
+                return None
+
+            # 슬리피지 (진입은 호가 한 단계 위 가정 — 기존 컨벤션과 동일)
+            entry_price = int(open_price * (1 + self.SLIPPAGE_PCT / 100))
+
+            exit_close = int(exit_row['종가'])
+            if exit_close == 0:
+                print(f"  [{name}] 청산일 종가 0원 - 스킵")
+                return None
+
+            # 보유 구간 high/low (entry_price 기준)
+            window = df.iloc[:self.holding_days]
+            window_high = int(window['고가'].max())
+            window_low = int(window['저가'].min())
+            max_profit_pct = (window_high - entry_price) / entry_price * 100 if entry_price > 0 else 0
+            max_loss_pct = (window_low - entry_price) / entry_price * 100 if entry_price > 0 else 0
+
+            quantity = investment // entry_price
+            if quantity == 0:
+                print(f"  [{name}] 매수 불가 (금액 부족)")
+                return None
+
+            return_pct = (exit_close - entry_price) / entry_price * 100
+            return_amount = int((exit_close - entry_price) * quantity)
+
+            # 청산일자 (df.index가 DatetimeIndex라면 strftime, str이면 그대로)
+            exit_idx = df.index[self.holding_days - 1]
+            try:
+                exit_date_str = exit_idx.strftime('%Y%m%d')
+            except AttributeError:
+                exit_date_str = str(exit_idx).replace('-', '')[:8]
+
+            result = TradeResult(
+                code=code,
+                name=name,
+                entry_price=entry_price,
+                exit_price=exit_close,
+                quantity=quantity,
+                return_pct=round(return_pct, 2),
+                return_amount=return_amount,
+                exit_type='close_multiday',
+                entry_time="09:00",
+                exit_time="15:20",
+                high_price=window_high,
+                low_price=window_low,
+                max_profit_pct=round(max_profit_pct, 2),
+                max_loss_pct=round(max_loss_pct, 2),
+                exit_date=exit_date_str,
+            )
+
+            emoji = "+" if return_pct > 0 else "-" if return_pct < 0 else "="
+            print(f"  [{name}] {entry_price:,}원 → {exit_close:,}원 ({return_pct:+.2f}%) "
+                  f"[close_multiday@{exit_date_str}, {self.holding_days}d hold] {emoji}")
+
+            return result
+
+        except Exception as e:
+            print(f"  [{name}] 다일 보유 시뮬레이션 오류: {e}")
+            return None
+
     def _determine_exit_daily(self,
                                open_p: int,
                                high_p: int,
@@ -643,6 +760,7 @@ class TradingSimulator:
             'date': self.trade_date,
             'strategy_id': self.strategy_id,
             'strategy_name': self.strategy_name,
+            'holding_days': self.holding_days,
         }
 
         if not self.results:
@@ -654,6 +772,11 @@ class TradingSimulator:
                 'win_rate': 0,
                 'total_return': 0,
                 'avg_return': 0,
+                'profit_exits': 0,
+                'loss_exits': 0,
+                'close_exits': 0,
+                'trailing_exits': 0,
+                'close_multiday_exits': 0,
                 'results': []
             }
 
@@ -674,6 +797,7 @@ class TradingSimulator:
             'loss_exits': len([r for r in self.results if r.exit_type == 'loss']),
             'close_exits': len([r for r in self.results if r.exit_type == 'close']),
             'trailing_exits': len([r for r in self.results if r.exit_type == 'trailing']),
+            'close_multiday_exits': len([r for r in self.results if r.exit_type == 'close_multiday']),
             'results': [r.to_dict() for r in self.results]
         }
 
