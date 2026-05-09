@@ -22,19 +22,36 @@ class IntradayCollector:
 
     def get_minute_data(self, stock_code, date_str, freq='1'):
         """
-        네이버 증권에서 분봉 데이터 수집
+        분봉 데이터 수집 (KIS 1차 + 네이버 폴백)
 
-        주의: 네이버 금융은 당일 장중 데이터만 제공합니다.
-        과거 데이터는 조회할 수 없습니다.
+        ISSUE-014 fix (2026-05-09): KIS API 도입으로 historical 30일 분봉 가능.
+        - 1차: KIS API (KIS_APP_KEY 환경변수 있으면, historical 지원)
+        - 2차: 네이버 (당일만, KIS 실패 또는 키 없을 때)
 
         Args:
             stock_code: 종목코드 (6자리)
-            date_str: 날짜 (YYYYMMDD) - 당일만 가능
-            freq: 분봉 간격 ('1') - 네이버는 1분봉만 제공
+            date_str: 날짜 (YYYYMMDD) - KIS는 historical, 네이버는 당일만
+            freq: 분봉 간격 ('1') - 1분봉만 지원
 
         Returns:
-            분봉 데이터 리스트
+            [{'time':'HH:MM:SS', 'open':int, 'high':int, 'low':int, 'close':int, 'volume':int}, ...]
         """
+        # 1차: KIS API (인스턴스 생성 성공하면 시도, 실패 시 네이버 폴백)
+        # KISClient.__init__ 이 .env 자동 로드. 키 없으면 ValueError 발생.
+        try:
+            from paper_trading.utils.kis_api import KISClient
+            kis = KISClient()
+            bars = kis.get_minute_data(stock_code, date_str, freq=freq)
+            if bars:
+                print(f"  📊 {stock_code} 분봉 {len(bars)}건 (KIS API, date={date_str})")
+                return bars
+            print(f"  📊 {stock_code} KIS 분봉 빈 응답 → 네이버 폴백")
+        except (ValueError, ImportError):
+            pass  # KIS 키 없거나 모듈 없음 → 네이버 폴백 조용히
+        except Exception as e:
+            print(f"  ⚠️  KIS 분봉 fetch 실패, 네이버 폴백: {e}")
+
+        # 2차: 네이버 (당일만)
         try:
             print(f"  📊 {stock_code} 분봉 데이터 수집 중... (Naver Finance)")
 
