@@ -17,6 +17,22 @@ from .leaderboard import Leaderboard
 KST = timezone(timedelta(hours=9))
 
 
+def _prev_business_day(date_str: str) -> str:
+    """date_str 의 직전 영업일 (월~금 + 한국 공휴일 제외).
+
+    ISSUE-015 fix (2026-05-09): run_daily(date=today) 호출 시 fetch_date 가
+    매매일 종가를 가져오는 결함 차단용. utils.is_market_day 재사용해
+    한국 공휴일까지 정확히 반영.
+    """
+    from utils import is_market_day
+    d = datetime.strptime(date_str, "%Y%m%d")
+    for _ in range(10):
+        d -= timedelta(days=1)
+        if d.weekday() < 5 and is_market_day(d):
+            return d.strftime("%Y%m%d")
+    return date_str  # 폴백: 10일 거슬러도 못 찾으면 원본 반환
+
+
 class ArenaManager:
     """
     4팀 경쟁 트레이딩 매니저
@@ -124,10 +140,17 @@ class ArenaManager:
             from paper_trading.multi_strategy_runner import _resolve_fetch_date
 
             # 비거래일/미래일 → 가장 최근 거래일로 fetch (target_date는 그대로)
+            # ISSUE-015 fix (2026-05-09): date == today (매매일) 시 fetch_date 가 매매일
+            # 종가를 가져오는 결함 방지. _resolve_fetch_date 가 KRX 데이터 유무에 의존
+            # 하므로 KRX가 매매일 데이터를 빨리 업로드하면 leakage 발생. 명시적으로 매매
+            # 전 영업일까지 cap. (target_date < today 인 backtest 호출은 영향 없음.)
             today_str = datetime.now(KST).strftime("%Y%m%d")
-            fetch_date = _resolve_fetch_date(min(date, today_str))
+            upper_bound = today_str
+            if date >= today_str:
+                upper_bound = _prev_business_day(today_str)
+            fetch_date = _resolve_fetch_date(min(date, upper_bound))
             if fetch_date != date:
-                print(f"[Arena] fetch_date={fetch_date} (target={date} 비거래일/미래)")
+                print(f"[Arena] fetch_date={fetch_date} (target={date} 비거래일/미래/leakage 차단)")
 
             # 1. 전략별 종목 선정
             print("\n[Phase 1] 5팀 종목 선정")
