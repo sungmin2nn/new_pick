@@ -13,6 +13,9 @@ from .theme_policy import ThemePolicyStrategy
 from .dart_disclosure import DartDisclosureStrategy
 from .frontier_gap import FrontierGapStrategy
 from .hybrid_alpha_delta import HybridAlphaDeltaStrategy
+# P3-3b: 스퀴즈 플레이 (DEC-005/006). 4주 shadow 운영용, 트레일링 미사용 5일 보유.
+from .squeeze_play_kospi_v6 import SqueezePlayKospiV6Strategy
+from .squeeze_play_kosdaq_v5 import SqueezePlayKosdaqV5Strategy
 
 __all__ = [
     'BaseStrategy',
@@ -25,6 +28,8 @@ __all__ = [
     'DartDisclosureStrategy',
     'FrontierGapStrategy',
     'HybridAlphaDeltaStrategy',
+    'SqueezePlayKospiV6Strategy',
+    'SqueezePlayKosdaqV5Strategy',
 ]
 
 # strategy_config.json 기반 추가 전략 동적 로드
