@@ -27,19 +27,6 @@
       "worst_day_return": -15.97,
       "total_6th": 2
     },
-    "team_i": {
-      "team_id": "team_i",
-      "team_name": "Alpha-Delta Hybrid",
-      "emoji": "🔀",
-      "elo": 1086,
-      "rank": 2,
-      "total_1st": 0,
-      "total_2nd": 2,
-      "total_3rd": 4,
-      "total_4th": 1,
-      "best_day_return": 23.93,
-      "worst_day_return": -4.21
-    },
     "team_h": {
       "team_id": "team_h",
       "team_name": "Theta Sector",
@@ -140,6 +127,22 @@
       "worst_day_return": -12.82,
       "archived_at": "2026-05-09",
       "archived_reason": "데이터 leakage 확정 — 3거래일 검증으로 일관된 매매당일 종가 사용 패턴 확인 (10건). 누적 +25.96% 는 미래 정보 기반 가짜 수익률. ISSUE-015 등재, theme_policy.py 코드 수정 후 재활성 검토."
+    },
+    "team_i": {
+      "team_id": "team_i",
+      "team_name": "Alpha-Delta Hybrid",
+      "strategy_id": "hybrid_alpha_delta",
+      "emoji": "🔀",
+      "elo": 1086,
+      "final_rank": 2,
+      "total_1st": 0,
+      "total_2nd": 2,
+      "total_3rd": 4,
+      "total_4th": 1,
+      "best_day_return": 23.93,
+      "worst_day_return": -4.21,
+      "archived_at": "2026-05-09",
+      "archived_reason": "ISSUE-015 연쇄 — hybrid_alpha_delta가 ThemePolicyStrategy 직접 호출, theme_policy leakage 전파 (6건/5거래일). theme_policy 코드 수정 후 재활성 검토."
     }
   },
   "daily_history": [
@@ -1142,7 +1145,7 @@
       ]
     }
   ],
-  "last_updated": "2026-05-09 11:26:18",
+  "last_updated": "2026-05-09 11:32:55",
   "reset_at": "2026-04-10 14:28:11",
   "reset_reason": "4팀 동시 시작 - 데이터 파이프라인 정상화 후 공정 경쟁"
 }

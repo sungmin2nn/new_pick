@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-05-09T15:00:00",
+  "updated_at": "2026-05-09T15:30:00",
   "strategies": {
     "momentum": {
       "enabled": true,
@@ -87,8 +87,8 @@
       "top_n": 5
     },
     "hybrid_alpha_delta": {
-      "enabled": true,
-      "status": "active",
+      "enabled": false,
+      "status": "deactivated",
       "source": "ntb",
       "module_path": "paper_trading.strategies.hybrid_alpha_delta",
       "class_name": "HybridAlphaDeltaStrategy",
@@ -100,6 +100,8 @@
       "risk_level": "medium",
       "initial_capital": 10000000,
       "activated_at": "2026-04-19",
+      "deactivated_at": "2026-05-09",
+      "deactivated_reason": "ISSUE-015 연쇄 영향 — hybrid_alpha_delta.py:53-56 가 ThemePolicyStrategy를 직접 import해 호출. strategy_config의 enabled=false 우회 불가. theme_policy의 데이터 leakage가 hybrid 결과에 그대로 전파됨 (전 운영기간 6건/5거래일 12% leakage율 확인). team_i 누적 +15.96% 도 부분 가짜 수익률. theme_policy.py 코드 수정 + hybrid 의존성 정리 후 재활성 검토.",
       "top_n": 5
     },
     "volatility_breakout_lw": {
