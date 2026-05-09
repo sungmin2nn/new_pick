@@ -182,17 +182,126 @@ def verify_date(date: str, verbose: bool = True):
     return summary
 
 
+def update_summary(results):
+    """누적 시계열 summary.json 갱신 + alert 산출
+
+    저장: data/arena/audit/accuracy_summary.json
+    구조:
+        {
+          "last_updated": ISO,
+          "history": [{date, n_trades, mismatch_rate_pct, sim_total_pct, real_total_pct, diff_pct}],
+          "rolling_5d": {mismatch_rate_pct_avg, diff_pct_avg},
+          "alerts": [{date, severity, message}],
+          "thresholds": {single_day_warn: 30, rolling_5d_warn: 15}
+        }
+    """
+    from datetime import datetime, timezone, timedelta
+    KST = timezone(timedelta(hours=9))
+    summary_path = OUT_DIR / "accuracy_summary.json"
+
+    summary = {"history": [], "alerts": [], "thresholds": {"single_day_warn": 30, "rolling_5d_warn": 15}}
+    if summary_path.exists():
+        try:
+            with open(summary_path) as f:
+                summary = json.load(f)
+        except Exception:
+            pass
+
+    # history append (중복 date는 갱신)
+    history_by_date = {h['date']: h for h in summary.get('history', [])}
+    for s in results:
+        sim_total = round(sum(t['sim_pct'] for t in s['team_pnl'].values()), 2)
+        real_total = round(sum(t['real_pct'] for t in s['team_pnl'].values()), 2)
+        history_by_date[s['date']] = {
+            'date': s['date'],
+            'n_trades': s['n_trades'],
+            'n_ok': s['n_ok'],
+            'mismatch_rate_pct': s['mismatch_rate_pct'],
+            'sim_total_pct': sim_total,
+            'real_total_pct': real_total,
+            'diff_pct': round(real_total - sim_total, 2),
+        }
+    summary['history'] = sorted(history_by_date.values(), key=lambda x: x['date'])
+
+    # rolling 5거래일 평균
+    recent = summary['history'][-5:]
+    if recent:
+        summary['rolling_5d'] = {
+            'days': len(recent),
+            'mismatch_rate_pct_avg': round(sum(h['mismatch_rate_pct'] for h in recent) / len(recent), 1),
+            'diff_pct_avg': round(sum(h['diff_pct'] for h in recent) / len(recent), 2),
+            'first_date': recent[0]['date'],
+            'last_date': recent[-1]['date'],
+        }
+
+    # alert 산출
+    th = summary.get('thresholds', {"single_day_warn": 30, "rolling_5d_warn": 15})
+    alerts = []
+    for h in summary['history']:
+        if h['mismatch_rate_pct'] > th['single_day_warn']:
+            alerts.append({
+                'date': h['date'], 'severity': 'warn', 'code': 'W_SINGLE_DAY_DIVERGENCE',
+                'message': f"부정확율 {h['mismatch_rate_pct']:.1f}% > {th['single_day_warn']}% (5팀합 차이 {h['diff_pct']:+.2f}%p)"
+            })
+    if 'rolling_5d' in summary and summary['rolling_5d']['mismatch_rate_pct_avg'] > th['rolling_5d_warn']:
+        alerts.append({
+            'date': summary['rolling_5d']['last_date'], 'severity': 'warn', 'code': 'W_ROLLING_DIVERGENCE',
+            'message': f"최근 {summary['rolling_5d']['days']}거래일 평균 부정확율 {summary['rolling_5d']['mismatch_rate_pct_avg']:.1f}% > {th['rolling_5d_warn']}%"
+        })
+    summary['alerts'] = alerts
+    summary['last_updated'] = datetime.now(KST).isoformat()
+
+    with open(summary_path, 'w', encoding='utf-8') as f:
+        json.dump(summary, f, ensure_ascii=False, indent=2)
+    return summary
+
+
+def today_kst() -> str:
+    from datetime import datetime, timezone, timedelta
+    return datetime.now(timezone(timedelta(hours=9))).strftime("%Y%m%d")
+
+
 if __name__ == '__main__':
-    dates = sys.argv[1:] if len(sys.argv) > 1 else ['20260508']
+    # 인자 없으면 오늘(KST), 있으면 명시 일자
+    dates = sys.argv[1:] if len(sys.argv) > 1 else [today_kst()]
     all_results = []
     for d in dates:
         s = verify_date(d)
         if s:
             all_results.append(s)
-    if len(all_results) > 1:
-        print(f"\n{'='*60}\n=== 종합 ({len(all_results)}거래일) ===")
-        print(f"{'date':<10}{'n':>5}{'OK':>5}{'DIR':>5}{'AMT':>5}{'부정확%':>9}{'5팀시뮬%':>11}{'5팀실측%':>11}{'차이%p':>9}")
-        for s in all_results:
-            sim_total = sum(t['sim_pct'] for t in s['team_pnl'].values())
-            real_total = sum(t['real_pct'] for t in s['team_pnl'].values())
-            print(f"{s['date']:<10}{s['n_trades']:>5}{s['n_ok']:>5}{s['n_dir_mismatch']:>5}{s['n_amt_mismatch']:>5}{s['mismatch_rate_pct']:>8.1f}%{sim_total:>+11.2f}{real_total:>+11.2f}{real_total-sim_total:>+9.2f}")
+
+    if all_results:
+        summary = update_summary(all_results)
+        print(f"\n{'='*60}\n=== 누적 시계열 (data/arena/audit/accuracy_summary.json) ===")
+        print(f"{'date':<10}{'n':>5}{'OK':>5}{'부정확%':>9}{'시뮬%':>9}{'실측%':>9}{'차이%p':>9}")
+        for h in summary['history'][-10:]:
+            print(f"{h['date']:<10}{h['n_trades']:>5}{h['n_ok']:>5}{h['mismatch_rate_pct']:>8.1f}%{h['sim_total_pct']:>+9.2f}{h['real_total_pct']:>+9.2f}{h['diff_pct']:>+9.2f}")
+        if 'rolling_5d' in summary:
+            r = summary['rolling_5d']
+            print(f"\n[rolling {r['days']}거래일] 부정확율 평균 {r['mismatch_rate_pct_avg']:.1f}%, 차이 평균 {r['diff_pct_avg']:+.2f}%p")
+        if summary.get('alerts'):
+            print(f"\n⚠️ Alerts ({len(summary['alerts'])}건):")
+            for a in summary['alerts']:
+                print(f"  [{a['code']}] {a['date']}: {a['message']}")
+        else:
+            print("\n✅ Alerts: 없음")
+
+        # GitHub Actions Step Summary 에도 동시 출력 (CI 환경에서 자동)
+        gh_summary_path = os.environ.get('GITHUB_STEP_SUMMARY')
+        if gh_summary_path:
+            with open(gh_summary_path, 'a', encoding='utf-8') as gs:
+                gs.write("\n## 🔍 시뮬 정합성 검증 (ISSUE-014 monitor)\n\n")
+                gs.write("| 날짜 | 거래 | 정합 | 부정확율 | 시뮬% | 실측% | 차이%p |\n")
+                gs.write("|---|---:|---:|---:|---:|---:|---:|\n")
+                for h in summary['history'][-5:]:
+                    gs.write(f"| {h['date']} | {h['n_trades']} | {h['n_ok']} | {h['mismatch_rate_pct']}% | {h['sim_total_pct']:+.2f} | {h['real_total_pct']:+.2f} | {h['diff_pct']:+.2f} |\n")
+                if 'rolling_5d' in summary:
+                    r = summary['rolling_5d']
+                    gs.write(f"\n**Rolling {r['days']}거래일 평균**: 부정확율 {r['mismatch_rate_pct_avg']}%, 차이 {r['diff_pct_avg']:+.2f}%p  \n\n")
+                alerts = summary.get('alerts', [])
+                if alerts:
+                    gs.write(f"### ⚠️ Alerts ({len(alerts)}건)\n")
+                    for a in alerts:
+                        gs.write(f"- **{a['code']}** ({a['date']}): {a['message']}\n")
+                else:
+                    gs.write("### ✅ Alerts: 없음\n")

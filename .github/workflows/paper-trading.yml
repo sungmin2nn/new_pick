@@ -143,6 +143,17 @@ jobs:
         # --update-issues: warning code 별 ISSUE 자동 등재 (dedupe, 새로운 것만)
         python -m paper_trading.audit.verify_facts --quiet --update-issues || true
 
+    - name: Verify intraday simulator accuracy (ISSUE-014 monitor)
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      env:
+        TZ: Asia/Seoul
+      run: |
+        # 시뮬 trades.json vs 네이버 실측 OHLC 정합성 검증 (오늘 일자).
+        # 출력: data/arena/audit/intraday_accuracy_<date>.json + accuracy_summary.json
+        # alert: 단일일 부정확율>30% 또는 rolling 5거래일 평균>15% 시 summary.alerts 추가
+        # GITHUB_STEP_SUMMARY 환경변수 자동 감지 → 마크다운 표 자동 출력
+        python -m paper_trading.audit.verify_intraday_accuracy || true
+
     - name: Commit and push results
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
