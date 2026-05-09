@@ -352,33 +352,78 @@ class ThemePolicyStrategy(BaseStrategy):
             return []
 
     def _fetch_stock_data(self, codes: List[str], date: str, code_to_themes: Dict = None) -> List[Dict]:
-        """종목 데이터 수집
+        """종목 데이터 수집 (KRX OpenAPI 1차, naver 폴백)
 
-        Fix (Phase 7C): 종목별 1회 호출 대신 시장 전체 1회 fetch + 매핑.
-        - 기존: get_market_ohlcv_by_date(date,date,ticker) × N → 미래 날짜에 빈 결과
-        - 신규: get_market_ohlcv_by_ticker(date, market) × 2 → 현재 snapshot에서 추출
+        ISSUE-015 fix (2026-05-09): naver `get_market_ohlcv_by_ticker` 가
+        `date` 인자를 무시하고 항상 실시간 시가총액 페이지를 크롤링하는 결함.
+        paper-trading-select cron(KST 16:30, 장 마감 후) 시점이라 매매당일 종가가
+        그대로 selection 에 들어가 데이터 leakage 발생.
+
+        Fix: momentum/frontier_gap/dart_disclosure 패턴 그대로 도입.
+        - 1차: KRX OpenAPI — date 인자 정확 적용, historical 지원
+        - 2차: naver 폴백 — 당일만 (date 무시 결함, 운영 시점 = leakage 위험 그대로)
         """
         stocks = []
+        if code_to_themes is None:
+            code_to_themes = {}
+        if not codes:
+            return stocks
+        codes_set = set(codes)
 
+        # 1차: KRX OpenAPI (당일 + historical)
+        krx = _get_krx() if callable(_get_krx) else None
+        if krx:
+            try:
+                market_data = {}
+                for market in ['KOSPI', 'KOSDAQ']:
+                    df = krx.get_stock_ohlcv(date, market=market)
+                    if df is None or df.empty:
+                        continue
+                    for code in df.index:
+                        if code in codes_set:
+                            market_data[code] = (df.loc[code], market)
+
+                for code in codes:
+                    item = market_data.get(code)
+                    if item is None:
+                        continue
+                    row, mkt = item
+                    try:
+                        close = int(row.get('종가', 0))
+                        if close == 0:
+                            continue
+                        themes_info = code_to_themes.get(code, [])
+                        theme_names = [t['name'] for t in themes_info] if themes_info else []
+                        max_theme_change = max([t['change_pct'] for t in themes_info], default=0) if themes_info else 0
+                        stocks.append({
+                            'code': code,
+                            'name': str(row.get('종목명', code)),
+                            'price': close,
+                            'change_pct': float(row.get('등락률', 0)),
+                            'volume': int(row.get('거래량', 0)),
+                            'trading_value': int(row.get('거래대금', 0)),
+                            'themes': theme_names,
+                            'theme_strength': max_theme_change,
+                        })
+                    except Exception as e:
+                        logger.debug(f"KRX 매핑 실패 {code}: {e}")
+                        continue
+
+                if stocks:
+                    return stocks
+            except Exception as e:
+                logger.warning(f"KRX fetch 실패, naver 폴백: {e}")
+
+        # 2차: naver 폴백 (당일만 동작 — date 인자 무시 결함, 폴백 시 leakage 가능)
         if pykrx_stock is None:
             return stocks
 
-        if code_to_themes is None:
-            code_to_themes = {}
-
-        if not codes:
-            return stocks
-
-        codes_set = set(codes)
-
-        # KOSPI + KOSDAQ 시장 1회 fetch
-        market_data = {}  # code -> row
+        market_data = {}
         for market in ['KOSPI', 'KOSDAQ']:
             try:
                 df = pykrx_stock.get_market_ohlcv_by_ticker(date, market=market)
                 if df is None or df.empty:
                     continue
-                # df.index가 종목코드, columns에 종목명/종가/등락률/거래량/거래대금
                 for code in df.index:
                     if code in codes_set:
                         market_data[code] = df.loc[code]

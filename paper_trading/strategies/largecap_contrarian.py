@@ -7,7 +7,7 @@
 import sys
 import logging
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -215,7 +215,7 @@ class LargecapContrarianStrategy(BaseStrategy):
 
         return stocks
 
-    def _get_kospi_change(self, date: str) -> float | None:
+    def _get_kospi_change(self, date: str) -> Optional[float]:
         """KOSPI 종합지수 일일 등락률 (KRX OpenAPI 우선, pykrx 폴백)"""
         # 1차: KRX OpenAPI (안정적)
         krx = _get_krx() if callable(_get_krx) else None
@@ -272,7 +272,7 @@ class LargecapContrarianStrategy(BaseStrategy):
                 passed.append(s)  # 보수적
         return passed
 
-    def _calc_rsi(self, code: str, date: str, krx, market: str = 'KOSPI') -> float | None:
+    def _calc_rsi(self, code: str, date: str, krx, market: str = 'KOSPI') -> Optional[float]:
         """단일 종목 RSI(14) 계산 - KRX OpenAPI historical fetch
 
         Args:
