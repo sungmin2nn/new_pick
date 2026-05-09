@@ -382,42 +382,54 @@ class TradingSimulator:
             first_hit_price = virtual_result.get('first_hit_price', 0)
             closing_price = virtual_result.get('closing_price', entry_price)
             max_profit_pct = virtual_result.get('max_profit_percent', 0) or 0
+            # ISSUE-014: 시간 순서 정렬을 위한 개별 hit time
+            loss_hit_time = virtual_result.get('loss_hit_time', '') or ''
+            profit_hit_time = virtual_result.get('profit_hit_time', '') or ''
 
             # 트레일링 매도% 계산 (TRAILING_ENABLED 시)
             trailing_pct = self._calc_trailing_exit_pct(max_profit_pct)
 
-            # 청산 유형 및 가격 결정
-            # 우선순위: 손절(트리거 미달 시) > 트레일링(트리거 도달 시) > 종가
-            # 슬리피지: 룰 기반 청산('trailing'/'profit'/'loss' 폴백)은 매도 호가 한 단계 아래
-            # (-SLIPPAGE_PCT). first_hit_price (실제 터치)와 closing_price 는 시장가 그대로.
+            # 청산 유형 및 가격 결정 (ISSUE-014 fix: 시간 순서 정렬)
+            # 후보 (loss / profit / trailing) 의 발생 시각을 비교해 가장 먼저 발생한 청산 채택.
+            # 후보가 모두 미발생 시 종가 청산.
+            # 슬리피지: 룰 기반 청산은 매도 호가 한 단계 아래(-SLIPPAGE_PCT).
+            # first_hit_price(실제 터치)와 closing_price 는 시장가 그대로.
             slip_factor = 1 - self.SLIPPAGE_PCT / 100
 
+            # 후보: (시각 HH:MM:SS, exit_type, exit_price)
+            candidates = []
+
+            # 손절 후보: loss_hit_time 우선, first_hit='loss' 경우 first_hit_time 폴백
+            lt = loss_hit_time or (first_hit_time if first_hit == 'loss' else '')
+            if lt:
+                lp = first_hit_price if (first_hit == 'loss' and first_hit_price) else \
+                     int(entry_price * (1 + self.LOSS_TARGET / 100) * slip_factor)
+                candidates.append((lt, 'loss', lp))
+
+            # 익절 후보: profit_hit_time 우선, first_hit='profit' 경우 first_hit_time 폴백
+            pt = profit_hit_time or (first_hit_time if first_hit == 'profit' else '')
+            if pt:
+                pp = first_hit_price if (first_hit == 'profit' and first_hit_price) else \
+                     int(entry_price * (1 + self.PROFIT_TARGET / 100) * slip_factor)
+                candidates.append((pt, 'profit', pp))
+
+            # 트레일링 후보: 분봉 재스캔으로 정확한 매도 시각 추출
             if trailing_pct is not None:
-                # 트레일링 발동 — max가 트리거 도달
-                # 분봉 first_hit='loss'여도 max가 트리거를 넘었다면 트레일링 우선 (max 도달 후 다시 빠진 케이스)
-                # 정확한 매도 시점은 분봉 시계열을 다시 훑어 추출 (running_max - drawback 매도선 터치 시점)
-                exit_price = int(entry_price * (1 + trailing_pct / 100) * slip_factor)
-                exit_type = 'trailing'
-                exit_time = '11:00:00'  # 폴백 (분봉 재조회 실패 시)
                 try:
                     minute_bars = self.intraday.get_minute_data(code, self.trade_date, freq='1')
                     trailing_hit = self._find_trailing_exit_from_bars(
                         minute_bars, entry_price, entry_time or '09:00:00'
                     )
                     if trailing_hit:
-                        exit_time = trailing_hit['exit_time']
-                        # exit_price는 트리거 매도선 가격 유지 (룰 일관성). 실제 체결가는 회귀 분석 기준이므로 변경 X.
+                        tp_price = int(entry_price * (1 + trailing_pct / 100) * slip_factor)
+                        candidates.append((trailing_hit['exit_time'], 'trailing', tp_price))
                 except Exception as inner:
-                    log_warning(_logger, f"[{name}] 트레일링 시점 재추출 실패, 폴백 사용: {inner}")
-            elif first_hit == 'profit':
-                # TRAILING_ENABLED=False 호환 경로
-                exit_price = first_hit_price or int(entry_price * (1 + self.PROFIT_TARGET / 100) * slip_factor)
-                exit_type = 'profit'
-                exit_time = first_hit_time or '10:00:00'
-            elif first_hit == 'loss':
-                exit_price = first_hit_price or int(entry_price * (1 + self.LOSS_TARGET / 100) * slip_factor)
-                exit_type = 'loss'
-                exit_time = first_hit_time or '09:30:00'
+                    log_warning(_logger, f"[{name}] 트레일링 시점 재추출 실패: {inner}")
+
+            # 가장 먼저 발생한 청산이 이김. 동률 시 append 순서 = loss > profit > trailing 보수적 우선
+            if candidates:
+                candidates.sort(key=lambda x: x[0])
+                exit_time, exit_type, exit_price = candidates[0]
             else:
                 exit_price = closing_price
                 exit_type = 'close'
