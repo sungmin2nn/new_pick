@@ -7,8 +7,8 @@
     "total_shortfall": 0,
     "shortfall_rate_pct": 0.0,
     "avg_team_avg_score": 60.2,
-    "overall_avg_price_err_pct": 3.172,
-    "overall_avg_change_err": 8.154,
+    "overall_avg_price_err_pct": 1.205,
+    "overall_avg_change_err": 1.048,
     "n_real_missing": 0,
     "n_duplicates": 6
   },
@@ -20,7 +20,7 @@
       "avg_score": 75.2,
       "min_score": 71.2,
       "avg_price_err_pct": 0.0,
-      "avg_change_err": 16.356,
+      "avg_change_err": 0.0,
       "n_price_compared": 5,
       "n_change_compared": 5
     },
@@ -30,8 +30,8 @@
       "shortfall": 0,
       "avg_score": 51.5,
       "min_score": 32.6,
-      "avg_price_err_pct": 5.652,
-      "avg_change_err": 0.0,
+      "avg_price_err_pct": 4.449,
+      "avg_change_err": 2.924,
       "n_price_compared": 5,
       "n_change_compared": 5
     },
@@ -41,10 +41,10 @@
       "shortfall": 0,
       "avg_score": 67.7,
       "min_score": 59.1,
-      "avg_price_err_pct": 8.26,
-      "avg_change_err": 4.458,
+      "avg_price_err_pct": 0.0,
+      "avg_change_err": 0,
       "n_price_compared": 5,
-      "n_change_compared": 5
+      "n_change_compared": 0
     },
     "team_h": {
       "strategy_id": "sector_rotation",
@@ -53,7 +53,7 @@
       "avg_score": 55.7,
       "min_score": 43.9,
       "avg_price_err_pct": 0.0,
-      "avg_change_err": 10.944,
+      "avg_change_err": 0.0,
       "n_price_compared": 5,
       "n_change_compared": 5
     },
@@ -63,8 +63,8 @@
       "shortfall": 0,
       "avg_score": 50.8,
       "min_score": 33.5,
-      "avg_price_err_pct": 1.949,
-      "avg_change_err": 9.012,
+      "avg_price_err_pct": 1.577,
+      "avg_change_err": 1.266,
       "n_price_compared": 5,
       "n_change_compared": 5
     }
@@ -79,49 +79,13 @@
   },
   "mismatch_rows": [
     {
-      "team": "team_a",
-      "code": "203650",
-      "name": "드림시큐리티",
+      "team": "team_d",
+      "code": "247540",
+      "name": "에코프로비엠",
       "flag": "STALE_CHANGE",
-      "sel_change": 9.99,
-      "real_change": -11.5,
-      "diff": 21.49
-    },
-    {
-      "team": "team_a",
-      "code": "041440",
-      "name": "현대에버다임",
-      "flag": "STALE_CHANGE",
-      "sel_change": 14.62,
-      "real_change": -2.88,
-      "diff": 17.5
-    },
-    {
-      "team": "team_a",
-      "code": "078150",
-      "name": "HB테크놀러지",
-      "flag": "STALE_CHANGE",
-      "sel_change": 12.69,
-      "real_change": 6.62,
-      "diff": 6.07
-    },
-    {
-      "team": "team_a",
-      "code": "003010",
-      "name": "혜인",
-      "flag": "STALE_CHANGE",
-      "sel_change": 14.12,
-      "real_change": -6.44,
-      "diff": 20.56
-    },
-    {
-      "team": "team_a",
-      "code": "011790",
-      "name": "SKC",
-      "flag": "STALE_CHANGE",
-      "sel_change": 8.0,
-      "real_change": -8.16,
-      "diff": 16.16
+      "sel_change": 0.85,
+      "real_change": 3.06,
+      "diff": 2.21
     },
     {
       "team": "team_d",
@@ -129,8 +93,18 @@
       "name": "현대글로비스",
       "flag": "STALE_PRICE",
       "sel_price": 251000,
-      "real_close": 230500,
-      "diff_pct": 8.89
+      "matched_field": "high",
+      "matched_value": 234500,
+      "diff_pct": 7.04
+    },
+    {
+      "team": "team_d",
+      "code": "086280",
+      "name": "현대글로비스",
+      "flag": "STALE_CHANGE",
+      "sel_change": 8.89,
+      "real_change": 4.77,
+      "diff": 4.12
     },
     {
       "team": "team_d",
@@ -138,8 +112,18 @@
       "name": "파두",
       "flag": "STALE_PRICE",
       "sel_price": 92400,
-      "real_close": 83800,
-      "diff_pct": 10.26
+      "matched_field": "high",
+      "matched_value": 84800,
+      "diff_pct": 8.96
+    },
+    {
+      "team": "team_d",
+      "code": "440110",
+      "name": "파두",
+      "flag": "STALE_CHANGE",
+      "sel_change": 10.26,
+      "real_change": 6.35,
+      "diff": 3.91
     },
     {
       "team": "team_d",
@@ -147,8 +131,18 @@
       "name": "현대차2우B",
       "flag": "STALE_PRICE",
       "sel_price": 271500,
-      "real_close": 256500,
-      "diff_pct": 5.85
+      "matched_field": "high",
+      "matched_value": 261500,
+      "diff_pct": 3.82
+    },
+    {
+      "team": "team_d",
+      "code": "005387",
+      "name": "현대차2우B",
+      "flag": "STALE_CHANGE",
+      "sel_change": 5.85,
+      "real_change": 2.4,
+      "diff": 3.45
     },
     {
       "team": "team_d",
@@ -156,170 +150,27 @@
       "name": "리가켐바이오",
       "flag": "STALE_PRICE",
       "sel_price": 187100,
-      "real_close": 182700,
-      "diff_pct": 2.41
+      "matched_field": "high",
+      "matched_value": 184200,
+      "diff_pct": 1.57
     },
     {
-      "team": "team_e",
-      "code": "377480",
-      "name": "마음AI",
-      "flag": "STALE_PRICE",
-      "sel_price": 16010,
-      "real_close": 17450,
-      "diff_pct": 8.25
-    },
-    {
-      "team": "team_e",
-      "code": "377480",
-      "name": "마음AI",
+      "team": "team_d",
+      "code": "141080",
+      "name": "리가켐바이오",
       "flag": "STALE_CHANGE",
-      "sel_change": 4.231770833333334,
-      "real_change": 3.5,
-      "diff": 0.73
-    },
-    {
-      "team": "team_e",
-      "code": "041440",
-      "name": "현대에버다임",
-      "flag": "STALE_PRICE",
-      "sel_price": 9420,
-      "real_close": 10430,
-      "diff_pct": 9.68
-    },
-    {
-      "team": "team_e",
-      "code": "041440",
-      "name": "현대에버다임",
-      "flag": "STALE_CHANGE",
-      "sel_change": 3.5164835164835164,
-      "real_change": -2.88,
-      "diff": 6.4
-    },
-    {
-      "team": "team_e",
-      "code": "010170",
-      "name": "대한광통신",
-      "flag": "STALE_PRICE",
-      "sel_price": 19130,
-      "real_close": 21800,
-      "diff_pct": 12.25
-    },
-    {
-      "team": "team_e",
-      "code": "010170",
-      "name": "대한광통신",
-      "flag": "STALE_CHANGE",
-      "sel_change": 4.707170224411604,
-      "real_change": 2.52,
-      "diff": 2.19
-    },
-    {
-      "team": "team_e",
-      "code": "079430",
-      "name": "현대리바트",
-      "flag": "STALE_PRICE",
-      "sel_price": 8050,
-      "real_close": 7890,
-      "diff_pct": 2.03
-    },
-    {
-      "team": "team_e",
-      "code": "079430",
-      "name": "현대리바트",
-      "flag": "STALE_CHANGE",
-      "sel_change": 2.027883396704689,
-      "real_change": -0.76,
-      "diff": 2.79
-    },
-    {
-      "team": "team_e",
-      "code": "003010",
-      "name": "혜인",
-      "flag": "STALE_PRICE",
-      "sel_price": 7200,
-      "real_close": 7920,
-      "diff_pct": 9.09
-    },
-    {
-      "team": "team_e",
-      "code": "003010",
-      "name": "혜인",
-      "flag": "STALE_CHANGE",
-      "sel_change": 3.7463976945244957,
-      "real_change": -6.44,
-      "diff": 10.19
-    },
-    {
-      "team": "team_h",
-      "code": "005930",
-      "name": "삼성전자",
-      "flag": "STALE_CHANGE",
-      "sel_change": 2.07,
-      "real_change": -1.1,
-      "diff": 3.17
-    },
-    {
-      "team": "team_h",
-      "code": "028050",
-      "name": "삼성E&A",
-      "flag": "STALE_CHANGE",
-      "sel_change": 21.51,
-      "real_change": -3.11,
-      "diff": 24.62
-    },
-    {
-      "team": "team_h",
-      "code": "034020",
-      "name": "두산에너빌리티",
-      "flag": "STALE_CHANGE",
-      "sel_change": 7.4,
-      "real_change": -4.99,
-      "diff": 12.39
-    },
-    {
-      "team": "team_h",
-      "code": "028260",
-      "name": "삼성물산",
-      "flag": "STALE_CHANGE",
-      "sel_change": 7.86,
-      "real_change": 4.32,
-      "diff": 3.54
-    },
-    {
-      "team": "team_h",
-      "code": "010140",
-      "name": "삼성중공업",
-      "flag": "STALE_CHANGE",
-      "sel_change": 5.81,
-      "real_change": -5.19,
-      "diff": 11.0
+      "sel_change": 2.41,
+      "real_change": 3.34,
+      "diff": 0.93
     },
     {
       "team": "team_i",
-      "code": "203650",
-      "name": "드림시큐리티",
+      "code": "247540",
+      "name": "에코프로비엠",
       "flag": "STALE_CHANGE",
-      "sel_change": 9.99,
-      "real_change": -11.5,
-      "diff": 21.49
-    },
-    {
-      "team": "team_i",
-      "code": "041440",
-      "name": "현대에버다임",
-      "flag": "STALE_CHANGE",
-      "sel_change": 14.62,
-      "real_change": -2.88,
-      "diff": 17.5
-    },
-    {
-      "team": "team_i",
-      "code": "078150",
-      "name": "HB테크놀러지",
-      "flag": "STALE_CHANGE",
-      "sel_change": 12.69,
-      "real_change": 6.62,
-      "diff": 6.07
+      "sel_change": 0.85,
+      "real_change": 3.06,
+      "diff": 2.21
     },
     {
       "team": "team_i",
@@ -327,8 +178,18 @@
       "name": "현대글로비스",
       "flag": "STALE_PRICE",
       "sel_price": 251000,
-      "real_close": 230500,
-      "diff_pct": 8.89
+      "matched_field": "high",
+      "matched_value": 234500,
+      "diff_pct": 7.04
+    },
+    {
+      "team": "team_i",
+      "code": "086280",
+      "name": "현대글로비스",
+      "flag": "STALE_CHANGE",
+      "sel_change": 8.89,
+      "real_change": 4.77,
+      "diff": 4.12
     }
   ]
 }

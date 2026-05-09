@@ -54,34 +54,66 @@ def collect_selections(date: str) -> dict:
 
 
 def get_real_prices(codes, ref_date: str) -> dict:
-    """ref_date(전일) 의 종가 + 등락률 (네이버)"""
+    """ref_date 의 OHLC + 등락률 (네이버 by_date 만 사용 — 정확)
+
+    naver `get_market_ohlcv_by_ticker` 는 일자 인자를 무시하고 항상 동일 응답 반환하는
+    결함이 있어 사용하지 않는다 (5/9 진단, ISSUE-014 monitor 후속).
+    """
+    start_dt = datetime.strptime(ref_date, "%Y%m%d") - timedelta(days=10)
+    start_str = start_dt.strftime("%Y%m%d")
+
     real = {}
     for code in codes:
         try:
-            df = nv.get_market_ohlcv_by_date(ref_date, ref_date, code)
-            for idx in df.index:
+            df = nv.get_market_ohlcv_by_date(start_str, ref_date, code)
+            if df is None or df.empty:
+                continue
+            df = df.sort_index()
+            ref_idx_pos = None
+            ref_row = None
+            for i, idx in enumerate(df.index):
                 if idx.strftime("%Y%m%d") == ref_date:
-                    row = df.loc[idx]
-                    close = int(row.get('종가', 0))
-                    # 네이버 일별 등락률은 직접 계산 (전전일 대비) — by_date 단일일은 등락률 미지원
-                    # 대신 by_ticker 시도
-                    real[code] = {'close': close, 'change_pct': None}
+                    ref_row = df.loc[idx]
+                    ref_idx_pos = i
                     break
+            if ref_row is None:
+                continue
+            ohlc = {
+                'open': int(ref_row.get('시가', 0)) or 0,
+                'high': int(ref_row.get('고가', 0)) or 0,
+                'low': int(ref_row.get('저가', 0)) or 0,
+                'close': int(ref_row.get('종가', 0)) or 0,
+            }
+            if ohlc['close'] == 0:
+                continue
+            # 등락률 직접 계산 (전 영업일 종가 → ref_date 종가)
+            change_pct = None
+            if ref_idx_pos > 0:
+                prev_close = int(df.iloc[ref_idx_pos - 1].get('종가', 0)) or 0
+                if prev_close > 0:
+                    change_pct = round((ohlc['close'] - prev_close) / prev_close * 100, 2)
+            real[code] = {**ohlc, 'change_pct': change_pct}
             time.sleep(0.1)
         except Exception:
-            pass
-
-    # change_pct 보강 — by_ticker 시장 단위 fetch (1번)
-    try:
-        for mkt in ['KOSPI', 'KOSDAQ']:
-            df = nv.get_market_ohlcv_by_ticker(ref_date, market=mkt)
-            for code in codes:
-                if code in df.index and code in real:
-                    real[code]['change_pct'] = float(df.loc[code].get('등락률', 0))
-            time.sleep(0.1)
-    except Exception:
-        pass
+            continue
     return real
+
+
+def closest_ohlc_match(sel_price: int, real: dict) -> tuple:
+    """selection.price 와 가장 가까운 OHLC 필드 찾기
+
+    전략별 price 의미가 다름 (frontier_gap=시가, momentum=종가, theme_policy=일중 어떤 시점 등).
+    OHLC 4개 중 절대 차이 최소인 필드를 매칭. (matched_field, matched_value, diff_pct)
+    """
+    fields = ['open', 'high', 'low', 'close']
+    best = None
+    for f in fields:
+        rp = real.get(f, 0)
+        if rp:
+            diff_pct = abs(sel_price - rp) / rp * 100
+            if best is None or diff_pct < best[2]:
+                best = (f, rp, diff_pct)
+    return best  # None or (field, real_value, diff_pct)
 
 
 def previous_business_day(date_str: str) -> str:
@@ -134,25 +166,33 @@ def verify_date(date: str, verbose: bool = True) -> dict:
         min_score = min(scores) if scores else 0
         shortfall = max(0, TOP_N_TARGET - n_sel)
 
+        # 전략별 의미 차이:
+        # - price: OHLC 4개 중 가장 가까운 것 자동 매칭 (closest_ohlc_match)
+        # - change_pct: frontier_gap 은 score_detail.gap_pct 를 따로 쓰므로 검증 스킵
+        strategy_id = s.get('strategy_id', '')
+        skip_change_verify = strategy_id in ('frontier_gap',)
+
         # 가격/등락률 검증
         price_diffs = []
         change_diffs = []
         for c in cands:
             duplicate_counter[c['code']] = duplicate_counter.get(c['code'], 0) + 1
             r = real.get(c['code'])
-            if r and r.get('close'):
-                sel_price = c.get('price', 0)
-                if sel_price:
-                    diff_pct = abs(sel_price - r['close']) / r['close'] * 100
+            sel_price = c.get('price', 0)
+            if r and sel_price:
+                match = closest_ohlc_match(sel_price, r)
+                if match:
+                    matched_field, matched_value, diff_pct = match
                     price_diffs.append(diff_pct)
                     if diff_pct > 1.0:
                         rows.append({
                             'team': tid, 'code': c['code'], 'name': c['name'],
                             'flag': 'STALE_PRICE',
-                            'sel_price': sel_price, 'real_close': r['close'],
+                            'sel_price': sel_price,
+                            'matched_field': matched_field, 'matched_value': matched_value,
                             'diff_pct': round(diff_pct, 2),
                         })
-            if r and r.get('change_pct') is not None:
+            if r and r.get('change_pct') is not None and not skip_change_verify:
                 sel_chg = c.get('change_pct', 0)
                 diff = abs(sel_chg - r['change_pct'])
                 change_diffs.append(diff)
