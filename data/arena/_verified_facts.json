@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-08T18:13:52.992199+09:00",
+  "generated_at": "2026-05-09T12:38:32.489599+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -46,7 +46,8 @@
         "last_date": "20260508",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "valid"
     },
     "team_b": {
       "team_id": "team_b",
@@ -86,7 +87,8 @@
         "last_date": "20260417",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "valid"
     },
     "team_c": {
       "team_id": "team_c",
@@ -126,13 +128,14 @@
         "last_date": "20260506",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "valid"
     },
     "team_d": {
       "team_id": "team_d",
       "team_name": "Delta Theme",
       "strategy_id": "theme_policy",
-      "enabled": true,
+      "enabled": false,
       "exists": true,
       "operational_days": 19,
       "capital": {
@@ -166,7 +169,10 @@
         "last_date": "20260508",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "invalid",
+      "invalidity_reason": "데이터 leakage 확정 — theme_policy 가 매매당일 종가로 종목 선정. 운영 기간 6 거래일 / 15건 (16% leakage율). 누적 +25.96% 는 미래 정보로 만든 가짜 수익률, 실거래 재현 불가.",
+      "invalidity_issue_id": "ISSUE-015"
     },
     "team_e": {
       "team_id": "team_e",
@@ -206,7 +212,8 @@
         "last_date": "20260508",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "valid"
     },
     "team_f": {
       "team_id": "team_f",
@@ -246,7 +253,8 @@
         "last_date": "20260507",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "valid"
     },
     "team_g": {
       "team_id": "team_g",
@@ -286,7 +294,8 @@
         "last_date": "20260506",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "valid"
     },
     "team_h": {
       "team_id": "team_h",
@@ -326,13 +335,14 @@
         "last_date": "20260508",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "valid"
     },
     "team_i": {
       "team_id": "team_i",
       "team_name": "Alpha-Delta Hybrid",
       "strategy_id": "hybrid_alpha_delta",
-      "enabled": true,
+      "enabled": false,
       "exists": true,
       "operational_days": 10,
       "capital": {
@@ -366,7 +376,10 @@
         "last_date": "20260508",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
-      }
+      },
+      "validity": "invalid",
+      "invalidity_reason": "ISSUE-015 연쇄 — hybrid_alpha_delta.py 가 ThemePolicyStrategy 직접 import해 호출. theme_policy 의 leakage 가 hybrid 결과의 50% 비중으로 전파 (5거래일 / 6건 부분 leakage). 누적 +15.96% 의 약 절반은 미래 정보 영향.",
+      "invalidity_issue_id": "ISSUE-015"
     }
   },
   "bnf": {
@@ -493,5 +506,18 @@
     "unique_dates": 19,
     "duplicates": {}
   },
-  "warnings": []
+  "warnings": [
+    {
+      "code": "W_LEAKAGE_INVALID",
+      "severity": "warn",
+      "scope": "team_d",
+      "message": "누적 portfolio 데이터 신뢰 불가 (ISSUE-015). 인용 금지 또는 (LEAKAGE) 표시 필수. 사유: 데이터 leakage 확정 — theme_policy 가 매매당일 종가로 종목 선정. 운영 기간 6 거래일 / 15건 (16% leakage율)..."
+    },
+    {
+      "code": "W_LEAKAGE_INVALID",
+      "severity": "warn",
+      "scope": "team_i",
+      "message": "누적 portfolio 데이터 신뢰 불가 (ISSUE-015). 인용 금지 또는 (LEAKAGE) 표시 필수. 사유: ISSUE-015 연쇄 — hybrid_alpha_delta.py 가 ThemePolicyStrategy 직접 import해 호출. theme_..."
+    }
+  ]
 }

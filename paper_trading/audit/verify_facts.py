@@ -440,7 +440,32 @@ def verify(write: bool = True, output_path: Path | None = None) -> dict:
     warnings: list[FactsWarning] = []
     team_strategy_map = _team_id_to_strategy_map(ARENA_DIR)
 
+    # ISSUE-015: invalid (leakage) 팀 메타 로드 — _invalid_teams.json
+    invalid_teams_meta = _read_json(ARENA_DIR / "_invalid_teams.json") or {}
+    invalid_teams = (invalid_teams_meta.get("invalid_teams") or {})
+
     arena = {tid: _verify_team(tid, meta, warnings) for tid, meta in sorted(team_strategy_map.items())}
+
+    # invalid 팀에 validity 마커 추가 + W_LEAKAGE_INVALID warning
+    for tid, t in arena.items():
+        if tid in invalid_teams:
+            inv = invalid_teams[tid]
+            t["validity"] = "invalid"
+            t["invalidity_reason"] = inv.get("reason", "")
+            t["invalidity_issue_id"] = inv.get("issue_id", "")
+            warnings.append(
+                FactsWarning(
+                    code="W_LEAKAGE_INVALID",
+                    severity="warn",
+                    scope=tid,
+                    message=(
+                        f"누적 portfolio 데이터 신뢰 불가 ({inv.get('issue_id','')}). "
+                        f"인용 금지 또는 (LEAKAGE) 표시 필수. 사유: {inv.get('reason','')[:80]}..."
+                    ),
+                )
+            )
+        else:
+            t["validity"] = "valid"
     bnf = _verify_bnf_system(warnings)
     bollinger = _verify_bollinger_system(warnings)
     duplicate_runs = _check_duplicate_runs(warnings)
@@ -517,6 +542,9 @@ def _print_summary(facts: dict) -> None:
             if match_c is False:
                 issues.append(f"cap pf={t['capital']['portfolio_json_current_krw']:,}")
             health = " ".join(issues)
+        # ISSUE-015: invalid 팀은 (LEAKAGE) 표시
+        if t.get("validity") == "invalid":
+            health = f"⚠️ LEAKAGE ({t.get('invalidity_issue_id','')})"
         print(f"  {tid:<6} {t['strategy_id']:<22} {en:>3} {days:>4} {cum:>6.2f}% {mdd:>5.2f}% {n:>6} {wr:>5.2f}% {health:<28}")
 
     print("\n[Independent Systems]")

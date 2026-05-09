@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-05-09T16:00:00+09:00",
+  "consumer_contract": {
+    "rule_1": "이 파일에 등재된 팀의 누적 portfolio/leaderboard 데이터는 데이터 leakage 등의 이유로 신뢰 불가. 분석/리포팅에서 인용 시 (LEAKAGE) 표시 필수.",
+    "rule_2": "verify_facts.py 가 자동으로 _verified_facts.json 의 해당 팀에 validity='invalid' 설정.",
+    "rule_3": "portfolio.json 데이터는 historical artifact 로 보존 — 폐기하지 않음. 단 인용 금지."
+  },
+  "invalid_teams": {
+    "team_d": {
+      "team_id": "team_d",
+      "team_name": "Delta Theme",
+      "strategy_id": "theme_policy",
+      "invalidated_at": "2026-05-09",
+      "issue_id": "ISSUE-015",
+      "validity": "invalid",
+      "reason": "데이터 leakage 확정 — theme_policy 가 매매당일 종가로 종목 선정. 운영 기간 6 거래일 / 15건 (16% leakage율). 누적 +25.96% 는 미래 정보로 만든 가짜 수익률, 실거래 재현 불가.",
+      "compromised_metrics": [
+        "total_return_pct (+25.96%)",
+        "current_capital (12,595,509)",
+        "win_rate (54/94 = 57.45%)",
+        "max_drawdown_pct (2.6%)",
+        "trades_history (94건 모두 미래 정보 기반 선정)"
+      ],
+      "patches_applied": [
+        "commit 86e5963 — theme_policy.py KRX OpenAPI 1차 도입 (fetch 결함)",
+        "commit b8c8805 — arena_manager.py fetch_date prev_business_day cap (운영 결함)"
+      ],
+      "rerun_needed": true,
+      "rerun_note": "theme_policy 재활성화 시 백테스트 재실행으로 정상 누적 산출 가능"
+    },
+    "team_i": {
+      "team_id": "team_i",
+      "team_name": "Alpha-Delta Hybrid",
+      "strategy_id": "hybrid_alpha_delta",
+      "invalidated_at": "2026-05-09",
+      "issue_id": "ISSUE-015",
+      "validity": "invalid",
+      "reason": "ISSUE-015 연쇄 — hybrid_alpha_delta.py 가 ThemePolicyStrategy 직접 import해 호출. theme_policy 의 leakage 가 hybrid 결과의 50% 비중으로 전파 (5거래일 / 6건 부분 leakage). 누적 +15.96% 의 약 절반은 미래 정보 영향.",
+      "compromised_metrics": [
+        "total_return_pct (+15.96%)",
+        "current_capital (11,595,664)",
+        "win_rate (29/50 = 58.0%)",
+        "max_drawdown_pct (0.77%)",
+        "trades_history (50건 중 theme_policy 비중)"
+      ],
+      "patches_applied": [
+        "commit 86e5963 — theme_policy.py 결함 차단 (간접 효과)",
+        "commit b8c8805 — arena_manager.py fetch_date cap (간접 효과)"
+      ],
+      "rerun_needed": true,
+      "rerun_note": "hybrid 재활성화 시 백테스트 재실행으로 정상 누적 산출 가능. 단 hybrid 의 ThemePolicyStrategy 직접 import 패턴 수정 별도 plan 권고."
+    }
+  }
+}
