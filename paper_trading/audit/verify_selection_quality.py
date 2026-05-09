@@ -102,7 +102,7 @@ def get_real_prices(codes, ref_date: str) -> dict:
 def closest_ohlc_match(sel_price: int, real: dict) -> tuple:
     """selection.price 와 가장 가까운 OHLC 필드 찾기
 
-    전략별 price 의미가 다름 (frontier_gap=시가, momentum=종가, theme_policy=일중 어떤 시점 등).
+    전략별 price 의미가 다름 (frontier_gap=시가, momentum=종가, theme_policy=??).
     OHLC 4개 중 절대 차이 최소인 필드를 매칭. (matched_field, matched_value, diff_pct)
     """
     fields = ['open', 'high', 'low', 'close']
@@ -114,6 +114,33 @@ def closest_ohlc_match(sel_price: int, real: dict) -> tuple:
             if best is None or diff_pct < best[2]:
                 best = (f, rp, diff_pct)
     return best  # None or (field, real_value, diff_pct)
+
+
+def detect_leakage(sel_price: int, ref_real: dict, trade_real: dict,
+                   ref_threshold_pct: float = 2.0, trade_threshold_pct: float = 0.5) -> dict:
+    """ISSUE-015: 데이터 leakage 자동 탐지
+
+    sel.price 가 ref_date(전 영업일) OHLC 와 멀리 떨어져 있고
+    매매당일 OHLC 와 정확히 일치하면 미래 데이터 사용 의심.
+
+    Returns: {is_leakage: bool, ref_match: tuple, trade_match: tuple, reason: str}
+    """
+    ref_match = closest_ohlc_match(sel_price, ref_real) if ref_real else None
+    trade_match = closest_ohlc_match(sel_price, trade_real) if trade_real else None
+
+    ref_diff = ref_match[2] if ref_match else 999
+    trade_diff = trade_match[2] if trade_match else 999
+
+    is_leakage = (ref_diff > ref_threshold_pct and trade_diff < trade_threshold_pct)
+    reason = ""
+    if is_leakage:
+        reason = f"ref({ref_match[0]})={ref_match[1]} {ref_diff:.1f}% 차이 vs trade({trade_match[0]})={trade_match[1]} {trade_diff:.1f}% 일치"
+    return {
+        'is_leakage': is_leakage,
+        'ref_match': ref_match,
+        'trade_match': trade_match,
+        'reason': reason,
+    }
 
 
 def previous_business_day(date_str: str) -> str:

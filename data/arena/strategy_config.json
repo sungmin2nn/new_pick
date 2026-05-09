@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-05-08T08:30:00",
+  "updated_at": "2026-05-09T15:00:00",
   "strategies": {
     "momentum": {
       "enabled": true,
@@ -53,8 +53,8 @@
       "top_n": 5
     },
     "theme_policy": {
-      "enabled": true,
-      "status": "active",
+      "enabled": false,
+      "status": "deactivated",
       "source": "ntb",
       "module_path": "paper_trading.strategies.theme_policy",
       "class_name": "ThemePolicyStrategy",
@@ -66,6 +66,8 @@
       "risk_level": "medium",
       "initial_capital": 10000000,
       "activated_at": "2026-04-01",
+      "deactivated_at": "2026-05-09",
+      "deactivated_reason": "데이터 leakage 확정 — 3거래일(5/4·5/7·5/8) 검증 결과 일관되게 매매당일 종가 데이터로 종목 선정. selection.date=20260507 인데 086280 현대글로비스 selection.price=251,000 = 5/8 종가 정확 일치 (5/7 OHLC 매칭은 7.04% 차이). 같은 패턴 10건/3거래일. 누적 +25.96% 는 미래 정보로 만든 가짜 수익률, 실거래 재현 불가. ISSUE-015 등재. theme_policy.py 코드 수정 plan 후 재활성 검토 가능. (verify_selection_quality.py + 매매당일 OHLC 매칭으로 확정)",
       "top_n": 5
     },
     "frontier_gap": {

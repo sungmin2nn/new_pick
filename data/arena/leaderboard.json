@@ -13,19 +13,6 @@
       "best_day_return": 45.97,
       "worst_day_return": -12.06
     },
-    "team_d": {
-      "team_id": "team_d",
-      "team_name": "Delta Theme",
-      "emoji": "🟡",
-      "elo": 1059,
-      "rank": 1,
-      "total_1st": 5,
-      "total_2nd": 5,
-      "total_3rd": 0,
-      "total_4th": 3,
-      "best_day_return": 29.93,
-      "worst_day_return": -12.82
-    },
     "team_e": {
       "team_id": "team_e",
       "team_name": "Echo Frontier",
@@ -137,6 +124,22 @@
       "worst_day_return": -9.56,
       "archived_at": "2026-05-08",
       "archived_reason": "슬리피지 위험 컷 — 9거래일 운용 누적 +14.19%로 절대 부진 아니나 시뮬-실거래 괴리 위험 일관. MDD 3.31%(active 8일팀 최고), avg_max_loss -4.42%(8일팀 최악). 백테스트 calibrated +25.49%로 lab 1위이나 CLAUDE.md §3 시뮬레이터 결함(슬리피지 미반영) 직접 노출. 동일 breakout 카테고리 team_e가 분산 유지하므로 사용자 판단 OFF."
+    },
+    "team_d": {
+      "team_id": "team_d",
+      "team_name": "Delta Theme",
+      "strategy_id": "theme_policy",
+      "emoji": "🟡",
+      "elo": 1059,
+      "final_rank": 1,
+      "total_1st": 5,
+      "total_2nd": 5,
+      "total_3rd": 0,
+      "total_4th": 3,
+      "best_day_return": 29.93,
+      "worst_day_return": -12.82,
+      "archived_at": "2026-05-09",
+      "archived_reason": "데이터 leakage 확정 — 3거래일 검증으로 일관된 매매당일 종가 사용 패턴 확인 (10건). 누적 +25.96% 는 미래 정보 기반 가짜 수익률. ISSUE-015 등재, theme_policy.py 코드 수정 후 재활성 검토."
     }
   },
   "daily_history": [
@@ -1139,7 +1142,7 @@
       ]
     }
   ],
-  "last_updated": "2026-05-08 18:06:20",
+  "last_updated": "2026-05-09 11:26:18",
   "reset_at": "2026-04-10 14:28:11",
   "reset_reason": "4팀 동시 시작 - 데이터 파이프라인 정상화 후 공정 경쟁"
 }
