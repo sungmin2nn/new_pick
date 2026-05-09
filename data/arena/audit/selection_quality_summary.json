@@ -1,0 +1,96 @@
+{
+  "history": [
+    {
+      "date": "20260504",
+      "reference_date": "20260430",
+      "n_teams": 8,
+      "total_picks": 35,
+      "total_shortfall": 5,
+      "shortfall_rate_pct": 12.5,
+      "avg_team_avg_score": 59.2,
+      "overall_avg_price_err_pct": 1.424,
+      "overall_avg_change_err": 10.83,
+      "n_real_missing": 0,
+      "n_duplicates": 8
+    },
+    {
+      "date": "20260507",
+      "reference_date": "20260506",
+      "n_teams": 6,
+      "total_picks": 30,
+      "total_shortfall": 0,
+      "shortfall_rate_pct": 0.0,
+      "avg_team_avg_score": 62.7,
+      "overall_avg_price_err_pct": 3.279,
+      "overall_avg_change_err": 10.818,
+      "n_real_missing": 0,
+      "n_duplicates": 5
+    },
+    {
+      "date": "20260508",
+      "reference_date": "20260507",
+      "n_teams": 5,
+      "total_picks": 25,
+      "total_shortfall": 0,
+      "shortfall_rate_pct": 0.0,
+      "avg_team_avg_score": 60.2,
+      "overall_avg_price_err_pct": 3.172,
+      "overall_avg_change_err": 8.154,
+      "n_real_missing": 0,
+      "n_duplicates": 6
+    }
+  ],
+  "alerts": [
+    {
+      "date": "20260504",
+      "severity": "warn",
+      "code": "W_STALE_PRICE",
+      "message": "평균 가격 오차 1.424% > 1.0%"
+    },
+    {
+      "date": "20260504",
+      "severity": "warn",
+      "code": "W_STALE_CHANGE",
+      "message": "등락률 오차 10.83%p > 0.5%p"
+    },
+    {
+      "date": "20260507",
+      "severity": "warn",
+      "code": "W_STALE_PRICE",
+      "message": "평균 가격 오차 3.279% > 1.0%"
+    },
+    {
+      "date": "20260507",
+      "severity": "warn",
+      "code": "W_STALE_CHANGE",
+      "message": "등락률 오차 10.818%p > 0.5%p"
+    },
+    {
+      "date": "20260508",
+      "severity": "warn",
+      "code": "W_STALE_PRICE",
+      "message": "평균 가격 오차 3.172% > 1.0%"
+    },
+    {
+      "date": "20260508",
+      "severity": "warn",
+      "code": "W_STALE_CHANGE",
+      "message": "등락률 오차 8.154%p > 0.5%p"
+    }
+  ],
+  "thresholds": {
+    "min_avg_score": 50.0,
+    "max_shortfall_rate_pct": 30,
+    "max_price_diff_pct": 1.0,
+    "max_change_diff_pct": 0.5
+  },
+  "rolling_5d": {
+    "days": 3,
+    "shortfall_rate_pct_avg": 4.2,
+    "avg_score_avg": 60.7,
+    "price_err_pct_avg": 2.625,
+    "first_date": "20260504",
+    "last_date": "20260508"
+  },
+  "last_updated": "2026-05-09T11:10:44.999732+09:00"
+}

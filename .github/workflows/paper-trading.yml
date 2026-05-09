@@ -154,6 +154,17 @@ jobs:
         # GITHUB_STEP_SUMMARY 환경변수 자동 감지 → 마크다운 표 자동 출력
         python -m paper_trading.audit.verify_intraday_accuracy || true
 
+    - name: Verify selection quality (선정 로직 monitor)
+      if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
+      env:
+        TZ: Asia/Seoul
+      run: |
+        # 선정 (selection.json) 품질 검증.
+        # 항목: top_n 미달율, 평균/최저 점수, 선정 가격·등락률 vs 네이버 실측 일치도
+        # 출력: data/arena/audit/selection_quality_<date>.json + selection_quality_summary.json
+        # alert: shortfall>30%, avg_score<50, price_err>1%, change_err>0.5%p
+        python -m paper_trading.audit.verify_selection_quality || true
+
     - name: Commit and push results
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'
       run: |
