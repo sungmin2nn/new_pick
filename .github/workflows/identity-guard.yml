@@ -1,0 +1,75 @@
+name: Identity Guard
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-author:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - name: Verify commit author email allowlist
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -e
+
+          # Determine commit range to inspect
+          if [ "$EVENT" = "pull_request" ]; then
+            range="$PR_BASE..$PR_HEAD"
+          elif [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || [ -z "$BEFORE" ]; then
+            # New branch, force-push, or initial push — inspect just the tip commit
+            range="HEAD~1..HEAD"
+            git rev-parse HEAD~1 >/dev/null 2>&1 || range="HEAD"
+          else
+            range="$BEFORE..$AFTER"
+          fi
+
+          echo "Inspecting range: $range"
+
+          # Allowlist (extended regex):
+          #   - any @users.noreply.github.com address (covers personal noreply, github-actions[bot], dependabot[bot])
+          #   - action@github.com (legacy GitHub Actions automation)
+          allowed='^([^@]+@users\.noreply\.github\.com|action@github\.com)$'
+
+          if [ "$range" = "HEAD" ]; then
+            authors=$(git log -1 --format='%ae' HEAD)
+          else
+            authors=$(git log --format='%ae' "$range" 2>/dev/null | sort -u)
+          fi
+
+          if [ -z "$authors" ]; then
+            echo "No commits in range — nothing to check."
+            exit 0
+          fi
+
+          echo "Authors found:"
+          echo "$authors" | sed 's/^/  /'
+
+          bad=$(echo "$authors" | grep -vE "$allowed" || true)
+
+          if [ -n "$bad" ]; then
+            echo ""
+            echo "::error::Disallowed commit author email(s) detected:"
+            echo "$bad" | while read -r e; do
+              [ -n "$e" ] && echo "::error::  $e"
+            done
+            echo ""
+            echo "Allowed authors must match: $allowed"
+            echo "Recommended: 252531815+sungmin2nn@users.noreply.github.com"
+            exit 1
+          fi
+
+          echo ""
+          echo "All commit authors in allowlist."
