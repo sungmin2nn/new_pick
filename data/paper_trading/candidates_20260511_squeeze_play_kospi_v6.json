@@ -1,0 +1,59 @@
+{
+  "strategy_id": "squeeze_play_kospi_v6",
+  "strategy_name": "스퀴즈 플레이 KOSPI v6",
+  "date": "20260508",
+  "selected_at": "2026-05-11 20:08:38",
+  "count": 2,
+  "candidates": [
+    {
+      "code": "024110",
+      "name": "기업은행",
+      "price": 21800,
+      "change_pct": 0.46,
+      "score": 21.86,
+      "score_detail": {
+        "percent_b": 0.1273,
+        "spread_pct": 5.76,
+        "ma200_rising": true,
+        "is_positive_candle": true,
+        "recommended_holding_days": 5,
+        "variant_id": "squeeze_play_kospi_v6"
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 1065365,
+      "trading_value": 23102544975
+    },
+    {
+      "code": "207940",
+      "name": "삼성바이오로직스",
+      "price": 1472000,
+      "change_pct": 0.14,
+      "score": 3.31,
+      "score_detail": {
+        "percent_b": 0.1944,
+        "spread_pct": 9.0,
+        "ma200_rising": true,
+        "is_positive_candle": true,
+        "recommended_holding_days": 5,
+        "variant_id": "squeeze_play_kospi_v6"
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 62693,
+      "trading_value": 92139390000
+    }
+  ],
+  "params": {
+    "universe_market": "KOSPI",
+    "universe_size": 53,
+    "ma200_filter": true,
+    "squeeze_filter": true,
+    "squeeze_max_spread_pct": 10.0,
+    "bb_period": 20,
+    "percent_b_max": 0.2,
+    "ma200_period": 200,
+    "recommended_holding_days": 5
+  },
+  "simulation": null
+}
