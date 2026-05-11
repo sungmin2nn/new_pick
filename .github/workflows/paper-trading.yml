@@ -93,14 +93,21 @@ jobs:
         from datetime import datetime, timedelta, timezone
 
         kst = timezone(timedelta(hours=9))
-        today = datetime.now(kst)
+
+        # workflow_dispatch input.date 가 있으면 그 날짜를 'today'(=시뮬·선정 기준일)
+        # 로 간주. 과거 일자 복구 실행 시 tomorrow 가 올바르게 매매일 다음 영업일로 계산되도록.
+        date_input = '${{ github.event.inputs.date }}'
+        if date_input:
+            today = datetime.strptime(date_input, '%Y%m%d').replace(tzinfo=kst)
+        else:
+            today = datetime.now(kst)
         tomorrow = today + timedelta(days=1)
         # 주말 + 한국 공휴일(임시공휴일 포함) 모두 건너뜀
         while tomorrow.weekday() >= 5 or not is_market_day(tomorrow):
             tomorrow += timedelta(days=1)
 
         tomorrow_str = tomorrow.strftime('%Y%m%d')
-        print(f'내일({tomorrow_str}) 다중 전략 종목 선정')
+        print(f'내일({tomorrow_str}) 다중 전략 종목 선정 (today={today.strftime(\"%Y%m%d\")})')
         results = run_all_strategies(date=tomorrow_str, top_n=5)
         print(f'총 {len(results)}개 전략 실행 완료')
         "
@@ -180,8 +187,27 @@ jobs:
         git add data/knowledge_base.json 2>/dev/null || true
         git add logs/ 2>/dev/null || true
 
-        git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "🏟️ Arena 일일 결과 - $(date +'%Y-%m-%d')" && git pull --rebase && git push) || true
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "[git] 변경 없음 — skip"
+          exit 0
+        fi
+
+        git commit -m "🏟️ Arena 일일 결과 - $(date +'%Y-%m-%d')"
+
+        # 동시 실행 워크플로(특히 Arena Healthcheck)와의 rebase 충돌 자동 복구.
+        # -X theirs: rebase 중 우리 커밋(=새 결과) 우선 채택. 충돌 파일은 시간변동 데이터
+        # (healthcheck json 등)라 손실 위험 없음. 5회 재시도 후 실패 시 명시적 fail.
+        for i in 1 2 3 4 5; do
+          if git pull --rebase -X theirs origin master && git push; then
+            echo "[git] push 성공 (시도 $i)"
+            exit 0
+          fi
+          git rebase --abort 2>/dev/null || true
+          echo "[git] push 실패 — 재시도 $i/5"
+          sleep $((i * 2))
+        done
+        echo "::error::Arena 결과 push 실패 — origin과 분기됨. 로컬 커밋: $(git rev-parse HEAD)"
+        exit 1
 
     - name: Send Telegram Alert (Arena 결과)
       if: steps.market_check.outputs.IS_MARKET_DAY != 'false'

@@ -88,8 +88,24 @@ jobs:
         git add data/paper_trading/results.json 2>/dev/null || true
         git add data/arena/healthcheck/ 2>/dev/null || true
 
-        git diff --quiet && git diff --staged --quiet || \
-          (git commit -m "🏥 Arena 헬스체크 - $(date +'%Y-%m-%d %H:%M')" && git pull --rebase && git push) || true
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "[git] 변경 없음 — skip"
+          exit 0
+        fi
+
+        git commit -m "🏥 Arena 헬스체크 - $(date +'%Y-%m-%d %H:%M')"
+
+        for i in 1 2 3 4 5; do
+          if git pull --rebase -X theirs origin master && git push; then
+            echo "[git] push 성공 (시도 $i)"
+            exit 0
+          fi
+          git rebase --abort 2>/dev/null || true
+          echo "[git] push 실패 — 재시도 $i/5"
+          sleep $((i * 2))
+        done
+        echo "::error::push 실패 — origin과 분기됨. 로컬 커밋: $(git rev-parse HEAD)"
+        exit 1
 
     - name: Send alerts (issues only)
       if: always()
