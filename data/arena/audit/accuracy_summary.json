@@ -26,6 +26,15 @@
       "sim_total_pct": 13.44,
       "real_total_pct": 3.19,
       "diff_pct": -10.25
+    },
+    {
+      "date": "20260512",
+      "n_trades": 15,
+      "n_ok": 13,
+      "mismatch_rate_pct": 13.3,
+      "sim_total_pct": -6.89,
+      "real_total_pct": -9.38,
+      "diff_pct": -2.49
     }
   ],
   "alerts": [
@@ -42,10 +51,10 @@
       "message": "부정확율 65.0% > 30% (5팀합 차이 -10.25%p)"
     },
     {
-      "date": "20260508",
+      "date": "20260512",
       "severity": "warn",
       "code": "W_ROLLING_DIVERGENCE",
-      "message": "최근 3거래일 평균 부정확율 54.4% > 15%"
+      "message": "최근 4거래일 평균 부정확율 44.1% > 15%"
     }
   ],
   "thresholds": {
@@ -53,11 +62,11 @@
     "rolling_5d_warn": 15
   },
   "rolling_5d": {
-    "days": 3,
-    "mismatch_rate_pct_avg": 54.4,
-    "diff_pct_avg": -10.11,
+    "days": 4,
+    "mismatch_rate_pct_avg": 44.1,
+    "diff_pct_avg": -8.21,
     "first_date": "20260504",
-    "last_date": "20260508"
+    "last_date": "20260512"
   },
-  "last_updated": "2026-05-09T11:05:08.136055+09:00"
+  "last_updated": "2026-05-12T19:49:56.868170+09:00"
 }

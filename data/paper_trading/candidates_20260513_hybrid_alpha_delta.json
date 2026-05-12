@@ -1,0 +1,136 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260511",
+  "selected_at": "2026-05-12 19:37:25",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "000660",
+      "name": "SK하이닉스",
+      "price": 1880000,
+      "change_pct": 11.51,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 84.5,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 7433039,
+      "trading_value": 14004335299500
+    },
+    {
+      "code": "099410",
+      "name": "동방선기",
+      "price": 6000,
+      "change_pct": 14.94,
+      "score": 53.9,
+      "score_detail": {
+        "alpha_score": 70.1,
+        "delta_score": 0.0,
+        "alpha_norm": 83.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 53.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 6139676,
+      "trading_value": 38908598300
+    },
+    {
+      "code": "212560",
+      "name": "네오오토",
+      "price": 9980,
+      "change_pct": 14.84,
+      "score": 53.7,
+      "score_detail": {
+        "alpha_score": 69.8,
+        "delta_score": 0.0,
+        "alpha_norm": 82.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 53.7,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 1008868,
+      "trading_value": 9643402970
+    },
+    {
+      "code": "079550",
+      "name": "LIG디펜스앤에어로스페이스",
+      "price": 875000,
+      "change_pct": 4.17,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 71.0,
+        "alpha_norm": 0.0,
+        "delta_norm": 99.9,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 19250000000000,
+      "volume": 376587,
+      "trading_value": 325451377500
+    },
+    {
+      "code": "010140",
+      "name": "삼성중공업",
+      "price": 33950,
+      "change_pct": 6.26,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 71.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 29876000000000,
+      "volume": 15532322,
+      "trading_value": 530500642075
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
