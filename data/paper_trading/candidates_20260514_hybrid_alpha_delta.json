@@ -1,0 +1,136 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260512",
+  "selected_at": "2026-05-13 19:30:48",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "007610",
+      "name": "선도전기",
+      "price": 14600,
+      "change_pct": 13.44,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 92.2,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 31256656,
+      "trading_value": 464944300725
+    },
+    {
+      "code": "090710",
+      "name": "휴림로봇",
+      "price": 12970,
+      "change_pct": 5.19,
+      "score": 54.9,
+      "score_detail": {
+        "alpha_score": 77.9,
+        "delta_score": 0.0,
+        "alpha_norm": 84.5,
+        "delta_norm": 0.0,
+        "alpha_weighted": 54.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 43655320,
+      "trading_value": 584045747170
+    },
+    {
+      "code": "253840",
+      "name": "수젠텍",
+      "price": 6850,
+      "change_pct": 13.22,
+      "score": 52.7,
+      "score_detail": {
+        "alpha_score": 74.7,
+        "delta_score": 0.0,
+        "alpha_norm": 81.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 52.7,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 18798528,
+      "trading_value": 133177068055
+    },
+    {
+      "code": "079550",
+      "name": "LIG디펜스앤에어로스페이스",
+      "price": 879000,
+      "change_pct": 0.46,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 51.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 19338000000000,
+      "volume": 309311,
+      "trading_value": 272464648000
+    },
+    {
+      "code": "003230",
+      "name": "삼양식품",
+      "price": 1331000,
+      "change_pct": 0.91,
+      "score": 34.6,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 50.9,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.8,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.6,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 10026442965000,
+      "volume": 70089,
+      "trading_value": 93045681500
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
