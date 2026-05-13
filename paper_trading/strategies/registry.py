@@ -9,6 +9,31 @@ from datetime import datetime
 from .base import BaseStrategy, StrategyResult
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data" / "paper_trading"
+THEME_INDEX_PATH = Path(__file__).parent.parent.parent / "data" / "theme_cache" / "_stock_to_themes.json"
+
+_STOCK_THEME_INDEX: Optional[Dict] = None
+
+
+def _theme_index() -> Dict:
+    """{code: {name, themes:[{code,name},...]}} raw 인덱스 (lazy load)."""
+    global _STOCK_THEME_INDEX
+    if _STOCK_THEME_INDEX is None:
+        try:
+            with open(THEME_INDEX_PATH, 'r', encoding='utf-8') as f:
+                raw = json.load(f)
+            _STOCK_THEME_INDEX = {k: v for k, v in raw.items() if k != '_meta'}
+        except Exception:
+            _STOCK_THEME_INDEX = {}
+    return _STOCK_THEME_INDEX
+
+
+def _enrich_themes(candidate_dict: Dict) -> None:
+    """candidate dict 에 themes 주입 (in-place). 이미 있으면 보존."""
+    if candidate_dict.get('themes'):
+        return
+    entry = _theme_index().get(candidate_dict.get('code'))
+    if entry and entry.get('themes'):
+        candidate_dict['themes'] = entry['themes']
 
 
 class StrategyRegistry:
@@ -81,18 +106,26 @@ class StrategyRegistry:
 
         DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-        # 전략별 개별 저장
+        # to_dict() 한 번 + themes enrich (개별/통합 저장 양쪽에 재사용)
+        enriched: Dict[str, dict] = {}
         for strategy_id, result in results.items():
+            rd = result.to_dict()
+            for c in rd.get('candidates', []):
+                _enrich_themes(c)
+            enriched[strategy_id] = rd
+
+        # 전략별 개별 저장
+        for strategy_id, rd in enriched.items():
             filename = DATA_DIR / f"candidates_{date}_{strategy_id}.json"
             with open(filename, 'w', encoding='utf-8') as f:
-                json.dump(result.to_dict(), f, ensure_ascii=False, indent=2)
+                json.dump(rd, f, ensure_ascii=False, indent=2)
             print(f"  저장: {filename.name}")
 
         # 통합 저장 (비교용)
         combined = {
             'date': date,
             'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'strategies': {sid: r.to_dict() for sid, r in results.items()}
+            'strategies': enriched,
         }
         combined_file = DATA_DIR / f"candidates_{date}_all.json"
         with open(combined_file, 'w', encoding='utf-8') as f:
