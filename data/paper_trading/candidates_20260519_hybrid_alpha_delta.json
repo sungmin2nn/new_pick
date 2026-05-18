@@ -1,0 +1,186 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260515",
+  "selected_at": "2026-05-18 20:49:41",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "001740",
+      "name": "SK네트웍스",
+      "price": 8720,
+      "change_pct": 10.38,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 89.9,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 70864974,
+      "trading_value": 620545686015,
+      "themes": [
+        {
+          "code": "514",
+          "name": "전기차(충전소/충전기)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "481",
+          "name": "마켓컬리(kurly)"
+        }
+      ]
+    },
+    {
+      "code": "001800",
+      "name": "오리온홀딩스",
+      "price": 28300,
+      "change_pct": 14.11,
+      "score": 51.5,
+      "score_detail": {
+        "alpha_score": 71.2,
+        "delta_score": 0.0,
+        "alpha_norm": 79.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 51.5,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1713856,
+      "trading_value": 48487913825,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        }
+      ]
+    },
+    {
+      "code": "071200",
+      "name": "인피니트헬스케어",
+      "price": 7700,
+      "change_pct": 14.58,
+      "score": 50.8,
+      "score_detail": {
+        "alpha_score": 70.3,
+        "delta_score": 0.0,
+        "alpha_norm": 78.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 50.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 788974,
+      "trading_value": 6168568375,
+      "themes": [
+        {
+          "code": "149",
+          "name": "원격진료/비대면진료(U-Healthcare)"
+        },
+        {
+          "code": "311",
+          "name": "고령화 사회(노인복지)"
+        }
+      ]
+    },
+    {
+      "code": "443060",
+      "name": "HD현대마린솔루션",
+      "price": 215500,
+      "change_pct": -2.93,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 95.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 9661610630000,
+      "volume": 394222,
+      "trading_value": 85733183500,
+      "themes": [
+        {
+          "code": "94",
+          "name": "조선기자재"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        }
+      ]
+    },
+    {
+      "code": "352820",
+      "name": "하이브",
+      "price": 244000,
+      "change_pct": -1.21,
+      "score": 22.5,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 61.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 64.3,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 22.5,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 10516948756000,
+      "volume": 385955,
+      "trading_value": 96142844250,
+      "themes": [
+        {
+          "code": "98",
+          "name": "음원/음반"
+        },
+        {
+          "code": "128",
+          "name": "엔터테인먼트"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
