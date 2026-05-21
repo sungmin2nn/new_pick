@@ -129,6 +129,19 @@
       "overall_avg_change_err": 0.0,
       "n_real_missing": 0,
       "n_duplicates": 1
+    },
+    {
+      "date": "20260521",
+      "reference_date": "20260520",
+      "n_teams": 3,
+      "total_picks": 10,
+      "total_shortfall": 5,
+      "shortfall_rate_pct": 33.3,
+      "avg_team_avg_score": 67.4,
+      "overall_avg_price_err_pct": 0.0,
+      "overall_avg_change_err": 0.0,
+      "n_real_missing": 0,
+      "n_duplicates": 0
     }
   ],
   "alerts": [
@@ -161,6 +174,12 @@
       "severity": "warn",
       "code": "W_STALE_CHANGE",
       "message": "등락률 오차 1.048%p > 0.5%p"
+    },
+    {
+      "date": "20260521",
+      "severity": "warn",
+      "code": "W_SELECTION_SHORTFALL",
+      "message": "선정 부족율 33.3% > 30%"
     }
   ],
   "thresholds": {
@@ -171,11 +190,11 @@
   },
   "rolling_5d": {
     "days": 5,
-    "shortfall_rate_pct_avg": 0.0,
-    "avg_score_avg": 63.1,
+    "shortfall_rate_pct_avg": 6.7,
+    "avg_score_avg": 61.8,
     "price_err_pct_avg": 0.0,
-    "first_date": "20260514",
-    "last_date": "20260520"
+    "first_date": "20260515",
+    "last_date": "20260521"
   },
-  "last_updated": "2026-05-20T20:20:23.534494+09:00"
+  "last_updated": "2026-05-21T20:40:29.969873+09:00"
 }
