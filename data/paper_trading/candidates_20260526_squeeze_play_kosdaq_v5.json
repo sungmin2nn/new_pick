@@ -1,0 +1,75 @@
+{
+  "strategy_id": "squeeze_play_kosdaq_v5",
+  "strategy_name": "스퀴즈 플레이 KOSDAQ v5",
+  "date": "20260521",
+  "selected_at": "2026-05-22 20:26:48",
+  "count": 2,
+  "candidates": [
+    {
+      "code": "086900",
+      "name": "메디톡스",
+      "price": 97400,
+      "change_pct": 0.1,
+      "score": 31.29,
+      "score_detail": {
+        "percent_b": 0.035,
+        "spread_pct": 13.2,
+        "ma200_rising": false,
+        "is_positive_candle": true,
+        "recommended_holding_days": 5,
+        "variant_id": "squeeze_play_kosdaq_v5"
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 41933,
+      "trading_value": 4139015950,
+      "themes": [
+        {
+          "code": "397",
+          "name": "보톡스(보툴리눔톡신)"
+        }
+      ]
+    },
+    {
+      "code": "192820",
+      "name": "코스맥스",
+      "price": 176500,
+      "change_pct": 0.86,
+      "score": 30.51,
+      "score_detail": {
+        "percent_b": 0.1162,
+        "spread_pct": 4.3,
+        "ma200_rising": false,
+        "is_positive_candle": true,
+        "recommended_holding_days": 5,
+        "variant_id": "squeeze_play_kosdaq_v5"
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 72017,
+      "trading_value": 0,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "universe_market": "KOSDAQ",
+    "universe_size": 35,
+    "ma200_filter": false,
+    "squeeze_filter": true,
+    "squeeze_max_spread_pct": 15.0,
+    "bb_period": 20,
+    "percent_b_max": 0.2,
+    "ma200_period": 200,
+    "recommended_holding_days": 5
+  },
+  "simulation": null
+}
