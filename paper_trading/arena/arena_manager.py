@@ -181,11 +181,13 @@ class ArenaManager:
                 # 전략 고유 손절 파라미터가 있으면 적용
                 strategy_cls = StrategyRegistry.get(strategy_id)
                 strategy_loss = getattr(strategy_cls, 'LOSS_TARGET', None) if strategy_cls else None
+                strategy_exit_deadline = TEAM_CONFIGS.get(team_id, {}).get('exit_deadline')
                 simulator = TradingSimulator(
                     capital=int(team.portfolio.current_capital),
                     strategy_id=strategy_id,
                     strategy_name=team.team_name,
                     loss_target=strategy_loss,
+                    exit_deadline=strategy_exit_deadline,
                 )
 
                 # Candidate → StockCandidate 변환

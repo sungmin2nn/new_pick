@@ -155,19 +155,21 @@
       "top_n": 5
     },
     "foreign_flow_momentum": {
-      "enabled": false,
-      "status": "pending",
+      "enabled": true,
+      "status": "active",
       "source": "lab",
       "module_path": "strategies.foreign_flow_momentum",
       "class_name": "ForeignFlowMomentumStrategy",
-      "team_id": null,
+      "team_id": "team_k",
       "team_name": "Iota Flow",
       "emoji": "💎",
-      "description": "외국인 수급 모멘텀",
+      "description": "외국인 수급 모멘텀 (paper 검증)",
       "category": "flow",
       "risk_level": "medium",
       "initial_capital": 10000000,
-      "activated_at": null,
+      "activated_at": "2026-05-21",
+      "activation_reason": "backward N=20 WR 5%·avg -2.67% 약한 음 신호이나 paper 검증 누적 결정. 시뮬레이션 환경 — 자본 위험 0. 1개월 누적 후 7월 초 재평가.",
+      "exit_deadline": "14:50",
       "top_n": 5
     },
     "turtle_breakout_short": {
@@ -205,19 +207,21 @@
       "top_n": 5
     },
     "opening_30min_volume_burst": {
-      "enabled": false,
-      "status": "pending",
+      "enabled": true,
+      "status": "active",
       "source": "lab",
       "module_path": "strategies.opening_30min_volume_burst",
       "class_name": "Opening30MinVolumeBurstStrategy",
-      "team_id": null,
+      "team_id": "team_j",
       "team_name": "Mu Burst",
       "emoji": "💥",
-      "description": "개장 30분 거래대금 폭발",
+      "description": "개장 30분 거래대금 폭발 (paper 검증)",
       "category": "breakout",
       "risk_level": "high",
       "initial_capital": 10000000,
-      "activated_at": null,
+      "activated_at": "2026-05-21",
+      "activation_reason": "backward N=20 WR 30%·avg -0.98% 부분 충족. Concretum 백서·Yang&Lim KOSPI 학술 근거 + 한국 시초 갭 메커니즘 정합. paper 검증 누적 1개월 후 재평가. 갭 필터(전일 +25% 종목 제외) + 14:50 강제마감 적용.",
+      "exit_deadline": "14:50",
       "top_n": 5
     },
     "news_catalyst_timing": {
@@ -286,8 +290,6 @@
     }
   },
   "team_id_pool": [
-    "team_j",
-    "team_k",
     "team_l",
     "team_m",
     "team_n",

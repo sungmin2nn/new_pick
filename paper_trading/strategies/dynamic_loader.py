@@ -166,6 +166,7 @@ def get_enabled_team_configs(config: Optional[dict] = None) -> dict:
             "strategy_id": strategy_id,
             "emoji": entry.get("emoji", "⚪"),
             "description": entry.get("description", ""),
+            "exit_deadline": entry.get("exit_deadline"),
         }
 
     return team_configs

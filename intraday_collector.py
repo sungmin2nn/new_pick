@@ -20,17 +20,90 @@ class IntradayCollector:
             'Referer': 'https://finance.naver.com/'
         })
 
-    def get_minute_data(self, stock_code, date_str, freq='1'):
+    def _fetch_naver_minute_ohlc(self, stock_code, date_str):
         """
-        분봉 데이터 수집 (KIS 1차 + 네이버 폴백)
+        새 네이버 분봉 OHLC endpoint (api.stock.naver.com).
 
-        ISSUE-014 fix (2026-05-09): KIS API 도입으로 historical 30일 분봉 가능.
-        - 1차: KIS API (KIS_APP_KEY 환경변수 있으면, historical 지원)
-        - 2차: 네이버 (당일만, KIS 실패 또는 키 없을 때)
+        ISSUE-NAVER-OHLC fix (2026-05-20): 기존 sise_time endpoint는 체결가만 제공해
+        OHLC가 동일하게 설정 → wick 기반 SL/TP 트리거 불가 → 시뮬 아티팩트 (5/5 균일).
+        새 endpoint는 실제 OHLC를 JSON 배열로 제공. KIS 키 없이도 작동.
 
         Args:
             stock_code: 종목코드 (6자리)
-            date_str: 날짜 (YYYYMMDD) - KIS는 historical, 네이버는 당일만
+            date_str: 날짜 (YYYYMMDD). 해당 일자로 시작하는 localDateTime만 필터링.
+
+        Returns:
+            [{'time':'HH:MM:SS', 'open':int, 'high':int, 'low':int, 'close':int, 'volume':int}, ...]
+            데이터 없거나 실패 시 [].
+        """
+        try:
+            url = (
+                f"https://api.stock.naver.com/chart/domestic/item/{stock_code}"
+                f"/minute?timeframe=1&count=400"
+            )
+            response = self.session.get(url, timeout=10)
+            response.raise_for_status()
+            payload = response.json()
+
+            if not isinstance(payload, list) or not payload:
+                print(f"    ⚠️  {stock_code} 새 endpoint 빈 응답")
+                return []
+
+            minute_data = []
+            for item in payload:
+                ldt = item.get('localDateTime', '')
+                if not ldt or not ldt.startswith(date_str):
+                    continue
+                # ldt format: "YYYYMMDDHHMMSS"
+                if len(ldt) < 14:
+                    continue
+                hh = ldt[8:10]
+                mm = ldt[10:12]
+                ss = ldt[12:14]
+
+                try:
+                    close_price = int(round(float(item.get('currentPrice', 0))))
+                    open_price = int(round(float(item.get('openPrice', close_price))))
+                    high_price = int(round(float(item.get('highPrice', close_price))))
+                    low_price = int(round(float(item.get('lowPrice', close_price))))
+                    volume = int(item.get('accumulatedTradingVolume', 0) or 0)
+                except (ValueError, TypeError):
+                    continue
+
+                if close_price <= 0:
+                    continue
+
+                minute_data.append({
+                    'time': f"{hh}:{mm}:{ss}",
+                    'open': open_price,
+                    'high': high_price,
+                    'low': low_price,
+                    'close': close_price,
+                    'volume': volume,
+                })
+
+            minute_data.sort(key=lambda x: x['time'])
+            return minute_data
+
+        except Exception as e:
+            print(f"    ⚠️  {stock_code} 새 endpoint fetch 실패: {e}")
+            return []
+
+    def get_minute_data(self, stock_code, date_str, freq='1'):
+        """
+        분봉 데이터 수집 (KIS 1차 + 네이버 OHLC 2차 + 네이버 체결가 3차 폴백)
+
+        ISSUE-014 fix (2026-05-09): KIS API 도입으로 historical 30일 분봉 가능.
+        ISSUE-NAVER-OHLC fix (2026-05-20): 네이버 새 OHLC endpoint 추가, 기존 sise_time은
+        체결가만 제공해 wick 트리거 불가 아티팩트 → 폴백 순위 강등.
+
+        - 1차: KIS API (KIS_APP_KEY 환경변수 있으면, historical 30일)
+        - 2차: 네이버 OHLC API (api.stock.naver.com, 당일+근접일, 진짜 OHLC)
+        - 3차: 네이버 sise_time (체결가만, OHLC=close, 호환성 유지용)
+
+        Args:
+            stock_code: 종목코드 (6자리)
+            date_str: 날짜 (YYYYMMDD) - KIS는 historical, 네이버는 당일/근접일만
             freq: 분봉 간격 ('1') - 1분봉만 지원
 
         Returns:
@@ -45,13 +118,20 @@ class IntradayCollector:
             if bars:
                 print(f"  📊 {stock_code} 분봉 {len(bars)}건 (KIS API, date={date_str})")
                 return bars
-            print(f"  📊 {stock_code} KIS 분봉 빈 응답 → 네이버 폴백")
+            print(f"  📊 {stock_code} KIS 분봉 빈 응답 → 네이버 OHLC 폴백")
         except (ValueError, ImportError):
             pass  # KIS 키 없거나 모듈 없음 → 네이버 폴백 조용히
         except Exception as e:
-            print(f"  ⚠️  KIS 분봉 fetch 실패, 네이버 폴백: {e}")
+            print(f"  ⚠️  KIS 분봉 fetch 실패, 네이버 OHLC 폴백: {e}")
 
-        # 2차: 네이버 (당일만)
+        # 2차: 네이버 OHLC API (api.stock.naver.com)
+        bars = self._fetch_naver_minute_ohlc(stock_code, date_str)
+        if bars:
+            print(f"  📊 {stock_code} 분봉 {len(bars)}건 (Naver OHLC API, date={date_str})")
+            return bars
+        print(f"  📊 {stock_code} 네이버 OHLC 빈 응답 → 네이버 sise_time 폴백")
+
+        # 3차: 네이버 sise_time (당일만, 체결가만 — OHLC 동일)
         try:
             print(f"  📊 {stock_code} 분봉 데이터 수집 중... (Naver Finance)")
 

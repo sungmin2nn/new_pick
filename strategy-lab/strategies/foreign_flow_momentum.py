@@ -115,6 +115,8 @@ class ForeignFlowMomentumStrategy(BaseStrategy):
     MIN_MARKET_CAP: int = 200_000_000_000   # 2000억
     MIN_TRADING_VALUE: int = 10_000_000_000  # 100억
     MIN_CHANGE_PCT: float = 0.0      # 음봉 제외
+    MAX_CHANGE_PCT: float = 25.0     # 갭 필터 — 상한가 익일 갭다운 함정 회피
+                                     # (5/19 케이피항공 +29.93% → 5/20 -19.7%)
 
     WEIGHTS = {
         "foreign_consistency": 35,   # 연속 순매수 일수
@@ -161,6 +163,11 @@ class ForeignFlowMomentumStrategy(BaseStrategy):
             min_trading_value=self.MIN_TRADING_VALUE,
         )
         filtered = [s for s in filtered if s["change_pct"] >= self.MIN_CHANGE_PCT]
+        # 갭 필터: 상한가 익일 갭다운 함정 회피 (T-1 +25%↑ 종목 제외)
+        before_gap = len(filtered)
+        filtered = [s for s in filtered if s["change_pct"] < self.MAX_CHANGE_PCT]
+        if before_gap != len(filtered):
+            print(f"  갭 필터: {before_gap}개 → {len(filtered)}개 (전일 +{self.MAX_CHANGE_PCT}%↑ 제외)")
         print(f"  기본 필터 통과: {len(filtered)}개")
 
         # 3. 시총 상위 풀로 좁힘 (수급 fetch 비용 ↓)

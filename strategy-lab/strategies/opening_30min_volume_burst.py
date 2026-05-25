@@ -114,6 +114,8 @@ class Opening30MinVolumeBurstStrategy(BaseStrategy):
     # 파라미터
     VALUE_SURGE_MIN: float = 3.0           # 거래대금 5일 평균 대비 3배 이상
     PRICE_UP_MIN_PCT: float = 1.5          # 양봉 최소 1.5%
+    MAX_CHANGE_PCT: float = 25.0           # 갭 필터 — 상한가 익일 갭다운 함정 회피
+                                           # (5/19 케이피항공 +29.93% → 5/20 -19.7%)
     MIN_PRICE: int = 2000
     MIN_MARKET_CAP: int = 50_000_000_000   # 500억
     MIN_TRADING_VALUE: int = 5_000_000_000  # 50억
@@ -152,6 +154,11 @@ class Opening30MinVolumeBurstStrategy(BaseStrategy):
             min_trading_value=self.MIN_TRADING_VALUE,
         )
         filtered = [s for s in filtered if s["change_pct"] >= self.PRICE_UP_MIN_PCT]
+        # 갭 필터: 상한가 익일 갭다운 함정 회피 (T-1 +25%↑ 종목 제외)
+        before_gap = len(filtered)
+        filtered = [s for s in filtered if s["change_pct"] < self.MAX_CHANGE_PCT]
+        if before_gap != len(filtered):
+            print(f"  갭 필터: {before_gap}개 → {len(filtered)}개 (전일 +{self.MAX_CHANGE_PCT}%↑ 제외)")
         print(f"  1차 필터: {len(filtered)}개")
 
         if not filtered:

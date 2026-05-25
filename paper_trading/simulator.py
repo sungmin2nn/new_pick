@@ -111,7 +111,8 @@ class TradingSimulator:
 
     def __init__(self, capital: int = None, strategy_id: str = None, strategy_name: str = None,
                  loss_target: float = None, trailing_enabled: bool = None,
-                 entry_mode: str = None, holding_days: int = 1):
+                 entry_mode: str = None, holding_days: int = 1,
+                 exit_deadline: str = None):
         self.capital = capital or self.INITIAL_CAPITAL
         self.results: List[TradeResult] = []
         self.trade_date: str = ""
@@ -121,6 +122,8 @@ class TradingSimulator:
             self.LOSS_TARGET = loss_target
         if trailing_enabled is not None:
             self.TRAILING_ENABLED = trailing_enabled
+        if exit_deadline is not None:
+            self.EXIT_DEADLINE = exit_deadline
         # 진입 모드: open(default) | confirm_0930
         self.entry_mode = entry_mode or self.ENTRY_MODE_OPEN
 
@@ -719,7 +722,7 @@ class TradingSimulator:
         elif hit_loss:
             return int(loss_p * slip_factor), 'loss', '09:30'
         else:
-            return close_p, 'close', '14:30'
+            return close_p, 'close', self.EXIT_DEADLINE
 
     def _print_summary(self):
         """결과 요약 출력"""

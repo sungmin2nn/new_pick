@@ -124,6 +124,16 @@ def run_all_strategies(date: str = None, top_n: int = 5, simulate: bool = False)
                 strategy_kwargs = {}
                 if strategy_id == 'theme_policy':
                     strategy_kwargs['entry_mode'] = 'confirm_0930'
+                # 전략별 exit_deadline 오버라이드 (strategy_config.json)
+                try:
+                    from paper_trading.strategies.dynamic_loader import load_config
+                    _cfg = load_config() or {}
+                    _entry = _cfg.get('strategies', {}).get(strategy_id, {})
+                    _exit_deadline = _entry.get('exit_deadline')
+                    if _exit_deadline:
+                        strategy_kwargs['exit_deadline'] = _exit_deadline
+                except Exception:
+                    pass
                 simulator = TradingSimulator(
                     strategy_id=strategy_id,
                     strategy_name=result.strategy_name,
