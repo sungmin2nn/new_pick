@@ -1,0 +1,202 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260526",
+  "selected_at": "2026-05-27 20:10:13",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "042660",
+      "name": "한화오션",
+      "price": 134700,
+      "change_pct": 10.23,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 81.4,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 4650970,
+      "trading_value": 620757909450,
+      "themes": [
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    },
+    {
+      "code": "403870",
+      "name": "HPSP",
+      "price": 60100,
+      "change_pct": 9.87,
+      "score": 58.7,
+      "score_detail": {
+        "alpha_score": 73.5,
+        "delta_score": 0.0,
+        "alpha_norm": 90.3,
+        "delta_norm": 0.0,
+        "alpha_weighted": 58.7,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 7530145,
+      "trading_value": 474518406000,
+      "themes": [
+        {
+          "code": "545",
+          "name": "온디바이스 AI"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "069540",
+      "name": "빛과전자",
+      "price": 6990,
+      "change_pct": 5.75,
+      "score": 57.8,
+      "score_detail": {
+        "alpha_score": 72.4,
+        "delta_score": 0.0,
+        "alpha_norm": 88.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 57.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 68621945,
+      "trading_value": 495559284130,
+      "themes": [
+        {
+          "code": "586",
+          "name": "광통신(광케이블/광섬유 등)"
+        },
+        {
+          "code": "373",
+          "name": "5G(5세대 이동통신)"
+        },
+        {
+          "code": "92",
+          "name": "통신장비"
+        }
+      ]
+    },
+    {
+      "code": "010140",
+      "name": "삼성중공업",
+      "price": 30450,
+      "change_pct": 3.22,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 66.3,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 26796000000000,
+      "volume": 5655369,
+      "trading_value": 171437797550,
+      "themes": [
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    },
+    {
+      "code": "267250",
+      "name": "HD현대",
+      "price": 289500,
+      "change_pct": 2.66,
+      "score": 33.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 62.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 94.4,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 22868498107500,
+      "volume": 165135,
+      "trading_value": 47811797500,
+      "themes": [
+        {
+          "code": "600",
+          "name": "주유소"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
