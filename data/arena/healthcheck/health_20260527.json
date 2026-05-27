@@ -197,29 +197,29 @@
   },
   {
     "date": "20260527",
-    "checked_at": "2026-05-27 20:40:42",
+    "checked_at": "2026-05-27 20:58:36",
     "status": "unhealthy",
     "checks": [
       {
         "check_type": "workflow_files",
         "workflow": "paper-trading-select",
         "description": "장전 종목 선정",
-        "status": "pass",
-        "details": "모든 파일 정상"
+        "status": "fail",
+        "details": "파일 미생성: candidates_20260527_all.json"
       },
       {
         "check_type": "workflow_files",
         "workflow": "paper-trading",
         "description": "장후 최종 결과",
-        "status": "fail",
-        "details": "파일 미생성: arena_report.json"
+        "status": "pass",
+        "details": "모든 파일 정상"
       },
       {
         "check_type": "workflow_files",
         "workflow": "paper-trading-check",
         "description": "장중 상태 체크",
-        "status": "pass",
-        "details": "모든 파일 정상"
+        "status": "fail",
+        "details": "파일 미생성: status_20260527.json"
       },
       {
         "check_type": "team_selections",
@@ -231,7 +231,7 @@
         "check_type": "arena_integrity",
         "description": "아레나 리포트 무결성",
         "status": "pass",
-        "details": "아레나 리포트 아직 생성 전"
+        "details": "5/5팀 정상 실행"
       },
       {
         "check_type": "portfolio_health",
@@ -244,10 +244,17 @@
     "issues": [
       {
         "check_type": "workflow_files",
-        "workflow": "paper-trading",
-        "description": "장후 최종 결과",
+        "workflow": "paper-trading-select",
+        "description": "장전 종목 선정",
         "status": "fail",
-        "details": "파일 미생성: arena_report.json"
+        "details": "파일 미생성: candidates_20260527_all.json"
+      },
+      {
+        "check_type": "workflow_files",
+        "workflow": "paper-trading-check",
+        "description": "장중 상태 체크",
+        "status": "fail",
+        "details": "파일 미생성: status_20260527.json"
       }
     ]
   }
