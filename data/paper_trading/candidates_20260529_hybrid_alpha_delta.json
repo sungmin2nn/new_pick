@@ -1,0 +1,177 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260527",
+  "selected_at": "2026-05-28 20:37:44",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "001740",
+      "name": "SK네트웍스",
+      "price": 11380,
+      "change_pct": 4.21,
+      "score": 110.0,
+      "score_detail": {
+        "alpha_score": 74.9,
+        "delta_score": 73.6,
+        "alpha_norm": 100.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 71426962,
+      "trading_value": 904981982160,
+      "themes": [
+        {
+          "code": "514",
+          "name": "전기차(충전소/충전기)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "481",
+          "name": "마켓컬리(kurly)"
+        }
+      ]
+    },
+    {
+      "code": "212710",
+      "name": "아이에스티이",
+      "price": 14070,
+      "change_pct": 14.95,
+      "score": 61.4,
+      "score_detail": {
+        "alpha_score": 70.8,
+        "delta_score": 0.0,
+        "alpha_norm": 94.5,
+        "delta_norm": 0.0,
+        "alpha_weighted": 61.4,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1699653,
+      "trading_value": 24597943665,
+      "themes": [
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        }
+      ]
+    },
+    {
+      "code": "055490",
+      "name": "테이팩스",
+      "price": 20600,
+      "change_pct": 12.88,
+      "score": 56.8,
+      "score_detail": {
+        "alpha_score": 65.5,
+        "delta_score": 0.0,
+        "alpha_norm": 87.4,
+        "delta_norm": 0.0,
+        "alpha_weighted": 56.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 554316,
+      "trading_value": 11939021650,
+      "themes": [
+        {
+          "code": "279",
+          "name": "스마트폰"
+        },
+        {
+          "code": "404",
+          "name": "폴더블폰"
+        }
+      ]
+    },
+    {
+      "code": "310210",
+      "name": "보로노이",
+      "price": 282000,
+      "change_pct": 3.3,
+      "score": 28.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 58.8,
+        "alpha_norm": 0.0,
+        "delta_norm": 79.9,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 28.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 5189412222000,
+      "volume": 130554,
+      "trading_value": 37025325250,
+      "themes": [
+        {
+          "code": "377",
+          "name": "치매"
+        }
+      ]
+    },
+    {
+      "code": "196170",
+      "name": "알테오젠",
+      "price": 386500,
+      "change_pct": 5.75,
+      "score": 24.1,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 50.7,
+        "alpha_norm": 0.0,
+        "delta_norm": 68.9,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 24.1,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 20711121569500,
+      "volume": 948649,
+      "trading_value": 363264035500
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
