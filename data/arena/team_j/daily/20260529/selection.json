@@ -1,0 +1,109 @@
+{
+  "strategy_id": "opening_30min_volume_burst",
+  "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+  "date": "20260528",
+  "selected_at": "2026-05-29 20:26:37",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "000220",
+      "name": "유유제약",
+      "price": 4160,
+      "change_pct": 9.19,
+      "score": 67.34,
+      "score_detail": {
+        "volume_surge": 45.0,
+        "price_momentum": 11.45,
+        "absolute_value": 0.89,
+        "price_level": 10
+      },
+      "rank": 1,
+      "market_cap": 70854580160,
+      "volume": 10303981,
+      "trading_value": 47397358879
+    },
+    {
+      "code": "001820",
+      "name": "삼화콘덴서",
+      "price": 156200,
+      "change_pct": 24.07,
+      "score": 50.66,
+      "score_detail": {
+        "volume_surge": 0.66,
+        "price_momentum": 30.0,
+        "absolute_value": 15.0,
+        "price_level": 5.0
+      },
+      "rank": 2,
+      "market_cap": 1623699000000,
+      "volume": 5450028,
+      "trading_value": 801140797650
+    },
+    {
+      "code": "006660",
+      "name": "삼성공조",
+      "price": 17170,
+      "change_pct": 10.63,
+      "score": 39.33,
+      "score_detail": {
+        "volume_surge": 11.18,
+        "price_momentum": 13.25,
+        "absolute_value": 4.9,
+        "price_level": 10
+      },
+      "rank": 3,
+      "market_cap": 139528811380,
+      "volume": 14486465,
+      "trading_value": 261610084310
+    },
+    {
+      "code": "417010",
+      "name": "나노팀",
+      "price": 14650,
+      "change_pct": 16.64,
+      "score": 38.5,
+      "score_detail": {
+        "volume_surge": 2.35,
+        "price_momentum": 20.74,
+        "absolute_value": 5.42,
+        "price_level": 10
+      },
+      "rank": 4,
+      "market_cap": 295530465200,
+      "volume": 19810696,
+      "trading_value": 289246262740
+    },
+    {
+      "code": "373220",
+      "name": "LG에너지솔루션",
+      "price": 442000,
+      "change_pct": 15.25,
+      "score": 38.43,
+      "score_detail": {
+        "volume_surge": 0.96,
+        "price_momentum": 19.01,
+        "absolute_value": 13.46,
+        "price_level": 5.0
+      },
+      "rank": 5,
+      "market_cap": 103428000000000,
+      "volume": 1665103,
+      "trading_value": 719000600250
+    }
+  ],
+  "params": {
+    "value_surge_min": 3.0,
+    "price_up_min_pct": 1.5,
+    "min_price": 2000,
+    "min_market_cap": 50000000000,
+    "min_trading_value": 5000000000,
+    "history_days": 7,
+    "weights": {
+      "volume_surge": 45,
+      "price_momentum": 30,
+      "absolute_value": 15,
+      "price_level": 10
+    }
+  },
+  "simulation": null
+}
