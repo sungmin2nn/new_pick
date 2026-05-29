@@ -1,6 +1,8 @@
-# news-trading-bot — 프로젝트 규칙
+# new_pick — 프로젝트 규칙
 
-> 이 파일은 news-trading-bot 작업 시 자동 로드된다. 전역 `~/Desktop/Claude/se/.claude/CLAUDE.md` 의 규칙 위에 추가로 적용.
+> 이 파일은 `sungmin2nn/new_pick` repo 작업 시 자동 로드된다. 전역 `~/Desktop/Claude/se/.claude/CLAUDE.md` 의 규칙 위에 추가로 적용.
+>
+> **계보 메모(2026-05-29 정정)**: 본 repo는 옛 `news-trading-bot` 프로젝트에서 갈라져 나온 현행 신호 생성 repo다. news-trade-runner(NTR)의 실 신호 소스 = 본 repo의 `data/paper_trading/candidates_YYYYMMDD_all.json` (구 news-trading-bot `signals_*.json` 아님). news-trading-bot은 별도 GitHub Actions 페이퍼 봇으로 아직 살아있으나 현재 어떤 운영 코드도 소비하지 않는 고아 상태.
 
 ---
 
