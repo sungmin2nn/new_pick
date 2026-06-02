@@ -1,0 +1,108 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260601",
+  "selected_at": "2026-06-02 20:58:17",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "032820",
+      "name": "우리기술",
+      "price": 15540,
+      "change_pct": 2.17,
+      "score": 75.87,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 6.06,
+        "trading_value": 4.81
+      },
+      "rank": 1,
+      "market_cap": 2666744590440,
+      "volume": 6410617,
+      "trading_value": 100571288205
+    },
+    {
+      "code": "064350",
+      "name": "현대로템",
+      "price": 213000,
+      "change_pct": 6.23,
+      "score": 71.07,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 9.0,
+        "price_momentum": 17.4,
+        "trading_value": 9.67
+      },
+      "rank": 2,
+      "market_cap": 23247308409000,
+      "volume": 935835,
+      "trading_value": 202023273600
+    },
+    {
+      "code": "090710",
+      "name": "휴림로봇",
+      "price": 11170,
+      "change_pct": 6.99,
+      "score": 68.84,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 6.28,
+        "price_momentum": 19.53,
+        "trading_value": 8.03
+      },
+      "rank": 3,
+      "market_cap": 1334336890490,
+      "volume": 14654561,
+      "trading_value": 167860686540
+    },
+    {
+      "code": "006260",
+      "name": "LS",
+      "price": 466000,
+      "change_pct": 4.48,
+      "score": 58.97,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 3.32,
+        "price_momentum": 12.51,
+        "trading_value": 8.14
+      },
+      "rank": 4,
+      "market_cap": 14539200000000,
+      "volume": 363149,
+      "trading_value": 169987005500
+    },
+    {
+      "code": "080220",
+      "name": "제주반도체",
+      "price": 98500,
+      "change_pct": 0.72,
+      "score": 57.29,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 5.28,
+        "price_momentum": 2.01,
+        "trading_value": 15.0
+      },
+      "rank": 5,
+      "market_cap": 3392619050500,
+      "volume": 3176301,
+      "trading_value": 313422062650
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}

@@ -1,0 +1,109 @@
+{
+  "strategy_id": "opening_30min_volume_burst",
+  "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+  "date": "20260601",
+  "selected_at": "2026-06-02 20:58:19",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "022100",
+      "name": "포스코DX",
+      "price": 38700,
+      "change_pct": 19.26,
+      "score": 80.59,
+      "score_detail": {
+        "volume_surge": 45.0,
+        "price_momentum": 24.42,
+        "absolute_value": 1.17,
+        "price_level": 10
+      },
+      "rank": 1,
+      "market_cap": 5883744012300,
+      "volume": 8244487,
+      "trading_value": 312063463400
+    },
+    {
+      "code": "455900",
+      "name": "엔젤로보틱스",
+      "price": 31600,
+      "change_pct": 22.01,
+      "score": 78.97,
+      "score_detail": {
+        "volume_surge": 40.94,
+        "price_momentum": 27.91,
+        "absolute_value": 0.12,
+        "price_level": 10
+      },
+      "rank": 2,
+      "market_cap": 483537859600,
+      "volume": 1008729,
+      "trading_value": 30913715625
+    },
+    {
+      "code": "377480",
+      "name": "마음AI",
+      "price": 14630,
+      "change_pct": 9.92,
+      "score": 60.05,
+      "score_detail": {
+        "volume_surge": 37.39,
+        "price_momentum": 12.58,
+        "absolute_value": 0.07,
+        "price_level": 10
+      },
+      "rank": 3,
+      "market_cap": 104023323250,
+      "volume": 1276340,
+      "trading_value": 19577951660
+    },
+    {
+      "code": "035420",
+      "name": "NAVER",
+      "price": 271500,
+      "change_pct": 16.03,
+      "score": 59.64,
+      "score_detail": {
+        "volume_surge": 19.32,
+        "price_momentum": 20.33,
+        "absolute_value": 15.0,
+        "price_level": 5.0
+      },
+      "rank": 4,
+      "market_cap": 42591230184000,
+      "volume": 14505895,
+      "trading_value": 3994657114250
+    },
+    {
+      "code": "108490",
+      "name": "로보티즈",
+      "price": 402500,
+      "change_pct": 23.66,
+      "score": 57.27,
+      "score_detail": {
+        "volume_surge": 20.21,
+        "price_momentum": 30.0,
+        "absolute_value": 2.06,
+        "price_level": 5.0
+      },
+      "rank": 5,
+      "market_cap": 5899453770000,
+      "volume": 1380451,
+      "trading_value": 549630450000
+    }
+  ],
+  "params": {
+    "value_surge_min": 3.0,
+    "price_up_min_pct": 1.5,
+    "min_price": 2000,
+    "min_market_cap": 50000000000,
+    "min_trading_value": 5000000000,
+    "history_days": 7,
+    "weights": {
+      "volume_surge": 45,
+      "price_momentum": 30,
+      "absolute_value": 15,
+      "price_level": 10
+    }
+  },
+  "simulation": null
+}

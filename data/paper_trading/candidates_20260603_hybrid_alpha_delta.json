@@ -1,0 +1,215 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260601",
+  "selected_at": "2026-06-02 21:01:47",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "128940",
+      "name": "한미약품",
+      "price": 539000,
+      "change_pct": 9.78,
+      "score": 91.2,
+      "score_detail": {
+        "alpha_score": 69.9,
+        "delta_score": 56.7,
+        "alpha_norm": 78.5,
+        "delta_norm": 86.2,
+        "alpha_weighted": 51.0,
+        "delta_weighted": 30.2,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 716871,
+      "trading_value": 385926972500,
+      "themes": [
+        {
+          "code": "266",
+          "name": "겨울"
+        },
+        {
+          "code": "108",
+          "name": "백신/진단시약/방역(신종플루, AI 등)"
+        },
+        {
+          "code": "172",
+          "name": "제약업체"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "011790",
+      "name": "SKC",
+      "price": 156500,
+      "change_pct": 12.35,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 89.1,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 3991380,
+      "trading_value": 666164240150,
+      "themes": [
+        {
+          "code": "382",
+          "name": "플렉서블 디스플레이"
+        },
+        {
+          "code": "404",
+          "name": "폴더블폰"
+        },
+        {
+          "code": "227",
+          "name": "전기차"
+        }
+      ]
+    },
+    {
+      "code": "001040",
+      "name": "CJ",
+      "price": 183000,
+      "change_pct": 13.17,
+      "score": 47.2,
+      "score_detail": {
+        "alpha_score": 64.7,
+        "delta_score": 0.0,
+        "alpha_norm": 72.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 47.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 437749,
+      "trading_value": 77391135300,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        }
+      ]
+    },
+    {
+      "code": "489790",
+      "name": "한화비전",
+      "price": 70800,
+      "change_pct": 5.51,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 65.8,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 3574578012000,
+      "volume": 1016619,
+      "trading_value": 72691010150,
+      "themes": [
+        {
+          "code": "28",
+          "name": "CCTV＆DVR"
+        },
+        {
+          "code": "234",
+          "name": "보안주(물리)"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "536",
+          "name": "HBM(고대역폭메모리)"
+        }
+      ]
+    },
+    {
+      "code": "001440",
+      "name": "대한전선",
+      "price": 47600,
+      "change_pct": 4.73,
+      "score": 33.4,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 62.8,
+        "alpha_norm": 0.0,
+        "delta_norm": 95.4,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.4,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 9329247569600,
+      "volume": 7291360,
+      "trading_value": 347646334225,
+      "themes": [
+        {
+          "code": "178",
+          "name": "전선"
+        },
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}

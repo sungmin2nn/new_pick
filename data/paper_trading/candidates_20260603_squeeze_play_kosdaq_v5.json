@@ -1,0 +1,54 @@
+{
+  "strategy_id": "squeeze_play_kosdaq_v5",
+  "strategy_name": "스퀴즈 플레이 KOSDAQ v5",
+  "date": "20260601",
+  "selected_at": "2026-06-02 21:16:27",
+  "count": 1,
+  "candidates": [
+    {
+      "code": "060280",
+      "name": "큐렉소",
+      "price": 11800,
+      "change_pct": 2.25,
+      "score": 26.55,
+      "score_detail": {
+        "percent_b": 0.1733,
+        "spread_pct": 6.64,
+        "ma200_rising": true,
+        "is_positive_candle": true,
+        "recommended_holding_days": 5,
+        "variant_id": "squeeze_play_kosdaq_v5"
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 464312,
+      "trading_value": 5472793000,
+      "themes": [
+        {
+          "code": "99",
+          "name": "지능형로봇/인공지능(AI)"
+        },
+        {
+          "code": "175",
+          "name": "의료기기"
+        },
+        {
+          "code": "311",
+          "name": "고령화 사회(노인복지)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "universe_market": "KOSDAQ",
+    "universe_size": 35,
+    "ma200_filter": false,
+    "squeeze_filter": true,
+    "squeeze_max_spread_pct": 15.0,
+    "bb_period": 20,
+    "percent_b_max": 0.2,
+    "ma200_period": 200,
+    "recommended_holding_days": 5
+  },
+  "simulation": null
+}
