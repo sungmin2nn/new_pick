@@ -14,7 +14,10 @@ _HOLIDAYS_CACHE_DIR = Path(__file__).parent / 'data' / 'holidays_cache'
 _HOLIDAYS_MEMORY_CACHE: dict = {}  # {year: set('MM-DD')}
 _HOLIDAYS_REMOTE_URL = 'https://raw.githubusercontent.com/hyunbinseo/holidays-kr/main/public/{year}.json'
 # 정부 공휴일이지만 KRX는 영업하는 날 (이름 부분일치). 추가 시 효과 즉시 반영
-_KRX_OPEN_HOLIDAY_KEYWORDS = ('제헌절', '선거')
+# '선거' 제거(2026-06-03): 전국단위 선거일(대선·총선·전국동시지방선거)은 공휴일=KRX 휴장
+# (2022 대선·지방선거, 2024 총선, 2026-06-03 지방선거 모두 휴장). holidays-kr는 공휴일만
+# 싣는 데이터셋이라 거기 뜨는 선거일=휴장 → 영업일 오판 버그였음(news-trade-runner #1과 동일).
+_KRX_OPEN_HOLIDAY_KEYWORDS = ('제헌절',)
 
 # 한국 시간대 (UTC+9)
 KST = timezone(timedelta(hours=9))
@@ -140,7 +143,7 @@ def is_market_day(dt=None):
 
 
 def _is_krx_open_holiday(names):
-    """정부 공휴일이지만 KRX는 영업하는 날(제헌절·선거일 등)이면 True."""
+    """정부 공휴일이지만 KRX는 영업하는 날(제헌절 등)이면 True."""
     return any(
         any(kw in n for kw in _KRX_OPEN_HOLIDAY_KEYWORDS)
         for n in names
