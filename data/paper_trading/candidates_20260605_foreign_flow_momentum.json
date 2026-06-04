@@ -1,0 +1,194 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260602",
+  "selected_at": "2026-06-04 20:25:10",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "024110",
+      "name": "기업은행",
+      "price": 20350,
+      "change_pct": 1.5,
+      "score": 69.62,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 2.1,
+        "trading_value": 2.52
+      },
+      "rank": 1,
+      "market_cap": 16227616434150,
+      "volume": 1676754,
+      "trading_value": 33703536735,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        }
+      ]
+    },
+    {
+      "code": "007390",
+      "name": "네이처셀",
+      "price": 30750,
+      "change_pct": 12.64,
+      "score": 66.2,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 6.22,
+        "price_momentum": 17.69,
+        "trading_value": 7.29
+      },
+      "rank": 2,
+      "market_cap": 1981377972000,
+      "volume": 3229311,
+      "trading_value": 97542125700,
+      "themes": [
+        {
+          "code": "113",
+          "name": "음식료업종"
+        },
+        {
+          "code": "448",
+          "name": "코로나19(치료제/백신 개발 등)"
+        },
+        {
+          "code": "436",
+          "name": "코로나19(진단/치료제/백신 개발 등)"
+        },
+        {
+          "code": "66",
+          "name": "줄기세포"
+        },
+        {
+          "code": "377",
+          "name": "치매"
+        }
+      ]
+    },
+    {
+      "code": "031330",
+      "name": "에스에이엠티",
+      "price": 16270,
+      "change_pct": 10.68,
+      "score": 62.93,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 10.94,
+        "price_momentum": 14.95,
+        "trading_value": 2.04
+      },
+      "rank": 3,
+      "market_cap": 1626919740090,
+      "volume": 1790175,
+      "trading_value": 27271328305,
+      "themes": [
+        {
+          "code": "14",
+          "name": "반도체 재료/부품"
+        }
+      ]
+    },
+    {
+      "code": "105560",
+      "name": "KB금융",
+      "price": 156600,
+      "change_pct": 2.96,
+      "score": 62.34,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 8.19,
+        "price_momentum": 4.14,
+        "trading_value": 15.0
+      },
+      "rank": 4,
+      "market_cap": 58388381253000,
+      "volume": 1307922,
+      "trading_value": 200680652350,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "489",
+          "name": "카카오뱅크(kakao BANK)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "343",
+          "name": "인터넷은행"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "055550",
+      "name": "신한지주",
+      "price": 96400,
+      "change_pct": 4.1,
+      "score": 60.39,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 9.83,
+        "price_momentum": 5.74,
+        "trading_value": 9.82
+      },
+      "rank": 5,
+      "market_cap": 45756680400400,
+      "volume": 1391336,
+      "trading_value": 131358239600,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
