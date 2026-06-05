@@ -1,0 +1,65 @@
+{
+  "strategy_id": "squeeze_play_kosdaq_v5",
+  "strategy_name": "스퀴즈 플레이 KOSDAQ v5",
+  "date": "20260604",
+  "selected_at": "2026-06-05 20:50:08",
+  "count": 2,
+  "candidates": [
+    {
+      "code": "000250",
+      "name": "삼천당제약",
+      "price": 309500,
+      "change_pct": 5.63,
+      "score": 66.6,
+      "score_detail": {
+        "percent_b": 0.073,
+        "spread_pct": 0.62,
+        "ma200_rising": true,
+        "is_positive_candle": true,
+        "recommended_holding_days": 5,
+        "variant_id": "squeeze_play_kosdaq_v5"
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 246779,
+      "trading_value": 77071445750,
+      "themes": [
+        {
+          "code": "172",
+          "name": "제약업체"
+        }
+      ]
+    },
+    {
+      "code": "950140",
+      "name": "잉글우드랩",
+      "price": 9250,
+      "change_pct": 4.64,
+      "score": 31.78,
+      "score_detail": {
+        "percent_b": 0.1806,
+        "spread_pct": 14.45,
+        "ma200_rising": false,
+        "is_positive_candle": true,
+        "recommended_holding_days": 5,
+        "variant_id": "squeeze_play_kosdaq_v5"
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 9173,
+      "trading_value": 84259615
+    }
+  ],
+  "params": {
+    "universe_market": "KOSDAQ",
+    "universe_size": 35,
+    "ma200_filter": false,
+    "squeeze_filter": true,
+    "squeeze_max_spread_pct": 15.0,
+    "bb_period": 20,
+    "percent_b_max": 0.2,
+    "ma200_period": 200,
+    "recommended_holding_days": 5
+  },
+  "simulation": null
+}
