@@ -1,0 +1,109 @@
+{
+  "strategy_id": "opening_30min_volume_burst",
+  "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+  "date": "20260608",
+  "selected_at": "2026-06-09 20:11:54",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "003220",
+      "name": "대원제약",
+      "price": 12400,
+      "change_pct": 10.32,
+      "score": 75.33,
+      "score_detail": {
+        "volume_surge": 45.0,
+        "price_momentum": 13.6,
+        "absolute_value": 6.72,
+        "price_level": 10
+      },
+      "rank": 1,
+      "market_cap": 278102029200,
+      "volume": 3573508,
+      "trading_value": 45729727105
+    },
+    {
+      "code": "010690",
+      "name": "화신",
+      "price": 11490,
+      "change_pct": 22.76,
+      "score": 56.56,
+      "score_detail": {
+        "volume_surge": 8.6,
+        "price_momentum": 30.0,
+        "absolute_value": 7.95,
+        "price_level": 10
+      },
+      "rank": 2,
+      "market_cap": 401235510900,
+      "volume": 4955132,
+      "trading_value": 54101103405
+    },
+    {
+      "code": "388790",
+      "name": "라이콤",
+      "price": 6750,
+      "change_pct": 14.21,
+      "score": 46.0,
+      "score_detail": {
+        "volume_surge": 2.27,
+        "price_momentum": 18.73,
+        "absolute_value": 15.0,
+        "price_level": 10
+      },
+      "rank": 3,
+      "market_cap": 206645580000,
+      "volume": 15032462,
+      "trading_value": 102041812820
+    },
+    {
+      "code": "030960",
+      "name": "양지사",
+      "price": 5670,
+      "change_pct": 14.08,
+      "score": 41.99,
+      "score_detail": {
+        "volume_surge": 11.87,
+        "price_momentum": 18.56,
+        "absolute_value": 1.56,
+        "price_level": 10
+      },
+      "rank": 4,
+      "market_cap": 90606600000,
+      "volume": 1845889,
+      "trading_value": 10616171650
+    },
+    {
+      "code": "459550",
+      "name": "알트",
+      "price": 2020,
+      "change_pct": 7.56,
+      "score": 34.24,
+      "score_detail": {
+        "volume_surge": 11.02,
+        "price_momentum": 9.96,
+        "absolute_value": 8.26,
+        "price_level": 5.0
+      },
+      "rank": 5,
+      "market_cap": 50945937220,
+      "volume": 26365254,
+      "trading_value": 56158745897
+    }
+  ],
+  "params": {
+    "value_surge_min": 3.0,
+    "price_up_min_pct": 1.5,
+    "min_price": 2000,
+    "min_market_cap": 50000000000,
+    "min_trading_value": 5000000000,
+    "history_days": 7,
+    "weights": {
+      "volume_surge": 45,
+      "price_momentum": 30,
+      "absolute_value": 15,
+      "price_level": 10
+    }
+  },
+  "simulation": null
+}

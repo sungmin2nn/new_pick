@@ -1,0 +1,1363 @@
+{
+  "date": "20260610",
+  "generated_at": "2026-06-09 20:26:48",
+  "strategies": {
+    "largecap_contrarian": {
+      "strategy_id": "largecap_contrarian",
+      "strategy_name": "대형주 역추세",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:12:05",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "min_price": 5000,
+        "max_change": -3.0,
+        "min_trading_value": 50,
+        "min_market_cap": 1000000000000,
+        "kospi_drop_threshold": -2.0,
+        "entry_time": "09:30",
+        "weights": {
+          "market_cap": 30,
+          "change_pct": 25,
+          "trading_value": 20,
+          "price_level": 15,
+          "volatility": 10
+        }
+      },
+      "simulation": null
+    },
+    "momentum": {
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀 추세",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:12:13",
+      "count": 4,
+      "candidates": [
+        {
+          "code": "388790",
+          "name": "라이콤",
+          "price": 6750,
+          "change_pct": 14.21,
+          "score": 100.0,
+          "score_detail": {
+            "change_pct": 35.0,
+            "trading_value": 30.0,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 15032462,
+          "trading_value": 102041812820,
+          "themes": [
+            {
+              "code": "586",
+              "name": "광통신(광케이블/광섬유 등)"
+            },
+            {
+              "code": "373",
+              "name": "5G(5세대 이동통신)"
+            },
+            {
+              "code": "92",
+              "name": "통신장비"
+            },
+            {
+              "code": "362",
+              "name": "자율주행차"
+            }
+          ]
+        },
+        {
+          "code": "003220",
+          "name": "대원제약",
+          "price": 12400,
+          "change_pct": 10.32,
+          "score": 73.9,
+          "score_detail": {
+            "change_pct": 25.41871921182266,
+            "trading_value": 13.444408475670592,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 3573508,
+          "trading_value": 45729727105,
+          "themes": [
+            {
+              "code": "487",
+              "name": "건강기능식품"
+            },
+            {
+              "code": "172",
+              "name": "제약업체"
+            },
+            {
+              "code": "175",
+              "name": "의료기기"
+            },
+            {
+              "code": "311",
+              "name": "고령화 사회(노인복지)"
+            }
+          ]
+        },
+        {
+          "code": "030960",
+          "name": "양지사",
+          "price": 5670,
+          "change_pct": 14.08,
+          "score": 72.8,
+          "score_detail": {
+            "change_pct": 34.679802955665025,
+            "trading_value": 3.1211239853392483,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 1845889,
+          "trading_value": 10616171650,
+          "themes": [
+            {
+              "code": "121",
+              "name": "남북경협"
+            }
+          ]
+        },
+        {
+          "code": "173130",
+          "name": "오파스넷",
+          "price": 7110,
+          "change_pct": 11.09,
+          "score": 64.7,
+          "score_detail": {
+            "change_pct": 27.31527093596059,
+            "trading_value": 2.374154008096149,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 1101915,
+          "trading_value": 8075432630,
+          "themes": [
+            {
+              "code": "373",
+              "name": "5G(5세대 이동통신)"
+            },
+            {
+              "code": "435",
+              "name": "재택근무/스마트워크"
+            },
+            {
+              "code": "17",
+              "name": "SI(시스템통합)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "min_price": 3000,
+        "min_change": 3.0,
+        "max_change": 15.0,
+        "min_trading_value": 30,
+        "weights": {
+          "change_pct": 35,
+          "trading_value": 30,
+          "volume_surge": 20,
+          "price_level": 15
+        }
+      },
+      "simulation": null
+    },
+    "theme_policy": {
+      "strategy_id": "theme_policy",
+      "strategy_name": "테마/정책",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:12:14",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "000810",
+          "name": "삼성화재",
+          "price": 670000,
+          "change_pct": -3.6,
+          "score": 47.9,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 2.4,
+            "trading_value": 4.3,
+            "theme_strength": 1.2,
+            "themes": [
+              "통신",
+              "IT 서비스",
+              "음식료·담배",
+              "부동산",
+              "종이·목재",
+              "섬유·의류",
+              "통신",
+              "코스닥 150 커뮤니케이션서비스",
+              "비금속"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 29913806910000,
+          "volume": 181724,
+          "trading_value": 120594086500,
+          "themes": [
+            {
+              "code": "571",
+              "name": "밸류업(25년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "164",
+              "name": "손해보험"
+            }
+          ]
+        },
+        {
+          "code": "011070",
+          "name": "LG이노텍",
+          "price": 1095000,
+          "change_pct": -5.6,
+          "score": 45.0,
+          "score_detail": {
+            "theme_relevance": 22.2,
+            "change_pct": 1.7,
+            "trading_value": 20.0,
+            "theme_strength": 1.2,
+            "themes": [
+              "통신",
+              "섬유·의류",
+              "통신",
+              "코스닥 150 커뮤니케이션서비스",
+              "비금속"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 25915482165000,
+          "volume": 504487,
+          "trading_value": 558511253000,
+          "themes": [
+            {
+              "code": "41",
+              "name": "카메라모듈/부품"
+            },
+            {
+              "code": "279",
+              "name": "스마트폰"
+            },
+            {
+              "code": "587",
+              "name": "피지컬 AI/휴머노이드 로봇"
+            },
+            {
+              "code": "480",
+              "name": "메타버스(Metaverse)"
+            },
+            {
+              "code": "27",
+              "name": "자동차부품"
+            },
+            {
+              "code": "321",
+              "name": "무선충전기술"
+            },
+            {
+              "code": "332",
+              "name": "스마트카(SMART CAR)"
+            },
+            {
+              "code": "388",
+              "name": "아이폰"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "362",
+              "name": "자율주행차"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "082800",
+          "name": "비보존 제약",
+          "price": 3185,
+          "change_pct": 6.88,
+          "score": 37.2,
+          "score_detail": {
+            "theme_relevance": 4.4,
+            "change_pct": 17.2,
+            "trading_value": 0.5,
+            "theme_strength": 15.0,
+            "themes": [
+              "출판·매체복제"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 193392136210,
+          "volume": 4539218,
+          "trading_value": 14605229938,
+          "themes": [
+            {
+              "code": "172",
+              "name": "제약업체"
+            }
+          ]
+        },
+        {
+          "code": "462350",
+          "name": "이노스페이스",
+          "price": 15060,
+          "change_pct": 6.28,
+          "score": 35.6,
+          "score_detail": {
+            "theme_relevance": 4.4,
+            "change_pct": 15.7,
+            "trading_value": 0.4,
+            "theme_strength": 15.0,
+            "themes": [
+              "출판·매체복제"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 314282049720,
+          "volume": 757121,
+          "trading_value": 11436817110,
+          "themes": [
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            }
+          ]
+        },
+        {
+          "code": "062040",
+          "name": "산일전기",
+          "price": 213500,
+          "change_pct": -3.39,
+          "score": 17.0,
+          "score_detail": {
+            "theme_relevance": 17.8,
+            "change_pct": 2.5,
+            "trading_value": 2.5,
+            "theme_strength": -5.7,
+            "themes": [
+              "IT 서비스",
+              "음식료·담배",
+              "부동산",
+              "종이·목재"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 6536483975000,
+          "volume": 318519,
+          "trading_value": 68547383400,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "active_themes": [
+          {
+            "name": "출판·매체복제",
+            "change_pct": 5.89
+          },
+          {
+            "name": "통신",
+            "change_pct": 0.46
+          },
+          {
+            "name": "IT 서비스",
+            "change_pct": -2.23
+          },
+          {
+            "name": "음식료·담배",
+            "change_pct": -2.58
+          },
+          {
+            "name": "부동산",
+            "change_pct": -3.56
+          },
+          {
+            "name": "종이·목재",
+            "change_pct": -3.89
+          },
+          {
+            "name": "섬유·의류",
+            "change_pct": -4.51
+          },
+          {
+            "name": "통신",
+            "change_pct": -4.64
+          },
+          {
+            "name": "코스닥 150 커뮤니케이션서비스",
+            "change_pct": -4.66
+          },
+          {
+            "name": "비금속",
+            "change_pct": -4.7
+          }
+        ],
+        "theme_count": 10,
+        "total_stocks": 100,
+        "weights": {
+          "theme_relevance": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "theme_strength": 15
+        }
+      },
+      "simulation": null
+    },
+    "dart_disclosure": {
+      "strategy_id": "dart_disclosure",
+      "strategy_name": "DART 공시",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:12:18",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "weights": {
+          "disclosure": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "market_cap": 15
+        },
+        "min_market_cap": 100000000000,
+        "max_market_cap": 10000000000000,
+        "min_trading_value": 1000000000
+      },
+      "simulation": null
+    },
+    "frontier_gap": {
+      "strategy_id": "frontier_gap",
+      "strategy_name": "프론티어 갭",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:12:20",
+      "count": 3,
+      "candidates": [
+        {
+          "code": "030960",
+          "name": "양지사",
+          "price": 5210,
+          "change_pct": 4.82897384305835,
+          "score": 87.2,
+          "score_detail": {
+            "gap_pct": 40.0,
+            "volume_surge": 35.0,
+            "trading_value": 2.2303767816002615,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 90606600000,
+          "volume": 1845889,
+          "trading_value": 10616171650,
+          "themes": [
+            {
+              "code": "121",
+              "name": "남북경협"
+            }
+          ]
+        },
+        {
+          "code": "066430",
+          "name": "아이로보틱스",
+          "price": 3380,
+          "change_pct": 2.89193302891933,
+          "score": 59.8,
+          "score_detail": {
+            "gap_pct": 23.95484525621512,
+            "volume_surge": 15.869914346895076,
+            "trading_value": 15.0,
+            "price_level": 5.0
+          },
+          "rank": 2,
+          "market_cap": 167185342520,
+          "volume": 17892902,
+          "trading_value": 71397163055
+        },
+        {
+          "code": "092790",
+          "name": "넥스틸",
+          "price": 14000,
+          "change_pct": 3.016924208977189,
+          "score": 41.2,
+          "score_detail": {
+            "gap_pct": 24.99018886436105,
+            "volume_surge": 4.253211991434689,
+            "trading_value": 1.97185186463989,
+            "price_level": 10
+          },
+          "rank": 3,
+          "market_cap": 362727900000,
+          "volume": 696774,
+          "trading_value": 9385641940
+        }
+      ],
+      "params": {
+        "gap_min": 2.0,
+        "gap_max": 5.0,
+        "min_price": 3000,
+        "min_trading_value": 50,
+        "volume_surge_mult": 2.0,
+        "weights": {
+          "gap_pct": 40,
+          "volume_surge": 35,
+          "trading_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    },
+    "hybrid_alpha_delta": {
+      "strategy_id": "hybrid_alpha_delta",
+      "strategy_name": "Alpha-Delta 하이브리드",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:12:27",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "388790",
+          "name": "라이콤",
+          "price": 6750,
+          "change_pct": 14.21,
+          "score": 65.0,
+          "score_detail": {
+            "alpha_score": 100.0,
+            "delta_score": 0.0,
+            "alpha_norm": 100.0,
+            "delta_norm": 0.0,
+            "alpha_weighted": 65.0,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 15032462,
+          "trading_value": 102041812820,
+          "themes": [
+            {
+              "code": "586",
+              "name": "광통신(광케이블/광섬유 등)"
+            },
+            {
+              "code": "373",
+              "name": "5G(5세대 이동통신)"
+            },
+            {
+              "code": "92",
+              "name": "통신장비"
+            },
+            {
+              "code": "362",
+              "name": "자율주행차"
+            }
+          ]
+        },
+        {
+          "code": "003220",
+          "name": "대원제약",
+          "price": 12400,
+          "change_pct": 10.32,
+          "score": 48.0,
+          "score_detail": {
+            "alpha_score": 73.9,
+            "delta_score": 0.0,
+            "alpha_norm": 73.9,
+            "delta_norm": 0.0,
+            "alpha_weighted": 48.0,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 3573508,
+          "trading_value": 45729727105,
+          "themes": [
+            {
+              "code": "487",
+              "name": "건강기능식품"
+            },
+            {
+              "code": "172",
+              "name": "제약업체"
+            },
+            {
+              "code": "175",
+              "name": "의료기기"
+            },
+            {
+              "code": "311",
+              "name": "고령화 사회(노인복지)"
+            }
+          ]
+        },
+        {
+          "code": "030960",
+          "name": "양지사",
+          "price": 5670,
+          "change_pct": 14.08,
+          "score": 47.3,
+          "score_detail": {
+            "alpha_score": 72.8,
+            "delta_score": 0.0,
+            "alpha_norm": 72.8,
+            "delta_norm": 0.0,
+            "alpha_weighted": 47.3,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 1845889,
+          "trading_value": 10616171650,
+          "themes": [
+            {
+              "code": "121",
+              "name": "남북경협"
+            }
+          ]
+        },
+        {
+          "code": "000810",
+          "name": "삼성화재",
+          "price": 670000,
+          "change_pct": -3.6,
+          "score": 35.0,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 47.9,
+            "alpha_norm": 0.0,
+            "delta_norm": 100.0,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 35.0,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 29913806910000,
+          "volume": 181724,
+          "trading_value": 120594086500,
+          "themes": [
+            {
+              "code": "571",
+              "name": "밸류업(25년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "164",
+              "name": "손해보험"
+            }
+          ]
+        },
+        {
+          "code": "011070",
+          "name": "LG이노텍",
+          "price": 1095000,
+          "change_pct": -5.6,
+          "score": 32.9,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 45.0,
+            "alpha_norm": 0.0,
+            "delta_norm": 93.9,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 32.9,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 25915482165000,
+          "volume": 504487,
+          "trading_value": 558511253000,
+          "themes": [
+            {
+              "code": "41",
+              "name": "카메라모듈/부품"
+            },
+            {
+              "code": "279",
+              "name": "스마트폰"
+            },
+            {
+              "code": "587",
+              "name": "피지컬 AI/휴머노이드 로봇"
+            },
+            {
+              "code": "480",
+              "name": "메타버스(Metaverse)"
+            },
+            {
+              "code": "27",
+              "name": "자동차부품"
+            },
+            {
+              "code": "321",
+              "name": "무선충전기술"
+            },
+            {
+              "code": "332",
+              "name": "스마트카(SMART CAR)"
+            },
+            {
+              "code": "388",
+              "name": "아이폰"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "362",
+              "name": "자율주행차"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "weight_alpha": 0.65,
+        "weight_delta": 0.35,
+        "overlap_bonus": 10.0,
+        "sub_top_n": 10,
+        "alpha_slot": 3,
+        "delta_slot": 2,
+        "score_normalization": "min-max per-strategy (0~100)",
+        "alpha_strategy": "momentum",
+        "delta_strategy": "theme_policy"
+      },
+      "simulation": null
+    },
+    "squeeze_play_kospi_v6": {
+      "strategy_id": "squeeze_play_kospi_v6",
+      "strategy_name": "스퀴즈 플레이 KOSPI v6",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:20:30",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "universe_market": "KOSPI",
+        "universe_size": 53,
+        "ma200_filter": true,
+        "squeeze_filter": true,
+        "squeeze_max_spread_pct": 10.0,
+        "bb_period": 20,
+        "percent_b_max": 0.2,
+        "ma200_period": 200,
+        "recommended_holding_days": 5
+      },
+      "simulation": null
+    },
+    "squeeze_play_kosdaq_v5": {
+      "strategy_id": "squeeze_play_kosdaq_v5",
+      "strategy_name": "스퀴즈 플레이 KOSDAQ v5",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:26:47",
+      "count": 3,
+      "candidates": [
+        {
+          "code": "022100",
+          "name": "포스코DX",
+          "price": 25650,
+          "change_pct": 0.39,
+          "score": 65.0,
+          "score_detail": {
+            "percent_b": -0.1303,
+            "spread_pct": 10.16,
+            "ma200_rising": true,
+            "is_positive_candle": true,
+            "recommended_holding_days": 5,
+            "variant_id": "squeeze_play_kosdaq_v5"
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 643091,
+          "trading_value": 0,
+          "themes": [
+            {
+              "code": "392",
+              "name": "스마트팩토리(스마트공장)"
+            },
+            {
+              "code": "587",
+              "name": "피지컬 AI/휴머노이드 로봇"
+            },
+            {
+              "code": "276",
+              "name": "클라우드 컴퓨팅"
+            },
+            {
+              "code": "104",
+              "name": "스마트홈(홈네트워크)"
+            },
+            {
+              "code": "17",
+              "name": "SI(시스템통합)"
+            },
+            {
+              "code": "19",
+              "name": "황사/미세먼지"
+            },
+            {
+              "code": "343",
+              "name": "인터넷은행"
+            },
+            {
+              "code": "229",
+              "name": "스마트그리드(지능형전력망)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "329",
+              "name": "전력저장장치(ESS)"
+            }
+          ]
+        },
+        {
+          "code": "121600",
+          "name": "나노신소재",
+          "price": 53500,
+          "change_pct": 1.13,
+          "score": 60.52,
+          "score_detail": {
+            "percent_b": -0.0885,
+            "spread_pct": 11.76,
+            "ma200_rising": true,
+            "is_positive_candle": true,
+            "recommended_holding_days": 5,
+            "variant_id": "squeeze_play_kosdaq_v5"
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 125593,
+          "trading_value": 6804277550,
+          "themes": [
+            {
+              "code": "33",
+              "name": "LED"
+            },
+            {
+              "code": "191",
+              "name": "태양광에너지"
+            },
+            {
+              "code": "9",
+              "name": "OLED(유기 발광 다이오드)"
+            }
+          ]
+        },
+        {
+          "code": "263750",
+          "name": "펄어비스",
+          "price": 38500,
+          "change_pct": 2.12,
+          "score": 50.4,
+          "score_detail": {
+            "percent_b": 0.0421,
+            "spread_pct": 4.96,
+            "ma200_rising": true,
+            "is_positive_candle": true,
+            "recommended_holding_days": 5,
+            "variant_id": "squeeze_play_kosdaq_v5"
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 526921,
+          "trading_value": 20429644325,
+          "themes": [
+            {
+              "code": "480",
+              "name": "메타버스(Metaverse)"
+            },
+            {
+              "code": "42",
+              "name": "게임"
+            },
+            {
+              "code": "265",
+              "name": "모바일게임(스마트폰)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "universe_market": "KOSDAQ",
+        "universe_size": 35,
+        "ma200_filter": false,
+        "squeeze_filter": true,
+        "squeeze_max_spread_pct": 15.0,
+        "bb_period": 20,
+        "percent_b_max": 0.2,
+        "ma200_period": 200,
+        "recommended_holding_days": 5
+      },
+      "simulation": null
+    },
+    "sector_rotation": {
+      "strategy_id": "sector_rotation",
+      "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:26:47",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "035420",
+          "name": "NAVER",
+          "price": 279000,
+          "change_pct": 9.2,
+          "score": 44.2,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 9.2,
+            "market_cap_rank": 20.0,
+            "volume_surge": 15.0
+          },
+          "rank": 1,
+          "market_cap": 43767783504000,
+          "volume": 10148390,
+          "trading_value": 2816298185000,
+          "themes": [
+            {
+              "code": "317",
+              "name": "SNS(소셜네트워크서비스)"
+            },
+            {
+              "code": "480",
+              "name": "메타버스(Metaverse)"
+            },
+            {
+              "code": "276",
+              "name": "클라우드 컴퓨팅"
+            },
+            {
+              "code": "362",
+              "name": "자율주행차"
+            },
+            {
+              "code": "529",
+              "name": "AI 챗봇(챗GPT 등)"
+            },
+            {
+              "code": "302",
+              "name": "음성인식"
+            },
+            {
+              "code": "270",
+              "name": "모바일콘텐츠(스마트폰/태블릿PC)"
+            },
+            {
+              "code": "387",
+              "name": "블록체인"
+            },
+            {
+              "code": "42",
+              "name": "게임"
+            },
+            {
+              "code": "342",
+              "name": "핀테크(FinTech)"
+            },
+            {
+              "code": "488",
+              "name": "웹툰"
+            },
+            {
+              "code": "265",
+              "name": "모바일게임(스마트폰)"
+            },
+            {
+              "code": "507",
+              "name": "마이데이터"
+            },
+            {
+              "code": "582",
+              "name": "스테이블코인"
+            }
+          ]
+        },
+        {
+          "code": "001740",
+          "name": "SK네트웍스",
+          "price": 14170,
+          "change_pct": 30.0,
+          "score": 35.28,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 30.0,
+            "market_cap_rank": 1.3,
+            "volume_surge": 3.98
+          },
+          "rank": 2,
+          "market_cap": 2842415407130,
+          "volume": 56509514,
+          "trading_value": 747249916850,
+          "themes": [
+            {
+              "code": "514",
+              "name": "전기차(충전소/충전기)"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "481",
+              "name": "마켓컬리(kurly)"
+            }
+          ]
+        },
+        {
+          "code": "010690",
+          "name": "화신",
+          "price": 11490,
+          "change_pct": 22.76,
+          "score": 23.23,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 22.76,
+            "market_cap_rank": 0.18,
+            "volume_surge": 0.29
+          },
+          "rank": 3,
+          "market_cap": 401235510900,
+          "volume": 4955132,
+          "trading_value": 54101103405,
+          "themes": [
+            {
+              "code": "27",
+              "name": "자동차부품"
+            },
+            {
+              "code": "227",
+              "name": "전기차"
+            }
+          ]
+        },
+        {
+          "code": "085620",
+          "name": "미래에셋생명",
+          "price": 21000,
+          "change_pct": 12.96,
+          "score": 14.78,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 12.96,
+            "market_cap_rank": 1.3,
+            "volume_surge": 0.52
+          },
+          "rank": 4,
+          "market_cap": 2838780000000,
+          "volume": 4839465,
+          "trading_value": 98257070610
+        },
+        {
+          "code": "003220",
+          "name": "대원제약",
+          "price": 12400,
+          "change_pct": 10.32,
+          "score": 10.69,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 10.32,
+            "market_cap_rank": 0.13,
+            "volume_surge": 0.24
+          },
+          "rank": 5,
+          "market_cap": 278102029200,
+          "volume": 3573508,
+          "trading_value": 45729727105,
+          "themes": [
+            {
+              "code": "487",
+              "name": "건강기능식품"
+            },
+            {
+              "code": "172",
+              "name": "제약업체"
+            },
+            {
+              "code": "175",
+              "name": "의료기기"
+            },
+            {
+              "code": "311",
+              "name": "고령화 사회(노인복지)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "top_sectors": 5,
+        "stocks_per_sector": 3,
+        "min_price": 3000,
+        "min_market_cap": 100000000000,
+        "min_trading_value": 5000000000,
+        "min_change_pct": 0.5,
+        "weights": {
+          "sector_strength": 35,
+          "stock_momentum": 30,
+          "market_cap_rank": 20,
+          "volume_surge": 15
+        }
+      },
+      "simulation": null
+    },
+    "foreign_flow_momentum": {
+      "strategy_id": "foreign_flow_momentum",
+      "strategy_name": "외국인 수급 모멘텀",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:26:47",
+      "count": 1,
+      "candidates": [
+        {
+          "code": "462350",
+          "name": "이노스페이스",
+          "price": 15060,
+          "change_pct": 6.28,
+          "score": 100.0,
+          "score_detail": {
+            "foreign_consistency": 35.0,
+            "foreign_magnitude": 30.0,
+            "price_momentum": 20.0,
+            "trading_value": 15.0
+          },
+          "rank": 1,
+          "market_cap": 314282049720,
+          "volume": 757121,
+          "trading_value": 11436817110,
+          "themes": [
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "pool_size": 100,
+        "lookback_days": 5,
+        "consecutive_days": 3,
+        "min_market_cap": 200000000000,
+        "min_trading_value": 10000000000,
+        "weights": {
+          "foreign_consistency": 35,
+          "foreign_magnitude": 30,
+          "price_momentum": 20,
+          "trading_value": 15
+        }
+      },
+      "simulation": null
+    },
+    "opening_30min_volume_burst": {
+      "strategy_id": "opening_30min_volume_burst",
+      "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+      "date": "20260608",
+      "selected_at": "2026-06-09 20:26:48",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "003220",
+          "name": "대원제약",
+          "price": 12400,
+          "change_pct": 10.32,
+          "score": 75.33,
+          "score_detail": {
+            "volume_surge": 45.0,
+            "price_momentum": 13.6,
+            "absolute_value": 6.72,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 278102029200,
+          "volume": 3573508,
+          "trading_value": 45729727105,
+          "themes": [
+            {
+              "code": "487",
+              "name": "건강기능식품"
+            },
+            {
+              "code": "172",
+              "name": "제약업체"
+            },
+            {
+              "code": "175",
+              "name": "의료기기"
+            },
+            {
+              "code": "311",
+              "name": "고령화 사회(노인복지)"
+            }
+          ]
+        },
+        {
+          "code": "010690",
+          "name": "화신",
+          "price": 11490,
+          "change_pct": 22.76,
+          "score": 56.56,
+          "score_detail": {
+            "volume_surge": 8.6,
+            "price_momentum": 30.0,
+            "absolute_value": 7.95,
+            "price_level": 10
+          },
+          "rank": 2,
+          "market_cap": 401235510900,
+          "volume": 4955132,
+          "trading_value": 54101103405,
+          "themes": [
+            {
+              "code": "27",
+              "name": "자동차부품"
+            },
+            {
+              "code": "227",
+              "name": "전기차"
+            }
+          ]
+        },
+        {
+          "code": "388790",
+          "name": "라이콤",
+          "price": 6750,
+          "change_pct": 14.21,
+          "score": 46.0,
+          "score_detail": {
+            "volume_surge": 2.27,
+            "price_momentum": 18.73,
+            "absolute_value": 15.0,
+            "price_level": 10
+          },
+          "rank": 3,
+          "market_cap": 206645580000,
+          "volume": 15032462,
+          "trading_value": 102041812820,
+          "themes": [
+            {
+              "code": "586",
+              "name": "광통신(광케이블/광섬유 등)"
+            },
+            {
+              "code": "373",
+              "name": "5G(5세대 이동통신)"
+            },
+            {
+              "code": "92",
+              "name": "통신장비"
+            },
+            {
+              "code": "362",
+              "name": "자율주행차"
+            }
+          ]
+        },
+        {
+          "code": "030960",
+          "name": "양지사",
+          "price": 5670,
+          "change_pct": 14.08,
+          "score": 41.99,
+          "score_detail": {
+            "volume_surge": 11.87,
+            "price_momentum": 18.56,
+            "absolute_value": 1.56,
+            "price_level": 10
+          },
+          "rank": 4,
+          "market_cap": 90606600000,
+          "volume": 1845889,
+          "trading_value": 10616171650,
+          "themes": [
+            {
+              "code": "121",
+              "name": "남북경협"
+            }
+          ]
+        },
+        {
+          "code": "459550",
+          "name": "알트",
+          "price": 2020,
+          "change_pct": 7.56,
+          "score": 34.24,
+          "score_detail": {
+            "volume_surge": 11.02,
+            "price_momentum": 9.96,
+            "absolute_value": 8.26,
+            "price_level": 5.0
+          },
+          "rank": 5,
+          "market_cap": 50945937220,
+          "volume": 26365254,
+          "trading_value": 56158745897,
+          "themes": [
+            {
+              "code": "279",
+              "name": "스마트폰"
+            },
+            {
+              "code": "583",
+              "name": "2025 하반기 신규상장"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "value_surge_min": 3.0,
+        "price_up_min_pct": 1.5,
+        "min_price": 2000,
+        "min_market_cap": 50000000000,
+        "min_trading_value": 5000000000,
+        "history_days": 7,
+        "weights": {
+          "volume_surge": 45,
+          "price_momentum": 30,
+          "absolute_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260608",
+  "selected_at": "2026-06-09 20:26:47",
+  "count": 1,
+  "candidates": [
+    {
+      "code": "462350",
+      "name": "이노스페이스",
+      "price": 15060,
+      "change_pct": 6.28,
+      "score": 100.0,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 20.0,
+        "trading_value": 15.0
+      },
+      "rank": 1,
+      "market_cap": 314282049720,
+      "volume": 757121,
+      "trading_value": 11436817110,
+      "themes": [
+        {
+          "code": "200",
+          "name": "우주항공산업(누리호/인공위성 등)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
