@@ -1,0 +1,202 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260610",
+  "selected_at": "2026-06-11 21:14:50",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "006220",
+      "name": "제주은행",
+      "price": 12750,
+      "change_pct": 14.56,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 96.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 15328286,
+      "trading_value": 198343041925,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        }
+      ]
+    },
+    {
+      "code": "279570",
+      "name": "케이뱅크",
+      "price": 6030,
+      "change_pct": 4.33,
+      "score": 50.6,
+      "score_detail": {
+        "alpha_score": 75.4,
+        "delta_score": 0.0,
+        "alpha_norm": 77.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 50.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 35362194,
+      "trading_value": 221753972975,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "343",
+          "name": "인터넷은행"
+        },
+        {
+          "code": "590",
+          "name": "2026 상반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "041830",
+      "name": "인바디",
+      "price": 45650,
+      "change_pct": 10.4,
+      "score": 41.2,
+      "score_detail": {
+        "alpha_score": 61.3,
+        "delta_score": 0.0,
+        "alpha_norm": 63.3,
+        "delta_norm": 0.0,
+        "alpha_weighted": 41.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 208165,
+      "trading_value": 9449678050,
+      "themes": [
+        {
+          "code": "175",
+          "name": "의료기기"
+        },
+        {
+          "code": "149",
+          "name": "원격진료/비대면진료(U-Healthcare)"
+        },
+        {
+          "code": "311",
+          "name": "고령화 사회(노인복지)"
+        }
+      ]
+    },
+    {
+      "code": "036930",
+      "name": "주성엔지니어링",
+      "price": 199000,
+      "change_pct": 3.81,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 57.9,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 9249743079000,
+      "volume": 4303341,
+      "trading_value": 907338067900,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "382",
+          "name": "플렉서블 디스플레이"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "9",
+          "name": "OLED(유기 발광 다이오드)"
+        }
+      ]
+    },
+    {
+      "code": "024110",
+      "name": "기업은행",
+      "price": 20900,
+      "change_pct": 1.7,
+      "score": 34.6,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 57.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.8,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.6,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 16666200662100,
+      "volume": 1409813,
+      "trading_value": 29297969950,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
