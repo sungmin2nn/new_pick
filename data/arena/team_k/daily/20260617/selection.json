@@ -1,0 +1,108 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260616",
+  "selected_at": "2026-06-17 21:24:05",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "088350",
+      "name": "한화생명",
+      "price": 5550,
+      "change_pct": 5.71,
+      "score": 82.32,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 14.74,
+        "trading_value": 2.59
+      },
+      "rank": 1,
+      "market_cap": 4820341500000,
+      "volume": 8246782,
+      "trading_value": 45202000740
+    },
+    {
+      "code": "042660",
+      "name": "한화오션",
+      "price": 129200,
+      "change_pct": 4.7,
+      "score": 69.96,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 7.83,
+        "price_momentum": 12.13,
+        "trading_value": 15.0
+      },
+      "rank": 2,
+      "market_cap": 39588610504800,
+      "volume": 2044579,
+      "trading_value": 262085328150
+    },
+    {
+      "code": "064350",
+      "name": "현대로템",
+      "price": 226500,
+      "change_pct": 6.34,
+      "score": 67.16,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 3.26,
+        "price_momentum": 16.36,
+        "trading_value": 12.54
+      },
+      "rank": 3,
+      "market_cap": 24720729364500,
+      "volume": 956649,
+      "trading_value": 219143668000
+    },
+    {
+      "code": "008770",
+      "name": "호텔신라",
+      "price": 59800,
+      "change_pct": 7.75,
+      "score": 56.73,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.14,
+        "price_momentum": 20.0,
+        "trading_value": 1.59
+      },
+      "rank": 4,
+      "market_cap": 2347037635800,
+      "volume": 474665,
+      "trading_value": 27796450850
+    },
+    {
+      "code": "023530",
+      "name": "롯데쇼핑",
+      "price": 198000,
+      "change_pct": 6.28,
+      "score": 56.0,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 1.66,
+        "price_momentum": 16.21,
+        "trading_value": 3.13
+      },
+      "rank": 5,
+      "market_cap": 5601173490000,
+      "volume": 281659,
+      "trading_value": 54757536300
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
