@@ -1,0 +1,190 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260617",
+  "selected_at": "2026-06-18 20:47:19",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "080220",
+      "name": "제주반도체",
+      "price": 111500,
+      "change_pct": 10.18,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 83.7,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 9070506,
+      "trading_value": 997197740650,
+      "themes": [
+        {
+          "code": "545",
+          "name": "온디바이스 AI"
+        }
+      ]
+    },
+    {
+      "code": "006340",
+      "name": "대원전선",
+      "price": 12330,
+      "change_pct": 10.58,
+      "score": 61.8,
+      "score_detail": {
+        "alpha_score": 79.6,
+        "delta_score": 0.0,
+        "alpha_norm": 95.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 61.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 45417583,
+      "trading_value": 578908096800,
+      "themes": [
+        {
+          "code": "178",
+          "name": "전선"
+        },
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "250",
+          "name": "철도"
+        }
+      ]
+    },
+    {
+      "code": "394420",
+      "name": "리센스메디컬",
+      "price": 21300,
+      "change_pct": 13.6,
+      "score": 54.6,
+      "score_detail": {
+        "alpha_score": 70.3,
+        "delta_score": 0.0,
+        "alpha_norm": 84.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 54.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 550358,
+      "trading_value": 11552481005,
+      "themes": [
+        {
+          "code": "175",
+          "name": "의료기기"
+        },
+        {
+          "code": "590",
+          "name": "2026 상반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "240810",
+      "name": "원익IPS",
+      "price": 161700,
+      "change_pct": 3.59,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 79.9,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 7936866791700,
+      "volume": 2517131,
+      "trading_value": 416130078000,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "9",
+          "name": "OLED(유기 발광 다이오드)"
+        }
+      ]
+    },
+    {
+      "code": "010140",
+      "name": "삼성중공업",
+      "price": 28950,
+      "change_pct": 3.02,
+      "score": 27.2,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 62.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 77.8,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 27.2,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 25476000000000,
+      "volume": 5929084,
+      "trading_value": 173184976825,
+      "themes": [
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
