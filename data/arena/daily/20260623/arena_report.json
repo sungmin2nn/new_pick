@@ -1,0 +1,1352 @@
+{
+  "date": "20260623",
+  "status": "success",
+  "teams": {
+    "team_a": {
+      "team_id": "team_a",
+      "team_name": "Alpha Momentum",
+      "strategy_id": "momentum",
+      "status": "success",
+      "selection": {
+        "strategy_id": "momentum",
+        "strategy_name": "모멘텀 추세",
+        "date": "20260622",
+        "selected_at": "2026-06-23 19:42:22",
+        "count": 5,
+        "candidates": [
+          {
+            "code": "293490",
+            "name": "카카오게임즈",
+            "price": 10040,
+            "change_pct": 13.96,
+            "score": 82.5,
+            "score_detail": {
+              "change_pct": 35.0,
+              "trading_value": 12.507235779610012,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 1,
+            "market_cap": 0,
+            "volume": 6885966,
+            "trading_value": 71781840730
+          },
+          {
+            "code": "014950",
+            "name": "삼익제약",
+            "price": 8960,
+            "change_pct": 6.54,
+            "score": 81.4,
+            "score_detail": {
+              "change_pct": 16.396848137535816,
+              "trading_value": 30.0,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 2,
+            "market_cap": 0,
+            "volume": 18632565,
+            "trading_value": 172176751110
+          },
+          {
+            "code": "204270",
+            "name": "제이앤티씨",
+            "price": 22850,
+            "change_pct": 8.81,
+            "score": 72.0,
+            "score_detail": {
+              "change_pct": 22.08810888252149,
+              "trading_value": 14.862146034543095,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 3,
+            "market_cap": 0,
+            "volume": 3771757,
+            "trading_value": 85297200625
+          },
+          {
+            "code": "030960",
+            "name": "양지사",
+            "price": 6330,
+            "change_pct": 10.86,
+            "score": 65.5,
+            "score_detail": {
+              "change_pct": 27.227793696275068,
+              "trading_value": 3.256088573722885,
+              "volume_surge": 20,
+              "price_level": 15
+            },
+            "rank": 4,
+            "market_cap": 0,
+            "volume": 2918288,
+            "trading_value": 18687425065
+          },
+          {
+            "code": "025320",
+            "name": "시노펙스",
+            "price": 4985,
+            "change_pct": 13.42,
+            "score": 62.4,
+            "score_detail": {
+              "change_pct": 33.646131805157594,
+              "trading_value": 1.2079433086010911,
+              "volume_surge": 20,
+              "price_level": 7.5
+            },
+            "rank": 5,
+            "market_cap": 0,
+            "volume": 1450514,
+            "trading_value": 6932658480
+          }
+        ],
+        "params": {
+          "min_price": 3000,
+          "min_change": 3.0,
+          "max_change": 15.0,
+          "min_trading_value": 30,
+          "weights": {
+            "change_pct": 35,
+            "trading_value": 30,
+            "volume_surge": 20,
+            "price_level": 15
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260623",
+        "strategy_id": "momentum",
+        "strategy_name": "Alpha Momentum",
+        "holding_days": 1,
+        "total_trades": 5,
+        "wins": 2,
+        "losses": 3,
+        "win_rate": 40.0,
+        "total_return": 19.06,
+        "avg_return": 3.81,
+        "total_return_amount": 881756,
+        "profit_exits": 0,
+        "loss_exits": 3,
+        "close_exits": 0,
+        "trailing_exits": 2,
+        "close_multiday_exits": 0,
+        "results": [
+          {
+            "code": "293490",
+            "name": "카카오게임즈",
+            "entry_price": 9318,
+            "exit_price": 9021,
+            "quantity": 497,
+            "return_pct": -3.19,
+            "return_amount": -147609,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:47",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 1.4,
+            "max_loss_pct": -7.53,
+            "exit_date": ""
+          },
+          {
+            "code": "014950",
+            "name": "삼익제약",
+            "entry_price": 9478,
+            "exit_price": 10365,
+            "quantity": 488,
+            "return_pct": 9.36,
+            "return_amount": 432856,
+            "exit_type": "trailing",
+            "entry_time": "09:00",
+            "exit_time": "09:01",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 12.58,
+            "max_loss_pct": -20.19,
+            "exit_date": ""
+          },
+          {
+            "code": "204270",
+            "name": "제이앤티씨",
+            "entry_price": 20691,
+            "exit_price": 20030,
+            "quantity": 223,
+            "return_pct": -3.19,
+            "return_amount": -147403,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:53",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 22.28,
+            "max_loss_pct": -4.12,
+            "exit_date": ""
+          },
+          {
+            "code": "030960",
+            "name": "양지사",
+            "entry_price": 6272,
+            "exit_price": 7481,
+            "quantity": 738,
+            "return_pct": 19.28,
+            "return_amount": 892242,
+            "exit_type": "trailing",
+            "entry_time": "09:05",
+            "exit_time": "09:10",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 22.52,
+            "max_loss_pct": -0.32,
+            "exit_date": ""
+          },
+          {
+            "code": "025320",
+            "name": "시노펙스",
+            "entry_price": 5090,
+            "exit_price": 4927,
+            "quantity": 910,
+            "return_pct": -3.2,
+            "return_amount": -148330,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:11",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 2.95,
+            "max_loss_pct": -6.5,
+            "exit_date": ""
+          }
+        ]
+      }
+    },
+    "team_e": {
+      "team_id": "team_e",
+      "team_name": "Echo Frontier",
+      "strategy_id": "frontier_gap",
+      "status": "success",
+      "selection": {
+        "strategy_id": "frontier_gap",
+        "strategy_name": "프론티어 갭",
+        "date": "20260622",
+        "selected_at": "2026-06-23 19:42:29",
+        "count": 4,
+        "candidates": [
+          {
+            "code": "014950",
+            "name": "삼익제약",
+            "price": 8670,
+            "change_pct": 3.0915576694411415,
+            "score": 100.0,
+            "score_detail": {
+              "gap_pct": 40.0,
+              "volume_surge": 35.0,
+              "trading_value": 15.0,
+              "price_level": 10
+            },
+            "rank": 1,
+            "market_cap": 89667988480,
+            "volume": 18632565,
+            "trading_value": 172176751110
+          },
+          {
+            "code": "040350",
+            "name": "크레오에스지",
+            "price": 9280,
+            "change_pct": 2.9966703662597114,
+            "score": 64.6,
+            "score_detail": {
+              "gap_pct": 38.77230427729873,
+              "volume_surge": 14.981308411214954,
+              "trading_value": 0.8345829722864028,
+              "price_level": 10
+            },
+            "rank": 2,
+            "market_cap": 221558038200,
+            "volume": 852519,
+            "trading_value": 9579718980
+          },
+          {
+            "code": "002020",
+            "name": "코오롱",
+            "price": 53300,
+            "change_pct": 2.5,
+            "score": 60.7,
+            "score_detail": {
+              "gap_pct": 32.34615384615385,
+              "volume_surge": 22.766355140186917,
+              "trading_value": 0.5903886788992624,
+              "price_level": 5.0
+            },
+            "rank": 3,
+            "market_cap": 618923256000,
+            "volume": 141173,
+            "trading_value": 6776746975
+          },
+          {
+            "code": "420770",
+            "name": "기가비스",
+            "price": 142300,
+            "change_pct": 2.3741007194244603,
+            "score": 56.3,
+            "score_detail": {
+              "gap_pct": 30.717210846707246,
+              "volume_surge": 17.27102803738318,
+              "trading_value": 3.322541624011249,
+              "price_level": 5.0
+            },
+            "rank": 4,
+            "market_cap": 2017980673600,
+            "volume": 242541,
+            "trading_value": 38137628150
+          }
+        ],
+        "params": {
+          "gap_min": 2.0,
+          "gap_max": 5.0,
+          "min_price": 3000,
+          "min_trading_value": 50,
+          "volume_surge_mult": 2.0,
+          "weights": {
+            "gap_pct": 40,
+            "volume_surge": 35,
+            "trading_value": 15,
+            "price_level": 10
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260623",
+        "strategy_id": "frontier_gap",
+        "strategy_name": "Echo Frontier",
+        "holding_days": 1,
+        "total_trades": 4,
+        "wins": 3,
+        "losses": 1,
+        "win_rate": 75.0,
+        "total_return": 14.18,
+        "avg_return": 3.54,
+        "total_return_amount": 505166,
+        "profit_exits": 0,
+        "loss_exits": 1,
+        "close_exits": 0,
+        "trailing_exits": 3,
+        "close_multiday_exits": 0,
+        "results": [
+          {
+            "code": "014950",
+            "name": "삼익제약",
+            "entry_price": 9478,
+            "exit_price": 10365,
+            "quantity": 375,
+            "return_pct": 9.36,
+            "return_amount": 332625,
+            "exit_type": "trailing",
+            "entry_time": "09:00",
+            "exit_time": "09:01",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 12.58,
+            "max_loss_pct": -20.19,
+            "exit_date": ""
+          },
+          {
+            "code": "040350",
+            "name": "크레오에스지",
+            "entry_price": 10691,
+            "exit_price": 11156,
+            "quantity": 333,
+            "return_pct": 4.35,
+            "return_amount": 154845,
+            "exit_type": "trailing",
+            "entry_time": "09:05",
+            "exit_time": "09:26",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 6.56,
+            "max_loss_pct": -0.19,
+            "exit_date": ""
+          },
+          {
+            "code": "002020",
+            "name": "코오롱",
+            "entry_price": 47795,
+            "exit_price": 49545,
+            "quantity": 74,
+            "return_pct": 3.66,
+            "return_amount": 129500,
+            "exit_type": "trailing",
+            "entry_time": "09:05",
+            "exit_time": "09:15",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 5.87,
+            "max_loss_pct": -1.47,
+            "exit_date": ""
+          },
+          {
+            "code": "420770",
+            "name": "기가비스",
+            "entry_price": 166732,
+            "exit_price": 161408,
+            "quantity": 21,
+            "return_pct": -3.19,
+            "return_amount": -111804,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:08",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 1.5,
+            "max_loss_pct": -6.67,
+            "exit_date": ""
+          }
+        ]
+      }
+    },
+    "team_h": {
+      "team_id": "team_h",
+      "team_name": "Theta Sector",
+      "strategy_id": "sector_rotation",
+      "status": "success",
+      "selection": {
+        "strategy_id": "sector_rotation",
+        "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+        "date": "20260622",
+        "selected_at": "2026-06-23 20:09:18",
+        "count": 5,
+        "candidates": [
+          {
+            "code": "066570",
+            "name": "LG전자",
+            "price": 227500,
+            "change_pct": 7.57,
+            "score": 82.48,
+            "score_detail": {
+              "sector_strength": 35,
+              "stock_momentum": 12.48,
+              "market_cap_rank": 20.0,
+              "volume_surge": 15.0
+            },
+            "rank": 1,
+            "market_cap": 37056255145000,
+            "volume": 3353936,
+            "trading_value": 778063824500
+          },
+          {
+            "code": "004710",
+            "name": "한솔테크닉스",
+            "price": 15460,
+            "change_pct": 18.2,
+            "score": 69.0,
+            "score_detail": {
+              "sector_strength": 35,
+              "stock_momentum": 30.0,
+              "market_cap_rank": 0.34,
+              "volume_surge": 3.66
+            },
+            "rank": 2,
+            "market_cap": 628132332820,
+            "volume": 12431044,
+            "trading_value": 189679763200
+          },
+          {
+            "code": "195870",
+            "name": "해성디에스",
+            "price": 85900,
+            "change_pct": 17.19,
+            "score": 64.72,
+            "score_detail": {
+              "sector_strength": 35,
+              "stock_momentum": 28.34,
+              "market_cap_rank": 0.79,
+              "volume_surge": 0.59
+            },
+            "rank": 3,
+            "market_cap": 1460300000000,
+            "volume": 377764,
+            "trading_value": 30815536450
+          },
+          {
+            "code": "000990",
+            "name": "DB하이텍",
+            "price": 174000,
+            "change_pct": 11.47,
+            "score": 61.51,
+            "score_detail": {
+              "sector_strength": 35,
+              "stock_momentum": 18.91,
+              "market_cap_rank": 4.09,
+              "volume_surge": 3.52
+            },
+            "rank": 4,
+            "market_cap": 7569798312000,
+            "volume": 1099286,
+            "trading_value": 182653004400
+          },
+          {
+            "code": "042700",
+            "name": "한미반도체",
+            "price": 301500,
+            "change_pct": 2.2,
+            "score": 59.23,
+            "score_detail": {
+              "sector_strength": 35,
+              "stock_momentum": 3.63,
+              "market_cap_rank": 15.51,
+              "volume_surge": 5.1
+            },
+            "rank": 5,
+            "market_cap": 28736628300000,
+            "volume": 883692,
+            "trading_value": 264305959250
+          }
+        ],
+        "params": {
+          "top_sectors": 5,
+          "stocks_per_sector": 3,
+          "min_price": 3000,
+          "min_market_cap": 100000000000,
+          "min_trading_value": 5000000000,
+          "min_change_pct": 0.5,
+          "weights": {
+            "sector_strength": 35,
+            "stock_momentum": 30,
+            "market_cap_rank": 20,
+            "volume_surge": 15
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260623",
+        "strategy_id": "sector_rotation",
+        "strategy_name": "Theta Sector",
+        "holding_days": 1,
+        "total_trades": 5,
+        "wins": 0,
+        "losses": 5,
+        "win_rate": 0.0,
+        "total_return": -15.95,
+        "avg_return": -3.19,
+        "total_return_amount": -328483,
+        "profit_exits": 0,
+        "loss_exits": 5,
+        "close_exits": 0,
+        "trailing_exits": 0,
+        "close_multiday_exits": 0,
+        "results": [
+          {
+            "code": "066570",
+            "name": "LG전자",
+            "entry_price": 224448,
+            "exit_price": 217280,
+            "quantity": 9,
+            "return_pct": -3.19,
+            "return_amount": -64512,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:14",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 0.22,
+            "max_loss_pct": -10.27,
+            "exit_date": ""
+          },
+          {
+            "code": "004710",
+            "name": "한솔테크닉스",
+            "entry_price": 14428,
+            "exit_price": 13968,
+            "quantity": 149,
+            "return_pct": -3.19,
+            "return_amount": -68540,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:26",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 2.57,
+            "max_loss_pct": -11.74,
+            "exit_date": ""
+          },
+          {
+            "code": "195870",
+            "name": "해성디에스",
+            "entry_price": 83767,
+            "exit_price": 81092,
+            "quantity": 25,
+            "return_pct": -3.19,
+            "return_amount": -66875,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:18",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 0.84,
+            "max_loss_pct": -15.07,
+            "exit_date": ""
+          },
+          {
+            "code": "000990",
+            "name": "DB하이텍",
+            "entry_price": 167133,
+            "exit_price": 161796,
+            "quantity": 12,
+            "return_pct": -3.19,
+            "return_amount": -64044,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "10:02",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 2.22,
+            "max_loss_pct": -10.55,
+            "exit_date": ""
+          },
+          {
+            "code": "042700",
+            "name": "한미반도체",
+            "entry_price": 288576,
+            "exit_price": 279360,
+            "quantity": 7,
+            "return_pct": -3.19,
+            "return_amount": -64512,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "10:45",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 1.56,
+            "max_loss_pct": -10.42,
+            "exit_date": ""
+          }
+        ]
+      }
+    },
+    "team_k": {
+      "team_id": "team_k",
+      "team_name": "Iota Flow",
+      "strategy_id": "foreign_flow_momentum",
+      "status": "success",
+      "selection": {
+        "strategy_id": "foreign_flow_momentum",
+        "strategy_name": "외국인 수급 모멘텀",
+        "date": "20260622",
+        "selected_at": "2026-06-23 20:09:53",
+        "count": 5,
+        "candidates": [
+          {
+            "code": "093370",
+            "name": "후성",
+            "price": 18600,
+            "change_pct": 9.8,
+            "score": 81.85,
+            "score_detail": {
+              "foreign_consistency": 35.0,
+              "foreign_magnitude": 30.0,
+              "price_momentum": 11.4,
+              "trading_value": 5.45
+            },
+            "rank": 1,
+            "market_cap": 1994949138000,
+            "volume": 9221276,
+            "trading_value": 171087386900
+          },
+          {
+            "code": "403870",
+            "name": "HPSP",
+            "price": 60000,
+            "change_pct": 6.01,
+            "score": 62.36,
+            "score_detail": {
+              "foreign_consistency": 35.0,
+              "foreign_magnitude": 5.37,
+              "price_momentum": 6.99,
+              "trading_value": 15.0
+            },
+            "rank": 2,
+            "market_cap": 4938000000000,
+            "volume": 7839535,
+            "trading_value": 471066615100
+          },
+          {
+            "code": "195870",
+            "name": "해성디에스",
+            "price": 85900,
+            "change_pct": 17.19,
+            "score": 61.84,
+            "score_detail": {
+              "foreign_consistency": 35.0,
+              "foreign_magnitude": 5.86,
+              "price_momentum": 20.0,
+              "trading_value": 0.98
+            },
+            "rank": 3,
+            "market_cap": 1460300000000,
+            "volume": 377764,
+            "trading_value": 30815536450
+          },
+          {
+            "code": "095340",
+            "name": "ISC",
+            "price": 198200,
+            "change_pct": 6.56,
+            "score": 51.87,
+            "score_detail": {
+              "foreign_consistency": 35.0,
+              "foreign_magnitude": 7.49,
+              "price_momentum": 7.63,
+              "trading_value": 1.75
+            },
+            "rank": 4,
+            "market_cap": 4201256895600,
+            "volume": 280631,
+            "trading_value": 54841236750
+          },
+          {
+            "code": "131970",
+            "name": "두산테스나",
+            "price": 142700,
+            "change_pct": 6.18,
+            "score": 48.89,
+            "score_detail": {
+              "foreign_consistency": 35.0,
+              "foreign_magnitude": 5.42,
+              "price_momentum": 7.19,
+              "trading_value": 1.28
+            },
+            "rank": 5,
+            "market_cap": 2757996862600,
+            "volume": 282938,
+            "trading_value": 40131842500
+          }
+        ],
+        "params": {
+          "pool_size": 100,
+          "lookback_days": 5,
+          "consecutive_days": 3,
+          "min_market_cap": 200000000000,
+          "min_trading_value": 10000000000,
+          "weights": {
+            "foreign_consistency": 35,
+            "foreign_magnitude": 30,
+            "price_momentum": 20,
+            "trading_value": 15
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260623",
+        "strategy_id": "foreign_flow_momentum",
+        "strategy_name": "Iota Flow",
+        "holding_days": 1,
+        "total_trades": 5,
+        "wins": 1,
+        "losses": 4,
+        "win_rate": 20.0,
+        "total_return": -9.29,
+        "avg_return": -1.86,
+        "total_return_amount": -210943,
+        "profit_exits": 0,
+        "loss_exits": 4,
+        "close_exits": 0,
+        "trailing_exits": 1,
+        "close_multiday_exits": 0,
+        "results": [
+          {
+            "code": "093370",
+            "name": "후성",
+            "entry_price": 18857,
+            "exit_price": 19511,
+            "quantity": 123,
+            "return_pct": 3.47,
+            "return_amount": 80442,
+            "exit_type": "trailing",
+            "entry_time": "09:05",
+            "exit_time": "09:07",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 4.68,
+            "max_loss_pct": -5.79,
+            "exit_date": ""
+          },
+          {
+            "code": "403870",
+            "name": "HPSP",
+            "entry_price": 57715,
+            "exit_price": 55872,
+            "quantity": 40,
+            "return_pct": -3.19,
+            "return_amount": -73720,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "10:32",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 2.95,
+            "max_loss_pct": -8.16,
+            "exit_date": ""
+          },
+          {
+            "code": "195870",
+            "name": "해성디에스",
+            "entry_price": 83767,
+            "exit_price": 81092,
+            "quantity": 27,
+            "return_pct": -3.19,
+            "return_amount": -72225,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:18",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 0.84,
+            "max_loss_pct": -15.07,
+            "exit_date": ""
+          },
+          {
+            "code": "095340",
+            "name": "ISC",
+            "entry_price": 206913,
+            "exit_price": 200305,
+            "quantity": 11,
+            "return_pct": -3.19,
+            "return_amount": -72688,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "10:47",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 3.15,
+            "max_loss_pct": -7.94,
+            "exit_date": ""
+          },
+          {
+            "code": "131970",
+            "name": "두산테스나",
+            "entry_price": 142384,
+            "exit_price": 137837,
+            "quantity": 16,
+            "return_pct": -3.19,
+            "return_amount": -72752,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:23",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 0.77,
+            "max_loss_pct": -12.03,
+            "exit_date": ""
+          }
+        ]
+      }
+    },
+    "team_j": {
+      "team_id": "team_j",
+      "team_name": "Mu Burst",
+      "strategy_id": "opening_30min_volume_burst",
+      "status": "success",
+      "selection": {
+        "strategy_id": "opening_30min_volume_burst",
+        "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+        "date": "20260622",
+        "selected_at": "2026-06-23 20:09:53",
+        "count": 5,
+        "candidates": [
+          {
+            "code": "293490",
+            "name": "카카오게임즈",
+            "price": 10040,
+            "change_pct": 13.96,
+            "score": 75.69,
+            "score_detail": {
+              "volume_surge": 42.67,
+              "price_momentum": 20.32,
+              "absolute_value": 2.7,
+              "price_level": 10
+            },
+            "rank": 1,
+            "market_cap": 901460586440,
+            "volume": 6885966,
+            "trading_value": 71781840730
+          },
+          {
+            "code": "000890",
+            "name": "보해양조",
+            "price": 2340,
+            "change_pct": 9.86,
+            "score": 68.41,
+            "score_detail": {
+              "volume_surge": 45.0,
+              "price_momentum": 14.35,
+              "absolute_value": 4.05,
+              "price_level": 5.0
+            },
+            "rank": 2,
+            "market_cap": 64640218500,
+            "volume": 43099663,
+            "trading_value": 107879413290
+          },
+          {
+            "code": "204270",
+            "name": "제이앤티씨",
+            "price": 22850,
+            "change_pct": 8.81,
+            "score": 53.56,
+            "score_detail": {
+              "volume_surge": 27.53,
+              "price_momentum": 12.82,
+              "absolute_value": 3.21,
+              "price_level": 10
+            },
+            "rank": 3,
+            "market_cap": 1321837448100,
+            "volume": 3771757,
+            "trading_value": 85297200625
+          },
+          {
+            "code": "004710",
+            "name": "한솔테크닉스",
+            "price": 15460,
+            "change_pct": 18.2,
+            "score": 47.04,
+            "score_detail": {
+              "volume_surge": 3.42,
+              "price_momentum": 26.49,
+              "absolute_value": 7.13,
+              "price_level": 10
+            },
+            "rank": 4,
+            "market_cap": 628132332820,
+            "volume": 12431044,
+            "trading_value": 189679763200
+          },
+          {
+            "code": "067310",
+            "name": "하나마이크론",
+            "price": 56800,
+            "change_pct": 15.92,
+            "score": 46.26,
+            "score_detail": {
+              "volume_surge": 3.09,
+              "price_momentum": 23.17,
+              "absolute_value": 15.0,
+              "price_level": 5.0
+            },
+            "rank": 5,
+            "market_cap": 3775974596800,
+            "volume": 7277423,
+            "trading_value": 399081032825
+          }
+        ],
+        "params": {
+          "value_surge_min": 3.0,
+          "price_up_min_pct": 1.5,
+          "min_price": 2000,
+          "min_market_cap": 50000000000,
+          "min_trading_value": 5000000000,
+          "history_days": 7,
+          "weights": {
+            "volume_surge": 45,
+            "price_momentum": 30,
+            "absolute_value": 15,
+            "price_level": 10
+          }
+        },
+        "simulation": null
+      },
+      "simulation": {
+        "date": "20260623",
+        "strategy_id": "opening_30min_volume_burst",
+        "strategy_name": "Mu Burst",
+        "holding_days": 1,
+        "total_trades": 5,
+        "wins": 1,
+        "losses": 4,
+        "win_rate": 20.0,
+        "total_return": 5.33,
+        "avg_return": 1.07,
+        "total_return_amount": 120108,
+        "profit_exits": 0,
+        "loss_exits": 4,
+        "close_exits": 0,
+        "trailing_exits": 1,
+        "close_multiday_exits": 0,
+        "results": [
+          {
+            "code": "293490",
+            "name": "카카오게임즈",
+            "entry_price": 9318,
+            "exit_price": 9021,
+            "quantity": 240,
+            "return_pct": -3.19,
+            "return_amount": -71280,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:47",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 1.4,
+            "max_loss_pct": -7.53,
+            "exit_date": ""
+          },
+          {
+            "code": "000890",
+            "name": "보해양조",
+            "entry_price": 2510,
+            "exit_price": 2964,
+            "quantity": 891,
+            "return_pct": 18.09,
+            "return_amount": 404514,
+            "exit_type": "trailing",
+            "entry_time": "09:00",
+            "exit_time": "09:00",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 21.36,
+            "max_loss_pct": -9.98,
+            "exit_date": ""
+          },
+          {
+            "code": "204270",
+            "name": "제이앤티씨",
+            "entry_price": 20691,
+            "exit_price": 20030,
+            "quantity": 108,
+            "return_pct": -3.19,
+            "return_amount": -71388,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:53",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 22.28,
+            "max_loss_pct": -4.12,
+            "exit_date": ""
+          },
+          {
+            "code": "004710",
+            "name": "한솔테크닉스",
+            "entry_price": 14428,
+            "exit_price": 13968,
+            "quantity": 155,
+            "return_pct": -3.19,
+            "return_amount": -71300,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "09:26",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 2.57,
+            "max_loss_pct": -11.74,
+            "exit_date": ""
+          },
+          {
+            "code": "067310",
+            "name": "하나마이크론",
+            "entry_price": 53807,
+            "exit_price": 52089,
+            "quantity": 41,
+            "return_pct": -3.19,
+            "return_amount": -70438,
+            "exit_type": "loss",
+            "entry_time": "09:05",
+            "exit_time": "10:49",
+            "high_price": 0,
+            "low_price": 0,
+            "max_profit_pct": 2.61,
+            "max_loss_pct": -8.19,
+            "exit_date": ""
+          }
+        ]
+      }
+    }
+  },
+  "leaderboard": {
+    "ranking": [
+      {
+        "team_id": "team_a",
+        "team_name": "Alpha Momentum",
+        "emoji": "🔴",
+        "elo": 1134,
+        "rank": 1,
+        "total_1st": 18,
+        "total_2nd": 15,
+        "total_3rd": 6,
+        "total_4th": 5,
+        "best_day_return": 45.97,
+        "worst_day_return": -15.95,
+        "total_5th": 3,
+        "elo_rank": 1
+      },
+      {
+        "team_id": "team_k",
+        "team_name": "Iota Flow",
+        "emoji": "💎",
+        "elo": 1061,
+        "rank": 4,
+        "total_1st": 6,
+        "total_2nd": 4,
+        "total_3rd": 2,
+        "total_4th": 5,
+        "best_day_return": 34.03,
+        "worst_day_return": -10.45,
+        "total_5th": 3,
+        "elo_rank": 2
+      },
+      {
+        "team_id": "team_e",
+        "team_name": "Echo Frontier",
+        "emoji": "🟣",
+        "elo": 1056,
+        "rank": 2,
+        "total_1st": 9,
+        "total_2nd": 13,
+        "total_3rd": 12,
+        "total_4th": 8,
+        "best_day_return": 40.86,
+        "worst_day_return": -15.97,
+        "total_6th": 2,
+        "total_5th": 3,
+        "elo_rank": 3
+      },
+      {
+        "team_id": "team_j",
+        "team_name": "Mu Burst",
+        "emoji": "💥",
+        "elo": 964,
+        "rank": 3,
+        "total_1st": 3,
+        "total_2nd": 3,
+        "total_3rd": 5,
+        "total_4th": 3,
+        "best_day_return": 76.7,
+        "worst_day_return": -15.95,
+        "total_5th": 6,
+        "elo_rank": 4
+      },
+      {
+        "team_id": "team_h",
+        "team_name": "Theta Sector",
+        "emoji": "🔷",
+        "elo": 852,
+        "rank": 5,
+        "total_1st": 4,
+        "total_2nd": 6,
+        "total_3rd": 12,
+        "total_4th": 9,
+        "best_day_return": 39.94,
+        "worst_day_return": -15.96,
+        "total_5th": 7,
+        "elo_rank": 5
+      }
+    ],
+    "recent_history": [
+      {
+        "date": "20260617",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_a",
+            "total_return": 19.09,
+            "win_rate": 60.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_k",
+            "total_return": 0.33,
+            "win_rate": 40.0,
+            "trades": 5
+          },
+          {
+            "rank": 3,
+            "team_id": "team_e",
+            "total_return": -7.95,
+            "win_rate": 20.0,
+            "trades": 5
+          },
+          {
+            "rank": 4,
+            "team_id": "team_h",
+            "total_return": -9.46,
+            "win_rate": 20.0,
+            "trades": 5
+          },
+          {
+            "rank": 5,
+            "team_id": "team_j",
+            "total_return": -15.95,
+            "win_rate": 0.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260618",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_a",
+            "total_return": 13.45,
+            "win_rate": 60.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_j",
+            "total_return": 7.21,
+            "win_rate": 60.0,
+            "trades": 5
+          },
+          {
+            "rank": 3,
+            "team_id": "team_e",
+            "total_return": 6.86,
+            "win_rate": 60.0,
+            "trades": 5
+          },
+          {
+            "rank": 4,
+            "team_id": "team_k",
+            "total_return": -4.84,
+            "win_rate": 20.0,
+            "trades": 5
+          },
+          {
+            "rank": 5,
+            "team_id": "team_h",
+            "total_return": -8.8,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260619",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_j",
+            "total_return": 16.45,
+            "win_rate": 80.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_a",
+            "total_return": 12.28,
+            "win_rate": 80.0,
+            "trades": 5
+          },
+          {
+            "rank": 3,
+            "team_id": "team_k",
+            "total_return": 2.58,
+            "win_rate": 40.0,
+            "trades": 5
+          },
+          {
+            "rank": 4,
+            "team_id": "team_e",
+            "total_return": -3.19,
+            "win_rate": 0.0,
+            "trades": 1
+          },
+          {
+            "rank": 5,
+            "team_id": "team_h",
+            "total_return": -10.48,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260622",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_k",
+            "total_return": 4.76,
+            "win_rate": 40.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_e",
+            "total_return": 1.78,
+            "win_rate": 40.0,
+            "trades": 5
+          },
+          {
+            "rank": 3,
+            "team_id": "team_a",
+            "total_return": -3.03,
+            "win_rate": 40.0,
+            "trades": 5
+          },
+          {
+            "rank": 4,
+            "team_id": "team_h",
+            "total_return": -3.62,
+            "win_rate": 40.0,
+            "trades": 5
+          },
+          {
+            "rank": 5,
+            "team_id": "team_j",
+            "total_return": -9.95,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        ]
+      },
+      {
+        "date": "20260623",
+        "ranking": [
+          {
+            "rank": 1,
+            "team_id": "team_a",
+            "total_return": 19.06,
+            "win_rate": 40.0,
+            "trades": 5
+          },
+          {
+            "rank": 2,
+            "team_id": "team_e",
+            "total_return": 14.18,
+            "win_rate": 75.0,
+            "trades": 4
+          },
+          {
+            "rank": 3,
+            "team_id": "team_j",
+            "total_return": 5.33,
+            "win_rate": 20.0,
+            "trades": 5
+          },
+          {
+            "rank": 4,
+            "team_id": "team_k",
+            "total_return": -9.29,
+            "win_rate": 20.0,
+            "trades": 5
+          },
+          {
+            "rank": 5,
+            "team_id": "team_h",
+            "total_return": -15.95,
+            "win_rate": 0.0,
+            "trades": 5
+          }
+        ]
+      }
+    ],
+    "total_days": 49,
+    "last_updated": "2026-06-23 20:10:03"
+  }
+}

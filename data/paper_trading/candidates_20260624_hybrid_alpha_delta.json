@@ -1,0 +1,214 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260622",
+  "selected_at": "2026-06-23 20:11:16",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "293490",
+      "name": "카카오게임즈",
+      "price": 10040,
+      "change_pct": 13.96,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 82.5,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 6885966,
+      "trading_value": 71781840730,
+      "themes": [
+        {
+          "code": "42",
+          "name": "게임"
+        },
+        {
+          "code": "265",
+          "name": "모바일게임(스마트폰)"
+        }
+      ]
+    },
+    {
+      "code": "014950",
+      "name": "삼익제약",
+      "price": 8960,
+      "change_pct": 6.54,
+      "score": 64.1,
+      "score_detail": {
+        "alpha_score": 81.4,
+        "delta_score": 0.0,
+        "alpha_norm": 98.7,
+        "delta_norm": 0.0,
+        "alpha_weighted": 64.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 18632565,
+      "trading_value": 172176751110,
+      "themes": [
+        {
+          "code": "583",
+          "name": "2025 하반기 신규상장"
+        },
+        {
+          "code": "172",
+          "name": "제약업체"
+        }
+      ]
+    },
+    {
+      "code": "204270",
+      "name": "제이앤티씨",
+      "price": 22850,
+      "change_pct": 8.81,
+      "score": 56.7,
+      "score_detail": {
+        "alpha_score": 72.0,
+        "delta_score": 0.0,
+        "alpha_norm": 87.3,
+        "delta_norm": 0.0,
+        "alpha_weighted": 56.7,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 3771757,
+      "trading_value": 85297200625,
+      "themes": [
+        {
+          "code": "279",
+          "name": "스마트폰"
+        },
+        {
+          "code": "393",
+          "name": "갤럭시 부품주"
+        }
+      ]
+    },
+    {
+      "code": "036930",
+      "name": "주성엔지니어링",
+      "price": 197900,
+      "change_pct": 2.49,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 70.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 9198613845900,
+      "volume": 2145985,
+      "trading_value": 414216222900,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "382",
+          "name": "플렉서블 디스플레이"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "9",
+          "name": "OLED(유기 발광 다이오드)"
+        }
+      ]
+    },
+    {
+      "code": "042700",
+      "name": "한미반도체",
+      "price": 301500,
+      "change_pct": 2.2,
+      "score": 31.5,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 63.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 89.9,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 31.5,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 28736628300000,
+      "volume": 883692,
+      "trading_value": 264305959250,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "18",
+          "name": "전자파"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "536",
+          "name": "HBM(고대역폭메모리)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
