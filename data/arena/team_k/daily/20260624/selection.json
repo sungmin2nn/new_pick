@@ -1,0 +1,40 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260623",
+  "selected_at": "2026-06-24 19:53:23",
+  "count": 1,
+  "candidates": [
+    {
+      "code": "039200",
+      "name": "오스코텍",
+      "price": 37000,
+      "change_pct": 1.51,
+      "score": 100.0,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 20.0,
+        "trading_value": 15.0
+      },
+      "rank": 1,
+      "market_cap": 1415552512000,
+      "volume": 304001,
+      "trading_value": 11446088425
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}

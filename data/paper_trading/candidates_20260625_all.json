@@ -1,0 +1,1339 @@
+{
+  "date": "20260625",
+  "generated_at": "2026-06-24 20:07:10",
+  "strategies": {
+    "largecap_contrarian": {
+      "strategy_id": "largecap_contrarian",
+      "strategy_name": "대형주 역추세",
+      "date": "20260623",
+      "selected_at": "2026-06-24 19:53:34",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "min_price": 5000,
+        "max_change": -3.0,
+        "min_trading_value": 50,
+        "min_market_cap": 1000000000000,
+        "kospi_drop_threshold": -2.0,
+        "entry_time": "09:30",
+        "weights": {
+          "market_cap": 30,
+          "change_pct": 25,
+          "trading_value": 20,
+          "price_level": 15,
+          "volatility": 10
+        }
+      },
+      "simulation": null
+    },
+    "momentum": {
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀 추세",
+      "date": "20260623",
+      "selected_at": "2026-06-24 19:53:36",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "000650",
+          "name": "천일고속",
+          "price": 202000,
+          "change_pct": 12.91,
+          "score": 82.8,
+          "score_detail": {
+            "change_pct": 31.33495145631068,
+            "trading_value": 24.014966962789067,
+            "volume_surge": 20,
+            "price_level": 7.5
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 141351,
+          "trading_value": 29771332450,
+          "themes": [
+            {
+              "code": "591",
+              "name": "서울고속버스터미널 재개발 수혜"
+            },
+            {
+              "code": "592",
+              "name": "부동산 보유 자산주"
+            }
+          ]
+        },
+        {
+          "code": "101530",
+          "name": "해태제과식품",
+          "price": 6220,
+          "change_pct": 13.71,
+          "score": 82.8,
+          "score_detail": {
+            "change_pct": 33.27669902912621,
+            "trading_value": 14.53595873847063,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 2660254,
+          "trading_value": 18020214675,
+          "themes": [
+            {
+              "code": "113",
+              "name": "음식료업종"
+            },
+            {
+              "code": "421",
+              "name": "日제품 불매운동(수혜)"
+            }
+          ]
+        },
+        {
+          "code": "290690",
+          "name": "소룩스",
+          "price": 5000,
+          "change_pct": 14.42,
+          "score": 79.1,
+          "score_detail": {
+            "change_pct": 35.0,
+            "trading_value": 9.09894210052975,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 2376476,
+          "trading_value": 11279950151,
+          "themes": [
+            {
+              "code": "33",
+              "name": "LED"
+            }
+          ]
+        },
+        {
+          "code": "030960",
+          "name": "양지사",
+          "price": 6610,
+          "change_pct": 4.42,
+          "score": 75.7,
+          "score_detail": {
+            "change_pct": 10.728155339805824,
+            "trading_value": 30.0,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 5283587,
+          "trading_value": 37190972400,
+          "themes": [
+            {
+              "code": "121",
+              "name": "남북경협"
+            }
+          ]
+        },
+        {
+          "code": "092220",
+          "name": "KEC",
+          "price": 4020,
+          "change_pct": 12.13,
+          "score": 67.7,
+          "score_detail": {
+            "change_pct": 29.441747572815537,
+            "trading_value": 10.736562342209691,
+            "volume_surge": 20,
+            "price_level": 7.5
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 3360336,
+          "trading_value": 13310106458,
+          "themes": [
+            {
+              "code": "533",
+              "name": "전력반도체"
+            },
+            {
+              "code": "14",
+              "name": "반도체 재료/부품"
+            },
+            {
+              "code": "227",
+              "name": "전기차"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "min_price": 3000,
+        "min_change": 3.0,
+        "max_change": 15.0,
+        "min_trading_value": 30,
+        "weights": {
+          "change_pct": 35,
+          "trading_value": 30,
+          "volume_surge": 20,
+          "price_level": 15
+        }
+      },
+      "simulation": null
+    },
+    "theme_policy": {
+      "strategy_id": "theme_policy",
+      "strategy_name": "테마/정책",
+      "date": "20260623",
+      "selected_at": "2026-06-24 19:53:37",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "006340",
+          "name": "대원전선",
+          "price": 10700,
+          "change_pct": 3.28,
+          "score": 47.6,
+          "score_detail": {
+            "theme_relevance": 4.4,
+            "change_pct": 8.2,
+            "trading_value": 20.0,
+            "theme_strength": 15.0,
+            "themes": [
+              "출판·매체복제"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 839034251200,
+          "volume": 24076006,
+          "trading_value": 278683299870,
+          "themes": [
+            {
+              "code": "178",
+              "name": "전선"
+            },
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "250",
+              "name": "철도"
+            }
+          ]
+        },
+        {
+          "code": "323410",
+          "name": "카카오뱅크",
+          "price": 20250,
+          "change_pct": -3.57,
+          "score": 35.1,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 2.4,
+            "trading_value": 1.7,
+            "theme_strength": -9.0,
+            "themes": [
+              "음식료·담배",
+              "음식료·담배",
+              "부동산",
+              "섬유·의류",
+              "통신",
+              "제약",
+              "운송·창고",
+              "코스닥 150 필수소비재",
+              "전기·가스"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 9661688849250,
+          "volume": 1139061,
+          "trading_value": 23648094550,
+          "themes": [
+            {
+              "code": "165",
+              "name": "은행"
+            },
+            {
+              "code": "489",
+              "name": "카카오뱅크(kakao BANK)"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "343",
+              "name": "인터넷은행"
+            }
+          ]
+        },
+        {
+          "code": "141080",
+          "name": "리가켐바이오",
+          "price": 138000,
+          "change_pct": 3.06,
+          "score": 32.9,
+          "score_detail": {
+            "theme_relevance": 4.4,
+            "change_pct": 7.6,
+            "trading_value": 5.8,
+            "theme_strength": 15.0,
+            "themes": [
+              "출판·매체복제"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 5108679684000,
+          "volume": 567932,
+          "trading_value": 80529306000,
+          "themes": [
+            {
+              "code": "448",
+              "name": "코로나19(치료제/백신 개발 등)"
+            },
+            {
+              "code": "436",
+              "name": "코로나19(진단/치료제/백신 개발 등)"
+            },
+            {
+              "code": "175",
+              "name": "의료기기"
+            }
+          ]
+        },
+        {
+          "code": "443060",
+          "name": "HD현대마린솔루션",
+          "price": 204500,
+          "change_pct": -2.39,
+          "score": 28.1,
+          "score_detail": {
+            "theme_relevance": 31.1,
+            "change_pct": 2.9,
+            "trading_value": 3.1,
+            "theme_strength": -9.0,
+            "themes": [
+              "음식료·담배",
+              "음식료·담배",
+              "부동산",
+              "섬유·의류",
+              "통신",
+              "제약",
+              "운송·창고"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 9168442570000,
+          "volume": 207363,
+          "trading_value": 43225031164,
+          "themes": [
+            {
+              "code": "94",
+              "name": "조선기자재"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            }
+          ]
+        },
+        {
+          "code": "278470",
+          "name": "에이피알",
+          "price": 355500,
+          "change_pct": -4.69,
+          "score": 11.3,
+          "score_detail": {
+            "theme_relevance": 17.8,
+            "change_pct": 2.0,
+            "trading_value": 12.1,
+            "theme_strength": -20.6,
+            "themes": [
+              "제약",
+              "운송·창고",
+              "코스닥 150 필수소비재",
+              "전기·가스"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 13309264102500,
+          "volume": 458666,
+          "trading_value": 169069489250,
+          "themes": [
+            {
+              "code": "32",
+              "name": "패션/의류"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "active_themes": [
+          {
+            "name": "출판·매체복제",
+            "change_pct": 2.35
+          },
+          {
+            "name": "음식료·담배",
+            "change_pct": -1.41
+          },
+          {
+            "name": "음식료·담배",
+            "change_pct": -2.24
+          },
+          {
+            "name": "부동산",
+            "change_pct": -2.49
+          },
+          {
+            "name": "섬유·의류",
+            "change_pct": -2.58
+          },
+          {
+            "name": "통신",
+            "change_pct": -2.6
+          },
+          {
+            "name": "제약",
+            "change_pct": -3.23
+          },
+          {
+            "name": "운송·창고",
+            "change_pct": -3.74
+          },
+          {
+            "name": "코스닥 150 필수소비재",
+            "change_pct": -3.95
+          },
+          {
+            "name": "전기·가스",
+            "change_pct": -4.25
+          }
+        ],
+        "theme_count": 10,
+        "total_stocks": 108,
+        "weights": {
+          "theme_relevance": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "theme_strength": 15
+        }
+      },
+      "simulation": null
+    },
+    "dart_disclosure": {
+      "strategy_id": "dart_disclosure",
+      "strategy_name": "DART 공시",
+      "date": "20260623",
+      "selected_at": "2026-06-24 19:53:39",
+      "count": 2,
+      "candidates": [
+        {
+          "code": "092040",
+          "name": "아미코젠",
+          "price": 1730,
+          "change_pct": 17.37,
+          "score": 87.9,
+          "score_detail": {
+            "disclosure": 40.0,
+            "change_pct": 25,
+            "trading_value": 20.0,
+            "market_cap": 2.9336116682399997,
+            "dart_raw": 15.0,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "주요사항보고서(유상증자결정)",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 1,
+          "market_cap": 122233819510,
+          "volume": 6481010,
+          "trading_value": 11383840259,
+          "themes": [
+            {
+              "code": "487",
+              "name": "건강기능식품"
+            }
+          ]
+        },
+        {
+          "code": "091810",
+          "name": "트리니티항공",
+          "price": 737,
+          "change_pct": -1.99,
+          "score": 49.1,
+          "score_detail": {
+            "disclosure": 40.0,
+            "change_pct": 0,
+            "trading_value": 1.7695121735456882,
+            "market_cap": 7.304604250680001,
+            "dart_raw": 15.0,
+            "disclosures": [
+              {
+                "category": "투자",
+                "report_nm": "주요사항보고서(유상증자결정)",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 2,
+          "market_cap": 304358510445,
+          "volume": 1345629,
+          "trading_value": 1007192196,
+          "themes": [
+            {
+              "code": "166",
+              "name": "항공/저가 항공사(LCC)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "weights": {
+          "disclosure": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "market_cap": 15
+        },
+        "min_market_cap": 100000000000,
+        "max_market_cap": 10000000000000,
+        "min_trading_value": 1000000000
+      },
+      "simulation": null
+    },
+    "frontier_gap": {
+      "strategy_id": "frontier_gap",
+      "strategy_name": "프론티어 갭",
+      "date": "20260623",
+      "selected_at": "2026-06-24 19:53:42",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "100660",
+          "name": "서암기계공업",
+          "price": 3895,
+          "change_pct": 4.986522911051213,
+          "score": 80.2,
+          "score_detail": {
+            "gap_pct": 40.0,
+            "volume_surge": 35.0,
+            "trading_value": 0.16734622031402618,
+            "price_level": 5.0
+          },
+          "rank": 1,
+          "market_cap": 42840000000,
+          "volume": 1658719,
+          "trading_value": 6435579129,
+          "themes": [
+            {
+              "code": "505",
+              "name": "로봇(산업용/협동로봇 등)"
+            },
+            {
+              "code": "250",
+              "name": "철도"
+            },
+            {
+              "code": "188",
+              "name": "풍력에너지"
+            },
+            {
+              "code": "517",
+              "name": "우크라이나 재건"
+            }
+          ]
+        },
+        {
+          "code": "475430",
+          "name": "키스트론",
+          "price": 6340,
+          "change_pct": 3.764320785597381,
+          "score": 68.2,
+          "score_detail": {
+            "gap_pct": 30.19595700446764,
+            "volume_surge": 24.45703493862134,
+            "trading_value": 3.5643743253511824,
+            "price_level": 10
+          },
+          "rank": 2,
+          "market_cap": 97093718400,
+          "volume": 21687697,
+          "trading_value": 137073983345
+        },
+        {
+          "code": "034730",
+          "name": "SK",
+          "price": 762000,
+          "change_pct": 4.383561643835616,
+          "score": 64.4,
+          "score_detail": {
+            "gap_pct": 35.163272861902996,
+            "volume_surge": 9.18791312559018,
+            "trading_value": 15.0,
+            "price_level": 5.0
+          },
+          "rank": 3,
+          "market_cap": 51114405615000,
+          "volume": 756245,
+          "trading_value": 576850118000,
+          "themes": [
+            {
+              "code": "514",
+              "name": "전기차(충전소/충전기)"
+            },
+            {
+              "code": "400",
+              "name": "조림사업"
+            },
+            {
+              "code": "392",
+              "name": "스마트팩토리(스마트공장)"
+            },
+            {
+              "code": "111",
+              "name": "지주사"
+            },
+            {
+              "code": "560",
+              "name": "냉각시스템(액침냉각 등)"
+            },
+            {
+              "code": "276",
+              "name": "클라우드 컴퓨팅"
+            },
+            {
+              "code": "381",
+              "name": "LNG(액화천연가스)"
+            },
+            {
+              "code": "386",
+              "name": "수소에너지(수소차/연료전지 등)"
+            },
+            {
+              "code": "17",
+              "name": "SI(시스템통합)"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "387",
+              "name": "블록체인"
+            },
+            {
+              "code": "342",
+              "name": "핀테크(FinTech)"
+            }
+          ]
+        },
+        {
+          "code": "320000",
+          "name": "한울반도체",
+          "price": 23800,
+          "change_pct": 2.8077753779697625,
+          "score": 60.2,
+          "score_detail": {
+            "gap_pct": 22.522911680579067,
+            "volume_surge": 19.169027384324835,
+            "trading_value": 8.53597978396357,
+            "price_level": 10
+          },
+          "rank": 4,
+          "market_cap": 154716392000,
+          "volume": 12864775,
+          "trading_value": 328265396375,
+          "themes": [
+            {
+              "code": "445",
+              "name": "2차전지(장비)"
+            },
+            {
+              "code": "9",
+              "name": "OLED(유기 발광 다이오드)"
+            }
+          ]
+        },
+        {
+          "code": "179900",
+          "name": "유티아이",
+          "price": 7650,
+          "change_pct": 2.684563758389262,
+          "score": 38.9,
+          "score_detail": {
+            "gap_pct": 21.534554688917105,
+            "volume_surge": 7.204910292728989,
+            "trading_value": 0.1983801547475804,
+            "price_level": 10
+          },
+          "rank": 5,
+          "market_cap": 115773910200,
+          "volume": 1207452,
+          "trading_value": 7629041045,
+          "themes": [
+            {
+              "code": "279",
+              "name": "스마트폰"
+            },
+            {
+              "code": "382",
+              "name": "플렉서블 디스플레이"
+            },
+            {
+              "code": "404",
+              "name": "폴더블폰"
+            },
+            {
+              "code": "393",
+              "name": "갤럭시 부품주"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "gap_min": 2.0,
+        "gap_max": 5.0,
+        "min_price": 3000,
+        "min_trading_value": 50,
+        "volume_surge_mult": 2.0,
+        "weights": {
+          "gap_pct": 40,
+          "volume_surge": 35,
+          "trading_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    },
+    "hybrid_alpha_delta": {
+      "strategy_id": "hybrid_alpha_delta",
+      "strategy_name": "Alpha-Delta 하이브리드",
+      "date": "20260623",
+      "selected_at": "2026-06-24 19:53:45",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "101530",
+          "name": "해태제과식품",
+          "price": 6220,
+          "change_pct": 13.71,
+          "score": 65.0,
+          "score_detail": {
+            "alpha_score": 82.8,
+            "delta_score": 0.0,
+            "alpha_norm": 100.0,
+            "delta_norm": 0.0,
+            "alpha_weighted": 65.0,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 2660254,
+          "trading_value": 18020214675,
+          "themes": [
+            {
+              "code": "113",
+              "name": "음식료업종"
+            },
+            {
+              "code": "421",
+              "name": "日제품 불매운동(수혜)"
+            }
+          ]
+        },
+        {
+          "code": "000650",
+          "name": "천일고속",
+          "price": 202000,
+          "change_pct": 12.91,
+          "score": 65.0,
+          "score_detail": {
+            "alpha_score": 82.8,
+            "delta_score": 0.0,
+            "alpha_norm": 100.0,
+            "delta_norm": 0.0,
+            "alpha_weighted": 65.0,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 141351,
+          "trading_value": 29771332450,
+          "themes": [
+            {
+              "code": "591",
+              "name": "서울고속버스터미널 재개발 수혜"
+            },
+            {
+              "code": "592",
+              "name": "부동산 보유 자산주"
+            }
+          ]
+        },
+        {
+          "code": "290690",
+          "name": "소룩스",
+          "price": 5000,
+          "change_pct": 14.42,
+          "score": 62.1,
+          "score_detail": {
+            "alpha_score": 79.1,
+            "delta_score": 0.0,
+            "alpha_norm": 95.5,
+            "delta_norm": 0.0,
+            "alpha_weighted": 62.1,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 2376476,
+          "trading_value": 11279950151,
+          "themes": [
+            {
+              "code": "33",
+              "name": "LED"
+            }
+          ]
+        },
+        {
+          "code": "006340",
+          "name": "대원전선",
+          "price": 10700,
+          "change_pct": 3.28,
+          "score": 35.0,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 47.6,
+            "alpha_norm": 0.0,
+            "delta_norm": 100.0,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 35.0,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 839034251200,
+          "volume": 24076006,
+          "trading_value": 278683299870,
+          "themes": [
+            {
+              "code": "178",
+              "name": "전선"
+            },
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "250",
+              "name": "철도"
+            }
+          ]
+        },
+        {
+          "code": "323410",
+          "name": "카카오뱅크",
+          "price": 20250,
+          "change_pct": -3.57,
+          "score": 25.8,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 35.1,
+            "alpha_norm": 0.0,
+            "delta_norm": 73.7,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 25.8,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 9661688849250,
+          "volume": 1139061,
+          "trading_value": 23648094550,
+          "themes": [
+            {
+              "code": "165",
+              "name": "은행"
+            },
+            {
+              "code": "489",
+              "name": "카카오뱅크(kakao BANK)"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "343",
+              "name": "인터넷은행"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "weight_alpha": 0.65,
+        "weight_delta": 0.35,
+        "overlap_bonus": 10.0,
+        "sub_top_n": 10,
+        "alpha_slot": 3,
+        "delta_slot": 2,
+        "score_normalization": "min-max per-strategy (0~100)",
+        "alpha_strategy": "momentum",
+        "delta_strategy": "theme_policy"
+      },
+      "simulation": null
+    },
+    "squeeze_play_kospi_v6": {
+      "strategy_id": "squeeze_play_kospi_v6",
+      "strategy_name": "스퀴즈 플레이 KOSPI v6",
+      "date": "20260623",
+      "selected_at": "2026-06-24 20:01:28",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "universe_market": "KOSPI",
+        "universe_size": 53,
+        "ma200_filter": true,
+        "squeeze_filter": true,
+        "squeeze_max_spread_pct": 10.0,
+        "bb_period": 20,
+        "percent_b_max": 0.2,
+        "ma200_period": 200,
+        "recommended_holding_days": 5
+      },
+      "simulation": null
+    },
+    "squeeze_play_kosdaq_v5": {
+      "strategy_id": "squeeze_play_kosdaq_v5",
+      "strategy_name": "스퀴즈 플레이 KOSDAQ v5",
+      "date": "20260623",
+      "selected_at": "2026-06-24 20:07:09",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "universe_market": "KOSDAQ",
+        "universe_size": 35,
+        "ma200_filter": false,
+        "squeeze_filter": true,
+        "squeeze_max_spread_pct": 15.0,
+        "bb_period": 20,
+        "percent_b_max": 0.2,
+        "ma200_period": 200,
+        "recommended_holding_days": 5
+      },
+      "simulation": null
+    },
+    "sector_rotation": {
+      "strategy_id": "sector_rotation",
+      "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+      "date": "20260623",
+      "selected_at": "2026-06-24 20:07:10",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "084670",
+          "name": "동양고속",
+          "price": 37750,
+          "change_pct": 18.52,
+          "score": 33.47,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 30.0,
+            "market_cap_rank": 0.82,
+            "volume_surge": 2.65
+          },
+          "rank": 1,
+          "market_cap": 109307729750,
+          "volume": 1273107,
+          "trading_value": 49271513425,
+          "themes": [
+            {
+              "code": "591",
+              "name": "서울고속버스터미널 재개발 수혜"
+            },
+            {
+              "code": "592",
+              "name": "부동산 보유 자산주"
+            }
+          ]
+        },
+        {
+          "code": "282330",
+          "name": "BGF리테일",
+          "price": 116800,
+          "change_pct": 8.15,
+          "score": 28.98,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 13.2,
+            "market_cap_rank": 15.09,
+            "volume_surge": 0.69
+          },
+          "rank": 2,
+          "market_cap": 2018760220800,
+          "volume": 110608,
+          "trading_value": 12811368150,
+          "themes": [
+            {
+              "code": "384",
+              "name": "편의점"
+            },
+            {
+              "code": "136",
+              "name": "소매유통"
+            },
+            {
+              "code": "571",
+              "name": "밸류업(25년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "483650",
+          "name": "달바글로벌",
+          "price": 207500,
+          "change_pct": 3.49,
+          "score": 27.48,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 5.65,
+            "market_cap_rank": 19.34,
+            "volume_surge": 2.48
+          },
+          "rank": 3,
+          "market_cap": 2587351737500,
+          "volume": 220213,
+          "trading_value": 46058353500
+        },
+        {
+          "code": "006340",
+          "name": "대원전선",
+          "price": 10700,
+          "change_pct": 3.28,
+          "score": 26.59,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 5.31,
+            "market_cap_rank": 6.27,
+            "volume_surge": 15.0
+          },
+          "rank": 4,
+          "market_cap": 839034251200,
+          "volume": 24076006,
+          "trading_value": 278683299870,
+          "themes": [
+            {
+              "code": "178",
+              "name": "전선"
+            },
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "250",
+              "name": "철도"
+            }
+          ]
+        },
+        {
+          "code": "000650",
+          "name": "천일고속",
+          "price": 202000,
+          "change_pct": 12.91,
+          "score": 24.67,
+          "score_detail": {
+            "sector_strength": 0,
+            "stock_momentum": 20.91,
+            "market_cap_rank": 2.16,
+            "volume_surge": 1.6
+          },
+          "rank": 5,
+          "market_cap": 288702440000,
+          "volume": 141351,
+          "trading_value": 29771332450,
+          "themes": [
+            {
+              "code": "591",
+              "name": "서울고속버스터미널 재개발 수혜"
+            },
+            {
+              "code": "592",
+              "name": "부동산 보유 자산주"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "top_sectors": 5,
+        "stocks_per_sector": 3,
+        "min_price": 3000,
+        "min_market_cap": 100000000000,
+        "min_trading_value": 5000000000,
+        "min_change_pct": 0.5,
+        "weights": {
+          "sector_strength": 35,
+          "stock_momentum": 30,
+          "market_cap_rank": 20,
+          "volume_surge": 15
+        }
+      },
+      "simulation": null
+    },
+    "foreign_flow_momentum": {
+      "strategy_id": "foreign_flow_momentum",
+      "strategy_name": "외국인 수급 모멘텀",
+      "date": "20260623",
+      "selected_at": "2026-06-24 20:07:10",
+      "count": 1,
+      "candidates": [
+        {
+          "code": "039200",
+          "name": "오스코텍",
+          "price": 37000,
+          "change_pct": 1.51,
+          "score": 100.0,
+          "score_detail": {
+            "foreign_consistency": 35.0,
+            "foreign_magnitude": 30.0,
+            "price_momentum": 20.0,
+            "trading_value": 15.0
+          },
+          "rank": 1,
+          "market_cap": 1415552512000,
+          "volume": 304001,
+          "trading_value": 11446088425,
+          "themes": [
+            {
+              "code": "571",
+              "name": "밸류업(25년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "377",
+              "name": "치매"
+            },
+            {
+              "code": "174",
+              "name": "치아 치료(임플란트 등)"
+            },
+            {
+              "code": "311",
+              "name": "고령화 사회(노인복지)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "pool_size": 100,
+        "lookback_days": 5,
+        "consecutive_days": 3,
+        "min_market_cap": 200000000000,
+        "min_trading_value": 10000000000,
+        "weights": {
+          "foreign_consistency": 35,
+          "foreign_magnitude": 30,
+          "price_momentum": 20,
+          "trading_value": 15
+        }
+      },
+      "simulation": null
+    },
+    "opening_30min_volume_burst": {
+      "strategy_id": "opening_30min_volume_burst",
+      "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+      "date": "20260623",
+      "selected_at": "2026-06-24 20:07:10",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "084670",
+          "name": "동양고속",
+          "price": 37750,
+          "change_pct": 18.52,
+          "score": 74.14,
+          "score_detail": {
+            "volume_surge": 35.19,
+            "price_momentum": 23.37,
+            "absolute_value": 5.57,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 109307729750,
+          "volume": 1273107,
+          "trading_value": 49271513425,
+          "themes": [
+            {
+              "code": "591",
+              "name": "서울고속버스터미널 재개발 수혜"
+            },
+            {
+              "code": "592",
+              "name": "부동산 보유 자산주"
+            }
+          ]
+        },
+        {
+          "code": "088910",
+          "name": "동우팜투테이블",
+          "price": 2570,
+          "change_pct": 13.72,
+          "score": 68.04,
+          "score_detail": {
+            "volume_surge": 45.0,
+            "price_momentum": 17.32,
+            "absolute_value": 0.72,
+            "price_level": 5.0
+          },
+          "rank": 2,
+          "market_cap": 66387633480,
+          "volume": 2533916,
+          "trading_value": 6399532551,
+          "themes": [
+            {
+              "code": "76",
+              "name": "여름"
+            },
+            {
+              "code": "60",
+              "name": "육계"
+            },
+            {
+              "code": "290",
+              "name": "스포츠행사 수혜(올림픽, 월드컵 등)"
+            },
+            {
+              "code": "16",
+              "name": "구제역/광우병 수혜"
+            },
+            {
+              "code": "417",
+              "name": "아프리카 돼지열병(ASF)"
+            }
+          ]
+        },
+        {
+          "code": "356680",
+          "name": "엑스게이트",
+          "price": 19690,
+          "change_pct": 21.54,
+          "score": 66.64,
+          "score_detail": {
+            "volume_surge": 14.45,
+            "price_momentum": 27.19,
+            "absolute_value": 15.0,
+            "price_level": 10
+          },
+          "rank": 3,
+          "market_cap": 562021357480,
+          "volume": 6945009,
+          "trading_value": 132640980955,
+          "themes": [
+            {
+              "code": "426",
+              "name": "양자암호/양자컴퓨팅"
+            },
+            {
+              "code": "55",
+              "name": "보안주(정보)"
+            }
+          ]
+        },
+        {
+          "code": "043650",
+          "name": "국순당",
+          "price": 4115,
+          "change_pct": 20.85,
+          "score": 61.07,
+          "score_detail": {
+            "volume_surge": 22.82,
+            "price_momentum": 26.31,
+            "absolute_value": 1.94,
+            "price_level": 10
+          },
+          "rank": 4,
+          "market_cap": 73486920960,
+          "volume": 4129060,
+          "trading_value": 17135506615,
+          "themes": [
+            {
+              "code": "547",
+              "name": "CXL(컴퓨트익스프레스링크)"
+            },
+            {
+              "code": "113",
+              "name": "음식료업종"
+            },
+            {
+              "code": "86",
+              "name": "주류업(주정, 에탄올 등)"
+            }
+          ]
+        },
+        {
+          "code": "101530",
+          "name": "해태제과식품",
+          "price": 6220,
+          "change_pct": 13.71,
+          "score": 55.9,
+          "score_detail": {
+            "volume_surge": 26.55,
+            "price_momentum": 17.3,
+            "absolute_value": 2.04,
+            "price_level": 10
+          },
+          "rank": 5,
+          "market_cap": 181106632840,
+          "volume": 2660254,
+          "trading_value": 18020214675,
+          "themes": [
+            {
+              "code": "113",
+              "name": "음식료업종"
+            },
+            {
+              "code": "421",
+              "name": "日제품 불매운동(수혜)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "value_surge_min": 3.0,
+        "price_up_min_pct": 1.5,
+        "min_price": 2000,
+        "min_market_cap": 50000000000,
+        "min_trading_value": 5000000000,
+        "history_days": 7,
+        "weights": {
+          "volume_surge": 45,
+          "price_momentum": 30,
+          "absolute_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    }
+  }
+}

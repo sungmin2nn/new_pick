@@ -1,0 +1,194 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260623",
+  "selected_at": "2026-06-24 19:53:45",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "101530",
+      "name": "해태제과식품",
+      "price": 6220,
+      "change_pct": 13.71,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 82.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 2660254,
+      "trading_value": 18020214675,
+      "themes": [
+        {
+          "code": "113",
+          "name": "음식료업종"
+        },
+        {
+          "code": "421",
+          "name": "日제품 불매운동(수혜)"
+        }
+      ]
+    },
+    {
+      "code": "000650",
+      "name": "천일고속",
+      "price": 202000,
+      "change_pct": 12.91,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 82.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 141351,
+      "trading_value": 29771332450,
+      "themes": [
+        {
+          "code": "591",
+          "name": "서울고속버스터미널 재개발 수혜"
+        },
+        {
+          "code": "592",
+          "name": "부동산 보유 자산주"
+        }
+      ]
+    },
+    {
+      "code": "290690",
+      "name": "소룩스",
+      "price": 5000,
+      "change_pct": 14.42,
+      "score": 62.1,
+      "score_detail": {
+        "alpha_score": 79.1,
+        "delta_score": 0.0,
+        "alpha_norm": 95.5,
+        "delta_norm": 0.0,
+        "alpha_weighted": 62.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 2376476,
+      "trading_value": 11279950151,
+      "themes": [
+        {
+          "code": "33",
+          "name": "LED"
+        }
+      ]
+    },
+    {
+      "code": "006340",
+      "name": "대원전선",
+      "price": 10700,
+      "change_pct": 3.28,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 47.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 839034251200,
+      "volume": 24076006,
+      "trading_value": 278683299870,
+      "themes": [
+        {
+          "code": "178",
+          "name": "전선"
+        },
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "250",
+          "name": "철도"
+        }
+      ]
+    },
+    {
+      "code": "323410",
+      "name": "카카오뱅크",
+      "price": 20250,
+      "change_pct": -3.57,
+      "score": 25.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 35.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 73.7,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 25.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 9661688849250,
+      "volume": 1139061,
+      "trading_value": 23648094550,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "489",
+          "name": "카카오뱅크(kakao BANK)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "343",
+          "name": "인터넷은행"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
