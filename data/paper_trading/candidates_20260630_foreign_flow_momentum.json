@@ -1,0 +1,171 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260626",
+  "selected_at": "2026-06-29 21:50:20",
+  "count": 4,
+  "candidates": [
+    {
+      "code": "032640",
+      "name": "LG유플러스",
+      "price": 14220,
+      "change_pct": 1.5,
+      "score": 92.81,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 20.0,
+        "trading_value": 7.81
+      },
+      "rank": 1,
+      "market_cap": 6035362349040,
+      "volume": 1019010,
+      "trading_value": 14332160470,
+      "themes": [
+        {
+          "code": "514",
+          "name": "전기차(충전소/충전기)"
+        },
+        {
+          "code": "373",
+          "name": "5G(5세대 이동통신)"
+        },
+        {
+          "code": "126",
+          "name": "통신"
+        },
+        {
+          "code": "480",
+          "name": "메타버스(Metaverse)"
+        },
+        {
+          "code": "426",
+          "name": "양자암호/양자컴퓨팅"
+        },
+        {
+          "code": "104",
+          "name": "스마트홈(홈네트워크)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "462",
+          "name": "UAM(도심항공모빌리티)"
+        }
+      ]
+    },
+    {
+      "code": "036570",
+      "name": "NC",
+      "price": 238000,
+      "change_pct": 1.49,
+      "score": 72.63,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 2.76,
+        "price_momentum": 19.87,
+        "trading_value": 15.0
+      },
+      "rank": 2,
+      "market_cap": 5127477236000,
+      "volume": 116875,
+      "trading_value": 27510577500,
+      "themes": [
+        {
+          "code": "289",
+          "name": "증강현실(AR)"
+        },
+        {
+          "code": "42",
+          "name": "게임"
+        },
+        {
+          "code": "265",
+          "name": "모바일게임(스마트폰)"
+        }
+      ]
+    },
+    {
+      "code": "271560",
+      "name": "오리온",
+      "price": 126400,
+      "change_pct": 1.28,
+      "score": 70.12,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 5.7,
+        "price_momentum": 17.07,
+        "trading_value": 12.35
+      },
+      "rank": 3,
+      "market_cap": 4997367084800,
+      "volume": 179824,
+      "trading_value": 22654183250,
+      "themes": [
+        {
+          "code": "113",
+          "name": "음식료업종"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "383310",
+      "name": "에코프로에이치엔",
+      "price": 28150,
+      "change_pct": 0.72,
+      "score": 53.83,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 2.52,
+        "price_momentum": 9.6,
+        "trading_value": 6.71
+      },
+      "rank": 4,
+      "market_cap": 590444335800,
+      "volume": 426340,
+      "trading_value": 12305316425,
+      "themes": [
+        {
+          "code": "152",
+          "name": "온실가스(탄소배출권)/탄소 포집·활용·저장(CCUS)"
+        },
+        {
+          "code": "19",
+          "name": "황사/미세먼지"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}

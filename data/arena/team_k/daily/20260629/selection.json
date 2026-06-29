@@ -1,0 +1,91 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260626",
+  "selected_at": "2026-06-29 21:36:44",
+  "count": 4,
+  "candidates": [
+    {
+      "code": "032640",
+      "name": "LG유플러스",
+      "price": 14220,
+      "change_pct": 1.5,
+      "score": 92.81,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 20.0,
+        "trading_value": 7.81
+      },
+      "rank": 1,
+      "market_cap": 6035362349040,
+      "volume": 1019010,
+      "trading_value": 14332160470
+    },
+    {
+      "code": "036570",
+      "name": "NC",
+      "price": 238000,
+      "change_pct": 1.49,
+      "score": 72.63,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 2.76,
+        "price_momentum": 19.87,
+        "trading_value": 15.0
+      },
+      "rank": 2,
+      "market_cap": 5127477236000,
+      "volume": 116875,
+      "trading_value": 27510577500
+    },
+    {
+      "code": "271560",
+      "name": "오리온",
+      "price": 126400,
+      "change_pct": 1.28,
+      "score": 70.12,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 5.7,
+        "price_momentum": 17.07,
+        "trading_value": 12.35
+      },
+      "rank": 3,
+      "market_cap": 4997367084800,
+      "volume": 179824,
+      "trading_value": 22654183250
+    },
+    {
+      "code": "383310",
+      "name": "에코프로에이치엔",
+      "price": 28150,
+      "change_pct": 0.72,
+      "score": 53.83,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 2.52,
+        "price_momentum": 9.6,
+        "trading_value": 6.71
+      },
+      "rank": 4,
+      "market_cap": 590444335800,
+      "volume": 426340,
+      "trading_value": 12305316425
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
