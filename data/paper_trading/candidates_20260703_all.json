@@ -1,0 +1,1577 @@
+{
+  "date": "20260703",
+  "generated_at": "2026-07-02 20:26:44",
+  "strategies": {
+    "largecap_contrarian": {
+      "strategy_id": "largecap_contrarian",
+      "strategy_name": "대형주 역추세",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:13:38",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "min_price": 5000,
+        "max_change": -3.0,
+        "min_trading_value": 50,
+        "min_market_cap": 1000000000000,
+        "kospi_drop_threshold": -2.0,
+        "entry_time": "09:30",
+        "weights": {
+          "market_cap": 30,
+          "change_pct": 25,
+          "trading_value": 20,
+          "price_level": 15,
+          "volatility": 10
+        }
+      },
+      "simulation": null
+    },
+    "momentum": {
+      "strategy_id": "momentum",
+      "strategy_name": "모멘텀 추세",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:13:58",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "028050",
+          "name": "삼성E&A",
+          "price": 51700,
+          "change_pct": 8.61,
+          "score": 79.5,
+          "score_detail": {
+            "change_pct": 21.96428571428571,
+            "trading_value": 30.0,
+            "volume_surge": 20,
+            "price_level": 7.5
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 5588262,
+          "trading_value": 284406572800
+        },
+        {
+          "code": "037350",
+          "name": "성도이엔지",
+          "price": 11200,
+          "change_pct": 13.25,
+          "score": 71.0,
+          "score_detail": {
+            "change_pct": 33.80102040816326,
+            "trading_value": 2.1666011457946164,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 1870898,
+          "trading_value": 20539853550,
+          "themes": [
+            {
+              "code": "12",
+              "name": "반도체 장비"
+            }
+          ]
+        },
+        {
+          "code": "089860",
+          "name": "롯데렌탈",
+          "price": 31950,
+          "change_pct": 13.7,
+          "score": 68.7,
+          "score_detail": {
+            "change_pct": 34.94897959183673,
+            "trading_value": 0.4827375696642128,
+            "volume_surge": 18.3058317,
+            "price_level": 15
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 146998,
+          "trading_value": 4576457925,
+          "themes": [
+            {
+              "code": "525",
+              "name": "렌터카"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "017510",
+          "name": "세명전기",
+          "price": 8650,
+          "change_pct": 12.78,
+          "score": 68.5,
+          "score_detail": {
+            "change_pct": 32.60204081632653,
+            "trading_value": 0.9154452333388549,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 4,
+          "market_cap": 0,
+          "volume": 1036878,
+          "trading_value": 8678621380,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "213",
+              "name": "해저터널(지하화/지하도로 등)"
+            },
+            {
+              "code": "250",
+              "name": "철도"
+            }
+          ]
+        },
+        {
+          "code": "039440",
+          "name": "에스티아이",
+          "price": 31600,
+          "change_pct": 11.27,
+          "score": 65.1,
+          "score_detail": {
+            "change_pct": 28.75,
+            "trading_value": 1.3784063766194365,
+            "volume_surge": 20,
+            "price_level": 15
+          },
+          "rank": 5,
+          "market_cap": 0,
+          "volume": 407960,
+          "trading_value": 13067594450,
+          "themes": [
+            {
+              "code": "533",
+              "name": "전력반도체"
+            },
+            {
+              "code": "12",
+              "name": "반도체 장비"
+            },
+            {
+              "code": "536",
+              "name": "HBM(고대역폭메모리)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "min_price": 3000,
+        "min_change": 3.0,
+        "max_change": 15.0,
+        "min_trading_value": 30,
+        "weights": {
+          "change_pct": 35,
+          "trading_value": 30,
+          "volume_surge": 20,
+          "price_level": 15
+        }
+      },
+      "simulation": null
+    },
+    "theme_policy": {
+      "strategy_id": "theme_policy",
+      "strategy_name": "테마/정책",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:13:59",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "267250",
+          "name": "HD현대",
+          "price": 210000,
+          "change_pct": 5.26,
+          "score": 71.2,
+          "score_detail": {
+            "theme_relevance": 40.0,
+            "change_pct": 13.2,
+            "trading_value": 3.1,
+            "theme_strength": 15.0,
+            "themes": [
+              "비금속",
+              "건설",
+              "코스닥 150 필수소비재",
+              "건설",
+              "코스닥 150 자유소비재",
+              "금속",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 벤처기업부",
+              "비금속",
+              "오락·문화"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 16588547850000,
+          "volume": 166890,
+          "trading_value": 34394212200,
+          "themes": [
+            {
+              "code": "600",
+              "name": "주유소"
+            },
+            {
+              "code": "111",
+              "name": "지주사"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "047810",
+          "name": "한국항공우주",
+          "price": 154200,
+          "change_pct": 5.33,
+          "score": 69.3,
+          "score_detail": {
+            "theme_relevance": 36.0,
+            "change_pct": 13.3,
+            "trading_value": 4.9,
+            "theme_strength": 15.0,
+            "themes": [
+              "비금속",
+              "건설",
+              "코스닥 150 필수소비재",
+              "건설",
+              "코스닥 150 자유소비재",
+              "금속",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 벤처기업부",
+              "비금속"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 15030661499400,
+          "volume": 361124,
+          "trading_value": 55252079550,
+          "themes": [
+            {
+              "code": "144",
+              "name": "방위산업/전쟁 및 테러"
+            },
+            {
+              "code": "349",
+              "name": "드론(Drone)"
+            },
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            },
+            {
+              "code": "571",
+              "name": "밸류업(25년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "462",
+              "name": "UAM(도심항공모빌리티)"
+            }
+          ]
+        },
+        {
+          "code": "047050",
+          "name": "포스코인터내셔널",
+          "price": 51300,
+          "change_pct": 4.37,
+          "score": 63.4,
+          "score_detail": {
+            "theme_relevance": 36.0,
+            "change_pct": 10.9,
+            "trading_value": 1.4,
+            "theme_strength": 15.0,
+            "themes": [
+              "비금속",
+              "건설",
+              "건설",
+              "코스닥 150 자유소비재",
+              "금속",
+              "코스닥 150 커뮤니케이션서비스",
+              "코스닥 벤처기업부",
+              "비금속",
+              "오락·문화"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 9024839024400,
+          "volume": 319420,
+          "trading_value": 16194118350,
+          "themes": [
+            {
+              "code": "323",
+              "name": "셰일가스(Shale Gas)"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "517",
+              "name": "우크라이나 재건"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "501",
+              "name": "리비안(RIVIAN)"
+            }
+          ]
+        },
+        {
+          "code": "222800",
+          "name": "심텍",
+          "price": 157300,
+          "change_pct": 5.78,
+          "score": 61.1,
+          "score_detail": {
+            "theme_relevance": 12.0,
+            "change_pct": 14.5,
+            "trading_value": 20.0,
+            "theme_strength": 14.6,
+            "themes": [
+              "건설",
+              "코스닥 150 필수소비재",
+              "건설"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 5893076346300,
+          "volume": 1437971,
+          "trading_value": 223582302400,
+          "themes": [
+            {
+              "code": "545",
+              "name": "온디바이스 AI"
+            },
+            {
+              "code": "599",
+              "name": "소캠(SOCAMM)"
+            },
+            {
+              "code": "287",
+              "name": "PCB(FPCB 등)"
+            }
+          ]
+        },
+        {
+          "code": "352820",
+          "name": "하이브",
+          "price": 204000,
+          "change_pct": 6.19,
+          "score": 60.0,
+          "score_detail": {
+            "theme_relevance": 24.0,
+            "change_pct": 15.5,
+            "trading_value": 5.9,
+            "theme_strength": 14.6,
+            "themes": [
+              "건설",
+              "코스닥 150 필수소비재",
+              "건설",
+              "코스닥 150 자유소비재",
+              "금속",
+              "코스닥 150 커뮤니케이션서비스"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 8792858796000,
+          "volume": 326173,
+          "trading_value": 65687268850,
+          "themes": [
+            {
+              "code": "98",
+              "name": "음원/음반"
+            },
+            {
+              "code": "128",
+              "name": "엔터테인먼트"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "active_themes": [
+          {
+            "name": "비금속",
+            "change_pct": 7.05
+          },
+          {
+            "name": "건설",
+            "change_pct": 6.88
+          },
+          {
+            "name": "코스닥 150 필수소비재",
+            "change_pct": 6.03
+          },
+          {
+            "name": "건설",
+            "change_pct": 5.79
+          },
+          {
+            "name": "코스닥 150 자유소비재",
+            "change_pct": 5.2
+          },
+          {
+            "name": "금속",
+            "change_pct": 5.12
+          },
+          {
+            "name": "코스닥 150 커뮤니케이션서비스",
+            "change_pct": 4.78
+          },
+          {
+            "name": "코스닥 벤처기업부",
+            "change_pct": 4.31
+          },
+          {
+            "name": "비금속",
+            "change_pct": 4.3
+          },
+          {
+            "name": "오락·문화",
+            "change_pct": 3.81
+          }
+        ],
+        "theme_count": 10,
+        "total_stocks": 96,
+        "weights": {
+          "theme_relevance": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "theme_strength": 15
+        }
+      },
+      "simulation": null
+    },
+    "dart_disclosure": {
+      "strategy_id": "dart_disclosure",
+      "strategy_name": "DART 공시",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:14:01",
+      "count": 1,
+      "candidates": [
+        {
+          "code": "0015G0",
+          "name": "그린광학",
+          "price": 18370,
+          "change_pct": 8.19,
+          "score": 85.6,
+          "score_detail": {
+            "disclosure": 40.0,
+            "change_pct": 20.474999999999998,
+            "trading_value": 20.0,
+            "market_cap": 5.15941627608,
+            "dart_raw": 40,
+            "disclosures": [
+              {
+                "category": "계약",
+                "report_nm": "단일판매ㆍ공급계약체결              ",
+                "amount": 0
+              }
+            ]
+          },
+          "rank": 1,
+          "market_cap": 214975678170,
+          "volume": 125382,
+          "trading_value": 2203195860,
+          "themes": [
+            {
+              "code": "144",
+              "name": "방위산업/전쟁 및 테러"
+            },
+            {
+              "code": "12",
+              "name": "반도체 장비"
+            },
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            },
+            {
+              "code": "583",
+              "name": "2025 하반기 신규상장"
+            },
+            {
+              "code": "9",
+              "name": "OLED(유기 발광 다이오드)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "weights": {
+          "disclosure": 40,
+          "change_pct": 25,
+          "trading_value": 20,
+          "market_cap": 15
+        },
+        "min_market_cap": 100000000000,
+        "max_market_cap": 10000000000000,
+        "min_trading_value": 1000000000
+      },
+      "simulation": null
+    },
+    "frontier_gap": {
+      "strategy_id": "frontier_gap",
+      "strategy_name": "프론티어 갭",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:14:11",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "006340",
+          "name": "대원전선",
+          "price": 10670,
+          "change_pct": 3.4917555771096023,
+          "score": 77.8,
+          "score_detail": {
+            "gap_pct": 28.966389744022266,
+            "volume_surge": 27.739628040057223,
+            "trading_value": 11.0575429309042,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 1050753174400,
+          "volume": 32007321,
+          "trading_value": 399479452695,
+          "themes": [
+            {
+              "code": "178",
+              "name": "전선"
+            },
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "250",
+              "name": "철도"
+            }
+          ]
+        },
+        {
+          "code": "119850",
+          "name": "지엔씨에너지",
+          "price": 23450,
+          "change_pct": 3.303964757709251,
+          "score": 66.7,
+          "score_detail": {
+            "gap_pct": 27.408542424822826,
+            "volume_surge": 28.64091559370529,
+            "trading_value": 0.6035525830717804,
+            "price_level": 10
+          },
+          "rank": 2,
+          "market_cap": 458102115650,
+          "volume": 813362,
+          "trading_value": 21804740625,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "121",
+              "name": "남북경협"
+            }
+          ]
+        },
+        {
+          "code": "045100",
+          "name": "한양이엔지",
+          "price": 31050,
+          "change_pct": 2.3064250411861615,
+          "score": 65.1,
+          "score_detail": {
+            "gap_pct": 19.13329990688346,
+            "volume_surge": 35.0,
+            "trading_value": 0.983010095087166,
+            "price_level": 10
+          },
+          "rank": 3,
+          "market_cap": 672000000000,
+          "volume": 968308,
+          "trading_value": 35513525675,
+          "themes": [
+            {
+              "code": "12",
+              "name": "반도체 장비"
+            },
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            },
+            {
+              "code": "537",
+              "name": "초전도체"
+            },
+            {
+              "code": "205",
+              "name": "원자력발전"
+            }
+          ]
+        },
+        {
+          "code": "010120",
+          "name": "LS ELECTRIC",
+          "price": 247500,
+          "change_pct": 3.9915966386554618,
+          "score": 64.3,
+          "score_detail": {
+            "gap_pct": 33.11289733284618,
+            "volume_surge": 11.216022889842632,
+            "trading_value": 15.0,
+            "price_level": 5.0
+          },
+          "rank": 4,
+          "market_cap": 39525000000000,
+          "volume": 2069313,
+          "trading_value": 541909882500,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "392",
+              "name": "스마트팩토리(스마트공장)"
+            },
+            {
+              "code": "191",
+              "name": "태양광에너지"
+            },
+            {
+              "code": "386",
+              "name": "수소에너지(수소차/연료전지 등)"
+            },
+            {
+              "code": "229",
+              "name": "스마트그리드(지능형전력망)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "329",
+              "name": "전력저장장치(ESS)"
+            },
+            {
+              "code": "227",
+              "name": "전기차"
+            },
+            {
+              "code": "537",
+              "name": "초전도체"
+            },
+            {
+              "code": "205",
+              "name": "원자력발전"
+            }
+          ]
+        },
+        {
+          "code": "062040",
+          "name": "산일전기",
+          "price": 250000,
+          "change_pct": 4.821802935010482,
+          "score": 61.8,
+          "score_detail": {
+            "gap_pct": 40.0,
+            "volume_surge": 11.967095851216023,
+            "trading_value": 4.861459299000696,
+            "price_level": 5.0
+          },
+          "rank": 5,
+          "market_cap": 8006044775000,
+          "volume": 669135,
+          "trading_value": 175631522500,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "gap_min": 2.0,
+        "gap_max": 5.0,
+        "min_price": 3000,
+        "min_trading_value": 50,
+        "volume_surge_mult": 2.0,
+        "weights": {
+          "gap_pct": 40,
+          "volume_surge": 35,
+          "trading_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    },
+    "hybrid_alpha_delta": {
+      "strategy_id": "hybrid_alpha_delta",
+      "strategy_name": "Alpha-Delta 하이브리드",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:14:31",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "028050",
+          "name": "삼성E&A",
+          "price": 51700,
+          "change_pct": 8.61,
+          "score": 65.0,
+          "score_detail": {
+            "alpha_score": 79.5,
+            "delta_score": 0.0,
+            "alpha_norm": 100.0,
+            "delta_norm": 0.0,
+            "alpha_weighted": 65.0,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 1,
+          "market_cap": 0,
+          "volume": 5588262,
+          "trading_value": 284406572800
+        },
+        {
+          "code": "037350",
+          "name": "성도이엔지",
+          "price": 11200,
+          "change_pct": 13.25,
+          "score": 58.1,
+          "score_detail": {
+            "alpha_score": 71.0,
+            "delta_score": 0.0,
+            "alpha_norm": 89.3,
+            "delta_norm": 0.0,
+            "alpha_weighted": 58.1,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 2,
+          "market_cap": 0,
+          "volume": 1870898,
+          "trading_value": 20539853550,
+          "themes": [
+            {
+              "code": "12",
+              "name": "반도체 장비"
+            }
+          ]
+        },
+        {
+          "code": "089860",
+          "name": "롯데렌탈",
+          "price": 31950,
+          "change_pct": 13.7,
+          "score": 56.2,
+          "score_detail": {
+            "alpha_score": 68.7,
+            "delta_score": 0.0,
+            "alpha_norm": 86.4,
+            "delta_norm": 0.0,
+            "alpha_weighted": 56.2,
+            "delta_weighted": 0.0,
+            "overlap_bonus": 0,
+            "source": [
+              "alpha"
+            ]
+          },
+          "rank": 3,
+          "market_cap": 0,
+          "volume": 146998,
+          "trading_value": 4576457925,
+          "themes": [
+            {
+              "code": "525",
+              "name": "렌터카"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "267250",
+          "name": "HD현대",
+          "price": 210000,
+          "change_pct": 5.26,
+          "score": 35.0,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 71.2,
+            "alpha_norm": 0.0,
+            "delta_norm": 100.0,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 35.0,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 4,
+          "market_cap": 16588547850000,
+          "volume": 166890,
+          "trading_value": 34394212200,
+          "themes": [
+            {
+              "code": "600",
+              "name": "주유소"
+            },
+            {
+              "code": "111",
+              "name": "지주사"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "047810",
+          "name": "한국항공우주",
+          "price": 154200,
+          "change_pct": 5.33,
+          "score": 34.1,
+          "score_detail": {
+            "alpha_score": 0.0,
+            "delta_score": 69.3,
+            "alpha_norm": 0.0,
+            "delta_norm": 97.3,
+            "alpha_weighted": 0.0,
+            "delta_weighted": 34.1,
+            "overlap_bonus": 0,
+            "source": [
+              "delta"
+            ]
+          },
+          "rank": 5,
+          "market_cap": 15030661499400,
+          "volume": 361124,
+          "trading_value": 55252079550,
+          "themes": [
+            {
+              "code": "144",
+              "name": "방위산업/전쟁 및 테러"
+            },
+            {
+              "code": "349",
+              "name": "드론(Drone)"
+            },
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            },
+            {
+              "code": "571",
+              "name": "밸류업(25년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "462",
+              "name": "UAM(도심항공모빌리티)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "weight_alpha": 0.65,
+        "weight_delta": 0.35,
+        "overlap_bonus": 10.0,
+        "sub_top_n": 10,
+        "alpha_slot": 3,
+        "delta_slot": 2,
+        "score_normalization": "min-max per-strategy (0~100)",
+        "alpha_strategy": "momentum",
+        "delta_strategy": "theme_policy"
+      },
+      "simulation": null
+    },
+    "squeeze_play_kospi_v6": {
+      "strategy_id": "squeeze_play_kospi_v6",
+      "strategy_name": "스퀴즈 플레이 KOSPI v6",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:21:18",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "universe_market": "KOSPI",
+        "universe_size": 53,
+        "ma200_filter": true,
+        "squeeze_filter": true,
+        "squeeze_max_spread_pct": 10.0,
+        "bb_period": 20,
+        "percent_b_max": 0.2,
+        "ma200_period": 200,
+        "recommended_holding_days": 5
+      },
+      "simulation": null
+    },
+    "squeeze_play_kosdaq_v5": {
+      "strategy_id": "squeeze_play_kosdaq_v5",
+      "strategy_name": "스퀴즈 플레이 KOSDAQ v5",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:26:43",
+      "count": 0,
+      "candidates": [],
+      "params": {
+        "universe_market": "KOSDAQ",
+        "universe_size": 35,
+        "ma200_filter": false,
+        "squeeze_filter": true,
+        "squeeze_max_spread_pct": 15.0,
+        "bb_period": 20,
+        "percent_b_max": 0.2,
+        "ma200_period": 200,
+        "recommended_holding_days": 5
+      },
+      "simulation": null
+    },
+    "sector_rotation": {
+      "strategy_id": "sector_rotation",
+      "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:26:44",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "010120",
+          "name": "LS ELECTRIC",
+          "price": 263500,
+          "change_pct": 10.71,
+          "score": 93.94,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 30.0,
+            "market_cap_rank": 13.94,
+            "volume_surge": 15.0
+          },
+          "rank": 1,
+          "market_cap": 39525000000000,
+          "volume": 2069313,
+          "trading_value": 541909882500,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "392",
+              "name": "스마트팩토리(스마트공장)"
+            },
+            {
+              "code": "191",
+              "name": "태양광에너지"
+            },
+            {
+              "code": "386",
+              "name": "수소에너지(수소차/연료전지 등)"
+            },
+            {
+              "code": "229",
+              "name": "스마트그리드(지능형전력망)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "329",
+              "name": "전력저장장치(ESS)"
+            },
+            {
+              "code": "227",
+              "name": "전기차"
+            },
+            {
+              "code": "537",
+              "name": "초전도체"
+            },
+            {
+              "code": "205",
+              "name": "원자력발전"
+            }
+          ]
+        },
+        {
+          "code": "064350",
+          "name": "현대로템",
+          "price": 189800,
+          "change_pct": 9.71,
+          "score": 72.02,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 27.2,
+            "market_cap_rank": 7.31,
+            "volume_surge": 2.52
+          },
+          "rank": 2,
+          "market_cap": 20715207211400,
+          "volume": 491669,
+          "trading_value": 90919398200,
+          "themes": [
+            {
+              "code": "250",
+              "name": "철도"
+            },
+            {
+              "code": "144",
+              "name": "방위산업/전쟁 및 테러"
+            },
+            {
+              "code": "386",
+              "name": "수소에너지(수소차/연료전지 등)"
+            },
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "006260",
+          "name": "LS",
+          "price": 399000,
+          "change_pct": 9.17,
+          "score": 67.93,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 25.69,
+            "market_cap_rank": 4.39,
+            "volume_surge": 2.85
+          },
+          "rank": 3,
+          "market_cap": 12448800000000,
+          "volume": 260834,
+          "trading_value": 103140541750,
+          "themes": [
+            {
+              "code": "178",
+              "name": "전선"
+            },
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "213",
+              "name": "해저터널(지하화/지하도로 등)"
+            },
+            {
+              "code": "586",
+              "name": "광통신(광케이블/광섬유 등)"
+            },
+            {
+              "code": "111",
+              "name": "지주사"
+            },
+            {
+              "code": "321",
+              "name": "무선충전기술"
+            },
+            {
+              "code": "188",
+              "name": "풍력에너지"
+            }
+          ]
+        },
+        {
+          "code": "034020",
+          "name": "두산에너빌리티",
+          "price": 88500,
+          "change_pct": 1.96,
+          "score": 65.85,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 5.49,
+            "market_cap_rank": 20.0,
+            "volume_surge": 5.36
+          },
+          "rank": 4,
+          "market_cap": 56689661421000,
+          "volume": 2186748,
+          "trading_value": 193684547550,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "323",
+              "name": "셰일가스(Shale Gas)"
+            },
+            {
+              "code": "188",
+              "name": "풍력에너지"
+            },
+            {
+              "code": "205",
+              "name": "원자력발전"
+            }
+          ]
+        },
+        {
+          "code": "000270",
+          "name": "기아",
+          "price": 141500,
+          "change_pct": 2.54,
+          "score": 64.69,
+          "score_detail": {
+            "sector_strength": 35,
+            "stock_momentum": 7.11,
+            "market_cap_rank": 19.49,
+            "volume_surge": 3.09
+          },
+          "rank": 5,
+          "market_cap": 55243439217000,
+          "volume": 790999,
+          "trading_value": 111532199100,
+          "themes": [
+            {
+              "code": "514",
+              "name": "전기차(충전소/충전기)"
+            },
+            {
+              "code": "587",
+              "name": "피지컬 AI/휴머노이드 로봇"
+            },
+            {
+              "code": "144",
+              "name": "방위산업/전쟁 및 테러"
+            },
+            {
+              "code": "386",
+              "name": "수소에너지(수소차/연료전지 등)"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "362",
+              "name": "자율주행차"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "227",
+              "name": "전기차"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "top_sectors": 5,
+        "stocks_per_sector": 3,
+        "min_price": 3000,
+        "min_market_cap": 100000000000,
+        "min_trading_value": 5000000000,
+        "min_change_pct": 0.5,
+        "weights": {
+          "sector_strength": 35,
+          "stock_momentum": 30,
+          "market_cap_rank": 20,
+          "volume_surge": 15
+        }
+      },
+      "simulation": null
+    },
+    "foreign_flow_momentum": {
+      "strategy_id": "foreign_flow_momentum",
+      "strategy_name": "외국인 수급 모멘텀",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:26:44",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "375500",
+          "name": "DL이앤씨",
+          "price": 66800,
+          "change_pct": 4.21,
+          "score": 86.57,
+          "score_detail": {
+            "foreign_consistency": 35.0,
+            "foreign_magnitude": 30.0,
+            "price_momentum": 10.56,
+            "trading_value": 11.0
+          },
+          "rank": 1,
+          "market_cap": 2584734016400,
+          "volume": 592336,
+          "trading_value": 39246332600,
+          "themes": [
+            {
+              "code": "205",
+              "name": "원자력발전"
+            }
+          ]
+        },
+        {
+          "code": "086280",
+          "name": "현대글로비스",
+          "price": 197700,
+          "change_pct": 7.97,
+          "score": 83.89,
+          "score_detail": {
+            "foreign_consistency": 35.0,
+            "foreign_magnitude": 13.89,
+            "price_momentum": 20.0,
+            "trading_value": 15.0
+          },
+          "rank": 2,
+          "market_cap": 14827500000000,
+          "volume": 271514,
+          "trading_value": 53509266100,
+          "themes": [
+            {
+              "code": "587",
+              "name": "피지컬 AI/휴머노이드 로봇"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "141",
+              "name": "종합 물류"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "483650",
+          "name": "달바글로벌",
+          "price": 241500,
+          "change_pct": 4.32,
+          "score": 59.85,
+          "score_detail": {
+            "foreign_consistency": 35.0,
+            "foreign_magnitude": 4.93,
+            "price_momentum": 10.84,
+            "trading_value": 9.08
+          },
+          "rank": 3,
+          "market_cap": 3015046597500,
+          "volume": 140793,
+          "trading_value": 32394474250
+        },
+        {
+          "code": "271560",
+          "name": "오리온",
+          "price": 136700,
+          "change_pct": 3.64,
+          "score": 55.27,
+          "score_detail": {
+            "foreign_consistency": 35.0,
+            "foreign_magnitude": 8.21,
+            "price_momentum": 9.13,
+            "trading_value": 2.93
+          },
+          "rank": 4,
+          "market_cap": 5404589244400,
+          "volume": 77243,
+          "trading_value": 10451483300,
+          "themes": [
+            {
+              "code": "113",
+              "name": "음식료업종"
+            },
+            {
+              "code": "31",
+              "name": "환율하락 수혜"
+            },
+            {
+              "code": "571",
+              "name": "밸류업(25년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        },
+        {
+          "code": "241560",
+          "name": "두산밥캣",
+          "price": 63700,
+          "change_pct": 3.24,
+          "score": 55.07,
+          "score_detail": {
+            "foreign_consistency": 35.0,
+            "foreign_magnitude": 8.3,
+            "price_momentum": 8.13,
+            "trading_value": 3.64
+          },
+          "rank": 5,
+          "market_cap": 6106031340500,
+          "volume": 203989,
+          "trading_value": 12980445800,
+          "themes": [
+            {
+              "code": "111",
+              "name": "지주사"
+            },
+            {
+              "code": "567",
+              "name": "밸류업(24년 기업가치 제고계획 발표)"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "pool_size": 100,
+        "lookback_days": 5,
+        "consecutive_days": 3,
+        "min_market_cap": 200000000000,
+        "min_trading_value": 10000000000,
+        "weights": {
+          "foreign_consistency": 35,
+          "foreign_magnitude": 30,
+          "price_momentum": 20,
+          "trading_value": 15
+        }
+      },
+      "simulation": null
+    },
+    "opening_30min_volume_burst": {
+      "strategy_id": "opening_30min_volume_burst",
+      "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+      "date": "20260701",
+      "selected_at": "2026-07-02 20:26:44",
+      "count": 5,
+      "candidates": [
+        {
+          "code": "006360",
+          "name": "GS건설",
+          "price": 30100,
+          "change_pct": 19.92,
+          "score": 83.21,
+          "score_detail": {
+            "volume_surge": 45.0,
+            "price_momentum": 26.34,
+            "absolute_value": 1.87,
+            "price_level": 10
+          },
+          "rank": 1,
+          "market_cap": 2576002849000,
+          "volume": 6557573,
+          "trading_value": 193081894400,
+          "themes": [
+            {
+              "code": "205",
+              "name": "원자력발전"
+            }
+          ]
+        },
+        {
+          "code": "119850",
+          "name": "지엔씨에너지",
+          "price": 27850,
+          "change_pct": 22.69,
+          "score": 66.32,
+          "score_detail": {
+            "volume_surge": 26.1,
+            "price_momentum": 30.0,
+            "absolute_value": 0.21,
+            "price_level": 10
+          },
+          "rank": 2,
+          "market_cap": 458102115650,
+          "volume": 813362,
+          "trading_value": 21804740625,
+          "themes": [
+            {
+              "code": "123",
+              "name": "전력설비"
+            },
+            {
+              "code": "121",
+              "name": "남북경협"
+            }
+          ]
+        },
+        {
+          "code": "036930",
+          "name": "주성엔지니어링",
+          "price": 242000,
+          "change_pct": 20.4,
+          "score": 59.74,
+          "score_detail": {
+            "volume_surge": 12.76,
+            "price_momentum": 26.97,
+            "absolute_value": 15.0,
+            "price_level": 5.0
+          },
+          "rank": 3,
+          "market_cap": 11248431282000,
+          "volume": 6602089,
+          "trading_value": 1545415606900,
+          "themes": [
+            {
+              "code": "191",
+              "name": "태양광에너지"
+            },
+            {
+              "code": "12",
+              "name": "반도체 장비"
+            },
+            {
+              "code": "382",
+              "name": "플렉서블 디스플레이"
+            },
+            {
+              "code": "568",
+              "name": "코리아 밸류업 지수(Korea Value-up Index)"
+            },
+            {
+              "code": "9",
+              "name": "OLED(유기 발광 다이오드)"
+            }
+          ]
+        },
+        {
+          "code": "347700",
+          "name": "스피어",
+          "price": 28050,
+          "change_pct": 20.13,
+          "score": 58.89,
+          "score_detail": {
+            "volume_surge": 20.55,
+            "price_momentum": 26.62,
+            "absolute_value": 1.73,
+            "price_level": 10
+          },
+          "rank": 4,
+          "market_cap": 1445679104100,
+          "volume": 6517028,
+          "trading_value": 178193828000,
+          "themes": [
+            {
+              "code": "200",
+              "name": "우주항공산업(누리호/인공위성 등)"
+            },
+            {
+              "code": "149",
+              "name": "원격진료/비대면진료(U-Healthcare)"
+            }
+          ]
+        },
+        {
+          "code": "089890",
+          "name": "코세스",
+          "price": 37000,
+          "change_pct": 18.4,
+          "score": 48.17,
+          "score_detail": {
+            "volume_surge": 13.7,
+            "price_momentum": 24.33,
+            "absolute_value": 0.14,
+            "price_level": 10
+          },
+          "rank": 5,
+          "market_cap": 613643594000,
+          "volume": 402584,
+          "trading_value": 14568409625,
+          "themes": [
+            {
+              "code": "390",
+              "name": "마이크로 LED"
+            },
+            {
+              "code": "559",
+              "name": "고체산화물 연료전지(SOFC)"
+            },
+            {
+              "code": "480",
+              "name": "메타버스(Metaverse)"
+            },
+            {
+              "code": "445",
+              "name": "2차전지(장비)"
+            },
+            {
+              "code": "12",
+              "name": "반도체 장비"
+            },
+            {
+              "code": "382",
+              "name": "플렉서블 디스플레이"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "value_surge_min": 3.0,
+        "price_up_min_pct": 1.5,
+        "min_price": 2000,
+        "min_market_cap": 50000000000,
+        "min_trading_value": 5000000000,
+        "history_days": 7,
+        "weights": {
+          "volume_surge": 45,
+          "price_momentum": 30,
+          "absolute_value": 15,
+          "price_level": 10
+        }
+      },
+      "simulation": null
+    }
+  }
+}

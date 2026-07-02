@@ -1,0 +1,200 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260701",
+  "selected_at": "2026-07-02 20:14:31",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 51700,
+      "change_pct": 8.61,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 79.5,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 5588262,
+      "trading_value": 284406572800
+    },
+    {
+      "code": "037350",
+      "name": "성도이엔지",
+      "price": 11200,
+      "change_pct": 13.25,
+      "score": 58.1,
+      "score_detail": {
+        "alpha_score": 71.0,
+        "delta_score": 0.0,
+        "alpha_norm": 89.3,
+        "delta_norm": 0.0,
+        "alpha_weighted": 58.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1870898,
+      "trading_value": 20539853550,
+      "themes": [
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        }
+      ]
+    },
+    {
+      "code": "089860",
+      "name": "롯데렌탈",
+      "price": 31950,
+      "change_pct": 13.7,
+      "score": 56.2,
+      "score_detail": {
+        "alpha_score": 68.7,
+        "delta_score": 0.0,
+        "alpha_norm": 86.4,
+        "delta_norm": 0.0,
+        "alpha_weighted": 56.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 146998,
+      "trading_value": 4576457925,
+      "themes": [
+        {
+          "code": "525",
+          "name": "렌터카"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "267250",
+      "name": "HD현대",
+      "price": 210000,
+      "change_pct": 5.26,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 71.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 16588547850000,
+      "volume": 166890,
+      "trading_value": 34394212200,
+      "themes": [
+        {
+          "code": "600",
+          "name": "주유소"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "047810",
+      "name": "한국항공우주",
+      "price": 154200,
+      "change_pct": 5.33,
+      "score": 34.1,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 69.3,
+        "alpha_norm": 0.0,
+        "delta_norm": 97.3,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.1,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 15030661499400,
+      "volume": 361124,
+      "trading_value": 55252079550,
+      "themes": [
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "349",
+          "name": "드론(Drone)"
+        },
+        {
+          "code": "200",
+          "name": "우주항공산업(누리호/인공위성 등)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "462",
+          "name": "UAM(도심항공모빌리티)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}

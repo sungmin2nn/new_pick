@@ -1,0 +1,164 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260701",
+  "selected_at": "2026-07-02 20:26:44",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "375500",
+      "name": "DL이앤씨",
+      "price": 66800,
+      "change_pct": 4.21,
+      "score": 86.57,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 10.56,
+        "trading_value": 11.0
+      },
+      "rank": 1,
+      "market_cap": 2584734016400,
+      "volume": 592336,
+      "trading_value": 39246332600,
+      "themes": [
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    },
+    {
+      "code": "086280",
+      "name": "현대글로비스",
+      "price": 197700,
+      "change_pct": 7.97,
+      "score": 83.89,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 13.89,
+        "price_momentum": 20.0,
+        "trading_value": 15.0
+      },
+      "rank": 2,
+      "market_cap": 14827500000000,
+      "volume": 271514,
+      "trading_value": 53509266100,
+      "themes": [
+        {
+          "code": "587",
+          "name": "피지컬 AI/휴머노이드 로봇"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "141",
+          "name": "종합 물류"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "483650",
+      "name": "달바글로벌",
+      "price": 241500,
+      "change_pct": 4.32,
+      "score": 59.85,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 4.93,
+        "price_momentum": 10.84,
+        "trading_value": 9.08
+      },
+      "rank": 3,
+      "market_cap": 3015046597500,
+      "volume": 140793,
+      "trading_value": 32394474250
+    },
+    {
+      "code": "271560",
+      "name": "오리온",
+      "price": 136700,
+      "change_pct": 3.64,
+      "score": 55.27,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 8.21,
+        "price_momentum": 9.13,
+        "trading_value": 2.93
+      },
+      "rank": 4,
+      "market_cap": 5404589244400,
+      "volume": 77243,
+      "trading_value": 10451483300,
+      "themes": [
+        {
+          "code": "113",
+          "name": "음식료업종"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "241560",
+      "name": "두산밥캣",
+      "price": 63700,
+      "change_pct": 3.24,
+      "score": 55.07,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 8.3,
+        "price_momentum": 8.13,
+        "trading_value": 3.64
+      },
+      "rank": 5,
+      "market_cap": 6106031340500,
+      "volume": 203989,
+      "trading_value": 12980445800,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
