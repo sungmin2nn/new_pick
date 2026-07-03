@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-02T20:26:46.511652+09:00",
+  "generated_at": "2026-07-03T19:52:05.691566+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,18 +14,18 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 57,
+      "operational_days": 58,
       "capital": {
         "initial_krw": 10000000,
-        "computed_current_krw": 30998814,
+        "computed_current_krw": 31374777,
         "computed_current_source": "sum(daily/<date>/trades.json/total_return_amount) + initial",
-        "portfolio_json_current_krw": 30998814.0
+        "portfolio_json_current_krw": 31374777.0
       },
       "returns_capital_basis": {
-        "cumulative_pct": 209.99,
+        "cumulative_pct": 213.75,
         "best_day_impact_pct": 10.81,
         "worst_day_impact_pct": -3.19,
-        "portfolio_json_cumulative_pct": 209.99,
+        "portfolio_json_cumulative_pct": 213.75,
         "_note": "stock-basis (daily/<date>/summary.json::simulation.total_return) 는 5종목 평균 수익률이라 자본 영향 아님 — 인용 금지"
       },
       "drawdown": {
@@ -33,17 +33,17 @@
         "portfolio_json_max_pct": 7.93
       },
       "trades": {
-        "total_daily_sum": 270,
-        "wins_daily_sum": 155,
-        "losses_daily_sum": 115,
-        "win_rate_pct": 57.41,
-        "portfolio_json_total": 270,
-        "portfolio_json_wins": 155
+        "total_daily_sum": 275,
+        "wins_daily_sum": 157,
+        "losses_daily_sum": 118,
+        "win_rate_pct": 57.09,
+        "portfolio_json_total": 275,
+        "portfolio_json_wins": 157
       },
       "data_health": {
-        "daily_files_count": 57,
+        "daily_files_count": 58,
         "first_date": "20260409",
-        "last_date": "20260702",
+        "last_date": "20260703",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -180,18 +180,18 @@
       "strategy_id": "frontier_gap",
       "enabled": true,
       "exists": true,
-      "operational_days": 46,
+      "operational_days": 47,
       "capital": {
         "initial_krw": 10000000,
-        "computed_current_krw": 18578254,
+        "computed_current_krw": 19123597,
         "computed_current_source": "sum(daily/<date>/trades.json/total_return_amount) + initial",
-        "portfolio_json_current_krw": 18578254.0
+        "portfolio_json_current_krw": 19123597.0
       },
       "returns_capital_basis": {
-        "cumulative_pct": 85.78,
+        "cumulative_pct": 91.24,
         "best_day_impact_pct": 8.62,
         "worst_day_impact_pct": -3.19,
-        "portfolio_json_cumulative_pct": 85.78,
+        "portfolio_json_cumulative_pct": 91.24,
         "_note": "stock-basis (daily/<date>/summary.json::simulation.total_return) 는 5종목 평균 수익률이라 자본 영향 아님 — 인용 금지"
       },
       "drawdown": {
@@ -199,17 +199,17 @@
         "portfolio_json_max_pct": 9.19
       },
       "trades": {
-        "total_daily_sum": 207,
-        "wins_daily_sum": 100,
-        "losses_daily_sum": 107,
-        "win_rate_pct": 48.31,
-        "portfolio_json_total": 207,
-        "portfolio_json_wins": 100
+        "total_daily_sum": 212,
+        "wins_daily_sum": 103,
+        "losses_daily_sum": 109,
+        "win_rate_pct": 48.58,
+        "portfolio_json_total": 212,
+        "portfolio_json_wins": 103
       },
       "data_health": {
-        "daily_files_count": 46,
+        "daily_files_count": 47,
         "first_date": "20260423",
-        "last_date": "20260702",
+        "last_date": "20260703",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -303,18 +303,18 @@
       "strategy_id": "sector_rotation",
       "enabled": true,
       "exists": true,
-      "operational_days": 47,
+      "operational_days": 48,
       "capital": {
         "initial_krw": 10000000,
-        "computed_current_krw": 11424014,
+        "computed_current_krw": 11630544,
         "computed_current_source": "sum(daily/<date>/trades.json/total_return_amount) + initial",
-        "portfolio_json_current_krw": 11424014.0
+        "portfolio_json_current_krw": 11630544.0
       },
       "returns_capital_basis": {
-        "cumulative_pct": 14.24,
+        "cumulative_pct": 16.31,
         "best_day_impact_pct": 7.65,
         "worst_day_impact_pct": -3.15,
-        "portfolio_json_cumulative_pct": 14.24,
+        "portfolio_json_cumulative_pct": 16.31,
         "_note": "stock-basis (daily/<date>/summary.json::simulation.total_return) 는 5종목 평균 수익률이라 자본 영향 아님 — 인용 금지"
       },
       "drawdown": {
@@ -322,17 +322,17 @@
         "portfolio_json_max_pct": 14.07
       },
       "trades": {
-        "total_daily_sum": 229,
-        "wins_daily_sum": 89,
+        "total_daily_sum": 234,
+        "wins_daily_sum": 94,
         "losses_daily_sum": 140,
-        "win_rate_pct": 38.86,
-        "portfolio_json_total": 229,
-        "portfolio_json_wins": 89
+        "win_rate_pct": 40.17,
+        "portfolio_json_total": 234,
+        "portfolio_json_wins": 94
       },
       "data_health": {
-        "daily_files_count": 47,
+        "daily_files_count": 48,
         "first_date": "20260423",
-        "last_date": "20260702",
+        "last_date": "20260703",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -387,18 +387,18 @@
       "strategy_id": "opening_30min_volume_burst",
       "enabled": true,
       "exists": true,
-      "operational_days": 27,
+      "operational_days": 28,
       "capital": {
         "initial_krw": 10000000,
-        "computed_current_krw": 14358588,
+        "computed_current_krw": 14572973,
         "computed_current_source": "sum(daily/<date>/trades.json/total_return_amount) + initial",
-        "portfolio_json_current_krw": 14358588
+        "portfolio_json_current_krw": 14572973
       },
       "returns_capital_basis": {
-        "cumulative_pct": 43.59,
+        "cumulative_pct": 45.73,
         "best_day_impact_pct": 15.29,
         "worst_day_impact_pct": -3.17,
-        "portfolio_json_cumulative_pct": 43.59,
+        "portfolio_json_cumulative_pct": 45.73,
         "_note": "stock-basis (daily/<date>/summary.json::simulation.total_return) 는 5종목 평균 수익률이라 자본 영향 아님 — 인용 금지"
       },
       "drawdown": {
@@ -406,17 +406,17 @@
         "portfolio_json_max_pct": 6.92
       },
       "trades": {
-        "total_daily_sum": 130,
-        "wins_daily_sum": 56,
-        "losses_daily_sum": 74,
-        "win_rate_pct": 43.08,
-        "portfolio_json_total": 130,
-        "portfolio_json_wins": 56
+        "total_daily_sum": 135,
+        "wins_daily_sum": 58,
+        "losses_daily_sum": 77,
+        "win_rate_pct": 42.96,
+        "portfolio_json_total": 135,
+        "portfolio_json_wins": 58
       },
       "data_health": {
-        "daily_files_count": 27,
+        "daily_files_count": 28,
         "first_date": "20260527",
-        "last_date": "20260702",
+        "last_date": "20260703",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -428,18 +428,18 @@
       "strategy_id": "foreign_flow_momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 27,
+      "operational_days": 28,
       "capital": {
         "initial_krw": 10000000,
-        "computed_current_krw": 12651348,
+        "computed_current_krw": 12874084,
         "computed_current_source": "sum(daily/<date>/trades.json/total_return_amount) + initial",
-        "portfolio_json_current_krw": 12651348
+        "portfolio_json_current_krw": 12874084
       },
       "returns_capital_basis": {
-        "cumulative_pct": 26.51,
+        "cumulative_pct": 28.74,
         "best_day_impact_pct": 6.73,
         "worst_day_impact_pct": -3.19,
-        "portfolio_json_cumulative_pct": 26.51,
+        "portfolio_json_cumulative_pct": 28.74,
         "_note": "stock-basis (daily/<date>/summary.json::simulation.total_return) 는 5종목 평균 수익률이라 자본 영향 아님 — 인용 금지"
       },
       "drawdown": {
@@ -447,17 +447,17 @@
         "portfolio_json_max_pct": 5.14
       },
       "trades": {
-        "total_daily_sum": 120,
-        "wins_daily_sum": 59,
-        "losses_daily_sum": 61,
-        "win_rate_pct": 49.17,
-        "portfolio_json_total": 120,
-        "portfolio_json_wins": 59
+        "total_daily_sum": 125,
+        "wins_daily_sum": 63,
+        "losses_daily_sum": 62,
+        "win_rate_pct": 50.4,
+        "portfolio_json_total": 125,
+        "portfolio_json_wins": 63
       },
       "data_health": {
-        "daily_files_count": 27,
+        "daily_files_count": 28,
         "first_date": "20260527",
-        "last_date": "20260702",
+        "last_date": "20260703",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -474,21 +474,21 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1768128,
-      "used": 2840200,
-      "realized_pnl": -1279772,
-      "unrealized_pnl": 47900
+      "current": 1667830,
+      "used": 2884000,
+      "realized_pnl": -1379220,
+      "unrealized_pnl": 47050
     },
     "returns": {
-      "cumulative_pct": -41.06,
-      "simple_sum_pct": -244.37,
-      "average_per_trade_pct": -1.44
+      "cumulative_pct": -44.41,
+      "simple_sum_pct": -262.29,
+      "average_per_trade_pct": -1.52
     },
     "trades": {
-      "total": 170,
+      "total": 173,
       "wins_computed": 39,
-      "losses_computed": 131,
-      "win_rate_pct": 22.9
+      "losses_computed": 134,
+      "win_rate_pct": 22.5
     },
     "positions": {
       "active_count": 5,
@@ -497,42 +497,40 @@
           "code": "085620",
           "name": "미래에셋생명",
           "entry_date": "2026-06-25",
-          "unrealized_pnl_pct": 4.69,
+          "unrealized_pnl_pct": 3.43,
           "selection_reason": "5일 35.2% | 고점 46.9%"
         },
         {
           "code": "347700",
           "name": "스피어",
           "entry_date": "2026-07-01",
-          "unrealized_pnl_pct": 3.39,
+          "unrealized_pnl_pct": 5.51,
           "selection_reason": "10일 29.0% | 고점 48.5%"
         },
         {
-          "code": "247540",
-          "name": "에코프로비엠",
-          "entry_date": "2026-07-02",
+          "code": "007810",
+          "name": "코리아써키트",
+          "entry_date": "2026-07-03",
           "unrealized_pnl_pct": 0,
-          "selection_reason": "10일 26.3% | 고점 36.5%"
+          "selection_reason": "5일 15.6% | 10일 41.0% | 고점 45.9%"
         },
         {
-          "code": "020150",
-          "name": "롯데에너지머티리얼즈",
-          "entry_date": "2026-07-02",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "10일 20.8% | 고점 35.7%"
+          "code": "319400",
+          "name": "현대무벡스",
+          "entry_date": "2026-07-03",
+          "unrealized_pnl_pct": -0.64,
+          "selection_reason": "10일 30.0% | 고점 44.1%"
         },
         {
-          "code": "131970",
-          "name": "두산테스나",
-          "entry_date": "2026-07-02",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "10일 23.2% | 고점 35.7%"
+          "code": "183300",
+          "name": "코미코",
+          "entry_date": "2026-07-03",
+          "unrealized_pnl_pct": -0.38,
+          "selection_reason": "10일 26.3% | 고점 43.3%"
         }
       ],
-      "cooldown_count": 16,
+      "cooldown_count": 17,
       "cooldown": {
-        "078600": "2026-07-02",
-        "0009K0": "2026-07-02",
         "307950": "2026-07-03",
         "003550": "2026-07-03",
         "100790": "2026-07-03",
@@ -546,10 +544,13 @@
         "000250": "2026-07-09",
         "043260": "2026-07-09",
         "031330": "2026-07-09",
-        "001740": "2026-07-09"
+        "001740": "2026-07-09",
+        "247540": "2026-07-10",
+        "020150": "2026-07-10",
+        "131970": "2026-07-10"
       }
     },
-    "last_updated": "2026-07-02 18:44:49"
+    "last_updated": "2026-07-03 18:43:12"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -560,11 +561,11 @@
       "candidates_pattern": "data/bnf/bollinger_candidates_*.json"
     },
     "trades": {
-      "total": 80,
-      "wins": 49,
+      "total": 82,
+      "wins": 51,
       "losses": 30,
-      "win_rate_pct": 61.25,
-      "total_profit_krw": 1447127
+      "win_rate_pct": 62.2,
+      "total_profit_krw": 1647127
     },
     "positions": {
       "active_count": 2,
@@ -573,24 +574,24 @@
           "code": "088980",
           "name": "맥쿼리인프라",
           "entry_date": "2026-07-02",
-          "unrealized_pnl_pct": -2.36,
+          "unrealized_pnl_pct": -0.59,
           "selection_reason": "BB%B=-0.13, RSI=25.4, Vol=1.1x"
         },
         {
           "code": "000500",
           "name": "가온전선",
-          "entry_date": "2026-07-02",
+          "entry_date": "2026-07-03",
           "unrealized_pnl_pct": 0,
           "selection_reason": "BB%B=0.05, RSI=37.7, Vol=2.3x"
         }
       ]
     },
-    "last_updated": "2026-07-02 18:43:27"
+    "last_updated": "2026-07-03 18:42:20"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 56,
-    "unique_dates": 56,
+    "total_entries": 57,
+    "unique_dates": 57,
     "duplicates": {}
   },
   "warnings": [
