@@ -1,0 +1,200 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260703",
+  "selected_at": "2026-07-06 21:13:38",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "477850",
+      "name": "마키나락스",
+      "price": 23400,
+      "change_pct": 9.86,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 88.5,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 10222167,
+      "trading_value": 234061011445
+    },
+    {
+      "code": "037070",
+      "name": "파세코",
+      "price": 6830,
+      "change_pct": 14.41,
+      "score": 54.0,
+      "score_detail": {
+        "alpha_score": 73.5,
+        "delta_score": 0.0,
+        "alpha_norm": 83.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 54.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 4600223,
+      "trading_value": 32111787155,
+      "themes": [
+        {
+          "code": "76",
+          "name": "여름"
+        },
+        {
+          "code": "13",
+          "name": "리모델링/인테리어"
+        },
+        {
+          "code": "328",
+          "name": "제습기"
+        },
+        {
+          "code": "266",
+          "name": "겨울"
+        },
+        {
+          "code": "19",
+          "name": "황사/미세먼지"
+        }
+      ]
+    },
+    {
+      "code": "039830",
+      "name": "오로라",
+      "price": 20400,
+      "change_pct": 14.67,
+      "score": 51.9,
+      "score_detail": {
+        "alpha_score": 70.7,
+        "delta_score": 0.0,
+        "alpha_norm": 79.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 51.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 289411,
+      "trading_value": 5597484850,
+      "themes": [
+        {
+          "code": "45",
+          "name": "캐릭터상품"
+        },
+        {
+          "code": "316",
+          "name": "엔젤산업"
+        }
+      ]
+    },
+    {
+      "code": "039490",
+      "name": "키움증권",
+      "price": 348500,
+      "change_pct": 8.06,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 78.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 9140568126000,
+      "volume": 204772,
+      "trading_value": 70057650750,
+      "themes": [
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "071050",
+      "name": "한국금융지주",
+      "price": 242000,
+      "change_pct": 7.32,
+      "score": 34.5,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 77.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.6,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.5,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 13485690064000,
+      "volume": 363389,
+      "trading_value": 85605343250,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "489",
+          "name": "카카오뱅크(kakao BANK)"
+        },
+        {
+          "code": "343",
+          "name": "인터넷은행"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
