@@ -153,8 +153,8 @@
   },
   {
     "date": "20260713",
-    "checked_at": "2026-07-13 20:14:51",
-    "status": "unhealthy",
+    "checked_at": "2026-07-13 20:25:27",
+    "status": "healthy",
     "checks": [
       {
         "check_type": "workflow_files",
@@ -167,8 +167,8 @@
         "check_type": "workflow_files",
         "workflow": "paper-trading",
         "description": "장후 최종 결과",
-        "status": "fail",
-        "details": "파일 미생성: arena_report.json"
+        "status": "pass",
+        "details": "모든 파일 정상"
       },
       {
         "check_type": "workflow_files",
@@ -187,7 +187,7 @@
         "check_type": "arena_integrity",
         "description": "아레나 리포트 무결성",
         "status": "pass",
-        "details": "아레나 리포트 아직 생성 전"
+        "details": "5/5팀 정상 실행"
       },
       {
         "check_type": "portfolio_health",
@@ -197,14 +197,6 @@
         "warnings": []
       }
     ],
-    "issues": [
-      {
-        "check_type": "workflow_files",
-        "workflow": "paper-trading",
-        "description": "장후 최종 결과",
-        "status": "fail",
-        "details": "파일 미생성: arena_report.json"
-      }
-    ]
+    "issues": []
   }
 ]
