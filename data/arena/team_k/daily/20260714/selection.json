@@ -1,0 +1,91 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260713",
+  "selected_at": "2026-07-14 19:07:09",
+  "count": 4,
+  "candidates": [
+    {
+      "code": "323410",
+      "name": "카카오뱅크",
+      "price": 23300,
+      "change_pct": 1.75,
+      "score": 85.95,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 20.0,
+        "trading_value": 0.95
+      },
+      "rank": 1,
+      "market_cap": 11116906182100,
+      "volume": 1402760,
+      "trading_value": 32599589650
+    },
+    {
+      "code": "066570",
+      "name": "LG전자",
+      "price": 185600,
+      "change_pct": 1.75,
+      "score": 70.44,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.44,
+        "price_momentum": 20.0,
+        "trading_value": 15.0
+      },
+      "rank": 2,
+      "market_cap": 30231388812800,
+      "volume": 2664002,
+      "trading_value": 515006935250
+    },
+    {
+      "code": "138930",
+      "name": "BNK금융지주",
+      "price": 18160,
+      "change_pct": 1.74,
+      "score": 61.97,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 6.66,
+        "price_momentum": 19.89,
+        "trading_value": 0.42
+      },
+      "rank": 3,
+      "market_cap": 5635538919280,
+      "volume": 796698,
+      "trading_value": 14573755505
+    },
+    {
+      "code": "051900",
+      "name": "LG생활건강",
+      "price": 248500,
+      "change_pct": 1.43,
+      "score": 51.85,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.21,
+        "price_momentum": 16.34,
+        "trading_value": 0.3
+      },
+      "rank": 4,
+      "market_cap": 3721417465500,
+      "volume": 40864,
+      "trading_value": 10149592500
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
