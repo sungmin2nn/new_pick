@@ -1,0 +1,188 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260714",
+  "selected_at": "2026-07-15 19:17:48",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "089030",
+      "name": "테크윙",
+      "price": 48450,
+      "change_pct": 10.49,
+      "score": 100.0,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 20.0,
+        "trading_value": 15.0
+      },
+      "rank": 1,
+      "market_cap": 1795249100250,
+      "volume": 4262975,
+      "trading_value": 209347515675,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "536",
+          "name": "HBM(고대역폭메모리)"
+        }
+      ]
+    },
+    {
+      "code": "042700",
+      "name": "한미반도체",
+      "price": 207500,
+      "change_pct": 0.97,
+      "score": 72.94,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 22.38,
+        "price_momentum": 1.85,
+        "trading_value": 13.71
+      },
+      "rank": 2,
+      "market_cap": 19777281500000,
+      "volume": 947589,
+      "trading_value": 191407498800,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "18",
+          "name": "전자파"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "536",
+          "name": "HBM(고대역폭메모리)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "011200",
+      "name": "HMM",
+      "price": 19760,
+      "change_pct": 1.07,
+      "score": 51.99,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 11.49,
+        "price_momentum": 2.04,
+        "trading_value": 3.46
+      },
+      "rank": 3,
+      "market_cap": 18638382287200,
+      "volume": 2415311,
+      "trading_value": 48275803465,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "000990",
+      "name": "DB하이텍",
+      "price": 113500,
+      "change_pct": 2.53,
+      "score": 48.46,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 4.42,
+        "price_momentum": 4.82,
+        "trading_value": 4.22
+      },
+      "rank": 4,
+      "market_cap": 4937770738000,
+      "volume": 529151,
+      "trading_value": 58849661100,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "155",
+          "name": "반도체 대표주(생산)"
+        },
+        {
+          "code": "533",
+          "name": "전력반도체"
+        },
+        {
+          "code": "332",
+          "name": "스마트카(SMART CAR)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "439090",
+      "name": "마녀공장",
+      "price": 16460,
+      "change_pct": 3.78,
+      "score": 44.03,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.71,
+        "price_momentum": 7.21,
+        "trading_value": 1.11
+      },
+      "rank": 5,
+      "market_cap": 269833059600,
+      "volume": 940421,
+      "trading_value": 15496182755
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
