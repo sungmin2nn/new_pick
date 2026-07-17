@@ -1,0 +1,108 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260716",
+  "selected_at": "2026-07-17 18:47:12",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "323410",
+      "name": "카카오뱅크",
+      "price": 23000,
+      "change_pct": 1.77,
+      "score": 78.86,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 11.88,
+        "trading_value": 1.98
+      },
+      "rank": 1,
+      "market_cap": 10973770051000,
+      "volume": 807081,
+      "trading_value": 18307576225
+    },
+    {
+      "code": "090430",
+      "name": "아모레퍼시픽",
+      "price": 124400,
+      "change_pct": 2.98,
+      "score": 62.71,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 4.72,
+        "price_momentum": 20.0,
+        "trading_value": 2.98
+      },
+      "rank": 2,
+      "market_cap": 7276499219600,
+      "volume": 224697,
+      "trading_value": 27613543300
+    },
+    {
+      "code": "035420",
+      "name": "NAVER",
+      "price": 190000,
+      "change_pct": 0.21,
+      "score": 62.29,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 10.88,
+        "price_momentum": 1.41,
+        "trading_value": 15.0
+      },
+      "rank": 3,
+      "market_cap": 29819405980000,
+      "volume": 737459,
+      "trading_value": 138857897200
+    },
+    {
+      "code": "024110",
+      "name": "기업은행",
+      "price": 21600,
+      "change_pct": 1.65,
+      "score": 61.74,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 12.69,
+        "price_momentum": 11.07,
+        "trading_value": 2.98
+      },
+      "rank": 4,
+      "market_cap": 17224398770400,
+      "volume": 1278452,
+      "trading_value": 27565933200
+    },
+    {
+      "code": "278470",
+      "name": "에이피알",
+      "price": 393000,
+      "change_pct": 1.95,
+      "score": 59.02,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 3.28,
+        "price_momentum": 13.09,
+        "trading_value": 7.66
+      },
+      "rank": 5,
+      "market_cap": 14713194915000,
+      "volume": 184615,
+      "trading_value": 70868441250
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
