@@ -1,0 +1,198 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260716",
+  "selected_at": "2026-07-20 20:23:11",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "004310",
+      "name": "현대약품",
+      "price": 7600,
+      "change_pct": 13.26,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 100.0,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 23630505,
+      "trading_value": 186449353855,
+      "themes": [
+        {
+          "code": "563",
+          "name": "낙태/피임"
+        },
+        {
+          "code": "172",
+          "name": "제약업체"
+        },
+        {
+          "code": "377",
+          "name": "치매"
+        },
+        {
+          "code": "506",
+          "name": "탈모 치료"
+        }
+      ]
+    },
+    {
+      "code": "279570",
+      "name": "케이뱅크",
+      "price": 6390,
+      "change_pct": 11.13,
+      "score": 51.2,
+      "score_detail": {
+        "alpha_score": 78.7,
+        "delta_score": 0.0,
+        "alpha_norm": 78.7,
+        "delta_norm": 0.0,
+        "alpha_weighted": 51.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 13896228,
+      "trading_value": 88999728405,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "343",
+          "name": "인터넷은행"
+        },
+        {
+          "code": "590",
+          "name": "2026 상반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "413630",
+      "name": "씨피시스템",
+      "price": 3360,
+      "change_pct": 12.37,
+      "score": 47.1,
+      "score_detail": {
+        "alpha_score": 72.5,
+        "delta_score": 0.0,
+        "alpha_norm": 72.5,
+        "delta_norm": 0.0,
+        "alpha_weighted": 47.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 22023957,
+      "trading_value": 76655102931,
+      "themes": [
+        {
+          "code": "505",
+          "name": "로봇(산업용/협동로봇 등)"
+        },
+        {
+          "code": "94",
+          "name": "조선기자재"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        }
+      ]
+    },
+    {
+      "code": "010140",
+      "name": "삼성중공업",
+      "price": 22300,
+      "change_pct": 2.06,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 67.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 19624000000000,
+      "volume": 3737922,
+      "trading_value": 82506752750,
+      "themes": [
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    },
+    {
+      "code": "278470",
+      "name": "에이피알",
+      "price": 393000,
+      "change_pct": 1.95,
+      "score": 34.3,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 66.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.1,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.3,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 14713194915000,
+      "volume": 184615,
+      "trading_value": 70868441250,
+      "themes": [
+        {
+          "code": "32",
+          "name": "패션/의류"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
