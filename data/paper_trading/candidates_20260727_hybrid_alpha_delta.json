@@ -1,0 +1,196 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260723",
+  "selected_at": "2026-07-24 19:14:26",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 46650,
+      "change_pct": 12.95,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 95.7,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 7112328,
+      "trading_value": 330855525100
+    },
+    {
+      "code": "032500",
+      "name": "케이엠더블유",
+      "price": 16880,
+      "change_pct": 14.75,
+      "score": 48.0,
+      "score_detail": {
+        "alpha_score": 70.7,
+        "delta_score": 0.0,
+        "alpha_norm": 73.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 48.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 473652,
+      "trading_value": 7747572665,
+      "themes": [
+        {
+          "code": "33",
+          "name": "LED"
+        },
+        {
+          "code": "373",
+          "name": "5G(5세대 이동통신)"
+        },
+        {
+          "code": "92",
+          "name": "통신장비"
+        }
+      ]
+    },
+    {
+      "code": "486990",
+      "name": "노타",
+      "price": 18800,
+      "change_pct": 14.01,
+      "score": 46.9,
+      "score_detail": {
+        "alpha_score": 69.1,
+        "delta_score": 0.0,
+        "alpha_norm": 72.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 46.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 510797,
+      "trading_value": 9431068290,
+      "themes": [
+        {
+          "code": "545",
+          "name": "온디바이스 AI"
+        },
+        {
+          "code": "99",
+          "name": "지능형로봇/인공지능(AI)"
+        },
+        {
+          "code": "583",
+          "name": "2025 하반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "042660",
+      "name": "한화오션",
+      "price": 89900,
+      "change_pct": 7.15,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 79.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 27546564120600,
+      "volume": 1912188,
+      "trading_value": 165304625200,
+      "themes": [
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    },
+    {
+      "code": "009540",
+      "name": "HD한국조선해양",
+      "price": 381000,
+      "change_pct": 7.78,
+      "score": 34.3,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 77.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.1,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.3,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 26964557196000,
+      "volume": 185377,
+      "trading_value": 69431751500,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
