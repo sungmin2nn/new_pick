@@ -1,0 +1,108 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260727",
+  "selected_at": "2026-07-28 19:18:02",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "067310",
+      "name": "하나마이크론",
+      "price": 35200,
+      "change_pct": 6.02,
+      "score": 82.59,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 15.24,
+        "trading_value": 2.35
+      },
+      "rank": 1,
+      "market_cap": 2340478588800,
+      "volume": 924513,
+      "trading_value": 32001448775
+    },
+    {
+      "code": "222800",
+      "name": "심텍",
+      "price": 92300,
+      "change_pct": 4.29,
+      "score": 76.37,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 28.14,
+        "price_momentum": 10.86,
+        "trading_value": 2.37
+      },
+      "rank": 2,
+      "market_cap": 3457920831300,
+      "volume": 361120,
+      "trading_value": 32337207250
+    },
+    {
+      "code": "095610",
+      "name": "테스",
+      "price": 142100,
+      "change_pct": 4.41,
+      "score": 72.87,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 21.96,
+        "price_momentum": 11.16,
+        "trading_value": 4.74
+      },
+      "rank": 3,
+      "market_cap": 2751056000000,
+      "volume": 458289,
+      "trading_value": 64678999950
+    },
+    {
+      "code": "175330",
+      "name": "JB금융지주",
+      "price": 28750,
+      "change_pct": 6.88,
+      "score": 69.63,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 16.46,
+        "price_momentum": 17.42,
+        "trading_value": 0.75
+      },
+      "rank": 4,
+      "market_cap": 5362502440000,
+      "volume": 356237,
+      "trading_value": 10222413925
+    },
+    {
+      "code": "036930",
+      "name": "주성엔지니어링",
+      "price": 149900,
+      "change_pct": 6.31,
+      "score": 69.4,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 3.42,
+        "price_momentum": 15.97,
+        "trading_value": 15.0
+      },
+      "rank": 5,
+      "market_cap": 6967520037900,
+      "volume": 1378492,
+      "trading_value": 204466344300
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
