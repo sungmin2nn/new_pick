@@ -1,0 +1,136 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260729",
+  "selected_at": "2026-07-30 19:21:37",
+  "count": 3,
+  "candidates": [
+    {
+      "code": "011200",
+      "name": "HMM",
+      "price": 20250,
+      "change_pct": 1.25,
+      "score": 76.36,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 8.5,
+        "trading_value": 2.85
+      },
+      "rank": 1,
+      "market_cap": 19100568892500,
+      "volume": 2200040,
+      "trading_value": 44658102535,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "051900",
+      "name": "LG생활건강",
+      "price": 263000,
+      "change_pct": 2.94,
+      "score": 60.98,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 3.03,
+        "price_momentum": 20.0,
+        "trading_value": 2.95
+      },
+      "rank": 2,
+      "market_cap": 3938562549000,
+      "volume": 171968,
+      "trading_value": 46140769500,
+      "themes": [
+        {
+          "code": "76",
+          "name": "여름"
+        },
+        {
+          "code": "113",
+          "name": "음식료업종"
+        },
+        {
+          "code": "487",
+          "name": "건강기능식품"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        }
+      ]
+    },
+    {
+      "code": "012330",
+      "name": "현대모비스",
+      "price": 445000,
+      "change_pct": 1.14,
+      "score": 59.18,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 1.42,
+        "price_momentum": 7.76,
+        "trading_value": 15.0
+      },
+      "rank": 3,
+      "market_cap": 40375999435000,
+      "volume": 526570,
+      "trading_value": 234796804250,
+      "themes": [
+        {
+          "code": "587",
+          "name": "피지컬 AI/휴머노이드 로봇"
+        },
+        {
+          "code": "27",
+          "name": "자동차부품"
+        },
+        {
+          "code": "332",
+          "name": "스마트카(SMART CAR)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "362",
+          "name": "자율주행차"
+        },
+        {
+          "code": "302",
+          "name": "음성인식"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "227",
+          "name": "전기차"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
