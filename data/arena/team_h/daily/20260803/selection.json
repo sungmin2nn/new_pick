@@ -1,0 +1,109 @@
+{
+  "strategy_id": "sector_rotation",
+  "strategy_name": "섹터 로테이션 (KOSPI 업종)",
+  "date": "20260731",
+  "selected_at": "2026-08-03 20:20:23",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "price": 262500,
+      "change_pct": 26.81,
+      "score": 98.75,
+      "score_detail": {
+        "sector_strength": 35,
+        "stock_momentum": 28.75,
+        "market_cap_rank": 20.0,
+        "volume_surge": 15.0
+      },
+      "rank": 1,
+      "market_cap": 1534648134600000,
+      "volume": 58478873,
+      "trading_value": 14924241538350
+    },
+    {
+      "code": "042700",
+      "name": "한미반도체",
+      "price": 214500,
+      "change_pct": 27.98,
+      "score": 65.73,
+      "score_detail": {
+        "sector_strength": 35,
+        "stock_momentum": 30.0,
+        "market_cap_rank": 0.27,
+        "volume_surge": 0.46
+      },
+      "rank": 2,
+      "market_cap": 20444466900000,
+      "volume": 2222655,
+      "trading_value": 461764042800
+    },
+    {
+      "code": "010120",
+      "name": "LS ELECTRIC",
+      "price": 184800,
+      "change_pct": 22.95,
+      "score": 60.28,
+      "score_detail": {
+        "sector_strength": 35,
+        "stock_momentum": 24.61,
+        "market_cap_rank": 0.36,
+        "volume_surge": 0.31
+      },
+      "rank": 3,
+      "market_cap": 27720000000000,
+      "volume": 1724011,
+      "trading_value": 309302184850
+    },
+    {
+      "code": "028260",
+      "name": "삼성물산",
+      "price": 351500,
+      "change_pct": 19.56,
+      "score": 57.15,
+      "score_detail": {
+        "sector_strength": 35,
+        "stock_momentum": 20.97,
+        "market_cap_rank": 0.74,
+        "volume_surge": 0.43
+      },
+      "rank": 4,
+      "market_cap": 57001904721500,
+      "volume": 1241836,
+      "trading_value": 430946057185
+    },
+    {
+      "code": "032830",
+      "name": "삼성생명",
+      "price": 311500,
+      "change_pct": 17.99,
+      "score": 55.27,
+      "score_detail": {
+        "sector_strength": 35,
+        "stock_momentum": 19.29,
+        "market_cap_rank": 0.81,
+        "volume_surge": 0.17
+      },
+      "rank": 5,
+      "market_cap": 62300000000000,
+      "volume": 561861,
+      "trading_value": 172006836850
+    }
+  ],
+  "params": {
+    "top_sectors": 5,
+    "stocks_per_sector": 3,
+    "min_price": 3000,
+    "min_market_cap": 100000000000,
+    "min_trading_value": 5000000000,
+    "min_change_pct": 0.5,
+    "weights": {
+      "sector_strength": 35,
+      "stock_momentum": 30,
+      "market_cap_rank": 20,
+      "volume_surge": 15
+    }
+  },
+  "simulation": null
+}

@@ -1,0 +1,108 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260731",
+  "selected_at": "2026-08-03 20:21:12",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "006800",
+      "name": "미래에셋증권",
+      "price": 34550,
+      "change_pct": 14.4,
+      "score": 81.24,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 12.55,
+        "trading_value": 3.7
+      },
+      "rank": 1,
+      "market_cap": 19333035704000,
+      "volume": 3037574,
+      "trading_value": 101725615950
+    },
+    {
+      "code": "010120",
+      "name": "LS ELECTRIC",
+      "price": 184800,
+      "change_pct": 22.95,
+      "score": 70.22,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 3.98,
+        "price_momentum": 20.0,
+        "trading_value": 11.24
+      },
+      "rank": 2,
+      "market_cap": 27720000000000,
+      "volume": 1724011,
+      "trading_value": 309302184850
+    },
+    {
+      "code": "005380",
+      "name": "현대차",
+      "price": 388000,
+      "change_pct": 10.54,
+      "score": 61.8,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 2.62,
+        "price_momentum": 9.19,
+        "trading_value": 15.0
+      },
+      "rank": 3,
+      "market_cap": 79446013208000,
+      "volume": 1085656,
+      "trading_value": 412877822000
+    },
+    {
+      "code": "042660",
+      "name": "한화오션",
+      "price": 85200,
+      "change_pct": 7.44,
+      "score": 58.96,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 11.8,
+        "price_momentum": 6.48,
+        "trading_value": 5.68
+      },
+      "rank": 4,
+      "market_cap": 26106421168800,
+      "volume": 1877179,
+      "trading_value": 156291171900
+    },
+    {
+      "code": "035720",
+      "name": "카카오",
+      "price": 37400,
+      "change_pct": 3.46,
+      "score": 58.19,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 16.12,
+        "price_momentum": 3.02,
+        "trading_value": 4.06
+      },
+      "rank": 5,
+      "market_cap": 16567492018000,
+      "volume": 3029760,
+      "trading_value": 111803940725
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
