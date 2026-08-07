@@ -1,0 +1,108 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260806",
+  "selected_at": "2026-08-07 17:44:07",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "073240",
+      "name": "금호타이어",
+      "price": 7940,
+      "change_pct": 7.59,
+      "score": 91.29,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 11.29,
+        "trading_value": 15.0
+      },
+      "rank": 1,
+      "market_cap": 2280846678780,
+      "volume": 19927188,
+      "trading_value": 158627420860
+    },
+    {
+      "code": "051900",
+      "name": "LG생활건강",
+      "price": 324000,
+      "change_pct": 10.77,
+      "score": 59.95,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.38,
+        "price_momentum": 16.03,
+        "trading_value": 8.54
+      },
+      "rank": 2,
+      "market_cap": 4852069452000,
+      "volume": 285599,
+      "trading_value": 90335570000
+    },
+    {
+      "code": "127120",
+      "name": "제이에스링크",
+      "price": 40100,
+      "change_pct": 13.44,
+      "score": 57.54,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.97,
+        "price_momentum": 20.0,
+        "trading_value": 1.56
+      },
+      "rank": 3,
+      "market_cap": 1393585595800,
+      "volume": 419818,
+      "trading_value": 16504019400
+    },
+    {
+      "code": "088350",
+      "name": "한화생명",
+      "price": 4580,
+      "change_pct": 5.17,
+      "score": 56.94,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 12.7,
+        "price_momentum": 7.69,
+        "trading_value": 1.55
+      },
+      "rank": 4,
+      "market_cap": 3977867400000,
+      "volume": 3639895,
+      "trading_value": 16351902933
+    },
+    {
+      "code": "068270",
+      "name": "셀트리온",
+      "price": 195000,
+      "change_pct": 2.47,
+      "score": 55.05,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 1.7,
+        "price_momentum": 3.68,
+        "trading_value": 14.68
+      },
+      "rank": 5,
+      "market_cap": 45347972670000,
+      "volume": 801664,
+      "trading_value": 155195305250
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}
