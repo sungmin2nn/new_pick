@@ -1,0 +1,192 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260807",
+  "selected_at": "2026-08-10 18:18:47",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "009830",
+      "name": "한화솔루션",
+      "price": 33900,
+      "change_pct": 11.51,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 94.0,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 20050044,
+      "trading_value": 693715418975,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "595",
+          "name": "우주태양광(페로브스카이트 등)"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        }
+      ]
+    },
+    {
+      "code": "126730",
+      "name": "코칩",
+      "price": 14690,
+      "change_pct": 13.88,
+      "score": 49.4,
+      "score_detail": {
+        "alpha_score": 71.4,
+        "delta_score": 0.0,
+        "alpha_norm": 76.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 49.4,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 2118758,
+      "trading_value": 32596383570
+    },
+    {
+      "code": "010060",
+      "name": "OCI홀딩스",
+      "price": 272500,
+      "change_pct": 11.68,
+      "score": 48.2,
+      "score_detail": {
+        "alpha_score": 69.7,
+        "delta_score": 0.0,
+        "alpha_norm": 74.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 48.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 1122836,
+      "trading_value": 294136201500,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        }
+      ]
+    },
+    {
+      "code": "047810",
+      "name": "한국항공우주",
+      "price": 154200,
+      "change_pct": 2.73,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 63.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 15030661499400,
+      "volume": 518986,
+      "trading_value": 80572812600,
+      "themes": [
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "349",
+          "name": "드론(Drone)"
+        },
+        {
+          "code": "200",
+          "name": "우주항공산업(누리호/인공위성 등)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "462",
+          "name": "UAM(도심항공모빌리티)"
+        }
+      ]
+    },
+    {
+      "code": "278470",
+      "name": "에이피알",
+      "price": 384500,
+      "change_pct": 1.72,
+      "score": 32.1,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 57.8,
+        "alpha_norm": 0.0,
+        "delta_norm": 91.6,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 32.1,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 14394970597500,
+      "volume": 283369,
+      "trading_value": 107699469000,
+      "themes": [
+        {
+          "code": "32",
+          "name": "패션/의류"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
