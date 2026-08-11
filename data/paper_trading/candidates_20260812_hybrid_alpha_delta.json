@@ -1,0 +1,166 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260810",
+  "selected_at": "2026-08-11 17:47:04",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "027360",
+      "name": "아주IB투자",
+      "price": 3625,
+      "change_pct": 14.53,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 92.3,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 12811626,
+      "trading_value": 46702851353
+    },
+    {
+      "code": "053260",
+      "name": "금강철강",
+      "price": 5820,
+      "change_pct": 9.4,
+      "score": 53.6,
+      "score_detail": {
+        "alpha_score": 76.1,
+        "delta_score": 0.0,
+        "alpha_norm": 82.4,
+        "delta_norm": 0.0,
+        "alpha_weighted": 53.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 4699020,
+      "trading_value": 28892491680
+    },
+    {
+      "code": "092730",
+      "name": "네오팜",
+      "price": 24100,
+      "change_pct": 13.95,
+      "score": 51.3,
+      "score_detail": {
+        "alpha_score": 72.8,
+        "delta_score": 0.0,
+        "alpha_norm": 78.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 51.3,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 286395,
+      "trading_value": 6744829450,
+      "themes": [
+        {
+          "code": "487",
+          "name": "건강기능식품"
+        },
+        {
+          "code": "139",
+          "name": "출산장려정책"
+        },
+        {
+          "code": "316",
+          "name": "엔젤산업"
+        }
+      ]
+    },
+    {
+      "code": "086520",
+      "name": "에코프로",
+      "price": 93500,
+      "change_pct": 8.72,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 88.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 12695070212000,
+      "volume": 1271412,
+      "trading_value": 115666566450,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "152",
+          "name": "온실가스(탄소배출권)/탄소 포집·활용·저장(CCUS)"
+        }
+      ]
+    },
+    {
+      "code": "006360",
+      "name": "GS건설",
+      "price": 34900,
+      "change_pct": 10.27,
+      "score": 32.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 82.9,
+        "alpha_norm": 0.0,
+        "delta_norm": 93.8,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 32.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 2986794001000,
+      "volume": 4904454,
+      "trading_value": 167947083975,
+      "themes": [
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
