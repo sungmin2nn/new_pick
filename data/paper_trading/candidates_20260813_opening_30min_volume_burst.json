@@ -1,0 +1,23 @@
+{
+  "strategy_id": "opening_30min_volume_burst",
+  "strategy_name": "개장 30분 거래대금 폭발 (한국 골든타임)",
+  "date": "20260812",
+  "selected_at": "2026-08-12 22:05:32",
+  "count": 0,
+  "candidates": [],
+  "params": {
+    "value_surge_min": 3.0,
+    "price_up_min_pct": 1.5,
+    "min_price": 2000,
+    "min_market_cap": 50000000000,
+    "min_trading_value": 5000000000,
+    "history_days": 7,
+    "weights": {
+      "volume_surge": 45,
+      "price_momentum": 30,
+      "absolute_value": 15,
+      "price_level": 10
+    }
+  },
+  "simulation": null
+}

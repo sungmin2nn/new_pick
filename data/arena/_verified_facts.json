@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-08-11T18:00:28.242312+09:00",
+  "generated_at": "2026-08-12T22:05:34.252100+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,18 +14,18 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 84,
+      "operational_days": 85,
       "capital": {
         "initial_krw": 10000000,
-        "computed_current_krw": 44630931,
+        "computed_current_krw": 47915580,
         "computed_current_source": "sum(daily/<date>/trades.json/total_return_amount) + initial",
-        "portfolio_json_current_krw": 44630931.0
+        "portfolio_json_current_krw": 47915580.0
       },
       "returns_capital_basis": {
-        "cumulative_pct": 346.31,
+        "cumulative_pct": 379.16,
         "best_day_impact_pct": 11.59,
         "worst_day_impact_pct": -3.19,
-        "portfolio_json_cumulative_pct": 346.31,
+        "portfolio_json_cumulative_pct": 379.16,
         "_note": "stock-basis (daily/<date>/summary.json::simulation.total_return) 는 5종목 평균 수익률이라 자본 영향 아님 — 인용 금지"
       },
       "drawdown": {
@@ -33,17 +33,17 @@
         "portfolio_json_max_pct": 7.93
       },
       "trades": {
-        "total_daily_sum": 391,
-        "wins_daily_sum": 211,
-        "losses_daily_sum": 180,
-        "win_rate_pct": 53.96,
-        "portfolio_json_total": 391,
-        "portfolio_json_wins": 211
+        "total_daily_sum": 396,
+        "wins_daily_sum": 215,
+        "losses_daily_sum": 181,
+        "win_rate_pct": 54.29,
+        "portfolio_json_total": 396,
+        "portfolio_json_wins": 215
       },
       "data_health": {
-        "daily_files_count": 84,
+        "daily_files_count": 85,
         "first_date": "20260409",
-        "last_date": "20260811",
+        "last_date": "20260812",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -474,74 +474,75 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 2055963,
-      "used": 2783850,
-      "realized_pnl": -1068037,
-      "unrealized_pnl": 124000
+      "current": 2096263,
+      "used": 2684300,
+      "realized_pnl": -935637,
+      "unrealized_pnl": 31900
     },
     "returns": {
-      "cumulative_pct": -31.47,
-      "simple_sum_pct": -213.28,
-      "average_per_trade_pct": -0.8
+      "cumulative_pct": -30.12,
+      "simple_sum_pct": -191.68,
+      "average_per_trade_pct": -0.71
     },
     "trades": {
-      "total": 267,
-      "wins_computed": 68,
-      "losses_computed": 199,
-      "win_rate_pct": 25.5
+      "total": 271,
+      "wins_computed": 70,
+      "losses_computed": 201,
+      "win_rate_pct": 25.8
     },
     "positions": {
       "active_count": 5,
       "active": [
         {
-          "code": "004170",
-          "name": "신세계",
-          "entry_date": "2026-08-03",
-          "unrealized_pnl_pct": 4.98,
-          "selection_reason": "5일 16.1% | 10일 28.2% | 고점 42.7%"
-        },
-        {
-          "code": "023530",
-          "name": "롯데쇼핑",
-          "entry_date": "2026-08-10",
-          "unrealized_pnl_pct": 6.4,
-          "selection_reason": "5일 15.0% | 10일 20.8% | 고점 39.5%"
-        },
-        {
-          "code": "336260",
-          "name": "두산퓨얼셀",
-          "entry_date": "2026-08-10",
-          "unrealized_pnl_pct": 8.81,
-          "selection_reason": "10일 28.6% | 고점 37.3%"
-        },
-        {
-          "code": "093370",
-          "name": "후성",
-          "entry_date": "2026-08-10",
-          "unrealized_pnl_pct": 2.3,
-          "selection_reason": "고점 31.1%"
-        },
-        {
           "code": "347850",
           "name": "디앤디파마텍",
           "entry_date": "2026-08-10",
-          "unrealized_pnl_pct": 0,
+          "unrealized_pnl_pct": 2.54,
           "selection_reason": "고점 37.8%"
+        },
+        {
+          "code": "319660",
+          "name": "피에스케이",
+          "entry_date": "2026-08-12",
+          "unrealized_pnl_pct": 1.92,
+          "selection_reason": "고점 39.1%"
+        },
+        {
+          "code": "000500",
+          "name": "가온전선",
+          "entry_date": "2026-08-12",
+          "unrealized_pnl_pct": 0.5,
+          "selection_reason": "고점 38.0%"
+        },
+        {
+          "code": "353200",
+          "name": "대덕전자",
+          "entry_date": "2026-08-12",
+          "unrealized_pnl_pct": 0.85,
+          "selection_reason": "고점 28.1%"
+        },
+        {
+          "code": "007810",
+          "name": "코리아써키트",
+          "entry_date": "2026-08-12",
+          "unrealized_pnl_pct": 0,
+          "selection_reason": "고점 25.3%"
         }
       ],
-      "cooldown_count": 8,
+      "cooldown_count": 9,
       "cooldown": {
-        "000500": "2026-08-11",
         "089970": "2026-08-13",
         "950160": "2026-08-13",
         "095610": "2026-08-14",
         "069960": "2026-08-14",
         "475150": "2026-08-14",
         "131970": "2026-08-14",
-        "322000": "2026-08-17"
+        "322000": "2026-08-17",
+        "023530": "2026-08-19",
+        "004170": "2026-08-19"
       }
     },
-    "last_updated": "2026-08-11 16:46:48"
+    "last_updated": "2026-08-12 17:00:47"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -552,44 +553,37 @@
       "candidates_pattern": "data/bnf/bollinger_candidates_*.json"
     },
     "trades": {
-      "total": 127,
-      "wins": 83,
+      "total": 128,
+      "wins": 84,
       "losses": 43,
-      "win_rate_pct": 65.35,
-      "total_profit_krw": 3227538
+      "win_rate_pct": 65.62,
+      "total_profit_krw": 3247938
     },
     "positions": {
-      "active_count": 3,
+      "active_count": 2,
       "active": [
         {
           "code": "138930",
           "name": "BNK금융지주",
           "entry_date": "2026-07-31",
-          "unrealized_pnl_pct": -0.4,
+          "unrealized_pnl_pct": -1.87,
           "selection_reason": "BB%B=-0.33, RSI=30.6, Vol=5.0x"
         },
         {
           "code": "023530",
           "name": "롯데쇼핑",
           "entry_date": "2026-08-11",
-          "unrealized_pnl_pct": -0.9,
+          "unrealized_pnl_pct": -2.41,
           "selection_reason": "BB%B=-0.07, RSI=21.2, Vol=3.7x"
-        },
-        {
-          "code": "016360",
-          "name": "삼성증권",
-          "entry_date": "2026-08-11",
-          "unrealized_pnl_pct": 1.87,
-          "selection_reason": "BB%B=0.18, RSI=38.8, Vol=1.5x"
         }
       ]
     },
-    "last_updated": "2026-08-11 16:46:21"
+    "last_updated": "2026-08-12 16:59:32"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 83,
-    "unique_dates": 83,
+    "total_entries": 84,
+    "unique_dates": 84,
     "duplicates": {}
   },
   "warnings": [
