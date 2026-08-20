@@ -1,0 +1,148 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260819",
+  "selected_at": "2026-08-20 17:33:19",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "006360",
+      "name": "GS건설",
+      "price": 34950,
+      "change_pct": 2.34,
+      "score": 90.35,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 11.73,
+        "trading_value": 13.62
+      },
+      "rank": 1,
+      "market_cap": 2991073075500,
+      "volume": 2860256,
+      "trading_value": 98829501750,
+      "themes": [
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    },
+    {
+      "code": "009830",
+      "name": "한화솔루션",
+      "price": 34650,
+      "change_pct": 1.91,
+      "score": 86.41,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 29.16,
+        "price_momentum": 9.57,
+        "trading_value": 12.68
+      },
+      "rank": 2,
+      "market_cap": 7792526372400,
+      "volume": 2664056,
+      "trading_value": 91986245500,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "595",
+          "name": "우주태양광(페로브스카이트 등)"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        }
+      ]
+    },
+    {
+      "code": "322000",
+      "name": "HD현대에너지솔루션",
+      "price": 129400,
+      "change_pct": 3.85,
+      "score": 69.37,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 3.85,
+        "price_momentum": 19.3,
+        "trading_value": 11.22
+      },
+      "rank": 3,
+      "market_cap": 1449280000000,
+      "volume": 619718,
+      "trading_value": 81417032150,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "595",
+          "name": "우주태양광(페로브스카이트 등)"
+        },
+        {
+          "code": "329",
+          "name": "전력저장장치(ESS)"
+        }
+      ]
+    },
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 48500,
+      "change_pct": 1.25,
+      "score": 65.76,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 14.2,
+        "price_momentum": 6.27,
+        "trading_value": 10.29
+      },
+      "rank": 4,
+      "market_cap": 9506000000000,
+      "volume": 1557136,
+      "trading_value": 74676118850
+    },
+    {
+      "code": "000370",
+      "name": "한화손해보험",
+      "price": 7300,
+      "change_pct": 3.99,
+      "score": 65.34,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 8.5,
+        "price_momentum": 20.0,
+        "trading_value": 1.84
+      },
+      "rank": 5,
+      "market_cap": 852194079500,
+      "volume": 1814700,
+      "trading_value": 13331552450,
+      "themes": [
+        {
+          "code": "164",
+          "name": "손해보험"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}

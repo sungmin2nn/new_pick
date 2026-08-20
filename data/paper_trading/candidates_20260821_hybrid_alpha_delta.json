@@ -1,0 +1,184 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260819",
+  "selected_at": "2026-08-20 17:20:09",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "098120",
+      "name": "마이크로컨텍솔",
+      "price": 41450,
+      "change_pct": 9.66,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 79.7,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 1287813,
+      "trading_value": 51526976925,
+      "themes": [
+        {
+          "code": "14",
+          "name": "반도체 재료/부품"
+        }
+      ]
+    },
+    {
+      "code": "045390",
+      "name": "대아티아이",
+      "price": 3335,
+      "change_pct": 10.61,
+      "score": 61.8,
+      "score_detail": {
+        "alpha_score": 75.8,
+        "delta_score": 0.0,
+        "alpha_norm": 95.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 61.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 16026029,
+      "trading_value": 54647538058,
+      "themes": [
+        {
+          "code": "250",
+          "name": "철도"
+        }
+      ]
+    },
+    {
+      "code": "011390",
+      "name": "부산산업",
+      "price": 55200,
+      "change_pct": 14.29,
+      "score": 54.7,
+      "score_detail": {
+        "alpha_score": 67.1,
+        "delta_score": 0.0,
+        "alpha_norm": 84.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 54.7,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 201181,
+      "trading_value": 11146841400,
+      "themes": [
+        {
+          "code": "213",
+          "name": "해저터널(지하화/지하도로 등)"
+        },
+        {
+          "code": "250",
+          "name": "철도"
+        },
+        {
+          "code": "44",
+          "name": "시멘트/레미콘"
+        }
+      ]
+    },
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 48500,
+      "change_pct": 1.25,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 67.3,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 9506000000000,
+      "volume": 1557136,
+      "trading_value": 74676118850
+    },
+    {
+      "code": "007660",
+      "name": "이수페타시스",
+      "price": 104400,
+      "change_pct": 1.46,
+      "score": 32.6,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 62.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 93.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 32.6,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 7663922463600,
+      "volume": 1527629,
+      "trading_value": 162498768050,
+      "themes": [
+        {
+          "code": "373",
+          "name": "5G(5세대 이동통신)"
+        },
+        {
+          "code": "287",
+          "name": "PCB(FPCB 등)"
+        },
+        {
+          "code": "200",
+          "name": "우주항공산업(누리호/인공위성 등)"
+        },
+        {
+          "code": "529",
+          "name": "AI 챗봇(챗GPT 등)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
