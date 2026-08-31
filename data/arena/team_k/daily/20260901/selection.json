@@ -1,0 +1,108 @@
+{
+  "strategy_id": "foreign_flow_momentum",
+  "strategy_name": "외국인 수급 모멘텀",
+  "date": "20260828",
+  "selected_at": "2026-09-01 00:29:41",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "003490",
+      "name": "대한항공",
+      "price": 28700,
+      "change_pct": 1.77,
+      "score": 86.21,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 30.0,
+        "price_momentum": 6.21,
+        "trading_value": 15.0
+      },
+      "rank": 1,
+      "market_cap": 10567932970700,
+      "volume": 2745728,
+      "trading_value": 78512401725
+    },
+    {
+      "code": "008930",
+      "name": "한미사이언스",
+      "price": 44500,
+      "change_pct": 5.7,
+      "score": 57.92,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.98,
+        "price_momentum": 20.0,
+        "trading_value": 1.94
+      },
+      "rank": 2,
+      "market_cap": 3043423975000,
+      "volume": 232237,
+      "trading_value": 10142742475
+    },
+    {
+      "code": "000880",
+      "name": "한화",
+      "price": 134900,
+      "change_pct": 3.61,
+      "score": 55.27,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 1.74,
+        "price_momentum": 12.67,
+        "trading_value": 5.86
+      },
+      "rank": 3,
+      "market_cap": 7194068205300,
+      "volume": 231586,
+      "trading_value": 30688138862
+    },
+    {
+      "code": "290650",
+      "name": "엘앤씨바이오",
+      "price": 52900,
+      "change_pct": 4.96,
+      "score": 54.93,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 0.38,
+        "price_momentum": 17.4,
+        "trading_value": 2.15
+      },
+      "rank": 4,
+      "market_cap": 1426697341600,
+      "volume": 214744,
+      "trading_value": 11264989800
+    },
+    {
+      "code": "010140",
+      "name": "삼성중공업",
+      "price": 21200,
+      "change_pct": 0.95,
+      "score": 53.14,
+      "score_detail": {
+        "foreign_consistency": 35.0,
+        "foreign_magnitude": 6.6,
+        "price_momentum": 3.33,
+        "trading_value": 8.2
+      },
+      "rank": 5,
+      "market_cap": 18656000000000,
+      "volume": 2029082,
+      "trading_value": 42927550975
+    }
+  ],
+  "params": {
+    "pool_size": 100,
+    "lookback_days": 5,
+    "consecutive_days": 3,
+    "min_market_cap": 200000000000,
+    "min_trading_value": 10000000000,
+    "weights": {
+      "foreign_consistency": 35,
+      "foreign_magnitude": 30,
+      "price_momentum": 20,
+      "trading_value": 15
+    }
+  },
+  "simulation": null
+}

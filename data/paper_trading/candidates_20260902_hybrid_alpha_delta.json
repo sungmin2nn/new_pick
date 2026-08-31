@@ -1,0 +1,186 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260828",
+  "selected_at": "2026-09-01 00:30:57",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "002990",
+      "name": "금호건설",
+      "price": 17020,
+      "change_pct": 12.34,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 95.5,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 35361722,
+      "trading_value": 597927574030,
+      "themes": [
+        {
+          "code": "322",
+          "name": "건설 중소형"
+        }
+      ]
+    },
+    {
+      "code": "019170",
+      "name": "신풍제약",
+      "price": 10090,
+      "change_pct": 14.14,
+      "score": 49.0,
+      "score_detail": {
+        "alpha_score": 72.0,
+        "delta_score": 0.0,
+        "alpha_norm": 75.4,
+        "delta_norm": 0.0,
+        "alpha_weighted": 49.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 3848986,
+      "trading_value": 39671687920,
+      "themes": [
+        {
+          "code": "108",
+          "name": "백신/진단시약/방역(신종플루, AI 등)"
+        },
+        {
+          "code": "448",
+          "name": "코로나19(치료제/백신 개발 등)"
+        },
+        {
+          "code": "436",
+          "name": "코로나19(진단/치료제/백신 개발 등)"
+        },
+        {
+          "code": "172",
+          "name": "제약업체"
+        }
+      ]
+    },
+    {
+      "code": "011560",
+      "name": "세보엠이씨",
+      "price": 26500,
+      "change_pct": 13.49,
+      "score": 46.8,
+      "score_detail": {
+        "alpha_score": 68.7,
+        "delta_score": 0.0,
+        "alpha_norm": 71.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 46.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 231304,
+      "trading_value": 6070885600
+    },
+    {
+      "code": "196170",
+      "name": "알테오젠",
+      "price": 320000,
+      "change_pct": 2.73,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 74.7,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 22289642560000,
+      "volume": 615333,
+      "trading_value": 195516223750
+    },
+    {
+      "code": "298040",
+      "name": "효성중공업",
+      "price": 3153000,
+      "change_pct": 2.4,
+      "score": 34.7,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 74.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 99.2,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.7,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 29400299844000,
+      "volume": 62581,
+      "trading_value": 198192399500,
+      "themes": [
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        },
+        {
+          "code": "188",
+          "name": "풍력에너지"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "329",
+          "name": "전력저장장치(ESS)"
+        },
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
