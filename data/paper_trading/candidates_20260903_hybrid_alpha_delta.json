@@ -1,0 +1,210 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260901",
+  "selected_at": "2026-09-02 21:36:35",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "047770",
+      "name": "코데즈컴바인",
+      "price": 3950,
+      "change_pct": 12.54,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 88.7,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 16135727,
+      "trading_value": 63371812321,
+      "themes": [
+        {
+          "code": "121",
+          "name": "남북경협"
+        },
+        {
+          "code": "421",
+          "name": "日제품 불매운동(수혜)"
+        },
+        {
+          "code": "32",
+          "name": "패션/의류"
+        }
+      ]
+    },
+    {
+      "code": "396300",
+      "name": "세아메카닉스",
+      "price": 5200,
+      "change_pct": 13.79,
+      "score": 60.6,
+      "score_detail": {
+        "alpha_score": 82.7,
+        "delta_score": 0.0,
+        "alpha_norm": 93.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 60.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 5515275,
+      "trading_value": 28337285315,
+      "themes": [
+        {
+          "code": "27",
+          "name": "자동차부품"
+        },
+        {
+          "code": "227",
+          "name": "전기차"
+        }
+      ]
+    },
+    {
+      "code": "293490",
+      "name": "카카오게임즈",
+      "price": 9880,
+      "change_pct": 12.15,
+      "score": 58.6,
+      "score_detail": {
+        "alpha_score": 80.0,
+        "delta_score": 0.0,
+        "alpha_norm": 90.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 58.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 3140970,
+      "trading_value": 31250766980,
+      "themes": [
+        {
+          "code": "42",
+          "name": "게임"
+        },
+        {
+          "code": "265",
+          "name": "모바일게임(스마트폰)"
+        }
+      ]
+    },
+    {
+      "code": "005490",
+      "name": "POSCO홀딩스",
+      "price": 341000,
+      "change_pct": 0.74,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 72.8,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 27021360707000,
+      "volume": 303526,
+      "trading_value": 104647684750,
+      "themes": [
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        },
+        {
+          "code": "188",
+          "name": "풍력에너지"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        }
+      ]
+    },
+    {
+      "code": "316140",
+      "name": "우리금융지주",
+      "price": 34550,
+      "change_pct": 2.22,
+      "score": 33.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 70.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 96.4,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 25455975544350,
+      "volume": 2086698,
+      "trading_value": 71585204300,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
