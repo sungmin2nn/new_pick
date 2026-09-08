@@ -1,0 +1,48 @@
+{
+  "strategy_id": "largecap_contrarian",
+  "strategy_name": "대형주 역추세",
+  "date": "20260907",
+  "selected_at": "2026-09-08 21:33:49",
+  "count": 1,
+  "candidates": [
+    {
+      "code": "127120",
+      "name": "제이에스링크",
+      "price": 32400,
+      "change_pct": -3.57,
+      "score": 90.0,
+      "score_detail": {
+        "market_cap": 30.0,
+        "change_pct": 25.0,
+        "trading_value": 20.0,
+        "price_level": 15
+      },
+      "rank": 1,
+      "market_cap": 1186992370800,
+      "volume": 202439,
+      "trading_value": 6620151250,
+      "themes": [
+        {
+          "code": "436",
+          "name": "코로나19(진단/치료제/백신 개발 등)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "min_price": 5000,
+    "max_change": -3.0,
+    "min_trading_value": 50,
+    "min_market_cap": 1000000000000,
+    "kospi_drop_threshold": -2.0,
+    "entry_time": "09:30",
+    "weights": {
+      "market_cap": 30,
+      "change_pct": 25,
+      "trading_value": 20,
+      "price_level": 15,
+      "volatility": 10
+    }
+  },
+  "simulation": null
+}
