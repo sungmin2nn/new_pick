@@ -1,0 +1,218 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260909",
+  "selected_at": "2026-09-10 21:48:26",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "010170",
+      "name": "대한광통신",
+      "price": 14960,
+      "change_pct": 9.2,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 87.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 30155856,
+      "trading_value": 453989637515,
+      "themes": [
+        {
+          "code": "586",
+          "name": "광통신(광케이블/광섬유 등)"
+        },
+        {
+          "code": "373",
+          "name": "5G(5세대 이동통신)"
+        },
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        }
+      ]
+    },
+    {
+      "code": "043260",
+      "name": "성호전자",
+      "price": 18440,
+      "change_pct": 12.99,
+      "score": 55.2,
+      "score_detail": {
+        "alpha_score": 74.5,
+        "delta_score": 0.0,
+        "alpha_norm": 84.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 55.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 5914470,
+      "trading_value": 110062725450,
+      "themes": [
+        {
+          "code": "586",
+          "name": "광통신(광케이블/광섬유 등)"
+        },
+        {
+          "code": "33",
+          "name": "LED"
+        },
+        {
+          "code": "112",
+          "name": "공기청정기"
+        },
+        {
+          "code": "227",
+          "name": "전기차"
+        }
+      ]
+    },
+    {
+      "code": "048410",
+      "name": "현대바이오",
+      "price": 7130,
+      "change_pct": 13.9,
+      "score": 55.0,
+      "score_detail": {
+        "alpha_score": 74.3,
+        "delta_score": 0.0,
+        "alpha_norm": 84.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 55.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 10090029,
+      "trading_value": 72400956355,
+      "themes": [
+        {
+          "code": "448",
+          "name": "코로나19(치료제/백신 개발 등)"
+        },
+        {
+          "code": "436",
+          "name": "코로나19(진단/치료제/백신 개발 등)"
+        }
+      ]
+    },
+    {
+      "code": "000150",
+      "name": "두산",
+      "price": 1299000,
+      "change_pct": 4.17,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 72.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 21035791665000,
+      "volume": 83445,
+      "trading_value": 108687800000,
+      "themes": [
+        {
+          "code": "505",
+          "name": "로봇(산업용/협동로봇 등)"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "14",
+          "name": "반도체 재료/부품"
+        }
+      ]
+    },
+    {
+      "code": "010950",
+      "name": "S-Oil",
+      "price": 165900,
+      "change_pct": 4.08,
+      "score": 34.4,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 71.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.2,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.4,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 18677485192800,
+      "volume": 562109,
+      "trading_value": 92066237850,
+      "themes": [
+        {
+          "code": "600",
+          "name": "주유소"
+        },
+        {
+          "code": "527",
+          "name": "윤활유"
+        },
+        {
+          "code": "177",
+          "name": "LPG(액화석유가스)"
+        },
+        {
+          "code": "185",
+          "name": "정유"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
