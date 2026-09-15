@@ -1130,6 +1130,19 @@
       "overall_avg_change_err": 0.0,
       "n_real_missing": 0,
       "n_duplicates": 1
+    },
+    {
+      "date": "20260915",
+      "reference_date": "20260914",
+      "n_teams": 4,
+      "total_picks": 20,
+      "total_shortfall": 0,
+      "shortfall_rate_pct": 0.0,
+      "avg_team_avg_score": 61.1,
+      "overall_avg_price_err_pct": 1.188,
+      "overall_avg_change_err": 2.212,
+      "n_real_missing": 0,
+      "n_duplicates": 4
     }
   ],
   "alerts": [
@@ -1192,6 +1205,18 @@
       "severity": "warn",
       "code": "W_STALE_CHANGE",
       "message": "등락률 오차 9.382%p > 0.5%p"
+    },
+    {
+      "date": "20260915",
+      "severity": "warn",
+      "code": "W_STALE_PRICE",
+      "message": "평균 가격 오차 1.188% > 1.0%"
+    },
+    {
+      "date": "20260915",
+      "severity": "warn",
+      "code": "W_STALE_CHANGE",
+      "message": "등락률 오차 2.212%p > 0.5%p"
     }
   ],
   "thresholds": {
@@ -1203,10 +1228,10 @@
   "rolling_5d": {
     "days": 5,
     "shortfall_rate_pct_avg": 2.0,
-    "avg_score_avg": 65.1,
-    "price_err_pct_avg": 0.0,
-    "first_date": "20260908",
-    "last_date": "20260914"
+    "avg_score_avg": 63.5,
+    "price_err_pct_avg": 0.238,
+    "first_date": "20260909",
+    "last_date": "20260915"
   },
-  "last_updated": "2026-09-14T23:40:10.308461+09:00"
+  "last_updated": "2026-09-15T22:16:54.040320+09:00"
 }

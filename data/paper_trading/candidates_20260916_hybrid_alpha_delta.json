@@ -1,0 +1,194 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20260914",
+  "selected_at": "2026-09-15 22:03:46",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "356680",
+      "name": "엑스게이트",
+      "price": 17200,
+      "change_pct": 7.1,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 82.2,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 16673818,
+      "trading_value": 291912432515,
+      "themes": [
+        {
+          "code": "426",
+          "name": "양자암호/양자컴퓨팅"
+        },
+        {
+          "code": "55",
+          "name": "보안주(정보)"
+        }
+      ]
+    },
+    {
+      "code": "263860",
+      "name": "지니언스",
+      "price": 19400,
+      "change_pct": 14.45,
+      "score": 59.7,
+      "score_detail": {
+        "alpha_score": 75.5,
+        "delta_score": 0.0,
+        "alpha_norm": 91.8,
+        "delta_norm": 0.0,
+        "alpha_weighted": 59.7,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 2792121,
+      "trading_value": 53373188690,
+      "themes": [
+        {
+          "code": "55",
+          "name": "보안주(정보)"
+        }
+      ]
+    },
+    {
+      "code": "441270",
+      "name": "파인엠텍",
+      "price": 9210,
+      "change_pct": 11.1,
+      "score": 53.3,
+      "score_detail": {
+        "alpha_score": 67.4,
+        "delta_score": 0.0,
+        "alpha_norm": 82.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 53.3,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 5901808,
+      "trading_value": 53823462955,
+      "themes": [
+        {
+          "code": "404",
+          "name": "폴더블폰"
+        }
+      ]
+    },
+    {
+      "code": "011200",
+      "name": "HMM",
+      "price": 21250,
+      "change_pct": 1.92,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 63.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 20043806862500,
+      "volume": 892619,
+      "trading_value": 18872057975,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "047810",
+      "name": "한국항공우주",
+      "price": 133000,
+      "change_pct": 1.92,
+      "score": 33.7,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 61.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 96.4,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.7,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 12964189231000,
+      "volume": 228786,
+      "trading_value": 30309081600,
+      "themes": [
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "349",
+          "name": "드론(Drone)"
+        },
+        {
+          "code": "200",
+          "name": "우주항공산업(누리호/인공위성 등)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "462",
+          "name": "UAM(도심항공모빌리티)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
