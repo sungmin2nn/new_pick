@@ -1,0 +1,303 @@
+{
+  "overall": {
+    "date": "20260916",
+    "reference_date": "20260915",
+    "n_teams": 4,
+    "total_picks": 20,
+    "total_shortfall": 0,
+    "shortfall_rate_pct": 0.0,
+    "avg_team_avg_score": 59.5,
+    "overall_avg_price_err_pct": 1.703,
+    "overall_avg_change_err": 4.225,
+    "n_real_missing": 0,
+    "n_duplicates": 2
+  },
+  "team_metrics": {
+    "team_a": {
+      "strategy_id": "momentum",
+      "n_selected": 5,
+      "shortfall": 0,
+      "avg_score": 81.4,
+      "min_score": 66.4,
+      "avg_price_err_pct": 3.078,
+      "avg_change_err": 5.176,
+      "n_price_compared": 5,
+      "n_change_compared": 5
+    },
+    "team_e": {
+      "strategy_id": "frontier_gap",
+      "n_selected": 5,
+      "shortfall": 0,
+      "avg_score": 66.1,
+      "min_score": 61.7,
+      "avg_price_err_pct": 0.0,
+      "avg_change_err": 0,
+      "n_price_compared": 5,
+      "n_change_compared": 0
+    },
+    "team_h": {
+      "strategy_id": "sector_rotation",
+      "n_selected": 5,
+      "shortfall": 0,
+      "avg_score": 47.0,
+      "min_score": 42.1,
+      "avg_price_err_pct": 1.087,
+      "avg_change_err": 2.966,
+      "n_price_compared": 5,
+      "n_change_compared": 5
+    },
+    "team_j": {
+      "strategy_id": "opening_30min_volume_burst",
+      "n_selected": 5,
+      "shortfall": 0,
+      "avg_score": 43.5,
+      "min_score": 33.5,
+      "avg_price_err_pct": 2.646,
+      "avg_change_err": 4.532,
+      "n_price_compared": 5,
+      "n_change_compared": 5
+    }
+  },
+  "duplicates": {
+    "030530": 2,
+    "042510": 3
+  },
+  "mismatch_rows": [
+    {
+      "team": "team_a",
+      "code": "030530",
+      "name": "원익홀딩스",
+      "flag": "STALE_PRICE",
+      "sel_price": 25050,
+      "matched_field": "close",
+      "matched_value": 25950,
+      "diff_pct": 3.47
+    },
+    {
+      "team": "team_a",
+      "code": "030530",
+      "name": "원익홀딩스",
+      "flag": "STALE_CHANGE",
+      "sel_change": 14.38,
+      "real_change": 21.55,
+      "diff": 7.17
+    },
+    {
+      "team": "team_a",
+      "code": "042510",
+      "name": "라온시큐어",
+      "flag": "STALE_PRICE",
+      "sel_price": 12960,
+      "matched_field": "close",
+      "matched_value": 12270,
+      "diff_pct": 5.62
+    },
+    {
+      "team": "team_a",
+      "code": "042510",
+      "name": "라온시큐어",
+      "flag": "STALE_CHANGE",
+      "sel_change": 14.69,
+      "real_change": 6.05,
+      "diff": 8.64
+    },
+    {
+      "team": "team_a",
+      "code": "058610",
+      "name": "에스피지",
+      "flag": "STALE_PRICE",
+      "sel_price": 102800,
+      "matched_field": "close",
+      "matched_value": 106500,
+      "diff_pct": 3.47
+    },
+    {
+      "team": "team_a",
+      "code": "058610",
+      "name": "에스피지",
+      "flag": "STALE_CHANGE",
+      "sel_change": 13.34,
+      "real_change": 19.66,
+      "diff": 6.32
+    },
+    {
+      "team": "team_a",
+      "code": "071200",
+      "name": "인피니트헬스케어",
+      "flag": "STALE_PRICE",
+      "sel_price": 12950,
+      "matched_field": "close",
+      "matched_value": 12800,
+      "diff_pct": 1.17
+    },
+    {
+      "team": "team_a",
+      "code": "071200",
+      "name": "인피니트헬스케어",
+      "flag": "STALE_CHANGE",
+      "sel_change": 14.5,
+      "real_change": 13.17,
+      "diff": 1.33
+    },
+    {
+      "team": "team_a",
+      "code": "125490",
+      "name": "한라캐스트",
+      "flag": "STALE_PRICE",
+      "sel_price": 11320,
+      "matched_field": "close",
+      "matched_value": 11510,
+      "diff_pct": 1.65
+    },
+    {
+      "team": "team_a",
+      "code": "125490",
+      "name": "한라캐스트",
+      "flag": "STALE_CHANGE",
+      "sel_change": 10.98,
+      "real_change": 13.4,
+      "diff": 2.42
+    },
+    {
+      "team": "team_h",
+      "code": "336260",
+      "name": "두산퓨얼셀",
+      "flag": "STALE_CHANGE",
+      "sel_change": 7.95,
+      "real_change": 11.85,
+      "diff": 3.9
+    },
+    {
+      "team": "team_h",
+      "code": "003670",
+      "name": "포스코퓨처엠",
+      "flag": "STALE_CHANGE",
+      "sel_change": 5.81,
+      "real_change": 7.24,
+      "diff": 1.43
+    },
+    {
+      "team": "team_h",
+      "code": "052690",
+      "name": "한전기술",
+      "flag": "STALE_PRICE",
+      "sel_price": 143800,
+      "matched_field": "high",
+      "matched_value": 148200,
+      "diff_pct": 2.97
+    },
+    {
+      "team": "team_h",
+      "code": "052690",
+      "name": "한전기술",
+      "flag": "STALE_CHANGE",
+      "sel_change": 4.05,
+      "real_change": 10.27,
+      "diff": 6.22
+    },
+    {
+      "team": "team_h",
+      "code": "004020",
+      "name": "현대제철",
+      "flag": "STALE_PRICE",
+      "sel_price": 35150,
+      "matched_field": "close",
+      "matched_value": 35550,
+      "diff_pct": 1.13
+    },
+    {
+      "team": "team_h",
+      "code": "004020",
+      "name": "현대제철",
+      "flag": "STALE_CHANGE",
+      "sel_change": 6.52,
+      "real_change": 9.38,
+      "diff": 2.86
+    },
+    {
+      "team": "team_j",
+      "code": "036220",
+      "name": "오상헬스케어",
+      "flag": "STALE_PRICE",
+      "sel_price": 7210,
+      "matched_field": "close",
+      "matched_value": 7110,
+      "diff_pct": 1.41
+    },
+    {
+      "team": "team_j",
+      "code": "036220",
+      "name": "오상헬스케어",
+      "flag": "STALE_CHANGE",
+      "sel_change": 10.58,
+      "real_change": 7.89,
+      "diff": 2.69
+    },
+    {
+      "team": "team_j",
+      "code": "160190",
+      "name": "하이젠알앤엠",
+      "flag": "STALE_PRICE",
+      "sel_price": 25000,
+      "matched_field": "close",
+      "matched_value": 25550,
+      "diff_pct": 2.15
+    },
+    {
+      "team": "team_j",
+      "code": "160190",
+      "name": "하이젠알앤엠",
+      "flag": "STALE_CHANGE",
+      "sel_change": 24.69,
+      "real_change": 27.11,
+      "diff": 2.42
+    },
+    {
+      "team": "team_j",
+      "code": "030530",
+      "name": "원익홀딩스",
+      "flag": "STALE_PRICE",
+      "sel_price": 25050,
+      "matched_field": "close",
+      "matched_value": 25950,
+      "diff_pct": 3.47
+    },
+    {
+      "team": "team_j",
+      "code": "030530",
+      "name": "원익홀딩스",
+      "flag": "STALE_CHANGE",
+      "sel_change": 14.38,
+      "real_change": 21.55,
+      "diff": 7.17
+    },
+    {
+      "team": "team_j",
+      "code": "042510",
+      "name": "라온시큐어",
+      "flag": "STALE_PRICE",
+      "sel_price": 12960,
+      "matched_field": "close",
+      "matched_value": 12270,
+      "diff_pct": 5.62
+    },
+    {
+      "team": "team_j",
+      "code": "042510",
+      "name": "라온시큐어",
+      "flag": "STALE_CHANGE",
+      "sel_change": 14.69,
+      "real_change": 6.05,
+      "diff": 8.64
+    },
+    {
+      "team": "team_j",
+      "code": "036540",
+      "name": "SFA반도체",
+      "flag": "STALE_CHANGE",
+      "sel_change": 14.21,
+      "real_change": 15.95,
+      "diff": 1.74
+    }
+  ]
+}
