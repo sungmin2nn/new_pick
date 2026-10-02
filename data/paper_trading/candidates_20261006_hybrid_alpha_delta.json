@@ -1,0 +1,206 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261001",
+  "selected_at": "2026-10-02 23:29:31",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "080220",
+      "name": "제주반도체",
+      "price": 88200,
+      "change_pct": 12.64,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 89.3,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 3771574,
+      "trading_value": 318312229050,
+      "themes": [
+        {
+          "code": "545",
+          "name": "온디바이스 AI"
+        }
+      ]
+    },
+    {
+      "code": "490470",
+      "name": "세미파이브",
+      "price": 20550,
+      "change_pct": 12.48,
+      "score": 61.5,
+      "score_detail": {
+        "alpha_score": 84.5,
+        "delta_score": 0.0,
+        "alpha_norm": 94.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 61.5,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 9513055,
+      "trading_value": 191977831310,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "583",
+          "name": "2025 하반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "003160",
+      "name": "디아이",
+      "price": 41500,
+      "change_pct": 13.08,
+      "score": 57.3,
+      "score_detail": {
+        "alpha_score": 78.7,
+        "delta_score": 0.0,
+        "alpha_norm": 88.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 57.3,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 2821586,
+      "trading_value": 114084855900,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "536",
+          "name": "HBM(고대역폭메모리)"
+        }
+      ]
+    },
+    {
+      "code": "079550",
+      "name": "LIG디펜스앤에어로스페이스",
+      "price": 724000,
+      "change_pct": 6.16,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 73.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 15928000000000,
+      "volume": 88024,
+      "trading_value": 62989414000,
+      "themes": [
+        {
+          "code": "505",
+          "name": "로봇(산업용/협동로봇 등)"
+        },
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "349",
+          "name": "드론(Drone)"
+        },
+        {
+          "code": "200",
+          "name": "우주항공산업(누리호/인공위성 등)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "462",
+          "name": "UAM(도심항공모빌리티)"
+        }
+      ]
+    },
+    {
+      "code": "222800",
+      "name": "심텍",
+      "price": 159700,
+      "change_pct": 6.25,
+      "score": 34.7,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 73.0,
+        "alpha_norm": 0.0,
+        "delta_norm": 99.2,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.7,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 6145978802200,
+      "volume": 814312,
+      "trading_value": 125891017300,
+      "themes": [
+        {
+          "code": "545",
+          "name": "온디바이스 AI"
+        },
+        {
+          "code": "599",
+          "name": "소캠(SOCAMM)"
+        },
+        {
+          "code": "287",
+          "name": "PCB(FPCB 등)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
