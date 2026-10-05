@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-02T23:44:47.668880+09:00",
+  "generated_at": "2026-10-06T01:47:17.082848+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,7 +14,7 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 116,
+      "operational_days": 117,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 83480976,
@@ -41,9 +41,9 @@
         "portfolio_json_wins": 299
       },
       "data_health": {
-        "daily_files_count": 116,
+        "daily_files_count": 117,
         "first_date": "20260409",
-        "last_date": "20261002",
+        "last_date": "20261006",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -180,7 +180,7 @@
       "strategy_id": "frontier_gap",
       "enabled": true,
       "exists": true,
-      "operational_days": 102,
+      "operational_days": 103,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 62944022,
@@ -207,9 +207,9 @@
         "portfolio_json_wins": 241
       },
       "data_health": {
-        "daily_files_count": 102,
+        "daily_files_count": 103,
         "first_date": "20260423",
-        "last_date": "20261002",
+        "last_date": "20261006",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -303,7 +303,7 @@
       "strategy_id": "sector_rotation",
       "enabled": true,
       "exists": true,
-      "operational_days": 103,
+      "operational_days": 104,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 11125558,
@@ -330,9 +330,9 @@
         "portfolio_json_wins": 210
       },
       "data_health": {
-        "daily_files_count": 103,
+        "daily_files_count": 104,
         "first_date": "20260423",
-        "last_date": "20261002",
+        "last_date": "20261006",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -387,7 +387,7 @@
       "strategy_id": "opening_30min_volume_burst",
       "enabled": true,
       "exists": true,
-      "operational_days": 84,
+      "operational_days": 85,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 46455405,
@@ -414,9 +414,9 @@
         "portfolio_json_wins": 195
       },
       "data_health": {
-        "daily_files_count": 84,
+        "daily_files_count": 85,
         "first_date": "20260527",
-        "last_date": "20261002",
+        "last_date": "20261006",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -539,7 +539,7 @@
         "087010": "2026-10-09"
       }
     },
-    "last_updated": "2026-10-02 22:03:59"
+    "last_updated": "2026-10-06 00:11:30"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -557,7 +557,7 @@
       "total_profit_krw": 3254873
     },
     "positions": {
-      "active_count": 2,
+      "active_count": 3,
       "active": [
         {
           "code": "069960",
@@ -572,15 +572,22 @@
           "entry_date": "2026-10-01",
           "unrealized_pnl_pct": -3.04,
           "selection_reason": "BB%B=-0.15, RSI=32.9, Vol=1.5x"
+        },
+        {
+          "code": "078930",
+          "name": "GS",
+          "entry_date": "2026-10-05",
+          "unrealized_pnl_pct": 2.84,
+          "selection_reason": "BB%B=-0.05, RSI=39.1, Vol=1.0x"
         }
       ]
     },
-    "last_updated": "2026-10-02 22:00:19"
+    "last_updated": "2026-10-06 00:09:07"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 117,
-    "unique_dates": 115,
+    "total_entries": 118,
+    "unique_dates": 116,
     "duplicates": {
       "20260901": 2,
       "20260929": 2
