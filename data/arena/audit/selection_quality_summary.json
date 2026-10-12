@@ -1273,6 +1273,19 @@
       "overall_avg_change_err": 0.0,
       "n_real_missing": 17,
       "n_duplicates": 3
+    },
+    {
+      "date": "20261013",
+      "reference_date": "20261008",
+      "n_teams": 4,
+      "total_picks": 20,
+      "total_shortfall": 0,
+      "shortfall_rate_pct": 0.0,
+      "avg_team_avg_score": 49.6,
+      "overall_avg_price_err_pct": 0.0,
+      "overall_avg_change_err": 0.0,
+      "n_real_missing": 18,
+      "n_duplicates": 2
     }
   ],
   "alerts": [
@@ -1359,6 +1372,12 @@
       "severity": "warn",
       "code": "W_STALE_CHANGE",
       "message": "등락률 오차 4.225%p > 0.5%p"
+    },
+    {
+      "date": "20261013",
+      "severity": "warn",
+      "code": "W_LOW_SCORE",
+      "message": "팀 평균 점수 49.6 < 50.0"
     }
   ],
   "thresholds": {
@@ -1370,10 +1389,10 @@
   "rolling_5d": {
     "days": 5,
     "shortfall_rate_pct_avg": 0.0,
-    "avg_score_avg": 67.9,
+    "avg_score_avg": 65.2,
     "price_err_pct_avg": 0.0,
-    "first_date": "20260923",
-    "last_date": "20261006"
+    "first_date": "20260929",
+    "last_date": "20261013"
   },
-  "last_updated": "2026-10-06T23:58:46.894600+09:00"
+  "last_updated": "2026-10-13T02:22:48.935495+09:00"
 }
