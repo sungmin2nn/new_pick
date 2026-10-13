@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-13T02:22:45.240454+09:00",
+  "generated_at": "2026-10-14T00:46:40.193352+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -474,48 +474,62 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1942750,
-      "used": 1674300,
-      "realized_pnl": -1028750,
-      "unrealized_pnl": -28500
+      "current": 1943226,
+      "used": 2833000,
+      "realized_pnl": -1101674,
+      "unrealized_pnl": 44900
     },
     "returns": {
-      "cumulative_pct": -35.24,
-      "simple_sum_pct": -205.85,
-      "average_per_trade_pct": -0.64
+      "cumulative_pct": -35.23,
+      "simple_sum_pct": -219.28,
+      "average_per_trade_pct": -0.68
     },
     "trades": {
-      "total": 322,
+      "total": 324,
       "wins_computed": 81,
-      "losses_computed": 241,
-      "win_rate_pct": 25.2
+      "losses_computed": 243,
+      "win_rate_pct": 25.0
     },
     "positions": {
-      "active_count": 3,
+      "active_count": 5,
       "active": [
-        {
-          "code": "145020",
-          "name": "휴젤",
-          "entry_date": "2026-09-30",
-          "unrealized_pnl_pct": -2.44,
-          "selection_reason": "10일 20.3% | 고점 28.4%"
-        },
-        {
-          "code": "087010",
-          "name": "펩트론",
-          "entry_date": "2026-10-12",
-          "unrealized_pnl_pct": -0.11,
-          "selection_reason": "5일 30.5% | 10일 42.7% | 고점 43.5%"
-        },
         {
           "code": "103140",
           "name": "풍산",
           "entry_date": "2026-10-12",
-          "unrealized_pnl_pct": -2.44,
+          "unrealized_pnl_pct": -2.29,
           "selection_reason": "5일 15.4%"
+        },
+        {
+          "code": "083650",
+          "name": "비에이치아이",
+          "entry_date": "2026-10-13",
+          "unrealized_pnl_pct": 2.94,
+          "selection_reason": "5일 18.7% | 10일 23.6% | 고점 29.6%"
+        },
+        {
+          "code": "437730",
+          "name": "삼현",
+          "entry_date": "2026-10-13",
+          "unrealized_pnl_pct": 2.85,
+          "selection_reason": "고점 27.6%"
+        },
+        {
+          "code": "042660",
+          "name": "한화오션",
+          "entry_date": "2026-10-13",
+          "unrealized_pnl_pct": 3.38,
+          "selection_reason": "5일 15.1% | 고점 26.6%"
+        },
+        {
+          "code": "108490",
+          "name": "로보티즈",
+          "entry_date": "2026-10-13",
+          "unrealized_pnl_pct": 1.01,
+          "selection_reason": "고점 26.1%"
         }
       ],
-      "cooldown_count": 9,
+      "cooldown_count": 11,
       "cooldown": {
         "004020": "2026-10-14",
         "257720": "2026-10-15",
@@ -525,10 +539,12 @@
         "336260": "2026-10-19",
         "000720": "2026-10-19",
         "375500": "2026-10-20",
-        "082740": "2026-10-20"
+        "082740": "2026-10-20",
+        "145020": "2026-10-20",
+        "087010": "2026-10-20"
       }
     },
-    "last_updated": "2026-10-13 00:58:00"
+    "last_updated": "2026-10-13 23:30:18"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -552,28 +568,29 @@
           "code": "030200",
           "name": "KT",
           "entry_date": "2026-10-08",
-          "unrealized_pnl_pct": -3.69,
+          "unrealized_pnl_pct": -3.98,
           "selection_reason": "BB%B=-0.03, RSI=35.7, Vol=1.2x"
         },
         {
           "code": "018260",
           "name": "삼성에스디에스",
           "entry_date": "2026-10-12",
-          "unrealized_pnl_pct": -1.13,
+          "unrealized_pnl_pct": 0.56,
           "selection_reason": "BB%B=-0.24, RSI=31.4, Vol=2.1x"
         }
       ]
     },
-    "last_updated": "2026-10-13 00:55:04"
+    "last_updated": "2026-10-13 23:28:52"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 121,
+    "total_entries": 122,
     "unique_dates": 118,
     "duplicates": {
       "20260901": 2,
       "20260929": 2,
-      "20261006": 2
+      "20261006": 2,
+      "20261013": 2
     }
   },
   "warnings": [
@@ -593,7 +610,7 @@
       "code": "W_DUPLICATE_RUNS",
       "severity": "warn",
       "scope": "leaderboard",
-      "message": "daily_history 중복 일자: {'20260901': 2, '20260929': 2, '20261006': 2} — arena_manager.run_daily 동일 일자 재실행 의심"
+      "message": "daily_history 중복 일자: {'20260901': 2, '20260929': 2, '20261006': 2, '20261013': 2} — arena_manager.run_daily 동일 일자 재실행 의심"
     }
   ]
 }

@@ -1,0 +1,196 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261012",
+  "selected_at": "2026-10-14 00:32:23",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "084670",
+      "name": "동양고속",
+      "price": 41300,
+      "change_pct": 8.68,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 80.9,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 2573855,
+      "trading_value": 109559086725,
+      "themes": [
+        {
+          "code": "591",
+          "name": "서울고속버스터미널 재개발 수혜"
+        },
+        {
+          "code": "592",
+          "name": "부동산 보유 자산주"
+        }
+      ]
+    },
+    {
+      "code": "038500",
+      "name": "삼표시멘트",
+      "price": 7410,
+      "change_pct": 4.66,
+      "score": 61.5,
+      "score_detail": {
+        "alpha_score": 76.5,
+        "delta_score": 0.0,
+        "alpha_norm": 94.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 61.5,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 17771524,
+      "trading_value": 134306304535,
+      "themes": [
+        {
+          "code": "44",
+          "name": "시멘트/레미콘"
+        },
+        {
+          "code": "592",
+          "name": "부동산 보유 자산주"
+        }
+      ]
+    },
+    {
+      "code": "011330",
+      "name": "유니켐",
+      "price": 5000,
+      "change_pct": 14.16,
+      "score": 59.8,
+      "score_detail": {
+        "alpha_score": 74.4,
+        "delta_score": 0.0,
+        "alpha_norm": 92.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 59.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 3738706,
+      "trading_value": 19475582537
+    },
+    {
+      "code": "316140",
+      "name": "우리금융지주",
+      "price": 32200,
+      "change_pct": -0.46,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 56.0,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 23724527135400,
+      "volume": 2378509,
+      "trading_value": 76637278675,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "003550",
+      "name": "LG",
+      "price": 108100,
+      "change_pct": 0.0,
+      "score": 34.4,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 55.1,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.4,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.4,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 16343855632400,
+      "volume": 212240,
+      "trading_value": 22956496050,
+      "themes": [
+        {
+          "code": "392",
+          "name": "스마트팩토리(스마트공장)"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "387",
+          "name": "블록체인"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
