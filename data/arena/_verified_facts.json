@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-16T22:02:42.338779+09:00",
+  "generated_at": "2026-10-20T00:28:37.644648+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,7 +14,7 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 122,
+      "operational_days": 123,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 88055070,
@@ -41,9 +41,9 @@
         "portfolio_json_wins": 307
       },
       "data_health": {
-        "daily_files_count": 122,
+        "daily_files_count": 123,
         "first_date": "20260409",
-        "last_date": "20261016",
+        "last_date": "20261019",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -180,7 +180,7 @@
       "strategy_id": "frontier_gap",
       "enabled": true,
       "exists": true,
-      "operational_days": 107,
+      "operational_days": 108,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 67378670,
@@ -207,9 +207,9 @@
         "portfolio_json_wins": 251
       },
       "data_health": {
-        "daily_files_count": 107,
+        "daily_files_count": 108,
         "first_date": "20260423",
-        "last_date": "20261015",
+        "last_date": "20261019",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -303,7 +303,7 @@
       "strategy_id": "sector_rotation",
       "enabled": true,
       "exists": true,
-      "operational_days": 109,
+      "operational_days": 110,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 10853983,
@@ -330,9 +330,9 @@
         "portfolio_json_wins": 218
       },
       "data_health": {
-        "daily_files_count": 109,
+        "daily_files_count": 110,
         "first_date": "20260423",
-        "last_date": "20261016",
+        "last_date": "20261019",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -387,7 +387,7 @@
       "strategy_id": "opening_30min_volume_burst",
       "enabled": true,
       "exists": true,
-      "operational_days": 90,
+      "operational_days": 91,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 48296629,
@@ -414,9 +414,9 @@
         "portfolio_json_wins": 204
       },
       "data_health": {
-        "daily_files_count": 90,
+        "daily_files_count": 91,
         "first_date": "20260527",
-        "last_date": "20261016",
+        "last_date": "20261019",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -474,21 +474,21 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1861622,
-      "used": 2739260,
-      "realized_pnl": -1201478,
-      "unrealized_pnl": 63100
+      "current": 1998222,
+      "used": 2594460,
+      "realized_pnl": -1127878,
+      "unrealized_pnl": 126100
     },
     "returns": {
-      "cumulative_pct": -37.95,
-      "simple_sum_pct": -238.22,
-      "average_per_trade_pct": -0.72
+      "cumulative_pct": -33.39,
+      "simple_sum_pct": -225.72,
+      "average_per_trade_pct": -0.68
     },
     "trades": {
-      "total": 333,
-      "wins_computed": 83,
+      "total": 334,
+      "wins_computed": 84,
       "losses_computed": 250,
-      "win_rate_pct": 24.9
+      "win_rate_pct": 25.1
     },
     "positions": {
       "active_count": 5,
@@ -497,36 +497,36 @@
           "code": "011070",
           "name": "LG이노텍",
           "entry_date": "2026-10-16",
-          "unrealized_pnl_pct": -0.12,
+          "unrealized_pnl_pct": 6.03,
           "selection_reason": "5일 33.8% | 10일 33.6% | 고점 40.5%"
         },
         {
           "code": "089970",
           "name": "브이엠",
           "entry_date": "2026-10-16",
-          "unrealized_pnl_pct": 3.35,
+          "unrealized_pnl_pct": 7.23,
           "selection_reason": "5일 30.5% | 10일 27.0% | 고점 37.4%"
         },
         {
           "code": "010170",
           "name": "대한광통신",
           "entry_date": "2026-10-16",
-          "unrealized_pnl_pct": 1.12,
+          "unrealized_pnl_pct": 0.75,
           "selection_reason": "5일 29.7% | 10일 26.6% | 고점 37.3%"
         },
         {
           "code": "080220",
           "name": "제주반도체",
           "entry_date": "2026-10-16",
-          "unrealized_pnl_pct": 6.49,
+          "unrealized_pnl_pct": 9.58,
           "selection_reason": "5일 27.7% | 10일 21.8% | 고점 36.3%"
         },
         {
-          "code": "204270",
-          "name": "제이앤티씨",
-          "entry_date": "2026-10-16",
+          "code": "006260",
+          "name": "LS",
+          "entry_date": "2026-10-19",
           "unrealized_pnl_pct": 0,
-          "selection_reason": "5일 30.8% | 10일 23.3% | 고점 36.1%"
+          "selection_reason": "10일 26.3% | 고점 32.4%"
         }
       ],
       "cooldown_count": 15,
@@ -548,7 +548,7 @@
         "440110": "2026-10-23"
       }
     },
-    "last_updated": "2026-10-16 20:49:06"
+    "last_updated": "2026-10-19 22:50:26"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -572,31 +572,31 @@
           "code": "007340",
           "name": "DN오토모티브",
           "entry_date": "2026-10-14",
-          "unrealized_pnl_pct": 2.81,
+          "unrealized_pnl_pct": 0.89,
           "selection_reason": "BB%B=-0.34, RSI=27.9, Vol=10.3x"
         },
         {
           "code": "001450",
           "name": "현대해상",
           "entry_date": "2026-10-16",
-          "unrealized_pnl_pct": 1.53,
+          "unrealized_pnl_pct": 2.36,
           "selection_reason": "BB%B=-0.28, RSI=32.5, Vol=2.1x"
         },
         {
           "code": "128940",
           "name": "한미약품",
           "entry_date": "2026-10-16",
-          "unrealized_pnl_pct": -1.85,
+          "unrealized_pnl_pct": -2.97,
           "selection_reason": "BB%B=-0.21, RSI=29.9, Vol=1.7x"
         }
       ]
     },
-    "last_updated": "2026-10-16 20:46:45"
+    "last_updated": "2026-10-19 22:48:18"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 125,
-    "unique_dates": 121,
+    "total_entries": 126,
+    "unique_dates": 122,
     "duplicates": {
       "20260901": 2,
       "20260929": 2,
