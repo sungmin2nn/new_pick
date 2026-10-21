@@ -1,0 +1,219 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261020",
+  "selected_at": "2026-10-21 22:24:17",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "126340",
+      "name": "비나텍",
+      "price": 91700,
+      "change_pct": 11.83,
+      "score": 93.3,
+      "score_detail": {
+        "alpha_score": 64.4,
+        "delta_score": 54.7,
+        "alpha_norm": 74.4,
+        "delta_norm": 100.0,
+        "alpha_weighted": 48.3,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 527525,
+      "trading_value": 49101910300,
+      "themes": [
+        {
+          "code": "559",
+          "name": "고체산화물 연료전지(SOFC)"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        },
+        {
+          "code": "329",
+          "name": "전력저장장치(ESS)"
+        }
+      ]
+    },
+    {
+      "code": "007810",
+      "name": "코리아써키트",
+      "price": 72500,
+      "change_pct": 12.4,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 86.6,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 2185665,
+      "trading_value": 160681439900,
+      "themes": [
+        {
+          "code": "547",
+          "name": "CXL(컴퓨트익스프레스링크)"
+        },
+        {
+          "code": "599",
+          "name": "소캠(SOCAMM)"
+        },
+        {
+          "code": "287",
+          "name": "PCB(FPCB 등)"
+        },
+        {
+          "code": "393",
+          "name": "갤럭시 부품주"
+        }
+      ]
+    },
+    {
+      "code": "456160",
+      "name": "지투지바이오",
+      "price": 37000,
+      "change_pct": 14.91,
+      "score": 56.0,
+      "score_detail": {
+        "alpha_score": 74.6,
+        "delta_score": 0.0,
+        "alpha_norm": 86.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 56.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 669359,
+      "trading_value": 24636929825,
+      "themes": [
+        {
+          "code": "583",
+          "name": "2025 하반기 신규상장"
+        },
+        {
+          "code": "377",
+          "name": "치매"
+        }
+      ]
+    },
+    {
+      "code": "000810",
+      "name": "삼성화재",
+      "price": 602000,
+      "change_pct": -0.82,
+      "score": 34.4,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 53.7,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.2,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.4,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 26877778746000,
+      "volume": 83834,
+      "trading_value": 50436262796,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "164",
+          "name": "손해보험"
+        }
+      ]
+    },
+    {
+      "code": "298040",
+      "name": "효성중공업",
+      "price": 1892000,
+      "change_pct": -2.27,
+      "score": 34.4,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 53.7,
+        "alpha_norm": 0.0,
+        "delta_norm": 98.2,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.4,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 17642044816000,
+      "volume": 51236,
+      "trading_value": 96126402000,
+      "themes": [
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        },
+        {
+          "code": "188",
+          "name": "풍력에너지"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "329",
+          "name": "전력저장장치(ESS)"
+        },
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
