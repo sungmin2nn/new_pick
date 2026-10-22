@@ -1,0 +1,223 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261021",
+  "selected_at": "2026-10-22 22:24:13",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "000150",
+      "name": "두산",
+      "price": 1056000,
+      "change_pct": 4.55,
+      "score": 106.3,
+      "score_detail": {
+        "alpha_score": 68.2,
+        "delta_score": 71.4,
+        "alpha_norm": 94.3,
+        "delta_norm": 100.0,
+        "alpha_weighted": 61.3,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 298692,
+      "trading_value": 311178711500,
+      "themes": [
+        {
+          "code": "505",
+          "name": "로봇(산업용/협동로봇 등)"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "14",
+          "name": "반도체 재료/부품"
+        }
+      ]
+    },
+    {
+      "code": "456160",
+      "name": "지투지바이오",
+      "price": 42100,
+      "change_pct": 13.78,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 72.3,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1152818,
+      "trading_value": 49838248825,
+      "themes": [
+        {
+          "code": "583",
+          "name": "2025 하반기 신규상장"
+        },
+        {
+          "code": "377",
+          "name": "치매"
+        }
+      ]
+    },
+    {
+      "code": "013580",
+      "name": "계룡건설",
+      "price": 25500,
+      "change_pct": 13.33,
+      "score": 60.3,
+      "score_detail": {
+        "alpha_score": 67.1,
+        "delta_score": 0.0,
+        "alpha_norm": 92.8,
+        "delta_norm": 0.0,
+        "alpha_weighted": 60.3,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 263665,
+      "trading_value": 6461147875,
+      "themes": [
+        {
+          "code": "322",
+          "name": "건설 중소형"
+        }
+      ]
+    },
+    {
+      "code": "096770",
+      "name": "SK이노베이션",
+      "price": 154300,
+      "change_pct": 4.19,
+      "score": 33.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 69.0,
+        "alpha_norm": 0.0,
+        "delta_norm": 96.6,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 26084845188400,
+      "volume": 867701,
+      "trading_value": 132511052150,
+      "themes": [
+        {
+          "code": "600",
+          "name": "주유소"
+        },
+        {
+          "code": "527",
+          "name": "윤활유"
+        },
+        {
+          "code": "177",
+          "name": "LPG(액화석유가스)"
+        },
+        {
+          "code": "185",
+          "name": "정유"
+        },
+        {
+          "code": "560",
+          "name": "냉각시스템(액침냉각 등)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "329",
+          "name": "전력저장장치(ESS)"
+        },
+        {
+          "code": "227",
+          "name": "전기차"
+        }
+      ]
+    },
+    {
+      "code": "036930",
+      "name": "주성엔지니어링",
+      "price": 205000,
+      "change_pct": 3.48,
+      "score": 20.7,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 42.3,
+        "alpha_norm": 0.0,
+        "delta_norm": 59.2,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 20.7,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 9528629805000,
+      "volume": 966166,
+      "trading_value": 197536885850,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "382",
+          "name": "플렉서블 디스플레이"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "9",
+          "name": "OLED(유기 발광 다이오드)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
