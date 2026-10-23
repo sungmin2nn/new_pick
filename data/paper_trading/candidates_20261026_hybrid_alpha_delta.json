@@ -1,0 +1,222 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261022",
+  "selected_at": "2026-10-23 22:04:04",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "126340",
+      "name": "비나텍",
+      "price": 108700,
+      "change_pct": 14.78,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 89.7,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 725611,
+      "trading_value": 81584679850,
+      "themes": [
+        {
+          "code": "559",
+          "name": "고체산화물 연료전지(SOFC)"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        },
+        {
+          "code": "329",
+          "name": "전력저장장치(ESS)"
+        }
+      ]
+    },
+    {
+      "code": "077500",
+      "name": "유니퀘스트",
+      "price": 11790,
+      "change_pct": 14.58,
+      "score": 59.6,
+      "score_detail": {
+        "alpha_score": 82.2,
+        "delta_score": 0.0,
+        "alpha_norm": 91.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 59.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 3185399,
+      "trading_value": 38221170415,
+      "themes": [
+        {
+          "code": "106",
+          "name": "바이오인식(생체인식)"
+        },
+        {
+          "code": "545",
+          "name": "온디바이스 AI"
+        },
+        {
+          "code": "362",
+          "name": "자율주행차"
+        }
+      ]
+    },
+    {
+      "code": "003010",
+      "name": "혜인",
+      "price": 10860,
+      "change_pct": 3.92,
+      "score": 53.8,
+      "score_detail": {
+        "alpha_score": 74.3,
+        "delta_score": 0.0,
+        "alpha_norm": 82.8,
+        "delta_norm": 0.0,
+        "alpha_weighted": 53.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 7683886,
+      "trading_value": 90147180790,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        },
+        {
+          "code": "517",
+          "name": "우크라이나 재건"
+        }
+      ]
+    },
+    {
+      "code": "298040",
+      "name": "효성중공업",
+      "price": 1924000,
+      "change_pct": -1.28,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 65.8,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 17940430352000,
+      "volume": 39308,
+      "trading_value": 76276595000,
+      "themes": [
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        },
+        {
+          "code": "188",
+          "name": "풍력에너지"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "329",
+          "name": "전력저장장치(ESS)"
+        },
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    },
+    {
+      "code": "033780",
+      "name": "KT&G",
+      "price": 193800,
+      "change_pct": -0.1,
+      "score": 34.9,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 65.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 99.7,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.9,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 20118466372800,
+      "volume": 278638,
+      "trading_value": 54155376700,
+      "themes": [
+        {
+          "code": "487",
+          "name": "건강기능식품"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
