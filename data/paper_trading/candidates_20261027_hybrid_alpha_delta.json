@@ -1,0 +1,204 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261023",
+  "selected_at": "2026-10-26 23:37:59",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 59800,
+      "change_pct": 7.94,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 92.5,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 13099086,
+      "trading_value": 780042481500
+    },
+    {
+      "code": "039980",
+      "name": "폴라리스AI",
+      "price": 5720,
+      "change_pct": 5.93,
+      "score": 44.1,
+      "score_detail": {
+        "alpha_score": 62.8,
+        "delta_score": 0.0,
+        "alpha_norm": 67.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 44.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 7088422,
+      "trading_value": 42429877060,
+      "themes": [
+        {
+          "code": "250",
+          "name": "철도"
+        },
+        {
+          "code": "32",
+          "name": "패션/의류"
+        },
+        {
+          "code": "529",
+          "name": "AI 챗봇(챗GPT 등)"
+        },
+        {
+          "code": "517",
+          "name": "우크라이나 재건"
+        },
+        {
+          "code": "335",
+          "name": "재난/안전(지진/화재 등)"
+        }
+      ]
+    },
+    {
+      "code": "225190",
+      "name": "LK삼양",
+      "price": 4395,
+      "change_pct": 5.65,
+      "score": 37.4,
+      "score_detail": {
+        "alpha_score": 53.2,
+        "delta_score": 0.0,
+        "alpha_norm": 57.5,
+        "delta_norm": 0.0,
+        "alpha_weighted": 37.4,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 4417584,
+      "trading_value": 20753794293,
+      "themes": [
+        {
+          "code": "41",
+          "name": "카메라모듈/부품"
+        },
+        {
+          "code": "200",
+          "name": "우주항공산업(누리호/인공위성 등)"
+        },
+        {
+          "code": "564",
+          "name": "전기차 화재 방지(배터리 열폭주 등)"
+        }
+      ]
+    },
+    {
+      "code": "042700",
+      "name": "한미반도체",
+      "price": 191000,
+      "change_pct": -0.1,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 64.7,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 18204630200000,
+      "volume": 655464,
+      "trading_value": 123002077600,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "18",
+          "name": "전자파"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "536",
+          "name": "HBM(고대역폭메모리)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "0126Z0",
+      "name": "삼성에피스홀딩스",
+      "price": 332000,
+      "change_pct": 1.22,
+      "score": 29.6,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 54.8,
+        "alpha_norm": 0.0,
+        "delta_norm": 84.7,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 29.6,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 8261172268000,
+      "volume": 22450,
+      "trading_value": 7369269000,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
