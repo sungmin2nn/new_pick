@@ -1,0 +1,182 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261027",
+  "selected_at": "2026-10-28 23:30:01",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "0013Y0",
+      "name": "엠에스바이오",
+      "price": 11740,
+      "change_pct": 8.91,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 86.4,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 25284909,
+      "trading_value": 306011473860
+    },
+    {
+      "code": "253590",
+      "name": "네오셈",
+      "price": 17130,
+      "change_pct": 13.29,
+      "score": 56.8,
+      "score_detail": {
+        "alpha_score": 75.5,
+        "delta_score": 0.0,
+        "alpha_norm": 87.4,
+        "delta_norm": 0.0,
+        "alpha_weighted": 56.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 5015153,
+      "trading_value": 86996275805,
+      "themes": [
+        {
+          "code": "547",
+          "name": "CXL(컴퓨트익스프레스링크)"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        }
+      ]
+    },
+    {
+      "code": "199820",
+      "name": "제일일렉트릭",
+      "price": 6840,
+      "change_pct": 14.57,
+      "score": 55.4,
+      "score_detail": {
+        "alpha_score": 73.6,
+        "delta_score": 0.0,
+        "alpha_norm": 85.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 55.4,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 5250203,
+      "trading_value": 36652864505,
+      "themes": [
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "104",
+          "name": "스마트홈(홈네트워크)"
+        },
+        {
+          "code": "564",
+          "name": "전기차 화재 방지(배터리 열폭주 등)"
+        }
+      ]
+    },
+    {
+      "code": "036930",
+      "name": "주성엔지니어링",
+      "price": 174800,
+      "change_pct": 4.3,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 85.7,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 8124899950800,
+      "volume": 1686472,
+      "trading_value": 301323974950,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "382",
+          "name": "플렉서블 디스플레이"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "9",
+          "name": "OLED(유기 발광 다이오드)"
+        }
+      ]
+    },
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 62200,
+      "change_pct": 4.01,
+      "score": 34.7,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 85.0,
+        "alpha_norm": 0.0,
+        "delta_norm": 99.2,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 34.7,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 12191200000000,
+      "volume": 4853393,
+      "trading_value": 302310292500
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
