@@ -1,0 +1,192 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261029",
+  "selected_at": "2026-10-30 23:29:24",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "0011A0",
+      "name": "액스비스",
+      "price": 11390,
+      "change_pct": 11.67,
+      "score": 110.0,
+      "score_detail": {
+        "alpha_score": 84.7,
+        "delta_score": 56.9,
+        "alpha_norm": 100.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 6535486,
+      "trading_value": 75044485820,
+      "themes": [
+        {
+          "code": "41",
+          "name": "카메라모듈/부품"
+        },
+        {
+          "code": "227",
+          "name": "전기차"
+        },
+        {
+          "code": "590",
+          "name": "2026 상반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "0088M0",
+      "name": "메쥬",
+      "price": 14700,
+      "change_pct": 12.21,
+      "score": 93.6,
+      "score_detail": {
+        "alpha_score": 71.2,
+        "delta_score": 47.1,
+        "alpha_norm": 84.1,
+        "delta_norm": 82.8,
+        "alpha_weighted": 54.6,
+        "delta_weighted": 29.0,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1073905,
+      "trading_value": 15813470685,
+      "themes": [
+        {
+          "code": "175",
+          "name": "의료기기"
+        },
+        {
+          "code": "590",
+          "name": "2026 상반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "079650",
+      "name": "서산",
+      "price": 7900,
+      "change_pct": 6.04,
+      "score": 62.1,
+      "score_detail": {
+        "alpha_score": 80.9,
+        "delta_score": 0.0,
+        "alpha_norm": 95.5,
+        "delta_norm": 0.0,
+        "alpha_weighted": 62.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 13845932,
+      "trading_value": 118858459005,
+      "themes": [
+        {
+          "code": "44",
+          "name": "시멘트/레미콘"
+        }
+      ]
+    },
+    {
+      "code": "005830",
+      "name": "DB손해보험",
+      "price": 182000,
+      "change_pct": 0.94,
+      "score": 29.8,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 48.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 85.1,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 29.8,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 11921063518000,
+      "volume": 139515,
+      "trading_value": 25297730650,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "164",
+          "name": "손해보험"
+        }
+      ]
+    },
+    {
+      "code": "006800",
+      "name": "미래에셋증권",
+      "price": 26450,
+      "change_pct": 0.57,
+      "score": 29.2,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 47.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 83.5,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 29.2,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 14362906798950,
+      "volume": 959938,
+      "trading_value": 24992780075,
+      "themes": [
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
