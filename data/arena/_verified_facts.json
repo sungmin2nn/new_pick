@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-30T23:40:18.427360+09:00",
+  "generated_at": "2026-11-03T02:36:09.457514+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,7 +14,7 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 132,
+      "operational_days": 133,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 103460693,
@@ -41,9 +41,9 @@
         "portfolio_json_wins": 328
       },
       "data_health": {
-        "daily_files_count": 132,
+        "daily_files_count": 133,
         "first_date": "20260409",
-        "last_date": "20261030",
+        "last_date": "20261103",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -180,7 +180,7 @@
       "strategy_id": "frontier_gap",
       "enabled": true,
       "exists": true,
-      "operational_days": 117,
+      "operational_days": 118,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 84518783,
@@ -207,9 +207,9 @@
         "portfolio_json_wins": 272
       },
       "data_health": {
-        "daily_files_count": 117,
+        "daily_files_count": 118,
         "first_date": "20260423",
-        "last_date": "20261030",
+        "last_date": "20261103",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -303,7 +303,7 @@
       "strategy_id": "sector_rotation",
       "enabled": true,
       "exists": true,
-      "operational_days": 119,
+      "operational_days": 120,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 11076734,
@@ -330,9 +330,9 @@
         "portfolio_json_wins": 242
       },
       "data_health": {
-        "daily_files_count": 119,
+        "daily_files_count": 120,
         "first_date": "20260423",
-        "last_date": "20261030",
+        "last_date": "20261103",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -387,7 +387,7 @@
       "strategy_id": "opening_30min_volume_burst",
       "enabled": true,
       "exists": true,
-      "operational_days": 100,
+      "operational_days": 101,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 60918277,
@@ -414,9 +414,9 @@
         "portfolio_json_wins": 229
       },
       "data_health": {
-        "daily_files_count": 100,
+        "daily_files_count": 101,
         "first_date": "20260527",
-        "last_date": "20261030",
+        "last_date": "20261103",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -474,13 +474,13 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1282761,
+      "current": 1458711,
       "used": 2873400,
       "realized_pnl": -1700339,
-      "unrealized_pnl": -16900
+      "unrealized_pnl": 159050
     },
     "returns": {
-      "cumulative_pct": -57.24,
+      "cumulative_pct": -51.38,
       "simple_sum_pct": -331.19,
       "average_per_trade_pct": -0.91
     },
@@ -497,43 +497,40 @@
           "code": "009830",
           "name": "한화솔루션",
           "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": -2.87,
+          "unrealized_pnl_pct": 5.3,
           "selection_reason": "5일 19.7% | 10일 21.3% | 고점 37.9%"
         },
         {
           "code": "001440",
           "name": "대한전선",
           "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": 0,
+          "unrealized_pnl_pct": 0.99,
           "selection_reason": "고점 36.5%"
         },
         {
           "code": "011790",
           "name": "SKC",
           "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": 0,
+          "unrealized_pnl_pct": 5.95,
           "selection_reason": "고점 35.2%"
         },
         {
           "code": "112610",
           "name": "씨에스윈드",
           "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": 0,
+          "unrealized_pnl_pct": 9.97,
           "selection_reason": "10일 23.0% | 고점 34.1%"
         },
         {
           "code": "066970",
           "name": "엘앤에프",
           "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": 0,
+          "unrealized_pnl_pct": 5.68,
           "selection_reason": "고점 32.9%"
         }
       ],
-      "cooldown_count": 20,
+      "cooldown_count": 17,
       "cooldown": {
-        "006260": "2026-10-30",
-        "082740": "2026-10-30",
-        "079550": "2026-10-30",
         "222800": "2026-11-02",
         "080220": "2026-11-02",
         "103590": "2026-11-02",
@@ -553,7 +550,7 @@
         "047040": "2026-11-06"
       }
     },
-    "last_updated": "2026-10-30 22:24:42"
+    "last_updated": "2026-11-03 01:28:52"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -564,11 +561,11 @@
       "candidates_pattern": "data/bnf/bollinger_candidates_*.json"
     },
     "trades": {
-      "total": 192,
-      "wins": 121,
+      "total": 194,
+      "wins": 123,
       "losses": 70,
-      "win_rate_pct": 63.02,
-      "total_profit_krw": 3505463
+      "win_rate_pct": 63.4,
+      "total_profit_krw": 3521843
     },
     "positions": {
       "active_count": 3,
@@ -577,31 +574,31 @@
           "code": "002380",
           "name": "KCC",
           "entry_date": "2026-10-22",
-          "unrealized_pnl_pct": -1.4,
+          "unrealized_pnl_pct": 2.94,
           "selection_reason": "BB%B=-0.07, RSI=25.5, Vol=1.4x"
         },
         {
           "code": "030200",
           "name": "KT",
           "entry_date": "2026-10-26",
-          "unrealized_pnl_pct": -2.73,
+          "unrealized_pnl_pct": -1.58,
           "selection_reason": "BB%B=-0.10, RSI=25.0, Vol=1.2x"
         },
         {
-          "code": "001120",
-          "name": "LX인터내셔널",
-          "entry_date": "2026-10-30",
+          "code": "088980",
+          "name": "맥쿼리인프라",
+          "entry_date": "2026-11-03",
           "unrealized_pnl_pct": 0,
-          "selection_reason": "BB%B=-0.06, RSI=38.5, Vol=1.3x"
+          "selection_reason": "BB%B=-0.04, RSI=29.2, Vol=2.6x"
         }
       ]
     },
-    "last_updated": "2026-10-30 22:22:03"
+    "last_updated": "2026-11-03 01:27:07"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 135,
-    "unique_dates": 131,
+    "total_entries": 136,
+    "unique_dates": 132,
     "duplicates": {
       "20260901": 2,
       "20260929": 2,

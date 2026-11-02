@@ -1,0 +1,202 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261030",
+  "selected_at": "2026-11-03 02:24:28",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "263860",
+      "name": "지니언스",
+      "price": 27750,
+      "change_pct": 11.0,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 95.2,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 3966902,
+      "trading_value": 111036248800,
+      "themes": [
+        {
+          "code": "55",
+          "name": "보안주(정보)"
+        }
+      ]
+    },
+    {
+      "code": "003220",
+      "name": "대원제약",
+      "price": 8680,
+      "change_pct": 12.73,
+      "score": 50.2,
+      "score_detail": {
+        "alpha_score": 73.5,
+        "delta_score": 0.0,
+        "alpha_norm": 77.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 50.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1472165,
+      "trading_value": 12978502545,
+      "themes": [
+        {
+          "code": "487",
+          "name": "건강기능식품"
+        },
+        {
+          "code": "172",
+          "name": "제약업체"
+        },
+        {
+          "code": "175",
+          "name": "의료기기"
+        },
+        {
+          "code": "311",
+          "name": "고령화 사회(노인복지)"
+        }
+      ]
+    },
+    {
+      "code": "042940",
+      "name": "상지건설",
+      "price": 6790,
+      "change_pct": 8.81,
+      "score": 48.8,
+      "score_detail": {
+        "alpha_score": 71.5,
+        "delta_score": 0.0,
+        "alpha_norm": 75.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 48.8,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 6303148,
+      "trading_value": 45344537630,
+      "themes": [
+        {
+          "code": "322",
+          "name": "건설 중소형"
+        }
+      ]
+    },
+    {
+      "code": "329180",
+      "name": "HD현대중공업",
+      "price": 274000,
+      "change_pct": 0.74,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 59.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 28759375650000,
+      "volume": 365328,
+      "trading_value": 98538590000,
+      "themes": [
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    },
+    {
+      "code": "316140",
+      "name": "우리금융지주",
+      "price": 30800,
+      "change_pct": 0.0,
+      "score": 33.9,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 57.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 97.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.9,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 22693025955600,
+      "volume": 2350838,
+      "trading_value": 71788993350,
+      "themes": [
+        {
+          "code": "165",
+          "name": "은행"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
