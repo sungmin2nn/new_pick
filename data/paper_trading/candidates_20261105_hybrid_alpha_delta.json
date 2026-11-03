@@ -1,0 +1,200 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261102",
+  "selected_at": "2026-11-04 00:28:47",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "180640",
+      "name": "한진칼",
+      "price": 134800,
+      "change_pct": 8.8,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 79.7,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 516362,
+      "trading_value": 70060647550,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "166",
+          "name": "항공/저가 항공사(LCC)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "004020",
+      "name": "현대제철",
+      "price": 28850,
+      "change_pct": 11.61,
+      "score": 63.1,
+      "score_detail": {
+        "alpha_score": 77.4,
+        "delta_score": 0.0,
+        "alpha_norm": 97.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 63.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1067401,
+      "trading_value": 30586601250,
+      "themes": [
+        {
+          "code": "250",
+          "name": "철도"
+        },
+        {
+          "code": "386",
+          "name": "수소에너지(수소차/연료전지 등)"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        }
+      ]
+    },
+    {
+      "code": "014620",
+      "name": "성광벤드",
+      "price": 30000,
+      "change_pct": 13.85,
+      "score": 60.6,
+      "score_detail": {
+        "alpha_score": 74.3,
+        "delta_score": 0.0,
+        "alpha_norm": 93.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 60.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 339083,
+      "trading_value": 10030891075,
+      "themes": [
+        {
+          "code": "94",
+          "name": "조선기자재"
+        },
+        {
+          "code": "520",
+          "name": "피팅(관이음쇠)/밸브"
+        },
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    },
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 63200,
+      "change_pct": 2.43,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 78.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 12387200000000,
+      "volume": 1850653,
+      "trading_value": 116173169600
+    },
+    {
+      "code": "005490",
+      "name": "POSCO홀딩스",
+      "price": 283000,
+      "change_pct": 3.47,
+      "score": 33.1,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 74.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 94.6,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.1,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 22425352141000,
+      "volume": 260942,
+      "trading_value": 73409674500,
+      "themes": [
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        },
+        {
+          "code": "188",
+          "name": "풍력에너지"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
