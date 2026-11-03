@@ -48,7 +48,7 @@ jobs:
         git commit -m "📸 테마 스냅샷 - $(date +'%Y-%m-%d')"
 
         for i in 1 2 3 4 5; do
-          if git pull --rebase -X theirs origin master && git push; then
+          if git pull --rebase --autostash -X theirs origin master && git push; then
             echo "[git] push 성공 (시도 $i)"
             exit 0
           fi
