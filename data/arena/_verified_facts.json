@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-04T00:43:19.938196+09:00",
+  "generated_at": "2026-11-05T00:57:08.375039+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,7 +14,7 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 134,
+      "operational_days": 135,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 103460693,
@@ -41,9 +41,9 @@
         "portfolio_json_wins": 328
       },
       "data_health": {
-        "daily_files_count": 134,
+        "daily_files_count": 135,
         "first_date": "20260409",
-        "last_date": "20261104",
+        "last_date": "20261105",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -180,7 +180,7 @@
       "strategy_id": "frontier_gap",
       "enabled": true,
       "exists": true,
-      "operational_days": 119,
+      "operational_days": 120,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 84518783,
@@ -207,9 +207,9 @@
         "portfolio_json_wins": 272
       },
       "data_health": {
-        "daily_files_count": 119,
+        "daily_files_count": 120,
         "first_date": "20260423",
-        "last_date": "20261104",
+        "last_date": "20261105",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -303,7 +303,7 @@
       "strategy_id": "sector_rotation",
       "enabled": true,
       "exists": true,
-      "operational_days": 121,
+      "operational_days": 122,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 11076734,
@@ -330,9 +330,9 @@
         "portfolio_json_wins": 242
       },
       "data_health": {
-        "daily_files_count": 121,
+        "daily_files_count": 122,
         "first_date": "20260423",
-        "last_date": "20261104",
+        "last_date": "20261105",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -387,7 +387,7 @@
       "strategy_id": "opening_30min_volume_burst",
       "enabled": true,
       "exists": true,
-      "operational_days": 102,
+      "operational_days": 103,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 60918277,
@@ -414,9 +414,9 @@
         "portfolio_json_wins": 229
       },
       "data_health": {
-        "daily_files_count": 102,
+        "daily_files_count": 103,
         "first_date": "20260527",
-        "last_date": "20261104",
+        "last_date": "20261105",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -474,65 +474,63 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1400061,
-      "used": 2644200,
-      "realized_pnl": -1655739,
-      "unrealized_pnl": 55800
+      "current": 1617261,
+      "used": 2634300,
+      "realized_pnl": -1443839,
+      "unrealized_pnl": 61100
     },
     "returns": {
-      "cumulative_pct": -53.33,
-      "simple_sum_pct": -323.05,
-      "average_per_trade_pct": -0.88
+      "cumulative_pct": -46.09,
+      "simple_sum_pct": -286.59,
+      "average_per_trade_pct": -0.78
     },
     "trades": {
-      "total": 366,
-      "wins_computed": 88,
+      "total": 368,
+      "wins_computed": 90,
       "losses_computed": 278,
-      "win_rate_pct": 24.0
+      "win_rate_pct": 24.5
     },
     "positions": {
       "active_count": 5,
       "active": [
         {
-          "code": "009830",
-          "name": "한화솔루션",
-          "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": 6.62,
-          "selection_reason": "5일 19.7% | 10일 21.3% | 고점 37.9%"
-        },
-        {
           "code": "011790",
           "name": "SKC",
           "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": 0.99,
+          "unrealized_pnl_pct": 5.1,
           "selection_reason": "고점 35.2%"
-        },
-        {
-          "code": "066970",
-          "name": "엘앤에프",
-          "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": 1.98,
-          "selection_reason": "고점 32.9%"
         },
         {
           "code": "079550",
           "name": "LIG디펜스앤에어로스페이스",
           "entry_date": "2026-11-03",
-          "unrealized_pnl_pct": 0,
+          "unrealized_pnl_pct": 2.05,
           "selection_reason": "10일 28.7% | 고점 45.4%"
         },
         {
           "code": "001820",
           "name": "삼화콘덴서",
           "entry_date": "2026-11-03",
-          "unrealized_pnl_pct": 0,
+          "unrealized_pnl_pct": -1.28,
           "selection_reason": "고점 37.0%"
+        },
+        {
+          "code": "214370",
+          "name": "케어젠",
+          "entry_date": "2026-11-04",
+          "unrealized_pnl_pct": 4.26,
+          "selection_reason": "5일 19.0% | 10일 31.7% | 고점 41.4%"
+        },
+        {
+          "code": "103590",
+          "name": "일진전기",
+          "entry_date": "2026-11-04",
+          "unrealized_pnl_pct": 0.91,
+          "selection_reason": "고점 41.3%"
         }
       ],
-      "cooldown_count": 14,
+      "cooldown_count": 12,
       "cooldown": {
-        "087010": "2026-11-03",
-        "322000": "2026-11-03",
         "042660": "2026-11-05",
         "267270": "2026-11-05",
         "336260": "2026-11-05",
@@ -547,7 +545,7 @@
         "001440": "2026-11-10"
       }
     },
-    "last_updated": "2026-11-03 23:34:14"
+    "last_updated": "2026-11-04 23:48:21"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -558,37 +556,37 @@
       "candidates_pattern": "data/bnf/bollinger_candidates_*.json"
     },
     "trades": {
-      "total": 196,
-      "wins": 125,
+      "total": 197,
+      "wins": 126,
       "losses": 70,
-      "win_rate_pct": 63.78,
-      "total_profit_krw": 3549553
+      "win_rate_pct": 63.96,
+      "total_profit_krw": 3568153
     },
     "positions": {
       "active_count": 2,
       "active": [
         {
-          "code": "030200",
-          "name": "KT",
-          "entry_date": "2026-10-26",
-          "unrealized_pnl_pct": -0.11,
-          "selection_reason": "BB%B=-0.10, RSI=25.0, Vol=1.2x"
-        },
-        {
           "code": "000270",
           "name": "기아",
           "entry_date": "2026-11-03",
-          "unrealized_pnl_pct": 1.15,
+          "unrealized_pnl_pct": 1.57,
           "selection_reason": "BB%B=-0.21, RSI=25.6, Vol=3.6x"
+        },
+        {
+          "code": "214370",
+          "name": "케어젠",
+          "entry_date": "2026-11-04",
+          "unrealized_pnl_pct": 1.81,
+          "selection_reason": "BB%B=-0.10, RSI=23.9, Vol=9.4x"
         }
       ]
     },
-    "last_updated": "2026-11-03 23:32:46"
+    "last_updated": "2026-11-04 23:47:19"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 137,
-    "unique_dates": 133,
+    "total_entries": 138,
+    "unique_dates": 134,
     "duplicates": {
       "20260901": 2,
       "20260929": 2,

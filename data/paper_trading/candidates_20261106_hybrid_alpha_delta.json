@@ -1,0 +1,174 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261103",
+  "selected_at": "2026-11-05 00:44:38",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "0053F0",
+      "name": "티앤이코리아",
+      "price": 19020,
+      "change_pct": 10.65,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 90.3,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 5538236,
+      "trading_value": 108374586140
+    },
+    {
+      "code": "488280",
+      "name": "에스투더블유",
+      "price": 11140,
+      "change_pct": 14.73,
+      "score": 55.2,
+      "score_detail": {
+        "alpha_score": 76.7,
+        "delta_score": 0.0,
+        "alpha_norm": 84.9,
+        "delta_norm": 0.0,
+        "alpha_weighted": 55.2,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 2164345,
+      "trading_value": 24032784785,
+      "themes": [
+        {
+          "code": "99",
+          "name": "지능형로봇/인공지능(AI)"
+        },
+        {
+          "code": "55",
+          "name": "보안주(정보)"
+        },
+        {
+          "code": "583",
+          "name": "2025 하반기 신규상장"
+        }
+      ]
+    },
+    {
+      "code": "0039P0",
+      "name": "매드업",
+      "price": 5870,
+      "change_pct": 7.71,
+      "score": 45.5,
+      "score_detail": {
+        "alpha_score": 63.2,
+        "delta_score": 0.0,
+        "alpha_norm": 70.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 45.5,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 5655148,
+      "trading_value": 35590114770
+    },
+    {
+      "code": "010140",
+      "name": "삼성중공업",
+      "price": 17280,
+      "change_pct": 0.93,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 64.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 15206400000000,
+      "volume": 3972218,
+      "trading_value": 68456854780,
+      "themes": [
+        {
+          "code": "381",
+          "name": "LNG(액화천연가스)"
+        },
+        {
+          "code": "30",
+          "name": "조선"
+        }
+      ]
+    },
+    {
+      "code": "000810",
+      "name": "삼성화재",
+      "price": 651000,
+      "change_pct": 0.0,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 64.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 29065504923000,
+      "volume": 83903,
+      "trading_value": 54677437000,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "164",
+          "name": "손해보험"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
