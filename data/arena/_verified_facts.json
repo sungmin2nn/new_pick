@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-06T01:07:57.036811+09:00",
+  "generated_at": "2026-11-07T00:39:52.463221+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -474,66 +474,35 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1379568,
-      "used": 2863700,
-      "realized_pnl": -1639132,
-      "unrealized_pnl": 18700
+      "current": 1236708,
+      "used": 594000,
+      "realized_pnl": -1789692,
+      "unrealized_pnl": 26400
     },
     "returns": {
-      "cumulative_pct": -54.01,
-      "simple_sum_pct": -323.98,
-      "average_per_trade_pct": -0.87
+      "cumulative_pct": -58.78,
+      "simple_sum_pct": -350.5,
+      "average_per_trade_pct": -0.93
     },
     "trades": {
-      "total": 374,
+      "total": 378,
       "wins_computed": 90,
-      "losses_computed": 284,
-      "win_rate_pct": 24.1
+      "losses_computed": 288,
+      "win_rate_pct": 23.8
     },
     "positions": {
-      "active_count": 5,
+      "active_count": 1,
       "active": [
-        {
-          "code": "011790",
-          "name": "SKC",
-          "entry_date": "2026-10-30",
-          "unrealized_pnl_pct": -1.56,
-          "selection_reason": "고점 35.2%"
-        },
         {
           "code": "214370",
           "name": "케어젠",
           "entry_date": "2026-11-04",
-          "unrealized_pnl_pct": 4.63,
+          "unrealized_pnl_pct": 4.44,
           "selection_reason": "5일 19.0% | 10일 31.7% | 고점 41.4%"
-        },
-        {
-          "code": "082740",
-          "name": "한화엔진",
-          "entry_date": "2026-11-05",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "고점 34.2%"
-        },
-        {
-          "code": "278470",
-          "name": "에이피알",
-          "entry_date": "2026-11-05",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "고점 33.9%"
-        },
-        {
-          "code": "010950",
-          "name": "S-Oil",
-          "entry_date": "2026-11-05",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "10일 21.5% | 고점 33.6%"
         }
       ],
-      "cooldown_count": 18,
+      "cooldown_count": 19,
       "cooldown": {
-        "042660": "2026-11-05",
-        "267270": "2026-11-05",
-        "336260": "2026-11-05",
         "440110": "2026-11-06",
         "000500": "2026-11-06",
         "089970": "2026-11-06",
@@ -548,10 +517,14 @@
         "103590": "2026-11-12",
         "281820": "2026-11-12",
         "066570": "2026-11-12",
-        "310210": "2026-11-12"
+        "310210": "2026-11-12",
+        "011790": "2026-11-13",
+        "082740": "2026-11-13",
+        "278470": "2026-11-13",
+        "010950": "2026-11-13"
       }
     },
-    "last_updated": "2026-11-05 23:53:43"
+    "last_updated": "2026-11-06 23:31:35"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -562,11 +535,11 @@
       "candidates_pattern": "data/bnf/bollinger_candidates_*.json"
     },
     "trades": {
-      "total": 199,
-      "wins": 127,
-      "losses": 71,
-      "win_rate_pct": 63.82,
-      "total_profit_krw": 3565803
+      "total": 201,
+      "wins": 128,
+      "losses": 72,
+      "win_rate_pct": 63.68,
+      "total_profit_krw": 3561653
     },
     "positions": {
       "active_count": 2,
@@ -575,29 +548,30 @@
           "code": "214370",
           "name": "케어젠",
           "entry_date": "2026-11-04",
-          "unrealized_pnl_pct": 2.17,
+          "unrealized_pnl_pct": 1.99,
           "selection_reason": "BB%B=-0.10, RSI=23.9, Vol=9.4x"
         },
         {
-          "code": "263750",
-          "name": "펄어비스",
-          "entry_date": "2026-11-05",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "BB%B=-0.10, RSI=33.6, Vol=1.1x"
+          "code": "051900",
+          "name": "LG생활건강",
+          "entry_date": "2026-11-06",
+          "unrealized_pnl_pct": 1.08,
+          "selection_reason": "BB%B=-0.21, RSI=21.7, Vol=4.4x"
         }
       ]
     },
-    "last_updated": "2026-11-05 23:52:28"
+    "last_updated": "2026-11-06 23:29:59"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 139,
+    "total_entries": 140,
     "unique_dates": 135,
     "duplicates": {
       "20260901": 2,
       "20260929": 2,
       "20261006": 2,
-      "20261013": 2
+      "20261013": 2,
+      "20261106": 2
     }
   },
   "warnings": [
@@ -617,7 +591,7 @@
       "code": "W_DUPLICATE_RUNS",
       "severity": "warn",
       "scope": "leaderboard",
-      "message": "daily_history 중복 일자: {'20260901': 2, '20260929': 2, '20261006': 2, '20261013': 2} — arena_manager.run_daily 동일 일자 재실행 의심"
+      "message": "daily_history 중복 일자: {'20260901': 2, '20260929': 2, '20261006': 2, '20261013': 2, '20261106': 2} — arena_manager.run_daily 동일 일자 재실행 의심"
     }
   ]
 }
