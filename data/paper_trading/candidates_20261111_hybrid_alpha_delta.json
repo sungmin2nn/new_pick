@@ -1,0 +1,216 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261106",
+  "selected_at": "2026-11-10 02:51:11",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "089860",
+      "name": "롯데렌탈",
+      "price": 58400,
+      "change_pct": 10.4,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 84.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 2411819,
+      "trading_value": 140874748200,
+      "themes": [
+        {
+          "code": "525",
+          "name": "렌터카"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "119850",
+      "name": "지엔씨에너지",
+      "price": 35300,
+      "change_pct": 13.32,
+      "score": 61.6,
+      "score_detail": {
+        "alpha_score": 80.4,
+        "delta_score": 0.0,
+        "alpha_norm": 94.8,
+        "delta_norm": 0.0,
+        "alpha_weighted": 61.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1413523,
+      "trading_value": 48923721375,
+      "themes": [
+        {
+          "code": "123",
+          "name": "전력설비"
+        },
+        {
+          "code": "121",
+          "name": "남북경협"
+        }
+      ]
+    },
+    {
+      "code": "0147B0",
+      "name": "래블업",
+      "price": 10980,
+      "change_pct": 6.71,
+      "score": 56.3,
+      "score_detail": {
+        "alpha_score": 73.5,
+        "delta_score": 0.0,
+        "alpha_norm": 86.7,
+        "delta_norm": 0.0,
+        "alpha_weighted": 56.3,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 8847067,
+      "trading_value": 98033474305
+    },
+    {
+      "code": "017670",
+      "name": "SK텔레콤",
+      "price": 77700,
+      "change_pct": 0.26,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 58.5,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 16689187118100,
+      "volume": 1669241,
+      "trading_value": 128064309700,
+      "themes": [
+        {
+          "code": "373",
+          "name": "5G(5세대 이동통신)"
+        },
+        {
+          "code": "126",
+          "name": "통신"
+        },
+        {
+          "code": "426",
+          "name": "양자암호/양자컴퓨팅"
+        },
+        {
+          "code": "276",
+          "name": "클라우드 컴퓨팅"
+        },
+        {
+          "code": "104",
+          "name": "스마트홈(홈네트워크)"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "362",
+          "name": "자율주행차"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "387",
+          "name": "블록체인"
+        },
+        {
+          "code": "462",
+          "name": "UAM(도심항공모빌리티)"
+        }
+      ]
+    },
+    {
+      "code": "259960",
+      "name": "크래프톤",
+      "price": 220500,
+      "change_pct": -0.23,
+      "score": 33.6,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 56.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 96.1,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.6,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 10028923222500,
+      "volume": 150349,
+      "trading_value": 33055946000,
+      "themes": [
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "42",
+          "name": "게임"
+        },
+        {
+          "code": "265",
+          "name": "모바일게임(스마트폰)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
