@@ -68,9 +68,25 @@ class TelegramNotifier:
         except Exception:
             pass  # 로깅 실패가 발송을 막으면 안 됨
 
+    POLICY_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config", "telegram_policy.json")
+
+    def _muted(self, msg_type: str) -> bool:
+        """config/telegram_policy.json 의 muted=true 면 allow_types 외 알림은 보내지 않는다.
+        (2026-11-10 알림 정리: new_pick 알림은 NTR 매매와 별개이고 GitHub 지연으로 밤에 몰려 와서 꺼 둠)"""
+        try:
+            with open(self.POLICY_PATH, encoding="utf-8") as f:
+                policy = json.load(f)
+        except (OSError, ValueError):
+            return False
+        return bool(policy.get("muted")) and msg_type not in policy.get("allow_types", [])
+
     def send_message(self, text: str, parse_mode: str = "HTML",
                      msg_type: str = "custom") -> bool:
         """메시지 전송"""
+        if self._muted(msg_type):
+            print(f"[Telegram] 알림 정책으로 생략: {msg_type}")
+            self._log_send(False, msg_type, text[:100], text, "muted")
+            return True     # 호출부는 성공으로 취급 — 생략이 작업 실패가 되지 않게
         if not self.is_configured():
             print("[Telegram] 설정되지 않음 - TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID 필요")
             self._log_send(False, msg_type, text[:100], text, "not_configured")
