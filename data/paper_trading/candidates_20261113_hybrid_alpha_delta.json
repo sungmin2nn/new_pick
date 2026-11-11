@@ -1,0 +1,190 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261110",
+  "selected_at": "2026-11-12 00:31:34",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "0162D0",
+      "name": "동원파츠",
+      "price": 29400,
+      "change_pct": 10.94,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 91.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 15388095,
+      "trading_value": 576930277575
+    },
+    {
+      "code": "012210",
+      "name": "삼미금속",
+      "price": 6800,
+      "change_pct": 14.29,
+      "score": 48.1,
+      "score_detail": {
+        "alpha_score": 68.0,
+        "delta_score": 0.0,
+        "alpha_norm": 74.1,
+        "delta_norm": 0.0,
+        "alpha_weighted": 48.1,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 667244,
+      "trading_value": 4446054690,
+      "themes": [
+        {
+          "code": "27",
+          "name": "자동차부품"
+        },
+        {
+          "code": "94",
+          "name": "조선기자재"
+        },
+        {
+          "code": "144",
+          "name": "방위산업/전쟁 및 테러"
+        },
+        {
+          "code": "583",
+          "name": "2025 하반기 신규상장"
+        },
+        {
+          "code": "205",
+          "name": "원자력발전"
+        }
+      ]
+    },
+    {
+      "code": "020560",
+      "name": "아시아나항공",
+      "price": 8700,
+      "change_pct": 11.68,
+      "score": 45.3,
+      "score_detail": {
+        "alpha_score": 64.0,
+        "delta_score": 0.0,
+        "alpha_norm": 69.7,
+        "delta_norm": 0.0,
+        "alpha_weighted": 45.3,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 847611,
+      "trading_value": 7314633930,
+      "themes": [
+        {
+          "code": "166",
+          "name": "항공/저가 항공사(LCC)"
+        },
+        {
+          "code": "31",
+          "name": "환율하락 수혜"
+        }
+      ]
+    },
+    {
+      "code": "036930",
+      "name": "주성엔지니어링",
+      "price": 152300,
+      "change_pct": 7.48,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 89.3,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 7079074728300,
+      "volume": 1300708,
+      "trading_value": 197556092550,
+      "themes": [
+        {
+          "code": "191",
+          "name": "태양광에너지"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        },
+        {
+          "code": "382",
+          "name": "플렉서블 디스플레이"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        },
+        {
+          "code": "9",
+          "name": "OLED(유기 발광 다이오드)"
+        }
+      ]
+    },
+    {
+      "code": "028050",
+      "name": "삼성E&A",
+      "price": 64600,
+      "change_pct": 6.6,
+      "score": 32.6,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 83.3,
+        "alpha_norm": 0.0,
+        "delta_norm": 93.3,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 32.6,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 12661600000000,
+      "volume": 2065957,
+      "trading_value": 132087171950
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
