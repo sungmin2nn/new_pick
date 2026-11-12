@@ -1,0 +1,189 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261111",
+  "selected_at": "2026-11-13 01:23:49",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "192820",
+      "name": "코스맥스",
+      "price": 263000,
+      "change_pct": 9.58,
+      "score": 85.2,
+      "score_detail": {
+        "alpha_score": 65.2,
+        "delta_score": 64.2,
+        "alpha_norm": 77.0,
+        "delta_norm": 71.8,
+        "alpha_weighted": 50.0,
+        "delta_weighted": 25.1,
+        "overlap_bonus": 10.0,
+        "source": [
+          "alpha",
+          "delta"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 269249,
+      "trading_value": 66724368500,
+      "themes": [
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "0162D0",
+      "name": "동원파츠",
+      "price": 31600,
+      "change_pct": 7.48,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 84.7,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 5287932,
+      "trading_value": 159557935350
+    },
+    {
+      "code": "460940",
+      "name": "피앤에스로보틱스",
+      "price": 5020,
+      "change_pct": 13.32,
+      "score": 56.9,
+      "score_detail": {
+        "alpha_score": 74.2,
+        "delta_score": 0.0,
+        "alpha_norm": 87.6,
+        "delta_norm": 0.0,
+        "alpha_weighted": 56.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 4415358,
+      "trading_value": 22516940015,
+      "themes": [
+        {
+          "code": "99",
+          "name": "지능형로봇/인공지능(AI)"
+        },
+        {
+          "code": "175",
+          "name": "의료기기"
+        },
+        {
+          "code": "311",
+          "name": "고령화 사회(노인복지)"
+        }
+      ]
+    },
+    {
+      "code": "030530",
+      "name": "원익홀딩스",
+      "price": 31400,
+      "change_pct": 8.09,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 89.4,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 2425272603400,
+      "volume": 4033296,
+      "trading_value": 124240268500,
+      "themes": [
+        {
+          "code": "505",
+          "name": "로봇(산업용/협동로봇 등)"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "12",
+          "name": "반도체 장비"
+        }
+      ]
+    },
+    {
+      "code": "000150",
+      "name": "두산",
+      "price": 688000,
+      "change_pct": 8.18,
+      "score": 33.5,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 85.6,
+        "alpha_norm": 0.0,
+        "delta_norm": 95.7,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 33.5,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 9795338768000,
+      "volume": 141927,
+      "trading_value": 93737187500,
+      "themes": [
+        {
+          "code": "505",
+          "name": "로봇(산업용/협동로봇 등)"
+        },
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "14",
+          "name": "반도체 재료/부품"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
