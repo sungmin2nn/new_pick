@@ -1,0 +1,196 @@
+{
+  "strategy_id": "hybrid_alpha_delta",
+  "strategy_name": "Alpha-Delta 하이브리드",
+  "date": "20261117",
+  "selected_at": "2026-11-19 01:50:30",
+  "count": 5,
+  "candidates": [
+    {
+      "code": "399720",
+      "name": "가온칩스",
+      "price": 37750,
+      "change_pct": 8.95,
+      "score": 65.0,
+      "score_detail": {
+        "alpha_score": 89.8,
+        "delta_score": 0.0,
+        "alpha_norm": 100.0,
+        "delta_norm": 0.0,
+        "alpha_weighted": 65.0,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 1,
+      "market_cap": 0,
+      "volume": 1644409,
+      "trading_value": 66497440575,
+      "themes": [
+        {
+          "code": "307",
+          "name": "시스템반도체"
+        },
+        {
+          "code": "545",
+          "name": "온디바이스 AI"
+        }
+      ]
+    },
+    {
+      "code": "0117P0",
+      "name": "피스피스스튜디오",
+      "price": 3830,
+      "change_pct": 12.65,
+      "score": 47.6,
+      "score_detail": {
+        "alpha_score": 65.8,
+        "delta_score": 0.0,
+        "alpha_norm": 73.3,
+        "delta_norm": 0.0,
+        "alpha_weighted": 47.6,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 2,
+      "market_cap": 0,
+      "volume": 1830127,
+      "trading_value": 7340060501
+    },
+    {
+      "code": "340810",
+      "name": "시선AI",
+      "price": 3415,
+      "change_pct": 6.72,
+      "score": 44.9,
+      "score_detail": {
+        "alpha_score": 62.1,
+        "delta_score": 0.0,
+        "alpha_norm": 69.2,
+        "delta_norm": 0.0,
+        "alpha_weighted": 44.9,
+        "delta_weighted": 0.0,
+        "overlap_bonus": 0,
+        "source": [
+          "alpha"
+        ]
+      },
+      "rank": 3,
+      "market_cap": 0,
+      "volume": 10251488,
+      "trading_value": 35520821661,
+      "themes": [
+        {
+          "code": "234",
+          "name": "보안주(물리)"
+        },
+        {
+          "code": "106",
+          "name": "바이오인식(생체인식)"
+        },
+        {
+          "code": "566",
+          "name": "딥페이크(deepfake)"
+        },
+        {
+          "code": "99",
+          "name": "지능형로봇/인공지능(AI)"
+        }
+      ]
+    },
+    {
+      "code": "033780",
+      "name": "KT&G",
+      "price": 181700,
+      "change_pct": 0.44,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 62.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 4,
+      "market_cap": 18862359855200,
+      "volume": 271526,
+      "trading_value": 49314565450,
+      "themes": [
+        {
+          "code": "487",
+          "name": "건강기능식품"
+        },
+        {
+          "code": "567",
+          "name": "밸류업(24년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    },
+    {
+      "code": "180640",
+      "name": "한진칼",
+      "price": 215500,
+      "change_pct": 0.0,
+      "score": 35.0,
+      "score_detail": {
+        "alpha_score": 0.0,
+        "delta_score": 62.2,
+        "alpha_norm": 0.0,
+        "delta_norm": 100.0,
+        "alpha_weighted": 0.0,
+        "delta_weighted": 35.0,
+        "overlap_bonus": 0,
+        "source": [
+          "delta"
+        ]
+      },
+      "rank": 5,
+      "market_cap": 14387270262500,
+      "volume": 282706,
+      "trading_value": 60470451000,
+      "themes": [
+        {
+          "code": "111",
+          "name": "지주사"
+        },
+        {
+          "code": "166",
+          "name": "항공/저가 항공사(LCC)"
+        },
+        {
+          "code": "571",
+          "name": "밸류업(25년 기업가치 제고계획 발표)"
+        },
+        {
+          "code": "568",
+          "name": "코리아 밸류업 지수(Korea Value-up Index)"
+        }
+      ]
+    }
+  ],
+  "params": {
+    "weight_alpha": 0.65,
+    "weight_delta": 0.35,
+    "overlap_bonus": 10.0,
+    "sub_top_n": 10,
+    "alpha_slot": 3,
+    "delta_slot": 2,
+    "score_normalization": "min-max per-strategy (0~100)",
+    "alpha_strategy": "momentum",
+    "delta_strategy": "theme_policy"
+  },
+  "simulation": null
+}
