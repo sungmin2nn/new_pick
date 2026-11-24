@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-24T04:49:22.880641+09:00",
+  "generated_at": "2026-11-25T04:27:03.683249+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,7 +14,7 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 145,
+      "operational_days": 146,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 103460693,
@@ -41,9 +41,9 @@
         "portfolio_json_wins": 328
       },
       "data_health": {
-        "daily_files_count": 145,
+        "daily_files_count": 146,
         "first_date": "20260409",
-        "last_date": "20261124",
+        "last_date": "20261125",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -180,7 +180,7 @@
       "strategy_id": "frontier_gap",
       "enabled": true,
       "exists": true,
-      "operational_days": 130,
+      "operational_days": 131,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 84518783,
@@ -207,9 +207,9 @@
         "portfolio_json_wins": 272
       },
       "data_health": {
-        "daily_files_count": 130,
+        "daily_files_count": 131,
         "first_date": "20260423",
-        "last_date": "20261124",
+        "last_date": "20261125",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -303,7 +303,7 @@
       "strategy_id": "sector_rotation",
       "enabled": true,
       "exists": true,
-      "operational_days": 132,
+      "operational_days": 133,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 11076734,
@@ -330,9 +330,9 @@
         "portfolio_json_wins": 242
       },
       "data_health": {
-        "daily_files_count": 132,
+        "daily_files_count": 133,
         "first_date": "20260423",
-        "last_date": "20261124",
+        "last_date": "20261125",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -387,7 +387,7 @@
       "strategy_id": "opening_30min_volume_burst",
       "enabled": true,
       "exists": true,
-      "operational_days": 113,
+      "operational_days": 114,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 60918277,
@@ -414,9 +414,9 @@
         "portfolio_json_wins": 229
       },
       "data_health": {
-        "daily_files_count": 113,
+        "daily_files_count": 114,
         "first_date": "20260527",
-        "last_date": "20261124",
+        "last_date": "20261125",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -474,13 +474,13 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1648589,
-      "used": 2257050,
+      "current": 1699439,
+      "used": 2852150,
       "realized_pnl": -1420861,
-      "unrealized_pnl": 69450
+      "unrealized_pnl": 120300
     },
     "returns": {
-      "cumulative_pct": -45.05,
+      "cumulative_pct": -43.35,
       "simple_sum_pct": -286.56,
       "average_per_trade_pct": -0.69
     },
@@ -491,43 +491,46 @@
       "win_rate_pct": 24.9
     },
     "positions": {
-      "active_count": 4,
+      "active_count": 5,
       "active": [
         {
           "code": "257720",
           "name": "실리콘투",
           "entry_date": "2026-11-18",
-          "unrealized_pnl_pct": 0.64,
+          "unrealized_pnl_pct": 7.25,
           "selection_reason": "고점 31.5%"
         },
         {
           "code": "000250",
           "name": "삼천당제약",
           "entry_date": "2026-11-20",
-          "unrealized_pnl_pct": 3.79,
+          "unrealized_pnl_pct": 1.93,
           "selection_reason": "5일 21.4% | 고점 30.0%"
         },
         {
           "code": "031980",
           "name": "피에스케이홀딩스",
           "entry_date": "2026-11-23",
-          "unrealized_pnl_pct": 6.83,
+          "unrealized_pnl_pct": 5.56,
           "selection_reason": "5일 22.8% | 고점 40.9%"
         },
         {
           "code": "011070",
           "name": "LG이노텍",
           "entry_date": "2026-11-23",
-          "unrealized_pnl_pct": 0.77,
+          "unrealized_pnl_pct": 4.43,
           "selection_reason": "고점 31.2%"
+        },
+        {
+          "code": "028300",
+          "name": "HLB",
+          "entry_date": "2026-11-24",
+          "unrealized_pnl_pct": 1.85,
+          "selection_reason": "고점 42.1%"
         }
       ],
-      "cooldown_count": 19,
+      "cooldown_count": 15,
       "cooldown": {
-        "084370": "2026-11-23",
-        "095610": "2026-11-23",
-        "131970": "2026-11-23",
-        "028300": "2026-11-23",
         "290650": "2026-11-24",
         "353200": "2026-11-24",
         "096770": "2026-11-24",
@@ -545,7 +548,7 @@
         "181710": "2026-12-01"
       }
     },
-    "last_updated": "2026-11-24 03:40:14"
+    "last_updated": "2026-11-25 03:09:38"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -556,37 +559,44 @@
       "candidates_pattern": "data/bnf/bollinger_candidates_*.json"
     },
     "trades": {
-      "total": 208,
-      "wins": 131,
+      "total": 209,
+      "wins": 132,
       "losses": 76,
-      "win_rate_pct": 62.98,
-      "total_profit_krw": 3516981
+      "win_rate_pct": 63.16,
+      "total_profit_krw": 3538481
     },
     "positions": {
-      "active_count": 2,
+      "active_count": 3,
       "active": [
         {
           "code": "096530",
           "name": "씨젠",
           "entry_date": "2026-11-11",
-          "unrealized_pnl_pct": -3.63,
+          "unrealized_pnl_pct": -2.62,
           "selection_reason": "BB%B=-0.22, RSI=21.1, Vol=4.7x"
         },
         {
           "code": "000250",
           "name": "삼천당제약",
           "entry_date": "2026-11-20",
-          "unrealized_pnl_pct": 5.61,
+          "unrealized_pnl_pct": 3.71,
           "selection_reason": "BB%B=-0.22, RSI=33.2, Vol=14.1x"
+        },
+        {
+          "code": "012330",
+          "name": "현대모비스",
+          "entry_date": "2026-11-25",
+          "unrealized_pnl_pct": 0,
+          "selection_reason": "BB%B=-0.13, RSI=37.9, Vol=1.0x"
         }
       ]
     },
-    "last_updated": "2026-11-24 03:38:37"
+    "last_updated": "2026-11-25 03:07:06"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 149,
-    "unique_dates": 144,
+    "total_entries": 150,
+    "unique_dates": 145,
     "duplicates": {
       "20260901": 2,
       "20260929": 2,
