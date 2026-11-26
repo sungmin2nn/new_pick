@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-26T03:35:52.560941+09:00",
+  "generated_at": "2026-11-27T03:22:40.527637+09:00",
   "consumer_contract": {
     "rule_1": "이 파일의 숫자만 인용. raw daily/portfolio/trades 파일 직접 인용 금지",
     "rule_2": "단위 명시 필수. capital-basis vs stock-basis 혼동 시 환각",
@@ -14,7 +14,7 @@
       "strategy_id": "momentum",
       "enabled": true,
       "exists": true,
-      "operational_days": 147,
+      "operational_days": 148,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 103460693,
@@ -41,9 +41,9 @@
         "portfolio_json_wins": 328
       },
       "data_health": {
-        "daily_files_count": 147,
+        "daily_files_count": 148,
         "first_date": "20260409",
-        "last_date": "20261126",
+        "last_date": "20261127",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -180,7 +180,7 @@
       "strategy_id": "frontier_gap",
       "enabled": true,
       "exists": true,
-      "operational_days": 132,
+      "operational_days": 133,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 84518783,
@@ -207,9 +207,9 @@
         "portfolio_json_wins": 272
       },
       "data_health": {
-        "daily_files_count": 132,
+        "daily_files_count": 133,
         "first_date": "20260423",
-        "last_date": "20261126",
+        "last_date": "20261127",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -303,7 +303,7 @@
       "strategy_id": "sector_rotation",
       "enabled": true,
       "exists": true,
-      "operational_days": 134,
+      "operational_days": 135,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 11076734,
@@ -330,9 +330,9 @@
         "portfolio_json_wins": 242
       },
       "data_health": {
-        "daily_files_count": 134,
+        "daily_files_count": 135,
         "first_date": "20260423",
-        "last_date": "20261126",
+        "last_date": "20261127",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -387,7 +387,7 @@
       "strategy_id": "opening_30min_volume_burst",
       "enabled": true,
       "exists": true,
-      "operational_days": 115,
+      "operational_days": 116,
       "capital": {
         "initial_krw": 10000000,
         "computed_current_krw": 60918277,
@@ -414,9 +414,9 @@
         "portfolio_json_wins": 229
       },
       "data_health": {
-        "daily_files_count": 115,
+        "daily_files_count": 116,
         "first_date": "20260527",
-        "last_date": "20261126",
+        "last_date": "20261127",
         "trade_count_matches_portfolio": true,
         "capital_matches_portfolio": true
       },
@@ -474,67 +474,64 @@
     },
     "capital_krw": {
       "total": 3000000,
-      "current": 1701085,
-      "used": 2734800,
-      "realized_pnl": -1351215,
-      "unrealized_pnl": 52300
+      "current": 1732945,
+      "used": 2858600,
+      "realized_pnl": -1303805,
+      "unrealized_pnl": 36750
     },
     "returns": {
-      "cumulative_pct": -43.3,
-      "simple_sum_pct": -274.64,
-      "average_per_trade_pct": -0.66
+      "cumulative_pct": -42.24,
+      "simple_sum_pct": -266.46,
+      "average_per_trade_pct": -0.63
     },
     "trades": {
-      "total": 417,
-      "wins_computed": 104,
-      "losses_computed": 313,
-      "win_rate_pct": 24.9
+      "total": 420,
+      "wins_computed": 105,
+      "losses_computed": 315,
+      "win_rate_pct": 25.0
     },
     "positions": {
       "active_count": 5,
       "active": [
         {
-          "code": "000250",
-          "name": "삼천당제약",
-          "entry_date": "2026-11-20",
-          "unrealized_pnl_pct": 6.23,
-          "selection_reason": "5일 21.4% | 고점 30.0%"
-        },
-        {
           "code": "011070",
           "name": "LG이노텍",
           "entry_date": "2026-11-23",
-          "unrealized_pnl_pct": 0.19,
+          "unrealized_pnl_pct": -1.16,
           "selection_reason": "고점 31.2%"
         },
         {
           "code": "028300",
           "name": "HLB",
           "entry_date": "2026-11-24",
-          "unrealized_pnl_pct": 2.77,
+          "unrealized_pnl_pct": 8.13,
           "selection_reason": "고점 42.1%"
         },
         {
-          "code": "131290",
-          "name": "티에스이",
+          "code": "062040",
+          "name": "산일전기",
           "entry_date": "2026-11-26",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "고점 43.3%"
+          "unrealized_pnl_pct": -2.28,
+          "selection_reason": "5일 19.5% | 10일 29.2% | 고점 43.1%"
         },
         {
-          "code": "000150",
-          "name": "두산",
+          "code": "082740",
+          "name": "한화엔진",
           "entry_date": "2026-11-26",
-          "unrealized_pnl_pct": 0,
-          "selection_reason": "고점 43.2%"
+          "unrealized_pnl_pct": 0.68,
+          "selection_reason": "10일 23.4% | 고점 35.9%"
+        },
+        {
+          "code": "034020",
+          "name": "두산에너빌리티",
+          "entry_date": "2026-11-26",
+          "unrealized_pnl_pct": 0.62,
+          "selection_reason": "고점 35.9%"
         }
       ],
-      "cooldown_count": 13,
+      "cooldown_count": 11,
       "cooldown": {
-        "000150": "2026-11-25",
-        "009830": "2026-11-25",
-        "034020": "2026-11-25",
-        "082740": "2026-11-25",
+        "000150": "2026-12-03",
         "010950": "2026-11-27",
         "067310": "2026-11-27",
         "272210": "2026-11-27",
@@ -543,10 +540,11 @@
         "047040": "2026-11-30",
         "181710": "2026-12-01",
         "031980": "2026-12-03",
-        "353200": "2026-12-03"
+        "353200": "2026-12-03",
+        "131290": "2026-12-03"
       }
     },
-    "last_updated": "2026-11-26 02:32:16"
+    "last_updated": "2026-11-27 02:14:29"
   },
   "bollinger": {
     "system_name": "Bollinger 스윙",
@@ -557,44 +555,37 @@
       "candidates_pattern": "data/bnf/bollinger_candidates_*.json"
     },
     "trades": {
-      "total": 212,
-      "wins": 135,
+      "total": 215,
+      "wins": 138,
       "losses": 76,
-      "win_rate_pct": 63.68,
-      "total_profit_krw": 3648681
+      "win_rate_pct": 64.19,
+      "total_profit_krw": 3709541
     },
     "positions": {
-      "active_count": 3,
+      "active_count": 2,
       "active": [
         {
-          "code": "096530",
-          "name": "씨젠",
-          "entry_date": "2026-11-11",
-          "unrealized_pnl_pct": -2.42,
-          "selection_reason": "BB%B=-0.22, RSI=21.1, Vol=4.7x"
-        },
-        {
-          "code": "024110",
-          "name": "기업은행",
-          "entry_date": "2026-11-25",
-          "unrealized_pnl_pct": 2.35,
-          "selection_reason": "BB%B=-0.21, RSI=30.1, Vol=1.1x"
-        },
-        {
-          "code": "064400",
-          "name": "LG씨엔에스",
+          "code": "003690",
+          "name": "코리안리",
           "entry_date": "2026-11-26",
+          "unrealized_pnl_pct": -0.68,
+          "selection_reason": "BB%B=-0.04, RSI=20.0, Vol=2.7x"
+        },
+        {
+          "code": "006360",
+          "name": "GS건설",
+          "entry_date": "2026-11-27",
           "unrealized_pnl_pct": 0,
-          "selection_reason": "BB%B=-0.25, RSI=32.5, Vol=2.2x"
+          "selection_reason": "BB%B=0.04, RSI=35.6, Vol=1.2x"
         }
       ]
     },
-    "last_updated": "2026-11-26 02:30:36"
+    "last_updated": "2026-11-27 02:12:51"
   },
   "duplicate_runs": {
     "checked": true,
-    "total_entries": 151,
-    "unique_dates": 146,
+    "total_entries": 152,
+    "unique_dates": 147,
     "duplicates": {
       "20260901": 2,
       "20260929": 2,
